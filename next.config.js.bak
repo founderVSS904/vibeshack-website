@@ -1,0 +1,44 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  trailingSlash: true,
+  output: 'standalone',
+  images: {
+    // Enable image optimization - removed unoptimized: true
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Cache optimized images for a long time
+    minimumCacheTTL: 60 * 60 * 24 * 365,
+  },
+  // Enable compression
+  compress: true,
+  // Generate ETags for caching
+  generateEtags: true,
+  // Headers for optimal caching and security
+  headers: async () => {
+    return [
+      // HTML pages: no caching (always fresh)
+      {
+        source: '/:path((?!_next|public).*\\.?)*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate, max-age=0',
+          },
+        ],
+      },
+      // Static assets in /public: long cache
+      {
+        source: '/public/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ]
+  },
+}
+
+module.exports = nextConfig

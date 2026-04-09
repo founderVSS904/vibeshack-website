@@ -1,0 +1,32 @@
+{
+  "name": "VibeShack Studios",
+  "short_name": "VibeShack",
+  "description": "Professional production studios in San Francisco. Podcast, green screen, photography, video production.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#FF0000",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.jpg",
+      "type": "image/jpeg",
+      "sizes": "1200x630"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots_dark": [
+    {
+      "src": "/og-image.jpg",
+      "type": "image/jpeg",
+      "sizes": "1200x630"
+    }
+  ]
+}

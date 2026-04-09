@@ -1,0 +1,360 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms & Services | VibeShack Studios',
+  description: 'VibeShack Studios Terms & Services. Booking policies, cancellation, liability, and house rules for studio rentals in San Francisco.',
+  canonical: 'https://www.vibeshackstudios.com/terms',
+};
+
+export default function TermsPage() {
+  return (
+    <main className="min-h-screen bg-black text-white py-20">
+      <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="mb-12">
+          <h1 className="text-white font-black leading-tight mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+            Terms & Services
+          </h1>
+          <p className="text-gray-500 text-sm">Effective Date: April 4, 2026</p>
+        </div>
+
+        <div className="prose prose-invert max-w-none prose-h2:text-white prose-h2:font-black prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-gray-200 prose-h3:font-bold prose-h3:mt-8 prose-h3:mb-3 prose-p:text-gray-400 prose-p:leading-relaxed prose-p:mb-4 prose-ul:text-gray-400 prose-ol:text-gray-400 prose-li:mb-2 prose-strong:text-white prose-a:text-brand-red hover:prose-a:text-white">
+          <p>These Terms & Services ("Terms") govern all bookings, rentals, and services provided by VibeShack Studios ("Studio," "we," "us," or "our"). By booking a session or entering the Studio, you agree to be bound by these Terms.</p>
+
+          <h2>1. Studio Rental Agreement</h2>
+
+          <h3>1.1 Booking & Confirmation</h3>
+          <ul>
+            <li>Bookings are confirmed upon payment via the Studio's booking system.</li>
+            <li>Confirmation emails will be sent to the email address provided at booking.</li>
+            <li>Bookings are on a first-come, first-served basis.</li>
+            <li>Availability shown in the booking system is subject to change without notice.</li>
+          </ul>
+
+          <h3>1.2 Studio Access & Hours</h3>
+          <ul>
+            <li>The Studio is open 24/7, 365 days per year.</li>
+            <li>Sessions must begin and end within the booked time slots.</li>
+            <li>Extended sessions beyond the booked time incur overage charges at the hourly rate.</li>
+            <li>The Studio reserves the right to require early checkout if the next session is booked.</li>
+          </ul>
+
+          <h3>1.3 Studio Capacity</h3>
+          <ul>
+            <li>Each studio has a maximum occupancy limit specified in the booking system.</li>
+            <li>Exceeding capacity is prohibited and may result in immediate session termination without refund.</li>
+          </ul>
+
+          <h2>2. Pricing & Payment</h2>
+
+          <h3>2.1 Rates & Add-Ons</h3>
+          <ul>
+            <li>Hourly rates are listed in the booking system and on the website.</li>
+            <li>Rates include basic setup and equipment operation.</li>
+            <li>Additional add-ons (cameraman, teleprompter, editing, etc.) are optional and charged per item/hour.</li>
+            <li>Prices do not include applicable sales tax.</li>
+          </ul>
+
+          <h3>2.2 Payment Terms</h3>
+          <ul>
+            <li>Full payment is required at the time of booking via Stripe.</li>
+            <li>Payment is non-refundable except as stated in Section 3 (Cancellation Policy).</li>
+            <li>Invoices are provided automatically via email.</li>
+          </ul>
+
+          <h3>2.3 Recurring Discounts</h3>
+          <ul>
+            <li>Weekly bookings receive 10% off base rate.</li>
+            <li>Bi-weekly bookings receive 7% off base rate.</li>
+            <li>Monthly bookings (4+ sessions) receive 5% off base rate.</li>
+            <li>Discounts apply to studio rental only, not add-ons.</li>
+          </ul>
+
+          <h3>2.4 Late Fees</h3>
+          <ul>
+            <li>If a session extends beyond the booked end time without prior authorization, overage charges will be applied at 1.5x the standard hourly rate.</li>
+            <li>Overage charges may be invoiced after the session.</li>
+          </ul>
+
+          <h2>3. Cancellation & Refund Policy</h2>
+
+          <h3>3.1 Cancellation Window</h3>
+          <ul>
+            <li>Cancellations made 48+ hours before the session: Full refund.</li>
+            <li>Cancellations made 24-48 hours before the session: 50% refund.</li>
+            <li>Cancellations made less than 24 hours before the session: No refund.</li>
+            <li>No-shows (no cancellation and no arrival): No refund.</li>
+          </ul>
+
+          <h3>3.2 Studio-Initiated Cancellations</h3>
+          <p>If the Studio must cancel due to emergency, equipment failure, or other circumstances, you will receive:</p>
+          <ul>
+            <li>Full refund, OR</li>
+            <li>Rescheduling to an alternative available slot</li>
+            <li>Your choice of the above.</li>
+          </ul>
+
+          <h3>3.3 Rescheduling</h3>
+          <ul>
+            <li>Rescheduling requests must be made at least 48 hours before the session.</li>
+            <li>Rescheduling is subject to availability.</li>
+            <li>Rescheduling incurs a $0 fee if you provide 48+ hours' notice.</li>
+            <li>Rescheduling less than 48 hours in advance incurs a $25 rescheduling fee.</li>
+          </ul>
+
+          <h2>4. House Rules & Conduct</h2>
+
+          <h3>4.1 Studio Use</h3>
+          <ul>
+            <li>The Studio is for professional use only. You may not use the Studio for illegal activities, harassment, or harm to any person.</li>
+            <li>Smoking, vaping, and open flames are strictly prohibited inside the Studio.</li>
+            <li>Excessive noise outside of your booked session time is prohibited.</li>
+          </ul>
+
+          <h3>4.2 Guest Limit</h3>
+          <ul>
+            <li>Only registered guests and production crew may be present during your session.</li>
+            <li>All guests must be listed or approved in advance for sessions requiring entry authorization.</li>
+            <li>Unauthorized persons on the premises may be asked to leave.</li>
+          </ul>
+
+          <h3>4.3 Equipment Handling</h3>
+          <ul>
+            <li>All equipment provided by the Studio is for use during your booked session only.</li>
+            <li>You are responsible for proper handling of all equipment.</li>
+            <li>Misuse, intentional damage, or theft will result in repair/replacement charges and potential legal action.</li>
+            <li>Do not remove any equipment from the Studio without written authorization.</li>
+          </ul>
+
+          <h3>4.4 Parking</h3>
+          <ul>
+            <li>Street parking is available on Battery Street and nearby areas.</li>
+            <li>The Studio does not provide reserved parking.</li>
+            <li>Parking is subject to San Francisco municipal regulations.</li>
+          </ul>
+
+          <h3>4.5 Cleanliness & Conduct</h3>
+          <ul>
+            <li>You are responsible for leaving the Studio in the condition you found it.</li>
+            <li>Excessive mess, spills, or damage require a cleaning fee of $150-$500, depending on severity.</li>
+            <li>Respect of Studio equipment and facilities is mandatory.</li>
+          </ul>
+
+          <h2>5. Content, Filming & Intellectual Property</h2>
+
+          <h3>5.1 Your Content</h3>
+          <ul>
+            <li>All content created during your session is your property.</li>
+            <li>You retain all copyrights to your footage, audio, and production.</li>
+            <li>The Studio makes no claims to your content.</li>
+          </ul>
+
+          <h3>5.2 Studio Footage & Marketing</h3>
+          <ul>
+            <li>The Studio may photograph or record your session for promotional purposes, UNLESS you explicitly opt-out in writing at booking.</li>
+            <li>Opting out does NOT change your session fee.</li>
+            <li>Studio promotional use is limited to: website, social media, marketing materials, and Studio showreel.</li>
+            <li>We will not use your content for commercial purposes beyond Studio promotion without written consent.</li>
+          </ul>
+
+          <h3>5.3 Copyrighted Material</h3>
+          <ul>
+            <li>You may not produce, film, or broadcast copyrighted material (movies, music videos, etc.) without proper licensing.</li>
+            <li>You are solely responsible for obtaining licenses, permissions, and clearances for any third-party intellectual property used during your session.</li>
+            <li>The Studio is not liable for copyright infringement claims arising from your use of copyrighted material.</li>
+          </ul>
+
+          <h3>5.4 Third-Party Appearances</h3>
+          <ul>
+            <li>If your session involves other individuals (actors, guests, interview subjects), you are responsible for obtaining their consent to appear on camera and be recorded.</li>
+            <li>The Studio is not liable for third-party appearances or rights.</li>
+          </ul>
+
+          <h2>6. Liability & Indemnification</h2>
+
+          <h3>6.1 Assumption of Risk</h3>
+          <p>You assume all risks associated with your use of the Studio, including but not limited to:</p>
+          <ul>
+            <li>Equipment malfunction or failure.</li>
+            <li>Injuries or accidents while in the Studio.</li>
+            <li>Loss, theft, or damage to your personal property or equipment.</li>
+            <li>Health hazards, allergens, or environmental conditions.</li>
+          </ul>
+
+          <h3>6.2 Studio Limitation of Liability</h3>
+          <ul>
+            <li>The Studio is provided "as-is" without warranties of merchantability, fitness, or suitability for a particular purpose.</li>
+            <li>The Studio will not be liable for:
+              <ul>
+                <li>Loss of footage, audio, or data (except due to direct Studio negligence).</li>
+                <li>Technical failures, delays, or interruptions.</li>
+                <li>Inconvenience, missed sessions, or lost business opportunities.</li>
+                <li>Indirect, incidental, or consequential damages.</li>
+              </ul>
+            </li>
+            <li><strong>Maximum liability cap: Refund of the session fee only.</strong></li>
+          </ul>
+
+          <h3>6.3 Indemnification</h3>
+          <p>You agree to indemnify, defend, and hold harmless the Studio, its owners, employees, and agents from any claims, damages, losses, or expenses (including legal fees) arising from:</p>
+          <ul>
+            <li>Your use of the Studio.</li>
+            <li>Your breach of these Terms.</li>
+            <li>Your content, filming, or intellectual property claims.</li>
+            <li>Injury to third parties or damage to third-party property during your session.</li>
+            <li>Your violation of applicable laws.</li>
+          </ul>
+
+          <h3>6.4 No Fitness Warranty</h3>
+          <ul>
+            <li>The Studio does not warrant that equipment will function without error or that internet/utilities will be uninterrupted.</li>
+            <li>The Studio is not responsible for power outages, connectivity issues, or other force majeure events.</li>
+          </ul>
+
+          <h2>7. Damage & Deposits</h2>
+
+          <h3>7.1 Damage Assessment</h3>
+          <ul>
+            <li>If damage occurs during your session, the Studio will assess the damage and provide a repair/replacement estimate.</li>
+            <li>Damage costs will be invoiced to the email on file.</li>
+            <li>Invoices must be paid within 14 days of issuance.</li>
+          </ul>
+
+          <h3>7.2 Examples of Damage Charges</h3>
+          <ul>
+            <li>Minor scuffs/marks: $25–$75 (cleaning/touch-up).</li>
+            <li>Equipment malfunction due to misuse: $150–$5,000+ (repair/replacement).</li>
+            <li>Structural damage (walls, floors, fixtures): $500–$5,000+ (repair costs).</li>
+            <li>Theft or removal of equipment: Full replacement cost + $500 penalty.</li>
+          </ul>
+
+          <h3>7.3 No Damage Deposit Requirement</h3>
+          <ul>
+            <li>The Studio does not require a pre-session damage deposit.</li>
+            <li>Damage charges are invoiced post-session.</li>
+          </ul>
+
+          <h2>8. Health, Safety & COVID-19</h2>
+
+          <h3>8.1 Health Responsibility</h3>
+          <ul>
+            <li>If you or anyone in your group is sick, experiencing symptoms, or exposed to contagious illness, you must reschedule your session.</li>
+            <li>The Studio reserves the right to deny entry or cancel a session if any person appears ill.</li>
+          </ul>
+
+          <h3>8.2 Sanitation</h3>
+          <ul>
+            <li>The Studio is sanitized between sessions.</li>
+            <li>You are responsible for sanitizing any personal equipment you bring.</li>
+            <li>The Studio is not liable for illness or disease transmission.</li>
+          </ul>
+
+          <h3>8.3 Vaccination & Testing</h3>
+          <ul>
+            <li>The Studio has no vaccination or testing requirements.</li>
+            <li>Compliance with local health orders is your responsibility.</li>
+          </ul>
+
+          <h2>9. Guest Policies</h2>
+
+          <h3>9.1 Studio Operator</h3>
+          <ul>
+            <li>For Podcast and Full-Service sessions, a Studio operator will be present and available.</li>
+            <li>The operator provides basic guidance, camera/audio operation, and equipment setup.</li>
+            <li>The operator does NOT provide creative direction, editing, or post-production work.</li>
+          </ul>
+
+          <h3>9.2 Cameraman/Crew Add-Ons</h3>
+          <ul>
+            <li>Optional cameraman and crew are available via add-ons.</li>
+            <li>Cameraman provides basic camera operation and frame adjustments per your direction.</li>
+            <li>Crew availability may be limited during peak hours.</li>
+          </ul>
+
+          <h3>9.3 Teleprompter & Other Add-Ons</h3>
+          <ul>
+            <li>Add-on equipment (teleprompter, lighting, etc.) is provided on a first-come, first-served basis.</li>
+            <li>If equipment is unavailable, the Studio will notify you in advance.</li>
+            <li>Add-on fees are non-refundable if the equipment is ready for use at session start.</li>
+          </ul>
+
+          <h2>10. Data, Privacy & Communications</h2>
+
+          <h3>10.1 Booking Information</h3>
+          <ul>
+            <li>We collect your name, email, phone number, and payment information.</li>
+            <li>This information is used to manage bookings, send confirmations, and process payments.</li>
+            <li>We will not share your information with third parties without consent.</li>
+          </ul>
+
+          <h3>10.2 Email Communications</h3>
+          <ul>
+            <li>We will send confirmation emails, receipts, and booking reminders.</li>
+            <li>You can opt out of non-essential communications in your account settings.</li>
+            <li>Essential booking communications (confirmations, reminders) cannot be opted out of.</li>
+          </ul>
+
+          <h3>10.3 Privacy Policy</h3>
+          <ul>
+            <li>Our full Privacy Policy is available at vibeshackstudios.com/privacy.</li>
+            <li>By booking, you agree to our Privacy Policy.</li>
+          </ul>
+
+          <h2>11. Modifications to Terms</h2>
+
+          <h3>11.1 Right to Modify</h3>
+          <ul>
+            <li>The Studio reserves the right to modify these Terms at any time.</li>
+            <li>Changes will be posted on the website with an updated "Effective Date."</li>
+            <li>Continued use of the Studio after changes constitutes acceptance of new Terms.</li>
+            <li>Material changes affecting future bookings will be communicated via email.</li>
+          </ul>
+
+          <h2>12. Dispute Resolution</h2>
+
+          <h3>12.1 Informal Resolution</h3>
+          <ul>
+            <li>If a dispute arises, please contact us at founder@vibeshackstudios.com with a detailed description.</li>
+            <li>We will attempt to resolve disputes informally within 14 days.</li>
+          </ul>
+
+          <h3>12.2 Binding Arbitration</h3>
+          <ul>
+            <li>Any unresolved dispute will be resolved by binding arbitration, not litigation.</li>
+            <li>Arbitration will occur in San Francisco, California.</li>
+            <li>Each party bears its own arbitration costs.</li>
+            <li>The arbitrator's decision is final and binding.</li>
+          </ul>
+
+          <h3>12.3 Limitations Period</h3>
+          <ul>
+            <li>All claims must be brought within 1 year of the incident date.</li>
+            <li>Claims brought after 1 year are barred.</li>
+          </ul>
+
+          <h2>13. Governing Law</h2>
+
+          <p>These Terms are governed by and construed in accordance with the laws of the State of California, without regard to conflict of laws. The exclusive venue for any dispute is San Francisco, California.</p>
+
+          <h2>14. Severability</h2>
+
+          <p>If any provision of these Terms is found to be invalid or unenforceable, that provision will be modified to the minimum extent necessary to make it valid, or if not possible, severed. All other provisions remain in full effect.</p>
+
+          <h2>15. Entire Agreement</h2>
+
+          <p>These Terms, together with our Privacy Policy, constitute the entire agreement between you and the Studio. These Terms supersede all prior agreements, understandings, and communications. If any term is in conflict with the website or booking system, these Terms control.</p>
+
+          <h2>16. Contact Us</h2>
+
+          <p><strong>VibeShack Studios</strong><br />
+          950 Battery Street<br />
+          San Francisco, CA 94111<br />
+          Email: <a href="mailto:founder@vibeshackstudios.com">founder@vibeshackstudios.com</a></p>
+
+          <p style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', fontSize: '0.875rem', color: '#999' }}>
+            <strong>Last Updated: April 4, 2026</strong>
+          </p>
+        </div>
+      </div>
+    </main>
+  );
+}

@@ -1,0 +1,155 @@
+{
+  "metadata": {
+    "title": "San Francisco Production Studio | VibeShack Studios",
+    "description": "SF's most equipped production studio. Podcast ($300/hr, cameraman included), green screen, photography. Multiple studios, open 24/7. Northern Waterfront."
+  },
+  "sections": [
+    {
+      "id": "hero-main",
+      "type": "hero",
+      "title": "Main Hero",
+      "visible": true,
+      "order": 0,
+      "content": {
+        "location": "San Francisco · Northern Waterfront · Open 24/7",
+        "headline": "More Studios.",
+        "headlineRed": "One Address.",
+        "ctaText": "Book a Session",
+        "ctaUrl": "/book",
+        "backgroundVideo": "/hero-video.mp4"
+      }
+    },
+    {
+      "id": "studio-grid",
+      "type": "studio-grid",
+      "title": "Studio Grid",
+      "visible": true,
+      "order": 1,
+      "content": {
+        "studios": [
+          {
+            "name": "The Executive",
+            "image": "/studio-images/the-executive-hero.jpg",
+            "url": "/sunset-room"
+          },
+          {
+            "name": "Sunset",
+            "image": "/studio-images/sunset-red.jpg",
+            "url": "/sunset-studio"
+          },
+          {
+            "name": "Encore",
+            "image": "/studio-images/encore-wide.jpg",
+            "url": "/modern-podcast"
+          },
+          {
+            "name": "The Wing",
+            "image": "/studio-images/the-wing-1.jpg",
+            "url": "/cozy-podcast"
+          },
+          {
+            "name": "Green Screen",
+            "image": "/studio-images/greenscreen-wide.jpg",
+            "url": "/green-screen-studio-sf"
+          },
+          {
+            "name": "Photography",
+            "image": "/studio-images/photography-hero.jpg",
+            "url": "/photography-studio-san-francisco"
+          },
+          {
+            "name": "Canvas",
+            "image": "/studio-images/podcast-cyc-duo.jpg",
+            "url": "/white-backdrop-studio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "differentiators",
+      "type": "differentiators",
+      "title": "Differentiators",
+      "visible": true,
+      "order": 2,
+      "content": {
+        "items": [
+          {
+            "number": "24/7",
+            "label": "Always Open",
+            "description": "Every hour. Every day. No exceptions."
+          },
+          {
+            "number": "$100",
+            "label": "Rentals from",
+            "description": "Bring your crew. We provide everything else."
+          },
+          {
+            "number": "$300",
+            "label": "Podcast studios",
+            "description": "Cameraman included on every booking."
+          },
+          {
+            "number": "6hr",
+            "label": "Footage turnaround",
+            "description": "Your footage delivered same day. 6–12hr turnaround."
+          }
+        ]
+      }
+    },
+    {
+      "id": "testimonial-main",
+      "type": "testimonial",
+      "title": "Main Testimonial",
+      "visible": true,
+      "order": 3,
+      "content": {
+        "quote": "Fantastic space, wonderful hosts. So much room to shoot.",
+        "author": "Daryl D.",
+        "company": "Dollars & Donuts Productions",
+        "source": "Peerspace"
+      }
+    },
+    {
+      "id": "podcast-showcase",
+      "type": "podcast-showcase",
+      "title": "Podcast Showcase",
+      "visible": true,
+      "order": 4,
+      "content": {
+        "sectionLabel": "Podcast Production",
+        "headline": "Built for the",
+        "headlineRed": "conversation.",
+        "linkText": "View podcast studios →",
+        "linkUrl": "/podcast-studio-san-francisco",
+        "mainImage": "/studio-images/podcast-cyc-duo.jpg",
+        "mainImageAlt": "Two-person podcast session on white cyc wall — VibeShack Studios SF",
+        "sideImages": [
+          {
+            "src": "/studio-images/podcast-cyc-solo-1.jpg",
+            "alt": "Solo podcast host — white cyc wall — VibeShack Studios SF"
+          },
+          {
+            "src": "/studio-images/podcast-cyc-solo-2.jpg",
+            "alt": "Podcast guest — studio session — VibeShack Studios SF"
+          }
+        ],
+        "features": [
+          {
+            "label": "Clean white cyc backdrop",
+            "description": "Minimal. Timeless. Versatile."
+          },
+          {
+            "label": "Professional mics & cameras",
+            "description": "Already set up. Walk in and record."
+          },
+          {
+            "label": "From $100/hr",
+            "description": "Cameraman included on podcast packages."
+          }
+        ]
+      }
+    }
+  ],
+  "lastUpdated": "2026-03-28T19:49:00Z",
+  "version": 1
+}
