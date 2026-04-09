@@ -31,7 +31,7 @@ export default function HorizonPage() {
           fill className="object-cover opacity-80" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#e11d48'}}>Creative Series</p>
+          <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#99f6e4'}}>Creative Series</p>
           <h1 data-reveal="up" className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
             Horizon.
           </h1>
