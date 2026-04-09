@@ -74,8 +74,8 @@ export default function AboutPage() {
                 { src: '/studio-images/drive-photo-hero.jpg', alt: 'Photography Studio' },
                 { src: '/studio-images/podcast-cyc-duo.jpg', alt: 'Canvas — VibeShack Studios' },
               ].map(({ src, alt }) => (
-                <div key={src} className="relative overflow-hidden rounded-xl aspect-square md:aspect-video">
-                  <Image src={src} alt={alt} fill className="object-cover" />
+                <div key={src} className="overflow-hidden rounded-xl">
+                  <Image src={src} alt={alt} width={400} height={180} className="w-full object-cover" style={{height: '180px'}} />
                 </div>
               ))}
             </div>
@@ -153,11 +153,11 @@ export default function AboutPage() {
             <div className="col-span-2 row-span-2 overflow-hidden rounded-xl">
               <Image src="/studio-images/1-23.jpg" alt="VibeShack Podcast Studio" width={800} height={480} className="w-full object-cover" style={{ height: '480px' }} />
             </div>
-            <div className="relative overflow-hidden rounded-xl aspect-square md:h-[234px] md:aspect-auto">
-              <Image src="/studio-images/1-11.jpg" alt="VibeShack Green Screen Studio" fill className="object-cover" />
+            <div className="overflow-hidden rounded-xl">
+              <Image src="/studio-images/1-11.jpg" alt="VibeShack Green Screen Studio" width={400} height={234} className="w-full object-cover" style={{ height: '234px' }} />
             </div>
-            <div className="relative overflow-hidden rounded-xl aspect-square md:h-[234px] md:aspect-auto">
-              <Image src="/studio-images/1-9.jpg" alt="VibeShack Photography Studio" fill className="object-cover" />
+            <div className="overflow-hidden rounded-xl">
+              <Image src="/studio-images/1-9.jpg" alt="VibeShack Photography Studio" width={400} height={234} className="w-full object-cover" style={{ height: '234px' }} />
             </div>
           </div>
         </div>

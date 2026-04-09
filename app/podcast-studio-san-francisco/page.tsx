@@ -58,7 +58,7 @@ const studios = [
     price: '$300',
   },
   {
-    name: 'Canvas Rental',
+    name: 'Canvas',
     href: '/white-backdrop-studio',
     bookHref: '/book?studio=canvas-rental',
     img: '/studio-images/podcast-cyc-duo.jpg',
@@ -78,8 +78,8 @@ export default function PodcastStudiosPage() {
         <Image src="/studio-images/the-executive-hero.jpg"
           alt="VibeShack Podcast Studios San Francisco"
           fill
-          className="object-cover object-bottom md:object-center"
-          style={{opacity: 0.75}}
+          className="object-cover"
+          style={{opacity: 0.75, objectPosition: 'center 40%'}}
           priority />
         <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, transparent 70%)'}} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
@@ -178,7 +178,7 @@ export default function PodcastStudiosPage() {
                 '/studio-images/sunset-blue.jpg',
                 '/studio-images/the-wing-2.jpg',
               ].map((src, i) => (
-                <div key={i} className="overflow-hidden rounded-xl relative aspect-square md:aspect-video">
+                <div key={i} className="overflow-hidden rounded-xl relative" style={{height: '180px'}}>
                   <Image src={src} alt="VibeShack Podcast Studios" fill className="object-cover" />
                 </div>
               ))}

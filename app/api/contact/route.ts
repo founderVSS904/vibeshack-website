@@ -10,7 +10,9 @@ export async function POST(req: NextRequest) {
     }
 
     const nodemailer = await import('nodemailer')
-    const gmailUser = process.env.GMAIL_USER || 'founder@vibeshackstudios.com'
+    // ncogrid@gmail.com is the operational SMTP sender for Vercel deployments.
+    // Submissions are forwarded to founder@vibeshackstudios.com for Gill/Tay visibility.
+    const gmailUser = process.env.GMAIL_USER || 'ncogrid@gmail.com'
     const gmailPass = process.env.GMAIL_APP_PASSWORD || ''
 
     const transporter = nodemailer.default.createTransport({

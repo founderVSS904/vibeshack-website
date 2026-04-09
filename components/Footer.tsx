@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-16">
 
         {/* Top row */}
-        <div className="flex flex-col lg:flex-row items-start justify-between gap-10 lg:gap-16 mb-16">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-16 mb-16">
           {/* Brand */}
           <div className="max-w-xs">
             <div className="mb-8">
@@ -31,7 +31,7 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-12">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-20">
             {/* Podcast Studios */}
             <div>
               <p className="text-gray-400 text-xs tracking-[0.2em] uppercase mb-5 font-bold">Podcast Studios</p>
@@ -53,7 +53,7 @@ export default function Footer() {
             </div>
 
             {/* Rental Studios */}
-            <div>
+            <div className="border-l border-white/20 pl-8">
               <p className="text-gray-400 text-xs tracking-[0.2em] uppercase mb-5 font-bold">Rental Studios</p>
               <ul className="space-y-3">
                 {[
@@ -111,12 +111,6 @@ export default function Footer() {
           <p className="text-white text-xs tracking-[0.15em] uppercase font-bold mb-6">The Dream Factory</p>
           <p className="text-gray-700 text-xs mt-2">© 2026 VibeShack Studios · San Francisco</p>
 
-        </div>
-        {/* SEO keyword block */}
-        <div className="border-t border-white/5 pt-10 mt-4">
-          <p className="text-gray-700 text-xs leading-relaxed text-center max-w-4xl mx-auto">
-            VibeShack Studios — San Francisco Podcast Studio · Green Screen Studio San Francisco · Photography Studio SF · Video Production Studio San Francisco · Studio Rental San Francisco · Content Creator Studio SF Bay Area · Podcast Recording Studio San Francisco · Production Studio Northern Waterfront · Green Screen Rental SF · Photo Studio Rental San Francisco · YouTube Studio San Francisco · TikTok Studio SF · Broadcast Studio San Francisco · 4K Video Studio SF · Professional Studio Rental Bay Area · VibeShack Studios 950 Battery St San Francisco CA 94111
-          </p>
         </div>
       </div>
     </footer>

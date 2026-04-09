@@ -34,8 +34,9 @@ export default function PhotographyStudioPage() {
           <Image
             src="/studio-images/photography-hero.jpg"
             fill
-            className="object-cover object-bottom md:object-center"
+            className="object-cover"
             alt="Photography studio with professional lighting and white backdrop — VibeShack Studios San Francisco"
+            style={{objectPosition: 'center right'}}
             priority
           />
           {/* Heavy bottom + left gradient so white text reads on light studio */}
@@ -193,7 +194,7 @@ export default function PhotographyStudioPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <p className="text-gray-600 text-xs uppercase tracking-widest mb-6">Also in the Creative Series</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <a href="/white-backdrop-studio" className="relative overflow-hidden rounded-2xl group block aspect-square md:aspect-video">
+            <a href="/white-backdrop-studio" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
               <Image src="/studio-images/drive-cyc-wall.jpg" alt="Canvas — seamless white cyc wall, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
@@ -201,7 +202,7 @@ export default function PhotographyStudioPage() {
                 <p className="text-gray-400 text-xs">$100/hr · White cyc wall</p>
               </div>
             </a>
-            <a href="/green-screen-studio-sf" className="relative overflow-hidden rounded-2xl group block aspect-square md:aspect-video">
+            <a href="/green-screen-studio-sf" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
               <Image src="/studio-images/greenscreen-wide.jpg" alt="Green Screen Studio — VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">

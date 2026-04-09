@@ -143,13 +143,12 @@ export default function PricingPage() {
               { duration: '4 Hours', price: '$450', note: 'Green Screen or Photography' },
               { duration: 'Full Day', price: 'Contact us', note: 'Best rate, any studio' },
             ].map(({ duration, price, note }) => (
-              <div key={duration} className="flex items-center justify-between py-6 gap-4">
+              <div key={duration} className="flex items-center justify-between py-6">
                 <div>
                   <span className="text-white font-black text-xl" style={{ letterSpacing: '-0.02em' }}>{duration}</span>
-                  <span className="text-gray-500 text-sm ml-4 hidden sm:inline">{note}</span>
-                  <span className="text-gray-500 text-xs block sm:hidden mt-0.5">{note}</span>
+                  <span className="text-gray-500 text-sm ml-4">{note}</span>
                 </div>
-                <div className="flex items-center gap-4 sm:gap-8 flex-shrink-0">
+                <div className="flex items-center gap-8">
                   <span className="text-brand-red font-black text-2xl" style={{ letterSpacing: '-0.03em' }}>{price}</span>
                   <a
                     href="/book"

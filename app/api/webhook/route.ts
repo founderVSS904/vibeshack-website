@@ -70,7 +70,7 @@ async function sendConfirmationEmail(
     const transporter = nodemailer.default.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.GMAIL_USER || 'founder@vibeshackstudios.com',
+        user: process.env.GMAIL_USER || 'ncogrid@gmail.com',
         pass: process.env.GMAIL_APP_PASSWORD || '',
       },
     })

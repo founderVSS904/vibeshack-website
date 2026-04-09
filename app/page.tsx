@@ -21,11 +21,9 @@ export default function HomePage() {
           HERO — Full viewport, cinematic, left-anchored
           Inspired by: Folioblox hero + SYNTH world-building
       ═══════════════════════════════════════════ */}
-      <section className="relative min-h-[70vh] md:min-h-screen flex items-start md:items-center justify-start bg-black overflow-hidden noise-bg pt-20 md:pt-0">
+      <section className="relative min-h-screen flex items-center justify-start bg-black overflow-hidden noise-bg">
         {/* WebGL Shader Background */}
-        <div className="absolute inset-0 z-0">
-          <WebGLShader />
-        </div>
+        <WebGLShader />
         {/* Left gradient — keeps text readable */}
         <div className="absolute inset-0 z-[1]" style={{background: 'linear-gradient(105deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.05) 80%, transparent 100%)'}} />
         
@@ -41,7 +39,7 @@ export default function HomePage() {
           {/* Main headline */}
           <div data-reveal="up" data-delay="200">
             <h1 className="mb-12 max-w-4xl">
-              <span className="block text-white font-black leading-none" style={{fontSize: 'clamp(2.5rem, 10vw, 8.75rem)', letterSpacing: '-0.05em', lineHeight: 0.9}}>
+              <span className="block text-white font-black leading-none" style={{fontSize: 'clamp(52px, 10vw, 140px)', letterSpacing: '-0.05em', lineHeight: 0.9}}>
                 More Studios.<br/><span className="text-brand-red">One Address.</span>
               </span>
             </h1>
@@ -77,7 +75,7 @@ export default function HomePage() {
               { src: '/studio-images/drive-cyc-wall.jpg',     label: 'Canvas Rental',  href: '/white-backdrop-studio', alt: 'Canvas Rental — White cyc wall studio for photography and content creation — VibeShack Studios SF' },
             ].map(({ src, label, href, alt }, idx) => (
               <div key={label} className="studio-grid-card card-lift">
-                <a href={href} className="relative overflow-hidden rounded-xl group block aspect-square md:aspect-video">
+                <a href={href} className="relative overflow-hidden rounded-xl group block" style={{height: '160px'}}>
                   <Image src={src} alt={alt} fill className="object-cover group-hover:scale-[1.07] transition-transform duration-500 ease-out" placeholder="blur" blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAARCAABAAEDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AJQAB/9k=" {...(idx < 4 ? { priority: true } : {})} />
                   <div className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-60" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)'}} />
                   <p className="absolute bottom-3 left-3 text-white text-xs font-semibold tracking-wide">{label}</p>
@@ -137,7 +135,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* Large left — duo shot */}
-            <div className="md:col-span-2 overflow-hidden rounded-2xl group relative aspect-video md:h-[480px] md:aspect-auto">
+            <div className="md:col-span-2 overflow-hidden rounded-2xl group relative" style={{height: '480px'}}>
               <Image
                 src="/studio-images/podcast-cyc-duo.jpg"
                 alt="Two-person podcast session on white cyc wall — VibeShack Studios SF"
@@ -148,7 +146,7 @@ export default function HomePage() {
             </div>
             {/* Right column — two stacked */}
             <div className="flex flex-col gap-3">
-              <div className="overflow-hidden rounded-2xl flex-1 group relative aspect-square md:aspect-video">
+              <div className="overflow-hidden rounded-2xl flex-1 group relative" style={{height: '232px'}}>
                 <Image
                   src="/studio-images/podcast-cyc-solo-1.jpg"
                   alt="Solo podcast host — white cyc wall — VibeShack Studios SF"
@@ -157,7 +155,7 @@ export default function HomePage() {
                   style={{objectPosition: 'center top'}}
                 />
               </div>
-              <div className="overflow-hidden rounded-2xl flex-1 group relative aspect-square md:aspect-video">
+              <div className="overflow-hidden rounded-2xl flex-1 group relative" style={{height: '232px'}}>
                 <Image
                   src="/studio-images/podcast-cyc-solo-2.jpg"
                   alt="Podcast guest — studio session — VibeShack Studios SF"
@@ -231,7 +229,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
             {[
               { slug: '/sunset-studio', img: '/studio-images/sunset-red.jpg', name: 'Sunset', series: 'Creative Series', seriesColor: '#99f6e4', seriesBg: 'rgba(13,148,136,0.3)', price: '$300', sub: 'Programmable color backdrop · Cameraman included' },
-              { slug: '/white-backdrop-studio', img: '/studio-images/podcast-cyc-duo.jpg', name: 'Canvas Rental', series: 'Creative Series', seriesColor: '#99f6e4', seriesBg: 'rgba(13,148,136,0.4)', price: '$100', sub: 'White cyc wall · Overhead lighting grid' },
+              { slug: '/white-backdrop-studio', img: '/studio-images/podcast-cyc-duo.jpg', name: 'Canvas', series: 'Creative Series', seriesColor: '#99f6e4', seriesBg: 'rgba(13,148,136,0.4)', price: '$100', sub: 'White cyc wall · Overhead lighting grid' },
             ].map(({ slug, img, name, series, seriesColor, seriesBg, price, sub }) => (
               <a key={name} href={slug} className="img-reveal studio-card block relative group overflow-hidden rounded-2xl" data-reveal="scale" style={{height: '380px'}}>
                 <Image src={img} alt={`${name} — VibeShack Studios San Francisco`} fill className="object-cover" />
@@ -256,7 +254,7 @@ export default function HomePage() {
             {[
               { name: 'The Executive', price: '$300/hr', slug: '/the-executive', note: 'Walnut Series · Podcast · cameraman included' },
               { name: 'The Wing', price: '$300/hr', slug: '/the-wing', note: 'Walnut Series · Podcast · cameraman included' },
-              { name: 'Canvas Rental', price: '$100/hr', slug: '/white-backdrop-studio', note: 'Creative Series · Rental · all equipment included' },
+              { name: 'Canvas', price: '$100/hr', slug: '/white-backdrop-studio', note: 'Creative Series · Rental · all equipment included' },
             ].map(({ name, price, slug, note }) => (
               <a key={name} href={slug}
                 className="flex items-center justify-between py-4 border-b border-white/8 group hover:opacity-70 transition-opacity">
@@ -293,7 +291,7 @@ export default function HomePage() {
             { src: '/studio-images/photography-hero.jpg', label: 'Photography Studio' },
             { src: '/studio-images/drive-homepage-4.jpg', label: 'Hair & Makeup Room' },
             { src: '/studio-images/the-wing-hero.jpg', label: 'The Wing — Walnut Series' },
-            { src: '/studio-images/drive-cyc-wall.jpg', label: 'Canvas Rental' },
+            { src: '/studio-images/drive-cyc-wall.jpg', label: 'Canvas' },
           ].map(({ src, label }) => (
             <div key={src} className="flex-shrink-0 relative group" style={{scrollSnapAlign: 'start', width: '340px'}}>
               <div className="overflow-hidden rounded-lg relative" style={{height: '220px'}}>
@@ -393,7 +391,7 @@ export default function HomePage() {
             { src: '/studio-images/drive-podcast-hero.jpg', alt: 'VibeShack Studios — podcast studio, SF' },
             { src: '/studio-images/drive-homepage-4.jpg', alt: 'VibeShack Studios — SF Northern Waterfront' },
           ].map(({ src, alt }) => (
-            <div key={src} className="img-reveal overflow-hidden rounded-xl group relative aspect-square md:aspect-video">
+            <div key={src} className="img-reveal overflow-hidden rounded-xl group relative" style={{height: '320px'}}>
               <Image src={src} alt={alt} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
           ))}

@@ -15,13 +15,13 @@ export default function WhiteBackdropStudioPage() {
         <Image src="/studio-images/drive-cyc-wall.jpg"
           alt="Canvas seamless white cyc wall studio hero — Creative Series VibeShack Studios San Francisco"
           fill
-          className="object-cover object-bottom md:object-center opacity-80"
+          className="object-cover opacity-80"
           priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#99f6e4'}}>Creative Series</p>
           <h1 data-reveal="up" className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
-            Canvas <span className="text-white">Rental</span>
+            Canvas <span className="text-brand-red">Rental</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
             Seamless white cyc wall. Fashion, product, and lifestyle. Everything already lit.
@@ -127,7 +127,7 @@ export default function WhiteBackdropStudioPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <p className="text-gray-600 text-xs uppercase tracking-widest mb-6">Also in the Creative Series</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <a href="/photography-studio-san-francisco" className="relative overflow-hidden rounded-2xl group block aspect-square md:aspect-video">
+            <a href="/photography-studio-san-francisco" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
               <Image src="/studio-images/photography-hero.jpg" alt="Photography Studio — Creative Series, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
@@ -135,7 +135,7 @@ export default function WhiteBackdropStudioPage() {
                 <p className="text-gray-400 text-xs">$100/hr · Hair & Makeup room</p>
               </div>
             </a>
-            <a href="/green-screen-studio-sf" className="relative overflow-hidden rounded-2xl group block aspect-square md:aspect-video">
+            <a href="/green-screen-studio-sf" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
               <Image src="/studio-images/greenscreen-wide.jpg" alt="Green Screen Studio — VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">

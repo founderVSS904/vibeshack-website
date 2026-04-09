@@ -23,7 +23,7 @@ export default function CanvasPodcastPage() {
             alt="Canvas Podcast Studio with orange LED backdrop"
             fill
             priority
-            className="object-cover object-bottom md:object-center"
+            className="object-cover"
             style={{ opacity: 0.4 }}
           />
           <div
@@ -61,7 +61,7 @@ export default function CanvasPodcastPage() {
       </section>
 
       {/* Signature Setups */}
-      <section className="py-16 md:py-32 bg-zinc-950 border-t border-white/5">
+      <section className="py-32 bg-zinc-950 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="mb-20">
             <span className="number-label mb-12 block">Choose Your Setup</span>

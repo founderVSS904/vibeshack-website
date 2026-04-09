@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 const studios = [
   {
-    name: 'Canvas Rental',
+    name: 'Canvas',
     href: '/white-backdrop-studio',
     bookHref: '/book?studio=canvas-rental',
     img: '/studio-images/podcast-cyc-duo.jpg',
@@ -55,8 +55,8 @@ export default function RentalStudiosPage() {
       <section className="relative min-h-[70vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/greenscreen-wide.jpg"
           alt="VibeShack Rental Studios San Francisco"
-          fill className="object-cover object-bottom md:object-center"
-          style={{opacity: 0.7}} priority />
+          fill className="object-cover"
+          style={{opacity: 0.7, objectPosition: 'center'}} priority />
         <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, transparent 70%)'}} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-gray-500 text-xs tracking-[0.3em] uppercase mb-4">VibeShack Studios · SF Northern Waterfront</p>
@@ -150,8 +150,8 @@ export default function RentalStudiosPage() {
                 '/studio-images/podcast-cyc-duo.jpg',
                 '/studio-images/greenscreen-empty.jpg',
               ].map((src, i) => (
-                <div key={i} className="relative overflow-hidden rounded-xl aspect-square md:aspect-video">
-                  <Image src={src} alt="VibeShack Rental Studios" fill className="object-cover" />
+                <div key={i} className="overflow-hidden rounded-xl">
+                  <Image src={src} alt="VibeShack Rental Studios" width={400} height={180} className="w-full object-cover" style={{height: '180px'}} />
                 </div>
               ))}
             </div>
