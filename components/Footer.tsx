@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-16">
 
         {/* Top row */}
-        <div className="flex flex-col lg:flex-row items-start justify-between gap-16 mb-16">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-10 lg:gap-16 mb-16">
           {/* Brand */}
           <div className="max-w-xs">
             <div className="mb-8">
@@ -31,7 +31,7 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-20">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-12">
             {/* Podcast Studios */}
             <div>
               <p className="text-gray-400 text-xs tracking-[0.2em] uppercase mb-5 font-bold">Podcast Studios</p>
@@ -53,7 +53,7 @@ export default function Footer() {
             </div>
 
             {/* Rental Studios */}
-            <div className="border-l border-white/20 pl-8">
+            <div>
               <p className="text-gray-400 text-xs tracking-[0.2em] uppercase mb-5 font-bold">Rental Studios</p>
               <ul className="space-y-3">
                 {[
