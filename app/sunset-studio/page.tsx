@@ -81,7 +81,7 @@ export default function SunsetPage() {
       </section>
 
       {/* Choose Your Mood - Carousel */}
-      <section className="py-32 bg-black border-t border-white/5 overflow-hidden">
+      <section className="py-16 md:py-32 bg-black border-t border-white/5 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 mb-12">
           <h2 data-reveal="up" className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
             Choose your <span style={{color: '#99f6e4'}}>mood.</span>

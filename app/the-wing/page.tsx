@@ -48,7 +48,7 @@ export default function TheWingPage() {
       </section>
 
       {/* Show up. Record - 2 Column: Features Left + Photo Right */}
-      <section className="py-32 bg-zinc-950 border-t" style={{borderColor: '#fcd34d'}}>
+      <section className="py-16 md:py-32 bg-zinc-950 border-t" style={{borderColor: '#fcd34d'}}>
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features */}

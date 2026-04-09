@@ -48,7 +48,7 @@ export default function HorizonPage() {
       </section>
 
       {/* Show up. Record */}
-      <section className="py-32 bg-zinc-950 border-t border-brand-red" style={{borderColor: '#e11d48'}}>
+      <section className="py-16 md:py-32 bg-zinc-950 border-t border-brand-red" style={{borderColor: '#e11d48'}}>
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features */}

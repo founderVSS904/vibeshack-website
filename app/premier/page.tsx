@@ -44,7 +44,7 @@ export default function PremierPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-32 bg-zinc-950 border-t" style={{borderColor: '#a855f7'}}>
+      <section className="py-16 md:py-32 bg-zinc-950 border-t" style={{borderColor: '#a855f7'}}>
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
