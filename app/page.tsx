@@ -21,13 +21,11 @@ export default function HomePage() {
           HERO — Full viewport, cinematic, left-anchored
           Inspired by: Folioblox hero + SYNTH world-building
       ═══════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center justify-start bg-black overflow-hidden noise-bg">
-        {/* WebGL Shader Background — desktop only (hidden on mobile to prevent blank canvas) */}
-        <div className="hidden md:block absolute inset-0 z-0">
+      <section className="relative min-h-[70vh] md:min-h-screen flex items-start md:items-center justify-start bg-black overflow-hidden noise-bg pt-20 md:pt-0">
+        {/* WebGL Shader Background */}
+        <div className="absolute inset-0 z-0">
           <WebGLShader />
         </div>
-        {/* Mobile fallback gradient background */}
-        <div className="block md:hidden absolute inset-0 z-0" style={{background: 'radial-gradient(ellipse at 30% 60%, rgba(100,20,20,0.55) 0%, rgba(0,0,0,1) 65%)'}} />
         {/* Left gradient — keeps text readable */}
         <div className="absolute inset-0 z-[1]" style={{background: 'linear-gradient(105deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.05) 80%, transparent 100%)'}} />
         
