@@ -1,45 +1,9 @@
 {
-  "projectId": "prj_x4OS0sdwAhMjngiZTtI1wWBWhTMG",
-  "orgId": "team_bCNlyMCShXZTLR5Xn1FiY8eg",
   "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
   "devCommand": "next dev",
   "installCommand": "npm install",
   "framework": "nextjs",
   "outputDirectory": ".next",
-  "env": [
-    {
-      "key": "NEXT_PUBLIC_SANITY_PROJECT_ID",
-      "value": "o6atri6b"
-    },
-    {
-      "key": "NEXT_PUBLIC_SANITY_DATASET",
-      "value": "production"
-    },
-    {
-      "key": "NEXT_PUBLIC_BASE_URL",
-      "value": "https://www.vibeshackstudios.com"
-    },
-    {
-      "key": "NEXT_PUBLIC_GA4_ID",
-      "value": "G-PLACEHOLDER"
-    }
-  ],
-  "envSecrets": [
-    "SANITY_API_TOKEN",
-    "STRIPE_PUBLISHABLE_KEY",
-    "STRIPE_SECRET_KEY",
-    "GOOGLE_CALENDAR_ID",
-    "GOOGLE_API_KEY"
-  ],
-  "domains": [
-    "vibeshackstudios.com",
-    "www.vibeshackstudios.com"
-  ],
-  "github": {
-    "silent": true,
-    "autoAlias": false
-  },
-  "crons": [],
   "headers": [
     {
       "source": "/(.*)",
