@@ -41,7 +41,7 @@ export default function HomePage() {
           {/* Main headline */}
           <div data-reveal="up" data-delay="200">
             <h1 className="mb-12 max-w-4xl">
-              <span className="block text-white font-black leading-none" style={{fontSize: 'clamp(52px, 10vw, 140px)', letterSpacing: '-0.05em', lineHeight: 0.9}}>
+              <span className="block text-white font-black leading-none" style={{fontSize: 'clamp(2.5rem, 10vw, 8.75rem)', letterSpacing: '-0.05em', lineHeight: 0.9}}>
                 More Studios.<br/><span className="text-brand-red">One Address.</span>
               </span>
             </h1>
@@ -77,7 +77,7 @@ export default function HomePage() {
               { src: '/studio-images/drive-cyc-wall.jpg',     label: 'Canvas Rental',  href: '/white-backdrop-studio', alt: 'Canvas Rental — White cyc wall studio for photography and content creation — VibeShack Studios SF' },
             ].map(({ src, label, href, alt }, idx) => (
               <div key={label} className="studio-grid-card card-lift">
-                <a href={href} className="relative overflow-hidden rounded-xl group block" style={{height: '160px'}}>
+                <a href={href} className="relative overflow-hidden rounded-xl group block aspect-square md:aspect-video">
                   <Image src={src} alt={alt} fill className="object-cover group-hover:scale-[1.07] transition-transform duration-500 ease-out" placeholder="blur" blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAARCAABAAEDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AJQAB/9k=" {...(idx < 4 ? { priority: true } : {})} />
                   <div className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-60" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)'}} />
                   <p className="absolute bottom-3 left-3 text-white text-xs font-semibold tracking-wide">{label}</p>
@@ -137,7 +137,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* Large left — duo shot */}
-            <div className="md:col-span-2 overflow-hidden rounded-2xl group relative" style={{height: '480px'}}>
+            <div className="md:col-span-2 overflow-hidden rounded-2xl group relative aspect-video md:h-[480px] md:aspect-auto">
               <Image
                 src="/studio-images/podcast-cyc-duo.jpg"
                 alt="Two-person podcast session on white cyc wall — VibeShack Studios SF"
@@ -148,7 +148,7 @@ export default function HomePage() {
             </div>
             {/* Right column — two stacked */}
             <div className="flex flex-col gap-3">
-              <div className="overflow-hidden rounded-2xl flex-1 group relative" style={{height: '232px'}}>
+              <div className="overflow-hidden rounded-2xl flex-1 group relative aspect-square md:aspect-video">
                 <Image
                   src="/studio-images/podcast-cyc-solo-1.jpg"
                   alt="Solo podcast host — white cyc wall — VibeShack Studios SF"
@@ -157,7 +157,7 @@ export default function HomePage() {
                   style={{objectPosition: 'center top'}}
                 />
               </div>
-              <div className="overflow-hidden rounded-2xl flex-1 group relative" style={{height: '232px'}}>
+              <div className="overflow-hidden rounded-2xl flex-1 group relative aspect-square md:aspect-video">
                 <Image
                   src="/studio-images/podcast-cyc-solo-2.jpg"
                   alt="Podcast guest — studio session — VibeShack Studios SF"
@@ -393,7 +393,7 @@ export default function HomePage() {
             { src: '/studio-images/drive-podcast-hero.jpg', alt: 'VibeShack Studios — podcast studio, SF' },
             { src: '/studio-images/drive-homepage-4.jpg', alt: 'VibeShack Studios — SF Northern Waterfront' },
           ].map(({ src, alt }) => (
-            <div key={src} className="img-reveal overflow-hidden rounded-xl group relative" style={{height: '320px'}}>
+            <div key={src} className="img-reveal overflow-hidden rounded-xl group relative aspect-square md:aspect-video">
               <Image src={src} alt={alt} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
           ))}

@@ -415,7 +415,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                               ? 'border-brand-red shadow-[0_0_0_1px_#E50000,0_20px_40px_rgba(229,0,0,0.12)] scale-[1.01]'
                               : 'border-transparent hover:border-white/20 hover:shadow-lg hover:shadow-black/40 hover:scale-[1.02]'
                           }`} data-tilt>
-                          <div className="relative overflow-hidden" style={{height: '200px'}}>
+                          <div className="relative overflow-hidden aspect-square md:aspect-video">
                             <Image src={s.heroImage} alt={s.name} fill className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out" />
                             <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.3) 45%, transparent 75%)'}} />
                             {s.tag && <div className="absolute top-4 left-4"><span className={`text-xs px-2.5 py-1 rounded-full font-bold tracking-wide ${
@@ -920,7 +920,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
               {/* Studio hero image — during datetime step */}
               {curStudio && builderStep === 'datetime' && (
                 <div className="border-t border-white/8 pt-6">
-                  <div className="rounded-2xl overflow-hidden mb-4 relative" style={{height: '180px'}}>
+                  <div className="rounded-2xl overflow-hidden mb-4 relative aspect-square md:aspect-video">
                     <Image src={curStudio.heroImage} alt={curStudio.name} fill className="object-cover" />
                     <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%)'}} />
                     <div className="absolute bottom-4 left-4 right-4">
@@ -948,7 +948,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   {cart.map(item => {
                     const s = studioById(item.studioId)
                     return (
-                      <div key={item.cartId} className="rounded-2xl overflow-hidden relative" style={{height: '140px'}}>
+                      <div key={item.cartId} className="rounded-2xl overflow-hidden relative aspect-square md:aspect-video">
                         <Image src={s.heroImage} alt={s.name} fill className="object-cover" />
                         <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 55%)'}} />
                         <div className="absolute bottom-3 left-4 right-4">

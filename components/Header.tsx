@@ -209,7 +209,7 @@ export default function Header() {
               <div className="space-y-1">
                 {podcastStudios.map(({ href, label, price }) => (
                   <Link key={href + label} href={href}
-                    className={`flex items-center justify-between py-2.5 transition-colors duration-150 ${
+                    className={`flex items-center justify-between py-3 min-h-[44px] transition-colors duration-150 ${
                       pathname === href ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`}
                     onClick={() => setMenuOpen(false)}>
@@ -222,7 +222,7 @@ export default function Header() {
               <div className="space-y-1">
                 {rentalStudios.map(({ href, label, price }) => (
                   <Link key={href + label} href={href}
-                    className={`flex items-center justify-between py-2.5 transition-colors duration-150 ${
+                    className={`flex items-center justify-between py-3 min-h-[44px] transition-colors duration-150 ${
                       pathname === href ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`}
                     onClick={() => setMenuOpen(false)}>
@@ -233,13 +233,13 @@ export default function Header() {
               </div>
             </div>
             <div className="border-t border-white/8 pt-4 space-y-3">
-              <a href="/find-your-studio" className={`block text-sm transition-colors duration-150 ${isActive('/find-your-studio') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Find a Studio</a>
-              <Link href="/pricing" className={`block text-sm transition-colors duration-150 ${isActive('/pricing') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Pricing</Link>
-              <Link href="/about" className={`block text-sm transition-colors duration-150 ${isActive('/about') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>About</Link>
-              <Link href="/made-at-vibeshack" className={`block text-sm transition-colors duration-150 ${isActive('/made-at-vibeshack') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Shot Here</Link>
-              <Link href="/support" className={`block text-sm transition-colors duration-150 ${isActive('/support') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Support</Link>
+              <a href="/find-your-studio" className={`block text-sm py-2 min-h-[44px] flex items-center transition-colors duration-150 ${isActive('/find-your-studio') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Find a Studio</a>
+              <Link href="/pricing" className={`block text-sm py-2 min-h-[44px] flex items-center transition-colors duration-150 ${isActive('/pricing') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Pricing</Link>
+              <Link href="/about" className={`block text-sm py-2 min-h-[44px] flex items-center transition-colors duration-150 ${isActive('/about') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>About</Link>
+              <Link href="/made-at-vibeshack" className={`block text-sm py-2 min-h-[44px] flex items-center transition-colors duration-150 ${isActive('/made-at-vibeshack') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Shot Here</Link>
+              <Link href="/support" className={`block text-sm py-2 min-h-[44px] flex items-center transition-colors duration-150 ${isActive('/support') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Support</Link>
               <Link href="/book"
-                className="inline-flex items-center gap-2 text-white font-semibold text-sm mt-2 px-5 py-2.5 bg-brand-red rounded-full hover:bg-red-700 transition-colors duration-200"
+                className="inline-flex items-center gap-2 text-white font-semibold text-sm mt-2 px-5 py-3 min-h-[44px] bg-brand-red rounded-full hover:bg-red-700 transition-colors duration-200"
                 onClick={() => setMenuOpen(false)}>
                 Book a Session →
               </Link>

@@ -150,8 +150,8 @@ export default function RentalStudiosPage() {
                 '/studio-images/podcast-cyc-duo.jpg',
                 '/studio-images/greenscreen-empty.jpg',
               ].map((src, i) => (
-                <div key={i} className="overflow-hidden rounded-xl">
-                  <Image src={src} alt="VibeShack Rental Studios" width={400} height={180} className="w-full object-cover" style={{height: '180px'}} />
+                <div key={i} className="relative overflow-hidden rounded-xl aspect-square md:aspect-video">
+                  <Image src={src} alt="VibeShack Rental Studios" fill className="object-cover" />
                 </div>
               ))}
             </div>

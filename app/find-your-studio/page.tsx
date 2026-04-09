@@ -261,7 +261,7 @@ export default function FindYourStudioPage() {
                   Object.values(STUDIOS).find(s => s.series === 'Vault Series' && s !== Object.values(STUDIOS).find(x => x.series === 'Vault Series' && x.name !== primary?.name) && s.name !== primary?.name)].filter(Boolean).map((s, i) => s && (
                   <a key={i} href={s.href}
                     className="block rounded-2xl overflow-hidden group">
-                    <div className="relative" style={{height: '180px'}}>
+                    <div className="relative aspect-square md:aspect-video">
                       <Image src={s.img} alt={s.name}
                         fill
                         className="object-cover group-hover:scale-[1.04] transition-transform duration-500" />
@@ -283,7 +283,7 @@ export default function FindYourStudioPage() {
                 {Object.values(STUDIOS).filter(s => s.price === 300 && s.name !== primary?.name && s.series !== 'Vault Series').map((s, i) => (
                   <a key={i} href={s.href}
                     className="block rounded-2xl overflow-hidden group">
-                    <div className="relative" style={{height: '160px'}}>
+                    <div className="relative aspect-square md:aspect-video">
                       <Image src={s.img} alt={s.name}
                         fill
                         className="object-cover group-hover:scale-[1.04] transition-transform duration-500" />
@@ -305,7 +305,7 @@ export default function FindYourStudioPage() {
                 {Object.values(STUDIOS).filter(s => s.price < 300).map((s, i) => (
                   <a key={i} href={s.href}
                     className="block rounded-2xl overflow-hidden group">
-                    <div className="relative" style={{height: '160px'}}>
+                    <div className="relative aspect-square md:aspect-video">
                       <Image src={s.img} alt={s.name}
                         fill
                         className="object-cover group-hover:scale-[1.04] transition-transform duration-500" />

@@ -212,7 +212,7 @@ export default function GreenScreenPage() {
               { src: '/studio-images/greenscreen-shoot-2.jpg', alt: 'Production crew filming on green screen stage — VibeShack Studios San Francisco' },
               { src: '/studio-images/greenscreen-empty.jpg',   alt: 'Green screen studio empty stage ready for production — VibeShack Studios San Francisco' },
             ].map(({ src, alt }) => (
-              <div key={src} className="overflow-hidden rounded-xl relative" style={{height: '220px'}}>
+              <div key={src} className="overflow-hidden rounded-xl relative aspect-square md:aspect-video">
                 <Image src={src} alt={alt} fill className="object-cover" />
               </div>
             ))}
@@ -309,7 +309,7 @@ export default function GreenScreenPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <p className="text-gray-600 text-xs uppercase tracking-widest mb-6">Also in the Creative Series</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <a href="/photography-studio-san-francisco" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
+            <a href="/photography-studio-san-francisco" className="relative overflow-hidden rounded-2xl group block aspect-square md:aspect-video">
               <Image src="/studio-images/photography-hero.jpg" alt="Photography Studio — Creative Series, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
@@ -317,7 +317,7 @@ export default function GreenScreenPage() {
                 <p className="text-gray-400 text-xs">$100/hr · Hair & Makeup room</p>
               </div>
             </a>
-            <a href="/white-backdrop-studio" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
+            <a href="/white-backdrop-studio" className="relative overflow-hidden rounded-2xl group block aspect-square md:aspect-video">
               <Image src="/studio-images/drive-cyc-wall.jpg" alt="Canvas — seamless white cyc wall, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">

@@ -178,7 +178,7 @@ export default function PodcastStudiosPage() {
                 '/studio-images/sunset-blue.jpg',
                 '/studio-images/the-wing-2.jpg',
               ].map((src, i) => (
-                <div key={i} className="overflow-hidden rounded-xl relative" style={{height: '180px'}}>
+                <div key={i} className="overflow-hidden rounded-xl relative aspect-square md:aspect-video">
                   <Image src={src} alt="VibeShack Podcast Studios" fill className="object-cover" />
                 </div>
               ))}

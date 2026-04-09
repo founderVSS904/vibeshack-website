@@ -52,7 +52,7 @@ export default function MadeAtVibeShackPage() {
               },
             ].map(({ name, desc, studio, img }) => (
               <div key={name} className="bg-black p-8 group">
-                <div className="overflow-hidden rounded-xl mb-6 relative" style={{height: '220px'}}>
+                <div className="overflow-hidden rounded-xl mb-6 relative aspect-square md:aspect-video">
                   <Image src={img} alt={name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <p className="text-white font-black text-xl mb-1" style={{letterSpacing: '-0.02em'}}>{name}</p>

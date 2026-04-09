@@ -125,7 +125,7 @@ export default function CozyPodcastPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <p className="text-gray-600 text-xs uppercase tracking-widest mb-6">Also in the Walnut Series</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <a href="/sunset-studio" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
+            <a href="/sunset-studio" className="relative overflow-hidden rounded-2xl group block aspect-square md:aspect-video">
               <Image src="/studio-images/the-executive-hero.jpg" alt="The Executive — Walnut Series podcast studio, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
