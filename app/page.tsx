@@ -231,7 +231,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
             {[
               { slug: '/sunset-studio', img: '/studio-images/sunset-red.jpg', name: 'Sunset', series: 'Creative Series', seriesColor: '#99f6e4', seriesBg: 'rgba(13,148,136,0.3)', price: '$300', sub: 'Programmable color backdrop · Cameraman included' },
-              { slug: '/white-backdrop-studio', img: '/studio-images/podcast-cyc-duo.jpg', name: 'Canvas', series: 'Creative Series', seriesColor: '#99f6e4', seriesBg: 'rgba(13,148,136,0.4)', price: '$100', sub: 'White cyc wall · Overhead lighting grid' },
+              { slug: '/white-backdrop-studio', img: '/studio-images/podcast-cyc-duo.jpg', name: 'Canvas Rental', series: 'Creative Series', seriesColor: '#99f6e4', seriesBg: 'rgba(13,148,136,0.4)', price: '$100', sub: 'White cyc wall · Overhead lighting grid' },
             ].map(({ slug, img, name, series, seriesColor, seriesBg, price, sub }) => (
               <a key={name} href={slug} className="img-reveal studio-card block relative group overflow-hidden rounded-2xl" data-reveal="scale" style={{height: '380px'}}>
                 <Image src={img} alt={`${name} — VibeShack Studios San Francisco`} fill className="object-cover" />
@@ -256,7 +256,7 @@ export default function HomePage() {
             {[
               { name: 'The Executive', price: '$300/hr', slug: '/the-executive', note: 'Walnut Series · Podcast · cameraman included' },
               { name: 'The Wing', price: '$300/hr', slug: '/the-wing', note: 'Walnut Series · Podcast · cameraman included' },
-              { name: 'Canvas', price: '$100/hr', slug: '/white-backdrop-studio', note: 'Creative Series · Rental · all equipment included' },
+              { name: 'Canvas Rental', price: '$100/hr', slug: '/white-backdrop-studio', note: 'Creative Series · Rental · all equipment included' },
             ].map(({ name, price, slug, note }) => (
               <a key={name} href={slug}
                 className="flex items-center justify-between py-4 border-b border-white/8 group hover:opacity-70 transition-opacity">
@@ -293,7 +293,7 @@ export default function HomePage() {
             { src: '/studio-images/photography-hero.jpg', label: 'Photography Studio' },
             { src: '/studio-images/drive-homepage-4.jpg', label: 'Hair & Makeup Room' },
             { src: '/studio-images/the-wing-hero.jpg', label: 'The Wing — Walnut Series' },
-            { src: '/studio-images/drive-cyc-wall.jpg', label: 'Canvas' },
+            { src: '/studio-images/drive-cyc-wall.jpg', label: 'Canvas Rental' },
           ].map(({ src, label }) => (
             <div key={src} className="flex-shrink-0 relative group" style={{scrollSnapAlign: 'start', width: '340px'}}>
               <div className="overflow-hidden rounded-lg relative" style={{height: '220px'}}>

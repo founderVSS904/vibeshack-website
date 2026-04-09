@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 const studios = [
   {
-    name: 'Canvas',
+    name: 'Canvas Rental',
     href: '/white-backdrop-studio',
     bookHref: '/book?studio=canvas-rental',
     img: '/studio-images/podcast-cyc-duo.jpg',

@@ -86,7 +86,7 @@ const STUDIOS: Record<string, { name: string; price: number; img: string; href: 
   'podcast-cozy': { name: 'The Wing',  price: 300, img: '/studio-images/the-wing-hero.jpg', href: '/the-wing',                  desc: '2-cam intimate · Cameraman included', series: 'Walnut Series' },
   'green-screen':    { name: 'Green Screen Studio',    price: 100, img: '/studio-images/greenscreen-shoot-1.jpg', href: '/green-screen-studio-sf',   desc: '750 sqft · Full lighting grid' },
   'photography':     { name: 'Photography Studio',     price: 100, img: '/studio-images/photography-hero.jpg',   href: '/photography-studio-san-francisco', desc: 'Pro ARRI lights · Hair & Makeup room' },
-  'white-backdrop':  { name: 'Canvas',  price: 100, img: '/studio-images/podcast-cyc-duo.jpg',    href: '/white-backdrop-studio',         desc: 'White cyc · Bring your crew', series: 'Creative Series' },
+  'white-backdrop':  { name: 'Canvas Rental',  price: 100, img: '/studio-images/podcast-cyc-duo.jpg',    href: '/white-backdrop-studio',         desc: 'White cyc · Bring your crew', series: 'Creative Series' },
   'premier':  { name: 'Premier',  price: 300, img: '/studio-images/premier-hero-v1775084326.jpg',    href: '/premier',         desc: 'Luxury interview · Cameraman included', series: 'Vault Series' },
 }
 

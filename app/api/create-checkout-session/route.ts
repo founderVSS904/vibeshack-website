@@ -42,12 +42,12 @@ const STUDIOS: Record<string, { name: string; price: number; description: string
     description: 'Cinema camera, interview lighting, hair & makeup room attached.',
   },
   'canvas-podcast': {
-    name: 'Canvas',
+    name: 'Canvas Podcast',
     price: 400,
     description: 'Seamless white cyc wall, podcast setup with professional audio.',
   },
   'white-backdrop': {
-    name: 'Canvas',
+    name: 'Canvas Rental',
     price: 100,
     description: 'Seamless white cyc wall, overhead lighting grid.',
   },
