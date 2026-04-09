@@ -1,7 +1,7 @@
 {
   "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
   "devCommand": "next dev",
-  "installCommand": "npm install",
+  "installCommand": "npm install --legacy-peer-deps",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "headers": [
