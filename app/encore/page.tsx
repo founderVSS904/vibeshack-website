@@ -28,7 +28,7 @@ export default function EncorePage() {
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/encore-wide.jpg"
           alt="Encore production studio hero shot — VibeShack Studios San Francisco"
-          fill className="object-cover opacity-85" priority />
+          fill className="object-cover object-bottom md:object-center opacity-85" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#a855f7'}}>Vault Series</p>

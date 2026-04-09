@@ -15,7 +15,7 @@ export default function WhiteBackdropStudioPage() {
         <Image src="/studio-images/drive-cyc-wall.jpg"
           alt="Canvas seamless white cyc wall studio hero — Creative Series VibeShack Studios San Francisco"
           fill
-          className="object-cover opacity-80"
+          className="object-cover object-bottom md:object-center opacity-80"
           priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">

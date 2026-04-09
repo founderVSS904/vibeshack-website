@@ -34,9 +34,8 @@ export default function PhotographyStudioPage() {
           <Image
             src="/studio-images/photography-hero.jpg"
             fill
-            className="object-cover"
+            className="object-cover object-bottom md:object-center"
             alt="Photography studio with professional lighting and white backdrop — VibeShack Studios San Francisco"
-            style={{objectPosition: 'center right'}}
             priority
           />
           {/* Heavy bottom + left gradient so white text reads on light studio */}

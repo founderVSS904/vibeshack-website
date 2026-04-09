@@ -23,7 +23,7 @@ export default function CanvasPodcastPage() {
             alt="Canvas Podcast Studio with orange LED backdrop"
             fill
             priority
-            className="object-cover"
+            className="object-cover object-bottom md:object-center"
             style={{ opacity: 0.4 }}
           />
           <div

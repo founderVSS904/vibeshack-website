@@ -98,9 +98,8 @@ export default function GreenScreenPage() {
           <Image
             src="/studio-images/greenscreen-wide.jpg"
             fill
-            className="object-cover"
+            className="object-cover object-bottom md:object-center"
             alt="750 sqft green screen studio floor-to-ceiling hero view — VibeShack Studios San Francisco"
-            style={{objectPosition: 'center center'}}
             priority
           />
           {/* Heavy left gradient — text lives in the dark */}

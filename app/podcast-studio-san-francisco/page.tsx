@@ -78,8 +78,8 @@ export default function PodcastStudiosPage() {
         <Image src="/studio-images/the-executive-hero.jpg"
           alt="VibeShack Podcast Studios San Francisco"
           fill
-          className="object-cover"
-          style={{opacity: 0.75, objectPosition: 'center 40%'}}
+          className="object-cover object-bottom md:object-center"
+          style={{opacity: 0.75}}
           priority />
         <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, transparent 70%)'}} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
