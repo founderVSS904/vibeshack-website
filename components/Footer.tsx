@@ -112,6 +112,12 @@ export default function Footer() {
           <p className="text-gray-700 text-xs mt-2">© 2026 VibeShack Studios · San Francisco</p>
 
         </div>
+        {/* SEO keyword block */}
+        <div className="border-t border-white/5 pt-10 mt-4">
+          <p className="text-gray-700 text-xs leading-relaxed text-center max-w-4xl mx-auto">
+            VibeShack Studios — San Francisco Podcast Studio · Green Screen Studio San Francisco · Photography Studio SF · Video Production Studio San Francisco · Studio Rental San Francisco · Content Creator Studio SF Bay Area · Podcast Recording Studio San Francisco · Production Studio Northern Waterfront · Green Screen Rental SF · Photo Studio Rental San Francisco · YouTube Studio San Francisco · TikTok Studio SF · Broadcast Studio San Francisco · 4K Video Studio SF · Professional Studio Rental Bay Area · VibeShack Studios 950 Battery St San Francisco CA 94111
+          </p>
+        </div>
       </div>
     </footer>
   )
