@@ -3,6 +3,8 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Terms of Service | VibeShack Studios',
   description: 'Complete Terms of Service for VibeShack Studios. Comprehensive legal agreement covering bookings, cancellations, liability, content rights, and dispute resolution.',
+  robots: { index: false, follow: true },
+  alternates: { canonical: 'https://www.vibeshackstudios.com/terms/' },
 };
 
 export default function TermsProfessionalPage() {
@@ -343,7 +345,7 @@ export default function TermsProfessionalPage() {
               United States<br />
               <br />
               <strong>Email:</strong> founder@vibeshackstudios.com<br />
-              <strong>Website:</strong> https://www.vibeshackstudios.com<br />
+              <strong>Website:</strong> https://www.vibeshackstudios.com/<br />
               <strong>Hours:</strong> 24/7 (by appointment)
             </p>
           </section>

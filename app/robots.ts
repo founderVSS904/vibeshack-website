@@ -6,10 +6,21 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/_next/'],
+        disallow: [
+          '/api/',
+          '/admin/',
+          '/private/',
+          '/book/confirmation/',
+          '/patriot-black/',
+          '/patriotblack/',
+          '/partners/patriot-black/',
+        ],
       },
     ],
-    sitemap: 'https://www.vibeshackstudios.com/sitemap.xml',
+    sitemap: [
+      'https://www.vibeshackstudios.com/sitemap.xml',
+      'https://www.vibeshackstudios.com/image-sitemap.xml',
+    ],
     host: 'https://www.vibeshackstudios.com',
   }
 }

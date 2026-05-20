@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Privacy Policy | VibeShack Studios',
   description: 'How VibeShack Studios collects, uses, and protects your personal information.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/privacy' }
+  alternates: { canonical: 'https://www.vibeshackstudios.com/privacy/' }
 }
 
 export default function PrivacyPage() {

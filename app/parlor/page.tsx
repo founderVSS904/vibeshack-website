@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
-  title: 'Parlor: Premium Interview Studio | VibeShack Studios SF',
-  description: 'Chesterfield seating. Full 4K production. Cameraman included. Premium interview studio in San Francisco. $300/hr. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/parlor' },
+  title: 'Parlor Interview Studio',
+  description: 'Chesterfield seating. Full 4K production. Cameraman included. Premium interview studio in San Francisco. $400/hr. Open 24/7.',
+  alternates: { canonical: 'https://www.vibeshackstudios.com/parlor/' },
   openGraph: {
     title: 'Parlor | VibeShack Studios SF',
-    description: 'Premium interview studio with Chesterfield seating and full 4K production. Cameraman included. $300/hr in San Francisco.',
+    description: 'Premium interview studio with Chesterfield seating and full 4K production. Cameraman included. $400/hr in San Francisco.',
     url: 'https://www.vibeshackstudios.com/parlor',
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/parlor-hero.jpg', width: 1200, height: 630, alt: 'Parlor at VibeShack Studios SF' }],
@@ -16,14 +17,27 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Parlor | VibeShack Studios SF',
-    description: 'Premium interview studio with Chesterfield seating and full 4K production. Cameraman included. $300/hr in San Francisco.',
+    description: 'Premium interview studio with Chesterfield seating and full 4K production. Cameraman included. $400/hr in San Francisco.',
     images: ['/studio-images/parlor-hero.jpg'],
   },
 }
 
+const parlorServiceSchema = studioServiceSchema({
+  name: 'Parlor Interview Studio Rental in San Francisco',
+  description: 'Premium interview studio in San Francisco with Chesterfield seating, 4K production, broadcast audio, and crew included.',
+  url: 'https://www.vibeshackstudios.com/parlor/',
+  image: 'https://www.vibeshackstudios.com/studio-images/parlor-hero.jpg',
+  price: '400',
+  serviceType: 'Interview Studio Rental',
+})
+
 export default function ParlorPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(parlorServiceSchema) }}
+      />
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/parlor-hero.jpg"
@@ -32,13 +46,13 @@ export default function ParlorPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#99f6e4'}}>Creative Series</p>
-          <h1 data-reveal="up" className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
+          <h1 data-reveal="up" className="revealed text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
             Parlor.
           </h1>
-          <p className="text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
+          <p className="revealed text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
             Premium interview setup. Chesterfield seating. Full crew included.
           </p>
-          <a href="/book?studio=parlor" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+          <a href="/book/?studio=parlor" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
             Book This Studio
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -73,7 +87,7 @@ export default function ParlorPage() {
             </div>
             {/* Right: Photo */}
             <div>
-              <Image src="/studio-images/parlor-hero.jpg" alt="Parlor premium interview setup — VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
+              <Image src="/studio-images/parlor-side-v20260509.jpg" alt="Parlor premium interview setup with Chesterfield seating — VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
             </div>
           </div>
         </div>
@@ -91,7 +105,7 @@ export default function ParlorPage() {
           <div className="space-y-24">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/parlor-hero.jpg" alt="Chesterfield seating in Parlor at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/parlor-production-v20260509.jpg" alt="Chesterfield seating and broadcast microphones in Parlor at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Chesterfield Seating That Reads on Camera</h3>
@@ -107,7 +121,7 @@ export default function ParlorPage() {
                 <p className="text-gray-400 text-lg leading-relaxed">You focus on the conversation. We focus on capturing it.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/parlor-hero.jpg" alt="Full production crew setup — Parlor at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/parlor-angled-v20260509.jpg" alt="Angled Parlor production setup with microphones and premium seating at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
               </div>
             </div>
           </div>
@@ -118,14 +132,14 @@ export default function ParlorPage() {
       <section className="py-32 bg-zinc-950 border-t border-white/5">
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
-          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$300</div>
+          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$400</div>
           <p className="text-gray-500 text-lg mb-1" data-reveal="fade">per hour</p>
           <p className="text-white font-semibold mb-12">Cameraman included. 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
-              { label: '2 Hours', price: '$600' },
-              { label: '4 Hours', price: '$1,200' },
-              { label: '8 Hours', price: '$2,400' },
+              { label: '2 Hours', price: '$800' },
+              { label: '4 Hours', price: '$1,600' },
+              { label: '8 Hours', price: '$3,200' },
             ].map(({ label, price }) => (
               <div key={label} className="flex items-center justify-between py-4">
                 <span className="text-gray-400 text-sm">{label}</span>
@@ -133,7 +147,7 @@ export default function ParlorPage() {
               </div>
             ))}
           </div>
-          <a href="/book?studio=parlor" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+          <a href="/book/?studio=parlor" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
             Book Parlor
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -149,15 +163,15 @@ export default function ParlorPage() {
           <h2 data-reveal="up" className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}>
             Ready to <span className="text-brand-red">Record?</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">$300/hr. Cameraman included. Instant confirmation.</p>
+          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">$400/hr. Cameraman included. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book?studio=parlor" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+            <a href="/book/?studio=parlor" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
               Book Your Session
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </a>
-            <a href="/contact" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →</a>
+            <a href="/tour/?studio=parlor" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →</a>
           </div>
         </div>
       </section>

@@ -1,160 +1,294 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { assertCartSlotsAvailable, type BookingCartItem } from '@/lib/booking/calendar'
+import { calculateRecurringDiscountCents, getAddOnById, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
+import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
+import { describeSlotRanges, formatDateForDisplay, isValidBookingDate } from '@/lib/booking/time'
+import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
+import { isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-02-25.clover',
-})
+const ATTRIBUTION_COOKIE = 'vbs_attribution'
+const CHECKOUT_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
+const CHECKOUT_RATE_LIMIT_MAX = 12
+const MAX_BODY_BYTES = 32 * 1024
 
-const STUDIOS: Record<string, { name: string; price: number; description: string }> = {
-  'podcast-premium': {
-    name: 'Premium Podcast Studio',
-    price: 300,
-    description: '3-camera 4K setup, broadcast audio, cameraman included.',
-  },
-  'podcast-modern': {
-    name: 'Modern Podcast Studio',
-    price: 300,
-    description: '3-camera 4K setup, broadcast audio, cameraman included.',
-  },
-  'podcast-sunset': {
-    name: 'The Sunset Room',
-    price: 300,
-    description: '3-camera 4K setup, broadcast audio, cameraman included.',
-  },
-  'podcast-cozy': {
-    name: 'Cozy 2-Person Podcast',
-    price: 300,
-    description: '3-camera 4K setup, broadcast audio, cameraman included.',
-  },
-  'green-screen': {
-    name: 'Green Screen Studio',
-    price: 100,
-    description: '750 sqft floor-to-ceiling green screen, lighting grid included.',
-  },
-  'photography': {
-    name: 'Photography Studio',
-    price: 100,
-    description: 'Professional lighting, white backdrop, hair & makeup room.',
-  },
-  'video-removed': {
-    name: 'Video Studio',
-    price: 100,
-    description: 'Cinema camera, interview lighting, hair & makeup room attached.',
-  },
-  'canvas-podcast': {
-    name: 'Canvas',
-    price: 400,
-    description: 'Seamless white cyc wall, podcast setup with professional audio.',
-  },
-  'white-backdrop': {
-    name: 'Canvas',
-    price: 100,
-    description: 'Seamless white cyc wall, overhead lighting grid.',
-  },
-  'sunset': {
-    name: 'Sunset',
-    price: 300,
-    description: 'Programmable color backdrop. Broadcast audio. Cameraman included.',
-  },
+function getStripe() {
+  const secret = process.env.STRIPE_SECRET_KEY
+  if (!secret) throw new Error('STRIPE_SECRET_KEY is not configured')
+  return new Stripe(secret, { apiVersion: '2026-02-25.clover' })
+}
+
+function getStripePublishableKey() {
+  const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY
+  if (!publishableKey) throw new Error('STRIPE_PUBLISHABLE_KEY is not configured')
+  return publishableKey
+}
+
+function getBaseUrl(req: NextRequest) {
+  const configured = process.env.NEXT_PUBLIC_BASE_URL
+  if (configured) return configured.replace(/\/$/, '')
+
+  const vercelUrl = process.env.VERCEL_URL
+  if (vercelUrl) return `https://${vercelUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}`
+
+  return new URL(req.url).origin
+}
+
+function toArray(value: unknown) {
+  return Array.isArray(value) ? value : []
+}
+
+function normalizeSlots(value: unknown) {
+  return toArray(value)
+    .filter((slot): slot is string => typeof slot === 'string')
+    .filter((slot) => !Number.isNaN(Date.parse(slot)))
+    .sort((a, b) => Date.parse(a) - Date.parse(b))
+}
+
+function buildCanonicalCart(rawCart: unknown): BookingCartItem[] {
+  const cart: BookingCartItem[] = []
+
+  for (const rawItem of toArray(rawCart)) {
+    if (!rawItem || typeof rawItem !== 'object') continue
+    const item = rawItem as Record<string, unknown>
+    const studioId = stripControlChars(item.studioId, 80)
+    const studio = getStudioById(studioId)
+    const date = stripControlChars(item.date, 20)
+    const slots = normalizeSlots(item.slots)
+
+    if (!studio || !isValidBookingDate(date) || slots.length === 0 || slots.length > 24) {
+      throw new Error('Invalid cart item')
+    }
+
+    cart.push({
+      studioId: studio.id,
+      studioName: studio.name,
+      date,
+      slots,
+      hours: slots.length,
+      price: studio.price * slots.length,
+    })
+  }
+
+  return cart
+}
+
+function buildCanonicalAddons(rawAddons: unknown) {
+  const ids = new Set<string>()
+  for (const rawAddon of toArray(rawAddons)) {
+    const id = typeof rawAddon === 'string'
+      ? stripControlChars(rawAddon, 80)
+      : stripControlChars((rawAddon as Record<string, unknown> | null)?.id, 80)
+    if (id) ids.add(id)
+  }
+  return Array.from(ids).map(getAddOnById).filter(Boolean) as NonNullable<ReturnType<typeof getAddOnById>>[]
+}
+
+function applyDiscountToSessionAmounts(amounts: number[], discountCents: number) {
+  if (discountCents <= 0) return amounts
+
+  const total = amounts.reduce((sum, amount) => sum + amount, 0)
+  let remaining = Math.min(discountCents, total - amounts.length)
+
+  return amounts.map((amount, index) => {
+    const isLast = index === amounts.length - 1
+    const share = isLast ? remaining : Math.round((discountCents * amount) / total)
+    const discount = Math.min(Math.max(share, 0), amount - 1, remaining)
+    remaining -= discount
+    return amount - discount
+  })
+}
+
+function parseJsonCookie(raw: string) {
+  const candidates = [raw]
+  try {
+    candidates.push(decodeURIComponent(raw))
+  } catch {}
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate)
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>
+      }
+    } catch {}
+  }
+
+  return null
+}
+
+function readAttributionMetadata(req: NextRequest) {
+  const raw = req.cookies.get(ATTRIBUTION_COOKIE)?.value
+  if (!raw) return {}
+
+  const parsed = parseJsonCookie(raw)
+  if (!parsed) return {}
+
+  const params = parsed.params && typeof parsed.params === 'object' && !Array.isArray(parsed.params)
+    ? parsed.params as Record<string, unknown>
+    : {}
+
+  const clickId = params.gclid || params.gbraid || params.wbraid || params.fbclid || params.msclkid
+  const metadata: Record<string, string> = {
+    trackingLandingPath: stripControlChars(parsed.landingPath, 240),
+    trackingReferrer: stripControlChars(parsed.referrer, 240),
+    trackingCapturedAt: stripControlChars(parsed.capturedAt, 80),
+    trackingSource: stripControlChars(params.utm_source, 80),
+    trackingMedium: stripControlChars(params.utm_medium, 80),
+    trackingCampaign: stripControlChars(params.utm_campaign, 120),
+    trackingContent: stripControlChars(params.utm_content, 120),
+    trackingTerm: stripControlChars(params.utm_term, 120),
+    trackingClickId: stripControlChars(clickId, 160),
+  }
+
+  return Object.fromEntries(Object.entries(metadata).filter(([, value]) => value))
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { cart, addons, totalAmount, name, email, phone } = body
+    const limited = rateLimit(req, {
+      key: 'checkout-session',
+      max: CHECKOUT_RATE_LIMIT_MAX,
+      windowMs: CHECKOUT_RATE_LIMIT_WINDOW_MS,
+    })
+    if (limited) return limited
 
-    if (!cart?.length || !name || !email) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    const body = await readJsonBody(req, MAX_BODY_BYTES)
+    const name = stripControlChars(body.name, 120)
+    const email = stripControlChars(body.email, 254).toLowerCase()
+    const phone = stripControlChars(body.phone, 40)
+    const recurring = stripControlChars(body.recurring, 40) || null
+    const recurringOption = getRecurringOptionById(recurring)
+    const teamEmails = parseEmailList(body.teamEmails, 10)
+    const referralSource = stripControlChars(
+      body.referralSource || req.cookies.get(REFERRAL_COOKIE)?.value || '',
+      80,
+    )
+
+    if (!name || !isEmail(email)) {
+      return NextResponse.json({ error: 'Name and valid email are required' }, { status: 400 })
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const cart = buildCanonicalCart(body.cart)
+    if (!cart.length) {
+      return NextResponse.json({ error: 'Cart is empty' }, { status: 400 })
+    }
 
-    // Build line items — one per cart item
-    const line_items = cart.map((item: { studioName: string; date: string; slots: string[]; hours: number; price: number; studioId: string }) => {
-      const dateStr = new Date(item.date + 'T12:00:00').toLocaleDateString('en-US', {
-        weekday: 'short', month: 'short', day: 'numeric'
-      })
-      const firstSlot = item.slots[0]
-      const lastSlot = item.slots[item.slots.length - 1]
-      const startTime = new Date(firstSlot).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' })
-      const endDate = new Date(lastSlot); endDate.setHours(endDate.getHours() + 1)
-      const endTime = endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' })
+    const availability = await assertCartSlotsAvailable(cart)
+    if (!availability.ok) {
+      const error = availability.status === 409
+        ? availability.error === 'Selected sessions overlap for the same studio.'
+          ? 'That room is already in your cart for that time. Please choose a different room or another open slot.'
+          : 'Sorry, that time was just booked or is no longer available. Please choose another open slot.'
+        : availability.error
+      return NextResponse.json({ error }, { status: availability.status })
+    }
 
-      return {
+    const addons = buildCanonicalAddons(body.addons)
+    const baseSessionTotalCents = cart.reduce((sum, item) => sum + item.price * 100, 0)
+    const addonTotalCents = addons.reduce((sum, addon) => sum + addon.price * 100, 0)
+    const discountCents = calculateRecurringDiscountCents(baseSessionTotalCents, recurringOption?.id)
+    const discountedSessionAmounts = applyDiscountToSessionAmounts(cart.map((item) => item.price * 100), discountCents)
+    const computedTotalCents = discountedSessionAmounts.reduce((sum, amount) => sum + amount, 0) + addonTotalCents
+    const referralInfo = buildReferralInfo(referralSource, computedTotalCents)
+
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = cart.map((item, index) => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: `${item.studioName} - VibeShack Studios`,
+          description: `${formatDateForDisplay(item.date)} - ${describeSlotRanges(item.slots)} - ${item.hours}hr${discountCents ? ' - recurring discount applied' : ''}`,
+          images: ['https://www.vibeshackstudios.com/og-image.jpg'],
+        },
+        unit_amount: discountedSessionAmounts[index],
+      },
+      quantity: 1,
+    }))
+
+    for (const addon of addons) {
+      lineItems.push({
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${item.studioName} — VibeShack Studios`,
-            description: `${dateStr} · ${startTime} – ${endTime} · ${item.hours}hr`,
+            name: `Add-on: ${addon.name}`,
+            description: addon.description || 'Optional add-on service',
             images: ['https://www.vibeshackstudios.com/og-image.jpg'],
           },
-          unit_amount: item.price * 100,
+          unit_amount: addon.price * 100,
         },
         quantity: 1,
-      }
-    })
-
-    // Add add-on line items if present
-    if (Array.isArray(addons) && addons.length > 0) {
-      for (const addon of addons as { id: string; name: string; price: number }[]) {
-        if (addon.price > 0) {
-          line_items.push({
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: `Add-on: ${addon.name}`,
-                description: 'Optional add-on service',
-                images: ['https://www.vibeshackstudios.com/og-image.jpg'],
-              },
-              unit_amount: addon.price * 100,
-            },
-            quantity: 1,
-          })
-        }
-      }
+      })
     }
 
-    // Build metadata — Stripe limit: 500 chars per value, 50 keys max.
-    // We split cart items into individual keys (cart_0, cart_1, ...) to avoid overflow.
     const bookingRef = crypto.randomUUID()
-    const firstItem = cart[0] as { studioId: string; studioName: string; date: string; slots: string[]; hours: number; price: number }
-
+    const attributionMetadata = readAttributionMetadata(req)
     const cartMetadata: Record<string, string> = {}
-    cart.forEach((item: { studioId: string; studioName: string; date: string; slots: string[]; hours: number; price: number }, idx: number) => {
-      // Compact representation: only essential fields
-      const compact = JSON.stringify({
+    cart.forEach((item, index) => {
+      cartMetadata[`cart_${index}`] = JSON.stringify({
         id: item.studioId,
         n: item.studioName,
         d: item.date,
         s: item.slots,
         h: item.hours,
         p: item.price,
-      })
-      cartMetadata[`cart_${idx}`] = compact.slice(0, 500)
+      }).slice(0, 500)
     })
 
-    const session = await stripe.checkout.sessions.create({
+    const baseUrl = getBaseUrl(req)
+    const session = await getStripe().checkout.sessions.create({
+      ui_mode: 'embedded',
       payment_method_types: ['card'],
-      line_items,
+      line_items: lineItems,
       mode: 'payment',
       customer_email: email,
+      payment_intent_data: {
+        receipt_email: email,
+        metadata: {
+          bookingRef,
+          customerEmail: email.slice(0, 500),
+          customerName: name.slice(0, 500),
+        },
+      },
       metadata: {
         bookingRef,
         customerName: name.slice(0, 500),
         customerEmail: email.slice(0, 500),
-        customerPhone: (phone || '').slice(0, 500),
-        studioName: firstItem.studioName.slice(0, 500),
+        customerPhone: phone.slice(0, 500),
+        studioName: cart[0].studioName.slice(0, 500),
         totalSessions: String(cart.length),
-        totalAmount: String(totalAmount),
+        totalAmount: String(computedTotalCents / 100),
+        computedTotalCents: String(computedTotalCents),
+        recurring: recurringOption?.id || '',
+        recurringDiscountCents: String(discountCents),
+        addons: addons.map((addon) => addon.id).join(',').slice(0, 500),
+        teamEmails: JSON.stringify(teamEmails).slice(0, 500),
+        referralSource: referralInfo?.source || '',
+        referralPartner: referralInfo?.partnerName || '',
+        referralCommissionRate: referralInfo ? String(referralInfo.commissionRate) : '',
+        referralCommissionCents: referralInfo ? String(referralInfo.commissionCents) : '0',
+        ...attributionMetadata,
         ...cartMetadata,
       },
-      success_url: `${baseUrl}/book/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/book/`,
+      return_url: `${baseUrl}/book/confirmation?session_id={CHECKOUT_SESSION_ID}`,
     })
 
-    return NextResponse.json({ url: session.url })
+    if (!session.client_secret) {
+      throw new Error('Stripe embedded checkout did not return a client secret')
+    }
+
+    return NextResponse.json({
+      clientSecret: session.client_secret,
+      publishableKey: getStripePublishableKey(),
+    })
   } catch (err) {
-    console.error('Stripe error:', err)
-    return NextResponse.json({ error: 'Payment session failed' }, { status: 500 })
+    const bodyError = jsonBodyErrorResponse(err)
+    if (bodyError) return bodyError
+
+    console.error('Stripe checkout error:', err)
+    const message = err instanceof Error && err.message === 'Invalid cart item'
+      ? 'Invalid booking selection'
+      : 'Payment session failed'
+    const status = message === 'Invalid booking selection' ? 400 : 500
+    return NextResponse.json({ error: message }, { status })
   }
 }

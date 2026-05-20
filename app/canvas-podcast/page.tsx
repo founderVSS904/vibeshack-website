@@ -1,26 +1,41 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
-  title: 'Canvas Podcast Studio | Premium Podcast Production | VibeShack SF',
+  title: 'Canvas Podcast Studio',
   description: 'Customizable LED backdrop podcast studio in San Francisco. Programmable lighting, cinema-grade equipment, premium aesthetics. $400/hr with crew included.',
   keywords: 'podcast studio san francisco, premium podcast recording, customizable backgrounds, LED backdrop studio, podcast production sf',
+  alternates: { canonical: 'https://www.vibeshackstudios.com/canvas-podcast/' },
   openGraph: {
     title: 'Canvas Podcast Studio — VibeShack Studios',
     description: 'Professional podcast production with customizable LED backgrounds and premium lighting.',
-    url: 'https://www.vibeshackstudios.com/canvas-podcast/',
+    url: 'https://www.vibeshackstudios.com/canvas-podcast',
   },
 }
+
+const canvasPodcastServiceSchema = studioServiceSchema({
+  name: 'Canvas Podcast Studio Rental in San Francisco',
+  description: 'Premium podcast studio in San Francisco with customizable LED backgrounds, cinema-grade lighting, and full crew included.',
+  url: 'https://www.vibeshackstudios.com/canvas-podcast/',
+  image: 'https://www.vibeshackstudios.com/studio-images/enhanced-canvas-podcast-warm-panel-wide-v20260510.jpg',
+  price: '400',
+  serviceType: 'Premium Podcast Studio Rental',
+})
 
 export default function CanvasPodcastPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(canvasPodcastServiceSchema) }}
+      />
       {/* Hero */}
       <section className="relative min-h-[90vh] flex items-center justify-center bg-black overflow-hidden pt-20">
         <div className="absolute inset-0">
           <Image
-            src="/studio-images/podcast-cyc-duo.jpg"
-            alt="Canvas Podcast Studio with orange LED backdrop"
+            src="/studio-images/enhanced-canvas-podcast-warm-panel-wide-v20260510.jpg"
+            alt="Canvas Podcast Studio with warm custom podcast setup"
             fill
             priority
             className="object-cover"
@@ -49,7 +64,7 @@ export default function CanvasPodcastPage() {
             Customizable LED backgrounds. Cinema-grade lighting. Everything you need to produce a show that looks and sounds premium.
           </p>
           <a
-            href="/book?studio=canvas-rental"
+            href="/book/?studio=canvas-podcast"
             className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
           >
             Book Canvas Podcast
@@ -82,7 +97,7 @@ export default function CanvasPodcastPage() {
             <div>
               <div className="relative overflow-hidden rounded-2xl mb-8 h-72">
                 <Image
-                  src="/studio-images/parlor-hero.jpg"
+                  src="/studio-images/enhanced-canvas-podcast-parlor-gold-wide-v20260510.jpg"
                   alt="Parlor — Premium interview studio"
                   fill
                   className="object-cover"
@@ -101,7 +116,7 @@ export default function CanvasPodcastPage() {
                 <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Built for executive conversations</span></li>
               </ul>
               <a
-                href="/book?studio=parlor"
+                href="/book/?studio=parlor"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
               >
                 Book Parlor
@@ -115,7 +130,7 @@ export default function CanvasPodcastPage() {
             <div>
               <div className="relative overflow-hidden rounded-2xl mb-8 h-72">
                 <Image
-                  src="/studio-images/horizon-hero.jpg"
+                  src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg"
                   alt="Horizon — Immersive creative space"
                   fill
                   className="object-cover"
@@ -134,7 +149,7 @@ export default function CanvasPodcastPage() {
                 <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Modern sage seating + impact</span></li>
               </ul>
               <a
-                href="/book?studio=horizon"
+                href="/book/?studio=horizon"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
               >
                 Book Horizon
@@ -155,7 +170,7 @@ export default function CanvasPodcastPage() {
               Not seeing exactly what you need? Tell us your vision. Custom lighting, backdrops, furniture, equipment — we'll build it.
             </p>
             <a
-              href="/book?studio=canvas-rental"
+              href="/canvas-podcast/custom-setup/"
               className="inline-flex items-center gap-2 px-8 py-3 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
             >
               Start Custom Setup
@@ -187,7 +202,7 @@ export default function CanvasPodcastPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
             <div className="relative overflow-hidden rounded-2xl bg-black aspect-video">
               <Image
-                src="/studio-images/podcast-cyc-duo.jpg"
+                src="/studio-images/enhanced-canvas-podcast-red-set-wide-v20260510.jpg"
                 alt="Customizable lighting moods"
                 fill
                 className="object-contain"
@@ -227,7 +242,7 @@ export default function CanvasPodcastPage() {
             </div>
             <div className="relative overflow-hidden rounded-2xl bg-black aspect-video">
               <Image
-                src="/studio-images/podcast-cyc-solo-1.jpg"
+                src="/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg"
                 alt="Cinema-grade lighting setup"
                 fill
                 className="object-contain"
@@ -239,7 +254,7 @@ export default function CanvasPodcastPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
             <div className="relative overflow-hidden rounded-2xl bg-black aspect-video">
               <Image
-                src="/studio-images/podcast-cyc-solo-2.jpg"
+                src="/studio-images/enhanced-canvas-podcast-white-studio-closeup-v20260510.jpg"
                 alt="Premium comfort and design"
                 fill
                 className="object-contain"
@@ -366,7 +381,7 @@ export default function CanvasPodcastPage() {
           </div>
 
           <a
-            href="/book?studio=canvas-rental"
+            href="/book/?studio=canvas-podcast"
             className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors mb-8"
           >
             Book Your Episode
@@ -397,7 +412,7 @@ export default function CanvasPodcastPage() {
             Canvas Podcast is available now. Book your session and let's create something great.
           </p>
           <a
-            href="/book?studio=canvas-rental"
+            href="/book/?studio=canvas-podcast"
             className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-base tracking-wide rounded hover:bg-red-700 transition-colors"
           >
             Book Canvas Podcast

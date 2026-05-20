@@ -1,64 +1,93 @@
 import { MetadataRoute } from 'next'
+import { comparisons } from '@/lib/seo/comparisons'
+import { studioGuides } from '@/lib/seo/studioGuides'
+import { useCases } from '@/lib/seo/useCases'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.vibeshackstudios.com'
+  const lastModified = new Date('2026-05-09')
+  const absoluteUrl = (path: string) => `${baseUrl}${path === '/' ? '/' : `${path}/`}`
 
   // Main pages
   const pages = [
-    { url: '/', lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 1 },
-    { url: '/pricing', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.9 },
-    { url: '/book', lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.95 },
-    { url: '/tour', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/about', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: '/contact', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: '/support', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: '/made-at-vibeshack', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: '/find-your-studio', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: '/privacy', lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },
-    { url: '/terms', lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },
+    { url: '/', lastModified, changeFrequency: 'weekly' as const, priority: 1 },
+    { url: '/pricing', lastModified, changeFrequency: 'monthly' as const, priority: 0.9 },
+    { url: '/book', lastModified, changeFrequency: 'weekly' as const, priority: 0.95 },
+    { url: '/tour', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: '/about', lastModified, changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: '/contact', lastModified, changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: '/support', lastModified, changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: '/made-at-vibeshack', lastModified, changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: '/services', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
+    { url: '/find-your-studio', lastModified, changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: '/studio-guides', lastModified, changeFrequency: 'monthly' as const, priority: 0.75 },
+    { url: '/use-cases', lastModified, changeFrequency: 'monthly' as const, priority: 0.75 },
+    { url: '/compare', lastModified, changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: '/press', lastModified, changeFrequency: 'monthly' as const, priority: 0.65 },
+    { url: '/press/24-7-san-francisco-production-studio', lastModified, changeFrequency: 'monthly' as const, priority: 0.62 },
+    { url: '/privacy', lastModified, changeFrequency: 'yearly' as const, priority: 0.3 },
+    { url: '/terms', lastModified, changeFrequency: 'yearly' as const, priority: 0.3 },
   ]
 
   // SEO landing pages
   const landingPages = [
-    { url: '/podcast-studio-san-francisco', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.85 },
-    { url: '/green-screen-studio-sf', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.85 },
-    { url: '/photography-studio-san-francisco', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.85 },
-    { url: '/rental-studios', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.75 },
+    { url: '/podcast-studio-san-francisco', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
+    { url: '/green-screen-studio-sf', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
+    { url: '/photo-services', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
+    { url: '/photography-studio-san-francisco', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
+    { url: '/video-production', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
+    { url: '/rental-studios', lastModified, changeFrequency: 'monthly' as const, priority: 0.75 },
   ]
 
   // Individual studio pages
   const studios = [
-    { url: '/the-executive', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/the-wing', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/encore', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/premier', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/sunset-studio', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/parlor', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/horizon', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/canvas-podcast', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/canvas-rental', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: '/white-backdrop-studio', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.75 },
-    { url: '/cozy-podcast', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.75 },
+    { url: '/the-executive', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: '/the-wing', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: '/encore', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: '/premier', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: '/sunset-studio', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: '/parlor', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: '/horizon', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: '/canvas-podcast', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: '/canvas-rental', lastModified, changeFrequency: 'monthly' as const, priority: 0.8 },
   ]
 
   return [
     ...pages.map(page => ({
-      url: `${baseUrl}${page.url}`,
+      url: absoluteUrl(page.url),
       lastModified: page.lastModified,
       changeFrequency: page.changeFrequency,
       priority: page.priority,
     })),
     ...landingPages.map(page => ({
-      url: `${baseUrl}${page.url}`,
+      url: absoluteUrl(page.url),
       lastModified: page.lastModified,
       changeFrequency: page.changeFrequency,
       priority: page.priority,
     })),
     ...studios.map(studio => ({
-      url: `${baseUrl}${studio.url}`,
+      url: absoluteUrl(studio.url),
       lastModified: studio.lastModified,
       changeFrequency: studio.changeFrequency,
       priority: studio.priority,
+    })),
+    ...studioGuides.map(guide => ({
+      url: absoluteUrl(`/studio-guides/${guide.slug}`),
+      lastModified,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
+    ...useCases.map(useCase => ({
+      url: absoluteUrl(`/use-cases/${useCase.slug}`),
+      lastModified,
+      changeFrequency: 'monthly' as const,
+      priority: 0.72,
+    })),
+    ...comparisons.map(comparison => ({
+      url: absoluteUrl(`/compare/${comparison.slug}`),
+      lastModified,
+      changeFrequency: 'monthly' as const,
+      priority: 0.68,
     })),
   ]
 }

@@ -149,7 +149,7 @@ The booking page remains **100% identical** in:
 ```
 NEXT_PUBLIC_SANITY_PROJECT_ID=o6atri6b
 NEXT_PUBLIC_SANITY_DATASET=production
-SANITY_API_TOKEN=skUOpGG2b6n...
+SANITY_API_TOKEN=<set in local/Vercel env only>
 ```
 
 ### ISR Settings

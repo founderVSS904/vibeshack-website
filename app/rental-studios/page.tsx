@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
-  title: 'Rental Studios San Francisco | VibeShack Studios',
-  description: 'Rent a professional studio in SF. Canvas, Photography Studio, Green Screen. $100/hr. Bring your own crew or equipment. SF Northern Waterfront. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/rental-studios' },
+  title: 'Rental Studios San Francisco',
+  description: 'Rent green screen, photography, and white cyc studios in San Francisco. Bring your crew or shoot solo. From $100/hr. Open 24/7.',
+  alternates: { canonical: 'https://www.vibeshackstudios.com/rental-studios/' },
   openGraph: {
     title: 'Rental Studios SF | VibeShack Studios',
     description: 'Canvas, Photography, Green Screen. $100/hr. Your crew, our space. Open 24/7.',
@@ -15,9 +16,9 @@ export const metadata: Metadata = {
 const studios = [
   {
     name: 'Canvas',
-    href: '/white-backdrop-studio',
-    bookHref: '/book?studio=canvas-rental',
-    img: '/studio-images/podcast-cyc-duo.jpg',
+    href: '/canvas-rental/',
+    bookHref: '/book/?studio=canvas-rental',
+    img: '/studio-images/inside-canvas-cyc-v20260509.jpg',
     series: 'Creative Series',
     seriesColor: '#99f6e4',
     seriesBg: 'rgba(13,148,136,0.3)',
@@ -26,9 +27,9 @@ const studios = [
   },
   {
     name: 'Photography Studio',
-    href: '/photography-studio-san-francisco',
-    bookHref: '/book?studio=photography',
-    img: '/studio-images/photography-hero.jpg',
+    href: '/photography-studio-san-francisco/',
+    bookHref: '/book/?studio=photography',
+    img: '/studio-images/inside-photography-red-v20260509.jpg',
     series: 'Creative Series',
     seriesColor: '#99f6e4',
     seriesBg: 'rgba(13,148,136,0.3)',
@@ -37,9 +38,9 @@ const studios = [
   },
   {
     name: 'Green Screen',
-    href: '/green-screen-studio-sf',
-    bookHref: '/book?studio=green-screen',
-    img: '/studio-images/greenscreen-wide.jpg',
+    href: '/green-screen-studio-sf/',
+    bookHref: '/book/?studio=green-screen',
+    img: '/studio-images/inside-green-screen-v20260509.jpg',
     series: 'Creative Series',
     seriesColor: '#99f6e4',
     seriesBg: 'rgba(13,148,136,0.3)',
@@ -48,12 +49,48 @@ const studios = [
   },
 ]
 
+const rentalFaqs = [
+  {
+    question: 'What rental studios are available at VibeShack?',
+    answer: 'You can rent Canvas, the Photography Studio, and the Green Screen Studio. They are built for photo, video, product, social, and creator shoots.',
+  },
+  {
+    question: 'Can I bring my own crew and equipment?',
+    answer: 'Yes. Rental studios are designed for clients who want the space, lighting, and setup while bringing their own crew or working solo.',
+  },
+  {
+    question: 'How much do rental studios cost?',
+    answer: 'Rental studios start at $100 per hour with no minimums. Podcast production rooms start at $300 per hour.',
+  },
+  {
+    question: 'Are rental studios available 24/7?',
+    answer: 'Yes. VibeShack is open 24/7, including late nights and weekends, subject to availability.',
+  },
+]
+
+const rentalServiceSchema = studioServiceSchema({
+  name: 'Production Studio Rental in San Francisco',
+  description: 'Green screen, photography, white cyc, and creative studio rentals in San Francisco for photo, video, product, and content shoots.',
+  url: 'https://www.vibeshackstudios.com/rental-studios/',
+  image: 'https://www.vibeshackstudios.com/studio-images/inside-canvas-cyc-v20260509.jpg',
+  price: '100',
+  serviceType: 'Production Studio Rental',
+})
+
 export default function RentalStudiosPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(rentalFaqs)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(rentalServiceSchema) }}
+      />
       {/* Hero */}
       <section className="relative min-h-[70vh] flex items-end bg-black overflow-hidden">
-        <Image src="/studio-images/greenscreen-wide.jpg"
+        <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg"
           alt="VibeShack Rental Studios San Francisco"
           fill className="object-cover"
           style={{opacity: 0.7, objectPosition: 'center'}} priority />
@@ -74,7 +111,7 @@ export default function RentalStudiosPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-4">
           <div className="space-y-3">
             {studios.map((s, i) => (
-              <a key={s.name} href={s.href}
+              <div key={s.name}
                 className="relative block overflow-hidden rounded-2xl group studio-card" data-tilt
                 style={{height: '420px'}}>
                 <Image src={s.img} alt={s.name}
@@ -97,7 +134,7 @@ export default function RentalStudiosPage() {
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 px-8 pb-8 flex items-end justify-between">
                   <div>
-                    <h2 data-reveal="up" className="text-white font-black mb-1" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em'}}>{s.name}</h2>
+                    <a href={s.href} data-reveal="up" className="text-white font-black mb-1 inline-block hover:text-gray-200 transition-colors" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em'}}>{s.name}</a>
                     <p className="text-gray-400 text-sm max-w-md">{s.desc}</p>
                   </div>
                   <div className="flex-shrink-0 ml-8 text-right">
@@ -110,7 +147,7 @@ export default function RentalStudiosPage() {
                     </a>
                   </div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </div>
@@ -159,6 +196,26 @@ export default function RentalStudiosPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="py-32 bg-black border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex items-end justify-between mb-16">
+            <h2 className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
+              Rental studio<br /><span className="text-brand-red">questions.</span>
+            </h2>
+            <span className="number-label">FAQ</span>
+          </div>
+          <div className="divide-y divide-white/10 border-y border-white/10">
+            {rentalFaqs.map(({ question, answer }) => (
+              <div key={question} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-16 py-8">
+                <p className="text-white font-semibold text-base">{question}</p>
+                <p className="text-gray-500 text-sm leading-relaxed">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
@@ -167,10 +224,10 @@ export default function RentalStudiosPage() {
           </h2>
           <p className="text-gray-500 text-lg mb-10" data-reveal="fade">Upgrade to a Podcast Studio and we handle the whole production.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book?studio=canvas-rental" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 transition-colors">
+            <a href="/book/?studio=canvas-rental" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 transition-colors">
               Book a Rental →
             </a>
-            <a href="/podcast-studio-san-francisco" className="inline-flex items-center gap-3 px-8 py-4 border border-white/20 text-white font-semibold text-sm rounded-full hover:border-white/40 transition-colors">
+            <a href="/podcast-studio-san-francisco/" className="inline-flex items-center gap-3 px-8 py-4 border border-white/20 text-white font-semibold text-sm rounded-full hover:border-white/40 transition-colors">
               View Podcast Studios
             </a>
           </div>

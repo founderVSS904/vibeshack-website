@@ -1,8 +1,12 @@
 .next/
 node_modules/
+.vercel/output/
 .env.local
 .env*.local
 public/studio-images/drive/
 tsconfig.tsbuildinfo
 test.tsx
 out/
+audit-screenshots-*/
+test-results/
+*.log

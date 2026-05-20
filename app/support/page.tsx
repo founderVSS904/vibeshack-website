@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Support | VibeShack Studios',
   description: 'Questions about booking, pricing, studios, or your session. We\'re here. VibeShack Studios, 950 Battery St, San Francisco.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/support' },
+  alternates: { canonical: 'https://www.vibeshackstudios.com/support/' },
 }
 
 const FAQS = [
@@ -57,7 +57,7 @@ const FAQS = [
       },
       {
         q: 'Can I do a free tour before I book?',
-        a: 'Yes. Tours are available 24/7. Book one at vibeshackstudios.com/tour or email us and we\'ll set it up.',
+        a: 'Yes. Book a free tour at vibeshackstudios.com/tour. The available times are checked against the live studio calendar before your tour is confirmed.',
       },
     ],
   },
@@ -244,7 +244,7 @@ export default function SupportPage() {
                 label: 'Hours',
                 value: 'Open 24/7',
                 sub: 'Every day. No exceptions.',
-                href: '/book',
+                href: '/book/',
               },
             ].map(({ label, value, sub, href }) => (
               <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined}

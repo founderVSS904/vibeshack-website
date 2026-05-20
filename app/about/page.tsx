@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-  title: 'About VibeShack Studios | SF Production Studio',
-  description: 'VibeShack Studios is The Dream Factory — San Francisco\'s creative production studio. Multiple studios at the Northern Waterfront. Built for creators, podcasters, and brands.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/about' }
+  title: 'About',
+  description: 'VibeShack Studios is San Francisco creative production infrastructure: podcast, green screen, photo, and rental studios at the Northern Waterfront.',
+  alternates: { canonical: 'https://www.vibeshackstudios.com/about/' }
 }
 
 export default function AboutPage() {
@@ -42,7 +42,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="relative min-h-[500px] lg:min-h-0 overflow-hidden rounded-2xl">
-            <Image src="/studio-images/1-16.jpg" alt="VibeShack Studios — The Creative Standard"
+            <Image src="/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg" alt="Creator recording inside VibeShack Studios in San Francisco"
               fill className="object-cover" style={{objectPosition: 'center'}} priority />
           </div>
         </div>
@@ -69,10 +69,10 @@ export default function AboutPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { src: '/studio-images/drive-podcast-hero.jpg', alt: 'Podcast Studio' },
-                { src: '/studio-images/drive-greenscreen-hero.jpg', alt: 'Green Screen Studio' },
-                { src: '/studio-images/drive-photo-hero.jpg', alt: 'Photography Studio' },
-                { src: '/studio-images/podcast-cyc-duo.jpg', alt: 'Canvas — VibeShack Studios' },
+                { src: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', alt: 'Podcast Studio' },
+                { src: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg', alt: 'Blue-lit production set' },
+                { src: '/studio-images/shot-here-red-fabric-wide-v20260509.jpg', alt: 'Creative photography shoot at VibeShack Studios' },
+                { src: '/studio-images/enhanced-canvas-podcast-parlor-gold-wide-v20260510.jpg', alt: 'Parlor podcast production at VibeShack Studios' },
               ].map(({ src, alt }) => (
                 <div key={src} className="overflow-hidden rounded-xl">
                   <Image src={src} alt={alt} width={400} height={180} className="w-full object-cover" style={{height: '180px'}} />
@@ -135,7 +135,7 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="overflow-hidden rounded-2xl">
-              <Image src="/studio-images/drive-homepage-1.jpg" alt="VibeShack Studios" width={800} height={480} className="w-full object-cover" style={{height: '480px'}} />
+              <Image src="/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg" alt="Podcast guest recording at VibeShack Studios" width={800} height={480} className="w-full object-cover" style={{height: '480px'}} />
             </div>
           </div>
         </div>
@@ -151,13 +151,13 @@ export default function AboutPage() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             <div className="col-span-2 row-span-2 overflow-hidden rounded-xl">
-              <Image src="/studio-images/1-23.jpg" alt="VibeShack Podcast Studio" width={800} height={480} className="w-full object-cover" style={{ height: '480px' }} />
+              <Image src="/studio-images/horizon-wide-v20260509.jpg" alt="Horizon podcast room at VibeShack Studios" width={800} height={480} className="w-full object-cover" style={{ height: '480px' }} />
             </div>
             <div className="overflow-hidden rounded-xl">
-              <Image src="/studio-images/1-11.jpg" alt="VibeShack Green Screen Studio" width={400} height={234} className="w-full object-cover" style={{ height: '234px' }} />
+              <Image src="/studio-images/parlor-side-v20260509.jpg" alt="Parlor lounge production set at VibeShack Studios" width={400} height={234} className="w-full object-cover" style={{ height: '234px' }} />
             </div>
             <div className="overflow-hidden rounded-xl">
-              <Image src="/studio-images/1-9.jpg" alt="VibeShack Photography Studio" width={400} height={234} className="w-full object-cover" style={{ height: '234px' }} />
+              <Image src="/studio-images/inside-photography-red-v20260509.jpg" alt="Red backdrop photography set at VibeShack Studios" width={400} height={234} className="w-full object-cover" style={{ height: '234px' }} />
             </div>
           </div>
         </div>
@@ -214,8 +214,8 @@ export default function AboutPage() {
             Come see the space.<br />
             <span className="text-brand-red">Book a free tour.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">Free studio tours available 24/7. 950 Battery St, San Francisco.</p>
-          <a href="/contact"
+          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">Pick a live tour time. 950 Battery St, San Francisco.</p>
+          <a href="/tour/"
             className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 transition-colors">
             Book a Free Tour
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>

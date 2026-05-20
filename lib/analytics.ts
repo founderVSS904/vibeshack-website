@@ -73,7 +73,8 @@ export const sendGAEvent = (eventType: GAEventType | string, params?: Record<str
  * Track page views with UTM parameters
  */
 export const trackPageView = (pathname: string) => {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
+  const gaId = process.env.NEXT_PUBLIC_GA4_ID
+  if (typeof window !== 'undefined' && (window as any).gtag && gaId) {
     let utmParams: Record<string, string | null> = {
       utm_source: null,
       utm_medium: null,
@@ -95,7 +96,7 @@ export const trackPageView = (pathname: string) => {
       // Fallback if URL parsing fails
     }
     
-    (window as any).gtag('config', process.env.NEXT_PUBLIC_GA4_ID, {
+    (window as any).gtag('config', gaId, {
       page_path: pathname,
       page_title: document.title,
       ...utmParams,
@@ -191,7 +192,7 @@ export const trackScrollDepth = (percentageScrolled: number) => {
   })
 }
 
-export default {
+const analytics = {
   sendGAEvent,
   trackPageView,
   trackConversion,
@@ -200,3 +201,5 @@ export default {
   trackBookingStep,
   trackScrollDepth,
 }
+
+export default analytics

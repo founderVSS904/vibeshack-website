@@ -48,7 +48,7 @@ export default function NotFound() {
             </svg>
           </Link>
           <Link
-            href="/book"
+            href="/book/"
             className="inline-flex items-center gap-2 px-8 py-4 text-white text-sm font-semibold border border-white/20 rounded-full hover:border-white/50 hover:bg-white/5 active:scale-[0.98] transition-all duration-200 cursor-pointer"
           >
             Book a Session

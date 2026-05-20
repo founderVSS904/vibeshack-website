@@ -4,6 +4,8 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: "Message Sent | VibeShack Studios",
   description: "Thanks for reaching out. We'll be in touch within 2 business hours.",
+  robots: { index: false, follow: false },
+  alternates: { canonical: 'https://www.vibeshackstudios.com/contact/' },
 }
 
 export default function ContactSuccessPage() {
@@ -17,7 +19,7 @@ export default function ContactSuccessPage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="/book"
+            href="/book/"
             className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
           >
             Book Your Session

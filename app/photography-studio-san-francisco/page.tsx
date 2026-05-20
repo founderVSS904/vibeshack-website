@@ -1,244 +1,398 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
+import { absoluteUrl } from '@/lib/seo/site'
+import { breadcrumbSchema, faqSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
-  title: 'Photography Studio San Francisco | Professional Lighting | VibeShack Studios',
+  title: 'Photography Studio Rental SF',
   description:
-    'Photography studio in San Francisco with a Hair and Makeup room, seamless white backdrop, and professional lighting grid. From $100/hr. Book instantly at VibeShack Studios.',
+    'Photography studio rental in San Francisco for photographers, creators, and crews bringing their own camera team. Lighting, backdrops, makeup room, from $100/hr.',
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/photography-studio-san-francisco',
+    canonical: 'https://www.vibeshackstudios.com/photography-studio-san-francisco/',
   },
   openGraph: {
-    title: 'Photography Studio San Francisco | Professional Lighting | VibeShack Studios',
+    title: 'Photography Studio Rental San Francisco | VibeShack Studios',
     description:
-      'Professional photography studio in SF. White backdrop wall, Hair and Makeup room, professional lighting grid. $100/hr.',
-    url: 'https://www.vibeshackstudios.com/photography-studio-san-francisco',
+      'Book a room-only photography studio rental in San Francisco with lighting, backdrops, makeup room, and white cyc access. From $100/hr.',
+    url: 'https://www.vibeshackstudios.com/photography-studio-san-francisco/',
+    images: ['/studio-images/photography-hero-service-v20260509.jpg'],
   },
 }
 
-const useCases = [
-  { label: 'Headshots', description: 'Professional headshots for executives, talent, and personal branding. Multiple backdrops available.' },
-  { label: 'Brand Campaigns', description: 'Full production capability for brand campaigns. Flexible studio environment.' },
-  { label: 'E-Commerce', description: 'Clean, controlled lighting for products of all sizes. White cyc wall for flawless backgrounds.' },
-  { label: 'Editorial', description: 'Cinema-quality lighting for editorial content. Full overhead lighting grid access.' },
-  { label: 'Lookbooks', description: 'White cyc wall with full lighting control for fashion and seasonal campaigns.' },
-  { label: 'Music Press Shots', description: 'Album art, press photos, and promo imagery. Professional lighting for cinema-grade portraits.' },
+const serviceTabs = [
+  { href: '/photo-services/', label: 'Photo Services', active: false },
+  { href: '/video-production/', label: 'Video Production', active: false },
+  { href: '/podcast-studio-san-francisco/', label: 'Podcast', active: false },
+  { href: '/green-screen-studio-sf/', label: 'Green Screen', active: false },
+  { href: '/canvas-rental/', label: 'White Cyc', active: false },
+  { href: '/photography-studio-san-francisco/', label: 'Studio Rental', active: true },
 ]
+
+const shootTypes = [
+  {
+    title: 'Brand and founder portraits',
+    pressure: 'You need the person to look credible, sharp, and current without making the shoot feel corporate-flat.',
+    roomAdvantage: 'Use controlled lighting, simple backgrounds, and enough room for wardrobe, grooming, and multiple crop ratios.',
+  },
+  {
+    title: 'Product and e-commerce',
+    pressure: 'Small products reveal messy light fast. Reflections, shadows, and color consistency matter more than people expect.',
+    roomAdvantage: 'The studio gives you repeatable light, clean surfaces, staging space, and white background options.',
+  },
+  {
+    title: 'Lookbooks and fashion tests',
+    pressure: 'You need speed: outfits, movement, verticals, horizontals, detail shots, and clean selects in one booking.',
+    roomAdvantage: 'The makeup room, clothing rack, steamer, backdrops, and open shooting zone keep the day moving.',
+  },
+  {
+    title: 'Press kits and music campaigns',
+    pressure: 'The images have to hold up as a profile photo, event poster, Spotify canvas, article hero, and social crop.',
+    roomAdvantage: 'Shoot tight portraits, full body frames, negative-space crops, and moodier lighting setups in one place.',
+  },
+]
+
+const planningNotes = [
+  ['Final placements', 'Know whether the hero image needs website-wide, square, vertical story, YouTube thumbnail, press headshot, or ad crop versions.'],
+  ['Background strategy', 'Pick one clean background, one texture or color look, and one close portrait setup instead of improvising every frame.'],
+  ['Wardrobe rhythm', 'Bring fewer outfits than you think, but make each one meaningfully different in color, silhouette, and use case.'],
+  ['Shot-list discipline', 'Plan required shots first, then leave time for creative variations. This prevents a beautiful shoot with missing deliverables.'],
+]
+
+const included = [
+  'Photography room with controlled lighting',
+  'White cyc and clean backdrop access',
+  'Hair and makeup room with vanity lighting',
+  'Colored backdrop options',
+  'Clothing rack, steamer, and changing area',
+  'Equipment staging space',
+  'High-speed WiFi for uploads and tethering',
+  '24/7 booking subject to availability',
+]
+
+const gallery = [
+  {
+    src: '/studio-images/photography-hero-service-v20260509.jpg',
+    alt: 'Fashion campaign still on a warm gradient set at VibeShack Studios San Francisco',
+    label: 'Campaign Movement',
+  },
+  {
+    src: '/studio-images/photography-spotlight-portrait-v20260509.jpg',
+    alt: 'Dramatic spotlight portrait photographed at VibeShack Studios San Francisco',
+    label: 'Spotlight Portrait',
+  },
+  {
+    src: '/studio-images/photography-cyc-editorial-v20260509.jpg',
+    alt: 'Black and white editorial movement image photographed on cyc at VibeShack Studios San Francisco',
+    label: 'Editorial Cyc',
+  },
+  {
+    src: '/studio-images/photography-vibeshack-cover-v20260509.jpg',
+    alt: 'Magazine-style portrait photographed at VibeShack Studios San Francisco',
+    label: 'Press Cover',
+  },
+]
+
+const photographyFaqs = [
+  {
+    question: 'How much is the photography studio?',
+    answer: 'The Photography Studio starts at $100 per hour for room rental. If you want VibeShack to help produce the actual photoshoot, use the Photo Services page instead so we can scope the shoot correctly.',
+  },
+  {
+    question: 'What is included with the photography studio?',
+    answer: 'The studio includes controlled lighting, backdrop options, white cyc access, hair and makeup room, clothing rack, steamer, changing area, WiFi, and staging space.',
+  },
+  {
+    question: 'Can I book for headshots, products, fashion, or brand campaigns?',
+    answer: 'Yes. The room works for headshots, founder portraits, e-commerce, product photos, fashion tests, lookbooks, press photos, album art, and campaign stills.',
+  },
+  {
+    question: 'Do I need to bring my own photographer?',
+    answer: 'Yes for room-only rental. This page is for clients bringing their own photographer, camera, and production plan. If you want VibeShack to help create the images, start with Photo Services.',
+  },
+  {
+    question: 'Is the photography studio available 24/7?',
+    answer: 'Yes. VibeShack is open 24/7 in San Francisco, subject to live calendar availability.',
+  },
+]
+
+const photographyServiceSchema = studioServiceSchema({
+  name: 'Photography Studio Rental in San Francisco',
+  description:
+    'Room-only photography studio rental in San Francisco for photographers, creators, and crews shooting headshots, products, portraits, fashion, lookbooks, press photos, and campaign stills with lighting, backdrops, white cyc access, and makeup room.',
+  url: 'https://www.vibeshackstudios.com/photography-studio-san-francisco/',
+  image: 'https://www.vibeshackstudios.com/studio-images/photography-hero-service-v20260509.jpg',
+  price: '100',
+  serviceType: 'Photography Studio Rental',
+})
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'VibeShack Studios', url: absoluteUrl('/') },
+  { name: 'Rental Studios', url: absoluteUrl('/rental-studios/') },
+  { name: 'Photography Studio Rental San Francisco', url: absoluteUrl('/photography-studio-san-francisco/') },
+])
 
 export default function PhotographyStudioPage() {
   return (
     <>
-      {/* Hero — anchored bottom-left in dark zone */}
-      <section className="relative min-h-screen flex items-end overflow-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(photographyFaqs)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(photographyServiceSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
+      />
+
+      <section className="relative min-h-screen flex items-end overflow-hidden bg-black">
         <div className="absolute inset-0">
           <Image
-            src="/studio-images/photography-hero.jpg"
+            src="/studio-images/photography-hero-service-v20260509.jpg"
             fill
             className="object-cover"
-            alt="Photography studio with professional lighting and white backdrop — VibeShack Studios San Francisco"
-            style={{objectPosition: 'center right'}}
+            alt="Fashion campaign photography created at VibeShack Studios San Francisco"
+            style={{ objectPosition: 'center right' }}
             priority
           />
-          {/* Heavy bottom + left gradient so white text reads on light studio */}
-          <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 25%, rgba(0,0,0,0.1) 60%, transparent 100%)'}} />
-          <div className="absolute inset-0" style={{background: 'linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)'}} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(100deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.72) 36%, rgba(0,0,0,0.18) 72%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.25) 42%, transparent 80%)' }} />
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-12 pt-28 sm:pt-40 w-full">
-          <div className="max-w-md">
-            <h1
-              className="font-black text-white leading-none mb-8"
-              style={{ fontSize: 'clamp(2.8rem, 5vw, 5rem)', letterSpacing: '-0.04em' }}
-            >
-              Your talent<br />
-              arrives <span className="text-brand-red">ready.</span>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-12 pt-32 w-full">
+          <div className="max-w-3xl">
+            <p className="number-label mb-8">Photography Studio Rental San Francisco</p>
+            <h1 className="font-black text-white leading-none mb-8" style={{ fontSize: 'clamp(3.2rem, 8vw, 7.5rem)', letterSpacing: '-0.055em' }}>
+              Rent the room. Bring your photographer.
             </h1>
-            <a
-              href="/book?studio=photography"
-              className="inline-flex items-center gap-3 px-7 py-3.5 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
-            >
-              Book Your Session
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* What's Included */}
-      <section className="py-32 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="mb-20">
-            <span className="number-label mb-12 block">What&apos;s Included</span>
-            <h2 data-reveal="up" className="text-white font-black leading-none max-w-xl" style={{fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', letterSpacing: '-0.04em'}}>
-              Everything&apos;s here.<br/>
-              <span className="text-brand-red">Already set up.</span>
-            </h2>
-          </div>
-
-          <div className="divide-y divide-white/10 border-y border-white/10 mb-16">
-            {[
-              { label: 'Hair and Makeup Room', detail: 'Dedicated vanity room with mirror lights. Bring your own Hair & Makeup team.' },
-              { label: 'White Cyclorama Wall', detail: 'Seamless floor-to-ceiling infinity backdrop. No seams, no shadows at the base.' },
-              { label: 'Professional Lighting', detail: '3-point kit. Overhead grid. Multiple configurations.' },
-              { label: 'Panel Lights', detail: '4x4 fill panels. Adjustable color temperature.' },
-              { label: 'Colored Backdrops', detail: 'Multiple colors available on request. Switch in minutes.' },
-              { label: 'Clothing Rack and Steamer', detail: 'Keep wardrobe clean and wrinkle-free.' },
-              { label: 'Changing Area', detail: 'Private space for talent to change between setups.' },
-              { label: 'High-Speed WiFi', detail: 'For tethered shooting, uploads, and streaming.' },
-            ].map(({ label, detail }) => (
-              <div key={label} className="flex items-start justify-between gap-8 py-5">
-                <span className="text-white font-semibold text-sm flex-shrink-0 w-56">{label}</span>
-                <span className="text-gray-500 text-sm text-right">{detail}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Room photo grid */}
-          <div className="space-y-3">
-            <Image src="/studio-images/photo-studio-empty.jpg" alt="Photography studio full room view with lighting grid — VibeShack Studios San Francisco"
-                width={1200} height={800} className="w-full h-auto rounded-2xl" />
-            <div className="grid grid-cols-2 gap-3">
-              <Image src="/studio-images/photo-studio-backdrops.jpg" alt="Photography studio backdrop selection options — VibeShack Studios San Francisco"
-                  width={600} height={400} className="w-full h-auto rounded-2xl" />
-              <Image src="/studio-images/photography-hero.jpg" alt="Photography studio with red backdrop and professional lighting — VibeShack Studios San Francisco"
-                  width={600} height={400} className="w-full h-auto rounded-2xl" />
+            <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mb-10">
+              A San Francisco photography studio rental for photographers, creators, agencies, and in-house teams who already have the shoot plan and need controlled light, backdrops, makeup space, staging room, and a clean production environment.
+            </p>
+            <div className="flex flex-wrap gap-4 items-center">
+              <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+                Book studio rental
+              </Link>
+              <Link href="/photo-services/" className="text-gray-400 hover:text-white text-sm font-semibold transition-colors">
+                Need VibeShack to shoot it?
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Use Cases */}
-      <section className="py-32 bg-zinc-950 border-t border-white/5">
+      <section className="bg-black border-t border-white/5 sticky top-20 z-30" data-carousel>
+        <div className="scrollbar-hide max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 overflow-x-auto">
+          <div className="flex gap-2 min-w-max pr-6" role="list" aria-label="Service pages">
+            {serviceTabs.map(({ href, label, active }) => (
+              <Link
+                key={href}
+                href={href}
+                role="listitem"
+                className={`px-4 py-2 rounded-full border text-sm font-semibold transition-colors ${
+                  active
+                    ? 'border-brand-red bg-brand-red text-white'
+                    : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <span className="number-label mb-12 block">What Gets Shot Here</span>
-          <h2
-            className="font-black text-white leading-tight mb-16"
-            style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}
-          >
-            Every frame,<br />
-            <span className="text-brand-red">controlled.</span>
-          </h2>
-          <div className="divide-y divide-white/10 border-y border-white/10">
-            {useCases.map(({ label, description }) => (
-              <div key={label} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-16 py-7">
-                <p className="text-white font-semibold text-base">{label}</p>
-                <p className="text-gray-500 text-sm leading-relaxed">{description}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-16 items-start">
+            <div>
+              <span className="number-label mb-6 block">The point</span>
+              <h2 className="text-white font-black leading-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+                Not just a room. A repeatable visual system.
+              </h2>
+              <p className="text-gray-500 text-base leading-relaxed mb-8">
+                Strong photo sessions are planned around the final use: website hero, press bio, product page, ad creative, cover art, social crop, or sales deck. The studio gives you the control to shoot those variations without changing locations.
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  ['$100/hr', 'Direct studio rental'],
+                  ['24/7', 'Live availability'],
+                  ['1 address', 'Studio, makeup, staging'],
+                ].map(([value, label]) => (
+                  <div key={value} className="border border-white/10 rounded-2xl p-5 bg-zinc-950">
+                    <p className="text-white font-black text-2xl leading-none mb-2" style={{ letterSpacing: '-0.035em' }}>{value}</p>
+                    <p className="text-gray-600 text-xs leading-relaxed">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="relative h-[520px] rounded-2xl overflow-hidden">
+                <Image src="/studio-images/photography-room-red-backdrop-v20260509.jpg" alt="Photography room with red backdrop at VibeShack Studios San Francisco" fill className="object-cover" />
+              </div>
+              <div className="space-y-3">
+                <div className="relative h-[254px] rounded-2xl overflow-hidden">
+                  <Image src="/studio-images/photography-cyc-editorial-v20260509.jpg" alt="Editorial photography created on a white cyc at VibeShack Studios San Francisco" fill className="object-cover" />
+                </div>
+                <div className="relative h-[254px] rounded-2xl overflow-hidden">
+                  <Image src="/studio-images/drive-video-studio.jpg" alt="Hair and makeup room at VibeShack Studios San Francisco" fill className="object-cover" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 bg-zinc-950 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-14">
+            <div>
+              <span className="number-label mb-6 block">What to shoot here</span>
+              <h2 className="text-white font-black leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+                Built for the photos your shoot actually needs.
+              </h2>
+            </div>
+            <p className="text-gray-500 text-sm leading-relaxed max-w-md">
+              A good studio should feel practical before you book: clear backgrounds, controllable light, room to stage, and enough flexibility to protect the final images.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {shootTypes.map(({ title, pressure, roomAdvantage }) => (
+              <div key={title} className="rounded-2xl border border-white/10 bg-black p-7">
+                <h3 className="text-white font-black text-2xl mb-5 leading-none" style={{ letterSpacing: '-0.03em' }}>{title}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-white/10 pt-5">
+                  <div>
+                    <p className="text-gray-600 text-[10px] tracking-[0.22em] uppercase mb-3">What matters</p>
+                    <p className="text-gray-400 text-sm leading-relaxed">{pressure}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-[10px] tracking-[0.22em] uppercase mb-3">Room advantage</p>
+                    <p className="text-gray-400 text-sm leading-relaxed">{roomAdvantage}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Made Here */}
-      <section className="py-32 bg-zinc-950 border-t border-white/5">
+      <section className="py-24 bg-black border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-16">
+            <div>
+              <span className="number-label mb-6 block">Plan the session</span>
+              <h2 className="text-white font-black leading-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+                The shoot gets better before anyone arrives.
+              </h2>
+              <p className="text-gray-500 text-sm leading-relaxed max-w-md">
+                Use this checklist before you book. It keeps the session focused and makes the final gallery more useful.
+              </p>
+            </div>
+            <div className="divide-y divide-white/10 border-y border-white/10">
+              {planningNotes.map(([title, body]) => (
+                <div key={title} className="grid grid-cols-1 md:grid-cols-[0.35fr_0.65fr] gap-4 md:gap-12 py-7">
+                  <p className="text-white font-semibold">{title}</p>
+                  <p className="text-gray-500 text-sm leading-relaxed">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 bg-zinc-950 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex items-end justify-between mb-12">
             <div>
-              <span className="number-label mb-4 block">Made Here</span>
-              <h2 data-reveal="up" className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
-                Productions shot<br/>in <span className="text-brand-red">Photography.</span>
+              <span className="number-label mb-6 block">Shot here</span>
+              <h2 className="text-white font-black leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+                Real photo work, not placeholder polish.
               </h2>
             </div>
+            <Link href="/made-at-vibeshack/" className="hidden md:block text-gray-600 hover:text-white text-sm transition-colors">More work made here</Link>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Image src="/studio-images/photo-studio-shoot-1.jpg" alt="Fashion shoot in progress — Photography Studio VibeShack Studios San Francisco"
-              width={600} height={400} className="w-full h-auto rounded-2xl" />
-            <Image src="/studio-images/photo-studio-shoot-2.jpg" alt="Video production shoot — Photography Studio VibeShack Studios San Francisco"
-              width={600} height={400} className="w-full h-auto rounded-2xl" />
-          </div>
-          <p className="text-gray-600 text-xs mt-4">
-            Have a production shot here? <a href="mailto:founder@vibeshackstudios.com" className="text-brand-red hover:text-white transition-colors">Send it to us</a> — we&apos;ll feature it.
-          </p>
-        </div>
-      </section>
 
-      {/* Pricing */}
-      <section className="py-32 bg-black border-t border-white/5">
-        <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
-          <span className="number-label mb-12 block">Pricing</span>
-          <div
-            className="font-black text-brand-red leading-none mb-2"
-            style={{ fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em' }}
-          >
-            $100
-          </div>
-          <p className="text-gray-500 text-lg mb-1" data-reveal="fade">per hour</p>
-          <p className="text-white font-semibold mb-12">No minimums. No hidden fees.</p>
-          <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
-            {[
-              'Professional overhead lighting',
-              'Panel fill lights',
-              'Seamless white backdrop',
-              'Full vanity and makeup station',
-              'Multiple backdrops',
-              'Equipment staging area',
-            ].map((f) => (
-              <div key={f} className="py-3.5 text-gray-400 text-sm">{f}</div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            {gallery.map(({ src, alt, label }, index) => (
+              <div key={src} className={`relative overflow-hidden rounded-2xl ${index === 0 ? 'md:col-span-2 md:row-span-2 h-[520px]' : 'h-[254px]'}`}>
+                <Image src={src} alt={alt} fill className="object-cover" sizes={index === 0 ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 768px) 25vw, 100vw'} />
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 48%)' }} />
+                <p className="absolute bottom-4 left-4 text-white text-sm font-semibold">{label}</p>
+              </div>
             ))}
           </div>
-          <a
-            href="/book?studio=photography"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
-          >
-            Book Your Session
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
         </div>
       </section>
 
-      {/* Sister Studios */}
-      <section className="py-16 bg-black border-t border-white/5">
+      <section className="py-24 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <p className="text-gray-600 text-xs uppercase tracking-widest mb-6">Also in the Creative Series</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <a href="/white-backdrop-studio" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
-              <Image src="/studio-images/drive-cyc-wall.jpg" alt="Canvas — seamless white cyc wall, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
-              <div className="absolute bottom-4 left-4">
-                <p className="text-white font-black">Canvas</p>
-                <p className="text-gray-400 text-xs">$100/hr · White cyc wall</p>
-              </div>
-            </a>
-            <a href="/green-screen-studio-sf" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
-              <Image src="/studio-images/greenscreen-wide.jpg" alt="Green Screen Studio — VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
-              <div className="absolute bottom-4 left-4">
-                <p className="text-white font-black">Green Screen</p>
-                <p className="text-gray-400 text-xs">$100/hr · 750 sqft</p>
-              </div>
-            </a>
+          <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-16">
+            <div>
+              <span className="number-label mb-6 block">Included</span>
+              <h2 className="text-white font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+                The boring details that save the shoot.
+              </h2>
+              <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+                Book studio rental
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 border border-white/10 rounded-2xl overflow-hidden">
+              {included.map((item) => (
+                <div key={item} className="p-5 border-b sm:odd:border-r border-white/10">
+                  <p className="text-gray-300 text-sm font-semibold">{item}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-32 bg-zinc-950 border-t border-white/10">
+      <section className="py-24 bg-zinc-950 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="grid grid-cols-1 lg:grid-cols-[0.75fr_1.25fr] gap-16 items-start">
+            <div>
+              <span className="number-label mb-6 block">Pricing</span>
+              <div className="font-black text-brand-red leading-none mb-3" style={{ fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.055em' }}>
+                $100
+              </div>
+              <p className="text-white font-semibold mb-2">per hour for studio rental</p>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Direct booking rate. Bring your photographer and crew, or contact us first if you need production support.
+              </p>
+            </div>
+
+            <div className="divide-y divide-white/10 border-y border-white/10">
+              {photographyFaqs.map(({ question, answer }) => (
+                <div key={question} className="grid grid-cols-1 md:grid-cols-[0.42fr_0.58fr] gap-4 md:gap-12 py-7">
+                  <p className="text-white font-semibold">{question}</p>
+                  <p className="text-gray-500 text-sm leading-relaxed">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <h2
-            className="font-black text-white leading-none mb-4"
-            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}
-          >
-            Book the <span className="text-brand-red">Photography Studio.</span>
+          <p className="number-label mb-8">Ready</p>
+          <h2 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', letterSpacing: '-0.05em' }}>
+            Book the room that makes the photo look intentional.
           </h2>
-          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">Professional lighting, white backdrop, Hair and Makeup room. $100/hr. Open 24/7.</p>
+          <p className="text-gray-500 text-lg mb-10">
+            Room-only photography studio rental in San Francisco from $100/hr. Open 24/7 at 950 Battery St.
+          </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a
-              href="/book?studio=photography"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
-            >
-              Book Your Session
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
-            <a
-              href="/contact"
-              className="text-gray-500 hover:text-white transition-colors text-sm self-center"
-            >Schedule a free tour →
-            </a>
+            <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+              Book studio rental
+            </Link>
+            <Link href="/services/" className="text-gray-500 hover:text-white transition-colors text-sm self-center">
+              Compare all services
+            </Link>
           </div>
         </div>
       </section>

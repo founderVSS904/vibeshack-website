@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import ContactForm from './ContactForm'
+import { peerspaceUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
-  title: 'Contact | Book a Studio or Tour | VibeShack Studios',
+  title: 'Contact',
   description:
     'Contact VibeShack Studios. Book a studio session or schedule a tour. 950 Battery St, San Francisco, CA 94111. founder@vibeshackstudios.com',
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/contact',
+    canonical: 'https://www.vibeshackstudios.com/contact/',
   },
   openGraph: {
     title: 'Contact VibeShack Studios | San Francisco',
@@ -100,7 +101,7 @@ export default function ContactPage() {
                   Pick your time and confirm instantly.
                 </p>
                 <a
-                  href="/book"
+                  href="/book/"
                   className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Book a Session →
@@ -141,12 +142,20 @@ export default function ContactPage() {
               <div className="py-8">
                 <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Instagram</p>
                 <a
-                  href="https://instagram.com/vibeshackstudios"
+                  href="https://instagram.com/vibeshackhq_"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white font-semibold hover:text-brand-red transition-colors"
+                  className="block text-white font-semibold hover:text-brand-red transition-colors"
                 >
-                  @vibeshackstudios
+                  @vibeshackhq_
+                </a>
+                <a
+                  href="https://instagram.com/vibeshackstudios_"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 block text-gray-400 font-semibold hover:text-brand-red transition-colors"
+                >
+                  @vibeshackstudios_
                 </a>
                 <p className="text-gray-500 text-sm mt-1">Behind-the-scenes, studio looks, client work.</p>
               </div>
@@ -164,7 +173,7 @@ export default function ContactPage() {
               <div className="py-8">
                 <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Also on Peerspace</p>
                 <a
-                  href="https://www.peerspace.com/pages/listings/689d6738fd3071ac60b894ab"
+                  href={peerspaceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-brand-red font-semibold text-sm hover:underline"

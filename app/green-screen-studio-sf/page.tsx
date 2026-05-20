@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
-  title: 'Green Screen Studio San Francisco | 750 sqft | VibeShack Studios',
+  title: 'Green Screen Studio San Francisco',
   description:
-    '750 sqft green screen studio in San Francisco. Floor-to-ceiling green screen, professional lighting, easy load-in. From $100/hr. Northern Waterfront location.',
+    '750 sqft floor-to-ceiling green screen studio in San Francisco with professional lighting and easy load-in. From $100/hr. Open 24/7.',
   keywords: [
     'green screen studio san francisco',
     'chroma key studio sf',
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
     'content creation studio sf',
   ],
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/green-screen-studio-sf',
+    canonical: 'https://www.vibeshackstudios.com/green-screen-studio-sf/',
   },
   openGraph: {
     title: 'Green Screen Studio SF | 750 sqft Floor-to-Ceiling | VibeShack Studios',
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://www.vibeshackstudios.com/studio-images/greenscreen-wide.jpg',
+        url: 'https://www.vibeshackstudios.com/studio-images/inside-green-screen-v20260509.jpg',
         width: 1200,
         height: 630,
         alt: 'Green Screen Studio - 750 sqft floor-to-ceiling - VibeShack Studios SF',
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Green Screen Studio SF | VibeShack Studios',
     description: '750 sqft floor-to-ceiling green screen. Professional lighting. From $100/hr. Open 24/7.',
-    images: ['https://www.vibeshackstudios.com/studio-images/greenscreen-wide.jpg'],
+    images: ['https://www.vibeshackstudios.com/studio-images/inside-green-screen-v20260509.jpg'],
   },
 }
 
@@ -87,16 +88,33 @@ const faqs = [
   },
 ]
 
+const greenScreenServiceSchema = studioServiceSchema({
+  name: 'Green Screen Studio Rental in San Francisco',
+  description: '750 sqft floor-to-ceiling green screen studio in San Francisco with professional lighting and easy load-in.',
+  url: 'https://www.vibeshackstudios.com/green-screen-studio-sf/',
+  image: 'https://www.vibeshackstudios.com/studio-images/inside-green-screen-v20260509.jpg',
+  price: '100',
+  serviceType: 'Green Screen Studio Rental',
+})
+
 export const dynamic = 'force-dynamic'
 
 export default function GreenScreenPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(faqs)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(greenScreenServiceSchema) }}
+      />
       {/* Hero — text anchored LEFT in dark zone, green screen breathes RIGHT */}
       <section className="relative min-h-screen flex items-end overflow-hidden bg-black">
         <div className="absolute inset-0 bg-black">
           <Image
-            src="/studio-images/greenscreen-wide.jpg"
+            src="/studio-images/inside-green-screen-v20260509.jpg"
             fill
             className="object-cover"
             alt="750 sqft green screen studio floor-to-ceiling hero view — VibeShack Studios San Francisco"
@@ -120,7 +138,7 @@ export default function GreenScreenPage() {
               750 sq ft. Floor-to-ceiling Green Screen. Lights included. Drop in any environment you can imagine.
             </p>
             <div className="flex gap-6 items-center">
-              <a href="/book?studio=green-screen" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+              <a href="/book/?studio=green-screen" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
                 Book Your Session
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </a>
@@ -176,7 +194,7 @@ export default function GreenScreenPage() {
             </div>
             {/* Use cases numbered list */}
             <div className="relative z-10">
-              <span className="number-label mb-12 block">What Gets Shot Here</span>
+              <span className="number-label mb-12 block">Best Green Screen Uses</span>
               <h2
                 className="font-black text-white leading-tight mb-16"
                 style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}
@@ -208,7 +226,7 @@ export default function GreenScreenPage() {
           {/* Photo grid — all shots */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
             {[
-              { src: '/studio-images/greenscreen-wide.jpg',    alt: 'Green Screen Studio full 750 sqft floor-to-ceiling view — VibeShack Studios San Francisco' },
+              { src: '/studio-images/inside-green-screen-v20260509.jpg', alt: 'Green Screen Studio full 750 sqft floor-to-ceiling view — VibeShack Studios San Francisco' },
               { src: '/studio-images/greenscreen-shoot-1.jpg', alt: 'Production shoot on green screen — VibeShack Studios San Francisco' },
               { src: '/studio-images/greenscreen-shoot-2.jpg', alt: 'Production crew filming on green screen stage — VibeShack Studios San Francisco' },
               { src: '/studio-images/greenscreen-empty.jpg',   alt: 'Green screen studio empty stage ready for production — VibeShack Studios San Francisco' },
@@ -274,7 +292,7 @@ export default function GreenScreenPage() {
             ))}
           </div>
           <a
-            href="/book?studio=green-screen"
+            href="/book/?studio=green-screen"
             className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded-lg hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer"
           >
             Book Your Session
@@ -310,16 +328,16 @@ export default function GreenScreenPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <p className="text-gray-600 text-xs uppercase tracking-widest mb-6">Also in the Creative Series</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <a href="/photography-studio-san-francisco" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
-              <Image src="/studio-images/photography-hero.jpg" alt="Photography Studio — Creative Series, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <a href="/photography-studio-san-francisco/" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
+              <Image src="/studio-images/inside-photography-red-v20260509.jpg" alt="Photography Studio — Creative Series, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
                 <p className="text-white font-black">Photography Studio</p>
                 <p className="text-gray-400 text-xs">$100/hr · Hair & Makeup room</p>
               </div>
             </a>
-            <a href="/white-backdrop-studio" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
-              <Image src="/studio-images/drive-cyc-wall.jpg" alt="Canvas — seamless white cyc wall, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <a href="/canvas-rental/" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
+              <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg" alt="Canvas — seamless white cyc wall, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
                 <p className="text-white font-black">Canvas</p>
@@ -341,7 +359,7 @@ export default function GreenScreenPage() {
           </h2>
           <p className="text-gray-500 text-lg mb-10" data-reveal="fade">750 sq ft. Professional lighting. $100/hr. Open 24/7.</p>
           <a
-            href="/book?studio=green-screen"
+            href="/book/?studio=green-screen"
             className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded-lg hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer"
           >
             Book Your Session

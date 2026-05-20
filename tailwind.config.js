@@ -9,7 +9,7 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          red: '#E50000',
+          red: '#EC0000',
           dark: '#0a0a0a',
           gray: '#111111',
           muted: '#888888',
@@ -17,7 +17,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-brand-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-brand-display)'],
+        mono: ['var(--font-brand-mono)'],
       },
     },
   },
