@@ -139,7 +139,7 @@ function DesktopMenuTrigger({
   children: ReactNode
 }) {
   return (
-    <div className="desktop-menu-trigger group">
+    <div className="desktop-menu-trigger group flex h-20 items-center">
       <button type="button" className={menuButtonClass}>
         {label}
         <svg className="h-3 w-3 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
