@@ -1,156 +1,215 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import * as THREE from "three"
+import { useEffect, useRef, useState } from "react"
+
+type ShaderRefs = {
+  gl: WebGLRenderingContext | null
+  program: WebGLProgram | null
+  buffer: WebGLBuffer | null
+  timeLocation: WebGLUniformLocation | null
+  resolutionLocation: WebGLUniformLocation | null
+  animationId: number | null
+  startTime: number
+}
+
+function compileShader(gl: WebGLRenderingContext, type: number, source: string) {
+  const shader = gl.createShader(type)
+  if (!shader) return null
+
+  gl.shaderSource(shader, source)
+  gl.compileShader(shader)
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    gl.deleteShader(shader)
+    return null
+  }
+
+  return shader
+}
+
+function createProgram(gl: WebGLRenderingContext, vertexSource: string, fragmentSource: string) {
+  const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexSource)
+  const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource)
+  const program = gl.createProgram()
+
+  if (!vertexShader || !fragmentShader || !program) return null
+
+  gl.attachShader(program, vertexShader)
+  gl.attachShader(program, fragmentShader)
+  gl.linkProgram(program)
+  gl.deleteShader(vertexShader)
+  gl.deleteShader(fragmentShader)
+
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    gl.deleteProgram(program)
+    return null
+  }
+
+  return program
+}
 
 export function WebGLShader() {
- const canvasRef = useRef<HTMLCanvasElement>(null)
- const sceneRef = useRef<{
- scene: THREE.Scene | null
- camera: THREE.OrthographicCamera | null
- renderer: THREE.WebGLRenderer | null
- mesh: THREE.Mesh | null
- uniforms: any
- animationId: number | null
- }>({
- scene: null,
- camera: null,
- renderer: null,
- mesh: null,
- uniforms: null,
- animationId: null,
- })
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [webGlUnavailable, setWebGlUnavailable] = useState(false)
+  const [shouldStart, setShouldStart] = useState(false)
+  const refs = useRef<ShaderRefs>({
+    gl: null,
+    program: null,
+    buffer: null,
+    timeLocation: null,
+    resolutionLocation: null,
+    animationId: null,
+    startTime: 0,
+  })
 
- useEffect(() => {
- if (!canvasRef.current) return
+  useEffect(() => {
+    const mobileDelay = window.matchMedia("(max-width: 767px)").matches ? 3500 : 0
+    if (mobileDelay === 0) {
+      setShouldStart(true)
+      return
+    }
 
- const canvas = canvasRef.current
- const { current: refs } = sceneRef
+    const startTimer = window.setTimeout(() => setShouldStart(true), mobileDelay)
+    return () => window.clearTimeout(startTimer)
+  }, [])
 
- const vertexShader = `
- attribute vec3 position;
- void main() {
- gl_Position = vec4(position, 1.0);
- }
- `
+  useEffect(() => {
+    if (!shouldStart) return
 
- const fragmentShader = `
- precision highp float;
- uniform vec2 resolution;
- uniform float time;
- uniform float xScale;
- uniform float yScale;
- uniform float distortion;
+    const canvas = canvasRef.current
+    if (!canvas) return
 
- void main() {
- vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
- 
- float d = length(p) * distortion;
- 
- float rx = p.x * (1.0 + d);
- float gx = p.x;
- float bx = p.x * (1.0 - d);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const gl = canvas.getContext("webgl", {
+      antialias: false,
+      alpha: false,
+      powerPreference: "low-power",
+    })
 
- float r = 0.05 / abs(p.y + sin((rx + time) * xScale) * yScale);
- float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);
- float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);
- 
- gl_FragColor = vec4(r, g, b, 1.0);
- }
- `
+    if (!gl) {
+      setWebGlUnavailable(true)
+      return
+    }
 
- const initScene = () => {
- if (!canvasRef.current) return
- 
- // Ensure canvas has dimensions before creating renderer
- const initialWidth = canvasRef.current.clientWidth
- const initialHeight = canvasRef.current.clientHeight
- 
- if (initialWidth === 0 || initialHeight === 0) {
- // Canvas not yet sized, retry after a frame
- requestAnimationFrame(() => initScene())
- return
- }
+    const vertexSource = `
+      attribute vec2 position;
 
- refs.scene = new THREE.Scene()
- refs.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false })
- refs.renderer.setPixelRatio(window.devicePixelRatio)
- refs.renderer.setClearColor(new THREE.Color(0x000000))
+      void main() {
+        gl_Position = vec4(position, 0.0, 1.0);
+      }
+    `
 
- refs.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1)
+    const fragmentSource = `
+      precision highp float;
 
- refs.uniforms = {
- resolution: { value: [initialWidth, initialHeight] },
- time: { value: 0.0 },
- xScale: { value: 1.0 },
- yScale: { value: 0.5 },
- distortion: { value: 0.05 },
- }
+      uniform vec2 resolution;
+      uniform float time;
 
- const position = [
- -1.0, -1.0, 0.0,
- 1.0, -1.0, 0.0,
- -1.0, 1.0, 0.0,
- 1.0, -1.0, 0.0,
- -1.0, 1.0, 0.0,
- 1.0, 1.0, 0.0,
- ]
+      void main() {
+        vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
+        float distortion = 0.05;
+        float xScale = 1.0;
+        float yScale = 0.5;
+        float d = length(p) * distortion;
 
- const positions = new THREE.BufferAttribute(new Float32Array(position), 3)
- const geometry = new THREE.BufferGeometry()
- geometry.setAttribute("position", positions)
+        float rx = p.x * (1.0 + d);
+        float gx = p.x;
+        float bx = p.x * (1.0 - d);
 
- const material = new THREE.RawShaderMaterial({
- vertexShader,
- fragmentShader,
- uniforms: refs.uniforms,
- side: THREE.DoubleSide,
- })
+        float r = 0.05 / abs(p.y + sin((rx + time) * xScale) * yScale);
+        float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);
+        float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);
 
- refs.mesh = new THREE.Mesh(geometry, material)
- refs.scene.add(refs.mesh)
+        gl_FragColor = vec4(r, g, b, 1.0);
+      }
+    `
 
- handleResize()
- }
+    const program = createProgram(gl, vertexSource, fragmentSource)
+    const buffer = gl.createBuffer()
+    if (!program || !buffer) {
+      setWebGlUnavailable(true)
+      return
+    }
 
- const animate = () => {
- if (refs.uniforms) refs.uniforms.time.value += 0.01
- if (refs.renderer && refs.scene && refs.camera) {
- refs.renderer.render(refs.scene, refs.camera)
- }
- refs.animationId = requestAnimationFrame(animate)
- }
+    const positionLocation = gl.getAttribLocation(program, "position")
+    const resolutionLocation = gl.getUniformLocation(program, "resolution")
+    const timeLocation = gl.getUniformLocation(program, "time")
+    const positions = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1])
 
- const handleResize = () => {
- if (!refs.renderer || !refs.uniforms || !canvasRef.current) return
- const width = canvasRef.current.clientWidth || window.innerWidth
- const height = canvasRef.current.clientHeight || window.innerHeight
- refs.renderer.setSize(width, height, false)
- refs.uniforms.resolution.value = [width, height]
- }
+    refs.current = {
+      gl,
+      program,
+      buffer,
+      timeLocation,
+      resolutionLocation,
+      animationId: null,
+      startTime: performance.now(),
+    }
 
- initScene()
- animate()
- window.addEventListener("resize", handleResize)
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW)
+    gl.useProgram(program)
+    gl.enableVertexAttribArray(positionLocation)
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0)
 
- return () => {
- if (refs.animationId) cancelAnimationFrame(refs.animationId)
- window.removeEventListener("resize", handleResize)
- if (refs.mesh) {
- refs.scene?.remove(refs.mesh)
- refs.mesh.geometry.dispose()
- if (refs.mesh.material instanceof THREE.Material) {
- refs.mesh.material.dispose()
- }
- }
- refs.renderer?.dispose()
- }
- }, [])
+    const resize = () => {
+      const width = canvas.clientWidth || window.innerWidth
+      const height = canvas.clientHeight || window.innerHeight
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2)
+      const renderWidth = Math.max(1, Math.floor(width * pixelRatio))
+      const renderHeight = Math.max(1, Math.floor(height * pixelRatio))
 
- return (
- <canvas
- ref={canvasRef}
- className="absolute top-0 left-0 w-full h-full block z-0"
- />
- )
+      if (canvas.width !== renderWidth || canvas.height !== renderHeight) {
+        canvas.width = renderWidth
+        canvas.height = renderHeight
+      }
+
+      gl.viewport(0, 0, renderWidth, renderHeight)
+      gl.uniform2f(resolutionLocation, renderWidth, renderHeight)
+    }
+
+    const draw = (now: number) => {
+      const { current } = refs
+      if (!current.gl || !current.program) return
+
+      gl.useProgram(program)
+      gl.uniform1f(timeLocation, reducedMotion ? 0.0 : (now - current.startTime) * 0.0006)
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+
+      if (!reducedMotion) {
+        current.animationId = requestAnimationFrame(draw)
+      }
+    }
+
+    resize()
+    draw(performance.now())
+    window.addEventListener("resize", resize, { passive: true })
+
+    return () => {
+      const { current } = refs
+      if (current.animationId) cancelAnimationFrame(current.animationId)
+      window.removeEventListener("resize", resize)
+      gl.deleteBuffer(buffer)
+      gl.deleteProgram(program)
+      refs.current = {
+        gl: null,
+        program: null,
+        buffer: null,
+        timeLocation: null,
+        resolutionLocation: null,
+        animationId: null,
+        startTime: 0,
+      }
+    }
+  }, [shouldStart])
+
+  if (webGlUnavailable) return null
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute top-0 left-0 z-0 block h-full w-full"
+      aria-hidden="true"
+    />
+  )
 }

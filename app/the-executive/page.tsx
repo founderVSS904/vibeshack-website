@@ -2,22 +2,22 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-  title: 'The Executive: Podcast Studio | VibeShack Studios SF',
+  title: 'The Executive Podcast Studio',
   description: 'Walnut Series. Wood slat walls, leather seating, globe lighting. 3-camera 4K podcast studio in San Francisco. $300/hr. Cameraman included. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/the-executive' },
+  alternates: { canonical: 'https://www.vibeshackstudios.com/the-executive/' },
   openGraph: {
     title: 'The Executive | VibeShack Studios SF',
     description: 'Walnut Series 3-camera 4K podcast studio with wood slat walls, leather seating, and globe lighting. Cameraman included. $300/hr in San Francisco.',
     url: 'https://www.vibeshackstudios.com/the-executive',
     siteName: 'VibeShack Studios',
-    images: [{ url: '/studio-images/the-executive-hero.jpg', width: 1200, height: 630, alt: 'The Executive at VibeShack Studios SF' }],
+    images: [{ url: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', width: 1200, height: 630, alt: 'The Executive at VibeShack Studios SF' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'The Executive | VibeShack Studios SF',
     description: 'Walnut Series 3-camera 4K podcast studio with wood slat walls, leather seating, and globe lighting. Cameraman included. $300/hr in San Francisco.',
-    images: ['/studio-images/the-executive-hero.jpg'],
+    images: ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg'],
   },
 }
 
@@ -26,7 +26,7 @@ export default function TheExecutivePage() {
     <>
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
-        <Image src="/studio-images/the-executive-hero.jpg"
+        <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg"
           alt="The Executive podcast studio hero shot — VibeShack Studios San Francisco"
           fill className="object-cover opacity-80" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
@@ -38,7 +38,7 @@ export default function TheExecutivePage() {
           <p className="text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
             Warm lighting. Intimate setting. 3 cameras. Built for conversations that feel real.
           </p>
-          <a href="/book?studio=the-executive" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+          <a href="/book/?studio=the-executive" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
             Book This Studio
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -73,7 +73,7 @@ export default function TheExecutivePage() {
             </div>
             {/* Right: Full Room Photo */}
             <div>
-              <Image src="/studio-images/the-executive-detail-02.jpg" alt="The Executive full room with professional lighting and setup — VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
+              <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg" alt="The Executive full room with professional lighting and setup — VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
             </div>
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function TheExecutivePage() {
             {/* Detail 1: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/the-executive-detail-01.jpg" alt="Neumann microphones in The Executive at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/enhanced-executive-podcast-guest-closeup-v20260510.jpg" alt="Broadcast microphones in The Executive at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Shure Mics That Cost More Than Your Gear</h3>
@@ -147,7 +147,7 @@ export default function TheExecutivePage() {
               </div>
             ))}
           </div>
-          <a href="/book?studio=the-executive" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+          <a href="/book/?studio=the-executive" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
             Book The Executive
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -186,7 +186,7 @@ export default function TheExecutivePage() {
             </div>
           </div>
           <p className="text-gray-600 text-xs mt-4">
-            Have a production shot here? <a href="mailto:founder@vibeshackstudios.com" className="text-brand-red hover:text-white transition-colors">Send it to us</a> — we&apos;ll feature it.
+            Created something here? <a href="mailto:founder@vibeshackstudios.com" className="text-brand-red hover:text-white transition-colors">Send it to us</a> — we&apos;ll feature it.
           </p>
         </div>
       </section>
@@ -200,8 +200,8 @@ export default function TheExecutivePage() {
               Also in the<br/><span style={{color: '#fcd34d'}}>Walnut Series.</span>
             </h2>
           </div>
-          <a href="/the-wing" className="relative overflow-hidden rounded-3xl group block w-full" style={{height: '400px'}}>
-            <Image src="/studio-images/the-wing-hero.jpg" alt="The Wing — Walnut Series podcast studio, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+          <a href="/the-wing/" className="relative overflow-hidden rounded-3xl group block w-full" style={{height: '400px'}}>
+            <Image src="/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg" alt="The Wing — Walnut Series podcast studio, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%)'}} />
             <div className="absolute bottom-0 left-0 right-0 p-12">
               <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{color: '#fcd34d'}}>Walnut Series</p>
@@ -221,13 +221,13 @@ export default function TheExecutivePage() {
           </h2>
           <p className="text-gray-500 text-lg mb-10" data-reveal="fade">$300/hr. Cameraman included. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book?studio=the-executive" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+            <a href="/book/?studio=the-executive" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
               Book Your Session
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </a>
-            <a href="/contact" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →
+            <a href="/tour/?studio=the-executive" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →
             </a>
           </div>
         </div>

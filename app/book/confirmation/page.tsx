@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 
@@ -11,7 +12,7 @@ function ConfirmationContent() {
       <div className="min-h-screen bg-black flex items-center justify-center px-6">
         <div className="text-center">
           <p className="text-white text-2xl font-bold mb-4">Something went wrong.</p>
-          <a href="/book" className="text-brand-red hover:underline text-sm">← Back to booking</a>
+          <Link href="/book/" prefetch={false} className="text-brand-red hover:underline text-sm">← Back to booking</Link>
         </div>
       </div>
     )
@@ -32,12 +33,12 @@ function ConfirmationContent() {
         <h1 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(3rem, 7vw, 5rem)', letterSpacing: '-0.05em'}}>
           You&apos;re booked.
         </h1>
-        <p className="text-gray-500 text-lg mb-14">Confirmation sent to your email.</p>
+        <p className="text-gray-500 text-lg mb-14">Your booking confirmation and Stripe receipt are on their way.</p>
 
         {/* What to expect */}
         <div className="space-y-0 mb-14">
           {[
-            { n: '01', title: 'Check your email', body: 'Full booking details and receipt are on their way. Check your spam if you don\'t see it.' },
+            { n: '01', title: 'Check your email', body: 'You should receive a VibeShack booking confirmation plus an official Stripe payment receipt. Check spam if you don\'t see them.' },
             { n: '02', title: 'Get to the studio', body: '950 Battery St, SF 94111 · Northern Waterfront. Street parking on Battery St. 10 min walk from the Ferry Building.' },
             { n: '03', title: 'Walk in ready to work', body: "Everything is set up before you arrive. Cameras on. Lights calibrated. Mics live. Just show up." },
             { n: '04', title: 'Free cancellation', body: 'Plans change. Cancel up to 48 hours before your session for a full refund. No questions asked.' },
@@ -54,11 +55,11 @@ function ConfirmationContent() {
 
         {/* Actions */}
         <div className="flex flex-wrap gap-4 items-center">
-          <a href="/book"
+          <Link href="/book/" prefetch={false}
             className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 transition-colors">
             Book another session
-          </a>
-          <a href="/" className="text-gray-600 hover:text-white transition-colors text-sm">← Back to home</a>
+          </Link>
+          <Link href="/" className="text-gray-600 hover:text-white transition-colors text-sm">← Back to home</Link>
         </div>
 
       </div>

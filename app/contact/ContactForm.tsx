@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react'
 
 export default function ContactForm() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const [startedAt] = useState(() => Date.now())
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -17,10 +18,12 @@ export default function ContactForm() {
       project_type: (form.elements.namedItem('project_type') as HTMLSelectElement).value,
       preferred_date: (form.elements.namedItem('preferred_date') as HTMLInputElement).value,
       message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
+      company: (form.elements.namedItem('company') as HTMLInputElement).value,
+      startedAt,
     }
 
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('/api/contact/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -51,6 +54,8 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-10">
+      <input type="text" name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+      <input type="hidden" name="startedAt" value={startedAt} />
       {status === 'error' && (
         <div className="p-4 border border-red-800 bg-red-950/40 rounded-lg">
           <p className="text-red-400 text-sm">
@@ -103,7 +108,8 @@ export default function ContactForm() {
           <option value="" style={{ background: '#111' }}>Select your project type</option>
           <option value="podcast" style={{ background: '#111' }}>Podcast / Video Podcast</option>
           <option value="green-screen" style={{ background: '#111' }}>Green Screen / VFX</option>
-          <option value="photography" style={{ background: '#111' }}>Photography / Lookbook</option>
+          <option value="photo-services" style={{ background: '#111' }}>Photo Services / Headshots / Portraits</option>
+          <option value="photography-studio-rental" style={{ background: '#111' }}>Photography Studio Rental / Room Only</option>
           <option value="video-interview" style={{ background: '#111' }}>Video / Interview / Corporate</option>
           <option value="music-video" style={{ background: '#111' }}>Music Video</option>
           <option value="brand-commercial" style={{ background: '#111' }}>Brand Commercial</option>

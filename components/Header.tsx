@@ -1,252 +1,282 @@
-'use client'
-
-import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import type { ReactNode } from 'react'
+import { BrandMark } from '@/components/BrandMark'
 
-const podcastStudios = [
-  { href: '/podcast-studio-san-francisco', label: 'All Podcast Studios', price: '' },
-  { href: '/the-executive', label: 'The Executive', price: '$300/hr' },
-  { href: '/the-wing',                 label: 'The Wing',      price: '$300/hr' },
-  { href: '/encore',                       label: 'Encore',        price: '$300/hr' },
-  { href: '/sunset-studio',                label: 'Sunset',        price: '$300/hr' },
-  { href: '/parlor',                        label: 'Parlor',        price: '$300/hr' },
-  { href: '/horizon',                       label: 'Horizon',       price: '$300/hr' },
-  { href: '/premier',                      label: 'Premier',       price: '$300/hr' },
+type HeaderLink = {
+  href: string
+  label: string
+  detail?: string
+  price?: string
+}
+
+const podcastStudios: HeaderLink[] = [
+  { href: '/podcast-studio-san-francisco/', label: 'All Podcast Studios', detail: 'Compare every podcast room' },
+  { href: '/the-executive/', label: 'The Executive', detail: 'Boardroom table, three cameras', price: '$300/hr' },
+  { href: '/the-wing/', label: 'The Wing', detail: 'Warm two-person conversation set', price: '$300/hr' },
+  { href: '/encore/', label: 'Encore', detail: 'Vault-style room with strong audio', price: '$300/hr' },
+  { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast room', price: '$300/hr' },
+  { href: '/parlor/', label: 'Parlor', detail: 'Premium lounge interview set', price: '$400/hr' },
+  { href: '/horizon/', label: 'Horizon', detail: 'Immersive LED wall podcast set', price: '$400/hr' },
+  { href: '/premier/', label: 'Premier', detail: 'Premium studio suite', price: '$300/hr' },
+  { href: '/canvas-podcast/', label: 'Canvas Podcast', detail: 'Custom LED backdrop podcast studio', price: '$400/hr' },
 ]
 
-const rentalStudios = [
-  { href: '/rental-studios',                       label: 'All Rental Studios', price: '' },
-  { href: '/white-backdrop-studio',                label: 'Canvas Rental',      price: '$100/hr' },
-  { href: '/photography-studio-san-francisco',     label: 'Photography Studio', price: '$100/hr' },
-  { href: '/green-screen-studio-sf',               label: 'Green Screen',       price: '$100/hr' },
+const rentalStudios: HeaderLink[] = [
+  { href: '/rental-studios/', label: 'All Rental Studios', detail: 'White cyc, green screen, photo rooms' },
+  { href: '/canvas-rental/', label: 'Canvas Rental', detail: 'White cyc and open production floor', price: '$100/hr' },
+  { href: '/photography-studio-san-francisco/', label: 'Photography Studio', detail: 'Backdrops, glam room, lighting', price: '$100/hr' },
+  { href: '/green-screen-studio-sf/', label: 'Green Screen', detail: 'Full green wall for compositing', price: '$100/hr' },
 ]
+
+const serviceLinks: HeaderLink[] = [
+  { href: '/services/', label: 'All Services', detail: 'Choose the right path before the room' },
+  { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, campaigns' },
+  { href: '/video-production/', label: 'Video Production', detail: 'Social content, commercials, music videos' },
+  { href: '/podcast-studio-san-francisco/', label: 'Podcast Production', detail: 'Rooms with cameras, audio, and crew' },
+  { href: '/green-screen-studio-sf/', label: 'Green Screen Video', detail: 'Controlled keying and compositing' },
+]
+
+const planningLinks: HeaderLink[] = [
+  { href: '/find-your-studio/', label: 'Find a Studio', detail: 'Pick by goal, room style, and deliverable' },
+  { href: '/pricing/', label: 'Pricing', detail: 'See room rates and production starting points' },
+  { href: '/book/', label: 'Book a Session', detail: 'Reserve studio time with live availability' },
+  { href: '/tour/', label: 'Tour the Studio', detail: 'Book a walkthrough before a bigger shoot' },
+]
+
+const studioHubLinks: HeaderLink[] = [
+  { href: '/podcast-studio-san-francisco/', label: 'Podcast Studios', detail: 'Rooms built for interviews and shows' },
+  { href: '/rental-studios/', label: 'Rental Studios', detail: 'White cyc, green screen, photo rooms' },
+  { href: '/find-your-studio/', label: 'Find a Studio', detail: 'Choose by outcome, not guesswork' },
+  { href: '/book/', label: 'Book a Session', detail: 'Live availability and checkout' },
+]
+
+const proofLinks: HeaderLink[] = [
+  { href: '/made-at-vibeshack/', label: 'Brands That Trust Us', detail: 'See the trusted-by wall' },
+  { href: '/studio-guides/', label: 'Studio Guides', detail: 'Prep smarter before the session' },
+  { href: '/use-cases/', label: 'Use Cases', detail: 'Choose by outcome and client need' },
+  { href: '/compare/', label: 'Compare Studios', detail: 'Understand the tradeoffs before booking' },
+]
+
+const corePodcastStudios = podcastStudios.slice(1, 6)
+const premiumPodcastStudios = podcastStudios.slice(6)
+
+const navLinkClass =
+  'text-sm tracking-wide whitespace-nowrap text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none'
+
+const menuButtonClass =
+  'flex items-center gap-1.5 text-sm tracking-wide whitespace-nowrap text-gray-400 transition-colors duration-200 group-hover:text-white group-focus-within:text-white'
 
 export default function Header() {
-  const [menuOpen, setMenuOpen]       = useState(false)
-  const [studiosOpen, setStudiosOpen] = useState(false)
-  const [visible, setVisible]         = useState(true)
-  const [scrolled, setScrolled]       = useState(false)
-  const [lastY, setLastY]             = useState(0)
-  const dropdownRef                   = useRef<HTMLDivElement>(null)
-  const pathname                      = usePathname()
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const y = window.scrollY
-      setScrolled(y > 40)
-      if (y < 80) { setVisible(true) }
-      else if (y > lastY + 4) { setVisible(false); setMenuOpen(false); setStudiosOpen(false) }
-      else if (y < lastY - 4) { setVisible(true) }
-      setLastY(y)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastY])
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setStudiosOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
-
-  // Close mobile menu on route change
-  useEffect(() => { setMenuOpen(false); setStudiosOpen(false) }, [pathname])
-
-  const isActive = (href: string) => {
-    if (href === '/') return pathname === '/'
-    return pathname.startsWith(href)
-  }
-
-  const navLinkClass = (href: string) =>
-    `text-sm tracking-wide transition-colors duration-200 relative group ${
-      isActive(href) ? 'text-white' : 'text-gray-400 hover:text-white'
-    }`
-
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 border-b"
-      style={{
-        background: scrolled ? 'rgba(0,0,0,0.92)' : 'rgba(0,0,0,0.6)',
-        backdropFilter: scrolled ? 'blur(24px) saturate(180%)' : 'blur(12px)',
-        borderColor: scrolled ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
-        transform: visible ? 'translateY(0)' : 'translateY(-100%)',
-        transition: 'transform 0.35s cubic-bezier(0.16,1,0.3,1), background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease',
-      }}>
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-        <div className="flex items-center justify-between h-20">
-
-          {/* Logo */}
-          <Link href="/" className="flex items-center flex-shrink-0 hover:opacity-80 transition-opacity duration-200">
-            <span className="text-brand-red font-black tracking-tight" style={{fontSize: '1.25rem', letterSpacing: '-0.04em'}}>
-              VibeShack
-            </span>
+      className="site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black/85 transition-colors duration-200"
+    >
+      <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
+        <div className="grid h-20 grid-cols-[auto_1fr_auto] items-center gap-6">
+          <Link
+            href="/"
+            aria-label="VibeShack Studios home"
+            className="flex flex-shrink-0 items-center transition-opacity duration-200 hover:opacity-80"
+          >
+            <BrandMark variant="lockup" priority className="h-[30px] w-auto sm:h-[34px]" />
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
+          <nav className="hidden items-center justify-center gap-7 xl:flex 2xl:gap-10" aria-label="Primary">
+            <DesktopMenuTrigger label="Studios">
+              <DesktopStudiosMenu />
+            </DesktopMenuTrigger>
 
-            {/* Studios dropdown */}
-            <div ref={dropdownRef} className="relative">
-              <button
-                onClick={() => setStudiosOpen(!studiosOpen)}
-                onMouseEnter={() => setStudiosOpen(true)}
-                className={`flex items-center gap-1 text-sm tracking-wide transition-colors duration-200 ${
-                  ['/the-executive','/sunset-studio','/encore','/the-wing','/canvas-podcast','/premier','/white-backdrop-studio','/photography-studio-san-francisco','/green-screen-studio-sf','/podcast-studio-san-francisco','/rental-studios'].some(h => pathname.startsWith(h))
-                    ? 'text-white' : 'text-gray-400 hover:text-white'
-                }`}>
-                Studios
-                <svg className={`w-3 h-3 transition-transform duration-200 ${studiosOpen ? 'rotate-180' : ''}`}
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
-                </svg>
-              </button>
+            <DesktopMenuTrigger label="Services">
+              <DesktopServicesMenu />
+            </DesktopMenuTrigger>
 
-              {/* Dropdown */}
-              <div
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-80 rounded-2xl overflow-hidden border border-white/10"
-                style={{
-                  background: 'rgba(10,10,10,0.97)',
-                  backdropFilter: 'blur(24px)',
-                  opacity: studiosOpen ? 1 : 0,
-                  transform: studiosOpen ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.97)',
-                  pointerEvents: studiosOpen ? 'auto' : 'none',
-                  transition: 'opacity 0.2s cubic-bezier(0.16,1,0.3,1), transform 0.2s cubic-bezier(0.16,1,0.3,1)',
-                }}
-                onMouseLeave={() => setStudiosOpen(false)}>
-                <div className="p-3">
-                  {/* Podcast */}
-                  {podcastStudios.map(({ href, label, price }, i) => {
-                    const isHub = i === 0
-                    return (
-                      <Link key={href + label} href={href} onClick={() => setStudiosOpen(false)}
-                        className={`flex items-center justify-between px-3 rounded-xl hover:bg-white/5 transition-colors duration-150 group ${isHub ? 'py-3 mb-1' : 'py-2'}`}>
-                        <span className={`text-sm transition-colors duration-150 group-hover:text-white ${
-                          pathname === href ? 'text-white' : isHub ? 'text-white font-bold' : 'text-gray-400'
-                        }`}>{label}</span>
-                        {price && <span className="text-gray-600 text-xs">{price}</span>}
-                        {isHub && <span className="text-gray-600 text-xs">→</span>}
-                      </Link>
-                    )
-                  })}
-
-                  {/* Rentals */}
-                  <div className="border-t border-white/8 mt-2 pt-1">
-                  {rentalStudios.map(({ href, label, price }, i) => {
-                    const isHub = i === 0
-                    return (
-                      <Link key={href + label} href={href} onClick={() => setStudiosOpen(false)}
-                        className={`flex items-center justify-between px-3 rounded-xl hover:bg-white/5 transition-colors duration-150 group ${isHub ? 'py-3 mb-1' : 'py-2'}`}>
-                        <span className={`text-sm transition-colors duration-150 group-hover:text-white ${
-                          pathname === href ? 'text-white' : isHub ? 'text-white font-bold' : 'text-gray-400'
-                        }`}>{label}</span>
-                        {price && <span className="text-gray-600 text-xs">{price}</span>}
-                        {isHub && <span className="text-gray-600 text-xs">→</span>}
-                      </Link>
-                    )
-                  })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <a href="/find-your-studio" className={navLinkClass('/find-your-studio')}>
-              Find a Studio
-              {isActive('/find-your-studio') && <span className="absolute -bottom-1 left-0 w-full h-px bg-brand-red" />}
-            </a>
-            <Link href="/pricing" className={navLinkClass('/pricing')}>
-              Pricing
-              {isActive('/pricing') && <span className="absolute -bottom-1 left-0 w-full h-px bg-brand-red" />}
-            </Link>
-            <Link href="/about" className={navLinkClass('/about')}>
-              About
-              {isActive('/about') && <span className="absolute -bottom-1 left-0 w-full h-px bg-brand-red" />}
-            </Link>
-            <Link href="/made-at-vibeshack" className={navLinkClass('/made-at-vibeshack')}>
-              Shot Here
-              {isActive('/made-at-vibeshack') && <span className="absolute -bottom-1 left-0 w-full h-px bg-brand-red" />}
-            </Link>
-            <Link href="/support" className={navLinkClass('/support')}>
-              Support
-              {isActive('/support') && <span className="absolute -bottom-1 left-0 w-full h-px bg-brand-red" />}
-            </Link>
+            <Link href="/find-your-studio/" className={navLinkClass}>Find a Studio</Link>
+            <Link href="/pricing/" className={navLinkClass}>Pricing</Link>
+            <Link href="/about/" className={navLinkClass}>About</Link>
+            <Link href="/made-at-vibeshack/" className={navLinkClass}>Trusted By</Link>
+            <Link href="/studio-guides/" className={navLinkClass}>Guides</Link>
+            <Link href="/use-cases/" className={navLinkClass}>Use Cases</Link>
+            <Link href="/support/" className={navLinkClass}>Support</Link>
           </nav>
 
-          {/* Right side */}
           <div className="flex items-center gap-4">
-            <Link href="/book"
-              className="hidden sm:inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-full border border-white/20 hover:border-white/50 hover:bg-white/8 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 cursor-pointer">
+            <Link
+              href="/book/"
+              prefetch={false}
+              className="hidden items-center gap-2 rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.03] hover:border-white/50 hover:bg-white/8 active:scale-[0.98] sm:inline-flex"
+            >
               Book
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
 
-            <button className="lg:hidden p-2 text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer"
-              onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {menuOpen
-                  ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                  : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />}
-              </svg>
-            </button>
-          </div>
-        </div>
+            <details className="group xl:hidden">
+              <summary className="list-none p-2 text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+                <span className="sr-only">Toggle menu</span>
+                <svg className="h-5 w-5 group-open:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <svg className="hidden h-5 w-5 group-open:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </summary>
 
-        {/* Mobile Menu — animated */}
-        <div
-          className="lg:hidden overflow-hidden"
-          style={{
-            maxHeight: menuOpen ? '600px' : '0px',
-            opacity: menuOpen ? 1 : 0,
-            transition: 'max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease',
-          }}>
-          <div className="border-t border-white/8 py-6">
-            <div className="mb-4">
-              <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-3">Podcast</p>
-              <div className="space-y-1">
-                {podcastStudios.map(({ href, label, price }) => (
-                  <Link key={href + label} href={href}
-                    className={`flex items-center justify-between py-2.5 transition-colors duration-150 ${
-                      pathname === href ? 'text-white' : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setMenuOpen(false)}>
-                    <span className="text-sm">{label}</span>
-                    <span className="text-gray-600 text-xs">{price}</span>
-                  </Link>
-                ))}
-              </div>
-              <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-3 mt-5">Rentals</p>
-              <div className="space-y-1">
-                {rentalStudios.map(({ href, label, price }) => (
-                  <Link key={href + label} href={href}
-                    className={`flex items-center justify-between py-2.5 transition-colors duration-150 ${
-                      pathname === href ? 'text-white' : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setMenuOpen(false)}>
-                    <span className="text-sm">{label}</span>
-                    <span className="text-gray-600 text-xs">{price}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <div className="border-t border-white/8 pt-4 space-y-3">
-              <a href="/find-your-studio" className={`block text-sm transition-colors duration-150 ${isActive('/find-your-studio') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Find a Studio</a>
-              <Link href="/pricing" className={`block text-sm transition-colors duration-150 ${isActive('/pricing') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Pricing</Link>
-              <Link href="/about" className={`block text-sm transition-colors duration-150 ${isActive('/about') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>About</Link>
-              <Link href="/made-at-vibeshack" className={`block text-sm transition-colors duration-150 ${isActive('/made-at-vibeshack') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Shot Here</Link>
-              <Link href="/support" className={`block text-sm transition-colors duration-150 ${isActive('/support') ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={() => setMenuOpen(false)}>Support</Link>
-              <Link href="/book"
-                className="inline-flex items-center gap-2 text-white font-semibold text-sm mt-2 px-5 py-2.5 bg-brand-red rounded-full hover:bg-red-700 transition-colors duration-200"
-                onClick={() => setMenuOpen(false)}>
-                Book a Session →
-              </Link>
-            </div>
+              <MobileMenu />
+            </details>
           </div>
         </div>
       </div>
     </header>
+  )
+}
+
+function DesktopMenuTrigger({
+  label,
+  children,
+}: {
+  label: string
+  children: ReactNode
+}) {
+  return (
+    <div className="desktop-menu-trigger group">
+      <button type="button" className={menuButtonClass}>
+        {label}
+        <svg className="h-3 w-3 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed bottom-0 left-0 right-0 top-20 hidden bg-black/35 opacity-0 backdrop-blur-[3px] transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 xl:block"
+      />
+      {children}
+    </div>
+  )
+}
+
+function DesktopStudiosMenu() {
+  return (
+    <DesktopMegaMenu className="max-w-7xl grid-cols-[1fr_1fr_1fr_1fr] gap-10">
+      <MegaColumn eyebrow="Browse" links={studioHubLinks} large />
+      <MegaColumn eyebrow="Podcast Rooms" links={corePodcastStudios} />
+      <MegaColumn eyebrow="Premium & Custom" links={premiumPodcastStudios} />
+      <MegaColumn eyebrow="Rental Studios" links={rentalStudios} />
+    </DesktopMegaMenu>
+  )
+}
+
+function DesktopServicesMenu() {
+  return (
+    <DesktopMegaMenu className="max-w-6xl grid-cols-[1.1fr_0.9fr_0.85fr] gap-14">
+      <MegaColumn eyebrow="Production Services" links={serviceLinks} large />
+      <MegaColumn eyebrow="Planning Tools" links={proofLinks} />
+      <div>
+        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Best First Step</p>
+        <Link
+          href="/find-your-studio/"
+          className="group/card block rounded-2xl border border-black/10 bg-white/65 p-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
+        >
+          <span className="block text-2xl font-black tracking-tight text-black">Match the room to the outcome.</span>
+          <span className="mt-3 block text-sm leading-relaxed text-zinc-600">
+            Start with what you are making: portraits, a brand film, a podcast, social clips, or a clean rental space.
+          </span>
+          <span className="mt-5 inline-flex text-sm font-bold text-brand-red transition-transform duration-300 group-hover/card:translate-x-1">
+            Find a Studio -&gt;
+          </span>
+        </Link>
+      </div>
+    </DesktopMegaMenu>
+  )
+}
+
+function DesktopMegaMenu({
+  className,
+  children,
+}: {
+  className: string
+  children: ReactNode
+}) {
+  return (
+    <div className="pointer-events-none invisible fixed left-0 right-0 top-[calc(5rem-1px)] hidden max-h-0 -translate-y-3 overflow-hidden border-b border-white/10 bg-[#f5f5f2] text-black opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.42)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[540px] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[540px] group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
+      <div className={`mx-auto grid px-10 py-9 lg:px-16 ${className}`}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function MegaColumn({
+  eyebrow,
+  links,
+  large,
+}: {
+  eyebrow: string
+  links: HeaderLink[]
+  large?: boolean
+}) {
+  return (
+    <div>
+      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">{eyebrow}</p>
+      <div className={large ? 'space-y-2' : 'space-y-2.5'}>
+        {links.map(({ href, label, detail, price }, index) => (
+          <Link
+            key={href + label}
+            href={href}
+            prefetch={href === '/book/' ? false : undefined}
+            className="group/link block text-zinc-700 transition-colors duration-200 hover:text-black"
+          >
+            <span className={`flex items-baseline justify-between gap-4 ${large ? 'text-[1.45rem] font-black leading-[1.08] tracking-tight' : 'text-[0.95rem] font-bold'}`}>
+              <span>{label}</span>
+              {price && <span className="text-xs font-semibold text-zinc-400 transition-colors duration-200 group-hover/link:text-zinc-700">{price}</span>}
+              {!price && index === 0 && <span className="text-xs font-semibold text-brand-red opacity-0 transition duration-200 group-hover/link:translate-x-1 group-hover/link:opacity-100">-&gt;</span>}
+            </span>
+            {detail && <span className="mt-0.5 block text-xs leading-relaxed text-zinc-500">{detail}</span>}
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function MobileMenu() {
+  return (
+    <div className="absolute left-0 right-0 top-full h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain border-t border-white/8 bg-black">
+      <div className="mx-auto max-w-7xl px-6 pb-10 pt-6 sm:px-10">
+        <MobileSection title="Studios" links={[...podcastStudios, ...rentalStudios]} />
+        <MobileSection title="Services" links={serviceLinks} />
+        <MobileSection title="Plan" links={[...planningLinks, ...proofLinks, { href: '/support/', label: 'Support', detail: 'Questions, policies, and help' }]} />
+      </div>
+    </div>
+  )
+}
+
+function MobileSection({
+  title,
+  links,
+}: {
+  title: string
+  links: HeaderLink[]
+}) {
+  return (
+    <div className="border-b border-white/8 py-5 last:border-b-0">
+      <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gray-600">{title}</p>
+      <div className="grid gap-1 sm:grid-cols-2 sm:gap-x-8">
+        {links.map(({ href, label, detail, price }) => (
+          <Link
+            key={href + label}
+            href={href}
+            prefetch={href === '/book/' ? false : undefined}
+            className="flex items-start justify-between gap-4 py-2.5 text-gray-400 transition-colors duration-150 hover:text-white"
+          >
+            <span>
+              <span className="block text-sm font-semibold">{label}</span>
+              {detail && <span className="mt-0.5 block text-xs leading-snug text-gray-600">{detail}</span>}
+            </span>
+            {price && <span className="pt-0.5 text-xs text-gray-600">{price}</span>}
+          </Link>
+        ))}
+      </div>
+    </div>
   )
 }

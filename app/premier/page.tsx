@@ -2,12 +2,12 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-  title: 'Premier: Luxury Podcast Studio | VibeShack Studios SF',
-  description: 'Vault Series. Premium interview studio with luxury furnishings, dual mics, and intimate conversational setup. $300/hr. Cameraman and director included. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/premier' },
+  title: 'Premier Podcast Studio',
+  description: 'Vault Series. Premium interview studio with luxury furnishings, dual mics, and intimate conversational setup. $300/hr. Cameraman and audio tech included. Open 24/7.',
+  alternates: { canonical: 'https://www.vibeshackstudios.com/premier/' },
   openGraph: {
     title: 'Premier | VibeShack Studios SF',
-    description: 'Vault Series luxury podcast studio with premium furnishings, dual boom mics, and gold curtain backdrop. Cameraman and director included. $300/hr in San Francisco.',
+    description: 'Vault Series luxury podcast studio with premium furnishings, dual boom mics, and gold curtain backdrop. Cameraman and audio tech included. $300/hr in San Francisco.',
     url: 'https://www.vibeshackstudios.com/premier',
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/premier-hero-v1775084326.jpg', width: 1200, height: 630, alt: 'Premier at VibeShack Studios SF' }],
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Premier | VibeShack Studios SF',
-    description: 'Vault Series luxury podcast studio with premium furnishings, dual boom mics, and gold curtain backdrop. Cameraman and director included. $300/hr in San Francisco.',
+    description: 'Vault Series luxury podcast studio with premium furnishings, dual boom mics, and gold curtain backdrop. Cameraman and audio tech included. $300/hr in San Francisco.',
     images: ['/studio-images/premier-hero-v1775084326.jpg'],
   },
 }
@@ -34,7 +34,7 @@ export default function PremierPage() {
           <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#a855f7'}}>Vault Series</p>
           <h1 data-reveal="up" className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>Premier</h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">Luxury conversation. Premium interview space. Where serious podcasters record their best work.</p>
-          <a href="/book?studio=premier" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+          <a href="/book/?studio=premier" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
             Book This Studio
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -55,7 +55,7 @@ export default function PremierPage() {
                 <div className="py-4 text-gray-400 text-base">Luxury furnishings: armchairs, premium rug</div>
                 <div className="py-4 text-gray-400 text-base">Dual boom mics for stereo interview format</div>
                 <div className="py-4 text-gray-400 text-base">Gold curtain backdrop with adjustable lighting</div>
-                <div className="py-4 text-gray-400 text-base">Cameraman and director included</div>
+                <div className="py-4 text-gray-400 text-base">Cameraman and audio tech included</div>
                 <div className="py-4 text-gray-400 text-base">Professional audio kit with wireless</div>
                 <div className="py-4 text-gray-400 text-base">Intimate 2-person conversation focus</div>
                 <div className="py-4 text-gray-400 text-base">High-end stone and natural finishes</div>
@@ -118,7 +118,7 @@ export default function PremierPage() {
           <span className="number-label mb-12 block">Pricing</span>
           <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$300</div>
           <p className="text-gray-500 text-lg mb-1" data-reveal="fade">per hour</p>
-          <p className="text-white font-semibold mb-12">Cameraman and director included. 2 hour minimum. Open 24/7.</p>
+          <p className="text-white font-semibold mb-12">Cameraman and audio tech included. 2 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             <div className="flex items-center justify-between py-4">
               <span className="text-gray-400 text-sm">2 Hours</span>
@@ -133,7 +133,7 @@ export default function PremierPage() {
               <span className="text-white font-black text-lg">$2,400</span>
             </div>
           </div>
-          <a href="/book?studio=premier" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded hover:bg-gray-200 transition-colors">
+          <a href="/book/?studio=premier" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded hover:bg-gray-200 transition-colors">
             Book Premier
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

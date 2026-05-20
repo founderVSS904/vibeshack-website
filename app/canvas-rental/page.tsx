@@ -1,15 +1,29 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
-  title: 'Canvas Rental: White Cyc Studio Space | VibeShack Studios SF',
+  title: 'Canvas White Cyc Studio',
   description: 'Creative Series. Flexible white cyc backdrop studio. Perfect for photography, video, and creative projects. $100/hr. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/canvas-rental' }
+  alternates: { canonical: 'https://www.vibeshackstudios.com/canvas-rental/' }
 }
+
+const canvasRentalServiceSchema = studioServiceSchema({
+  name: 'White Cyc Studio Rental in San Francisco',
+  description: 'Canvas Rental is a flexible white cyc studio in San Francisco with overhead lighting grid for photography, video, product, and content shoots.',
+  url: 'https://www.vibeshackstudios.com/canvas-rental/',
+  image: 'https://www.vibeshackstudios.com/studio-images/canvas-rental-hero-v1775094073.jpg',
+  price: '100',
+  serviceType: 'White Cyc Studio Rental',
+})
 
 export default function CanvasRentalPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(canvasRentalServiceSchema) }}
+      />
       <style>{`
         .use-card {
           position: relative;
@@ -77,7 +91,7 @@ export default function CanvasRentalPage() {
           <p className="text-lg sm:text-xl text-gray-300 max-w-2xl leading-relaxed mb-8">
             White cyc backdrop. Overhead lighting grid. Total creative control. Rent by the hour for any production.
           </p>
-          <a href="/book?studio=canvas-rental" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer">
+          <a href="/book/?studio=canvas-rental" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer">
             Book Canvas Rental
           </a>
         </div>
@@ -138,7 +152,7 @@ export default function CanvasRentalPage() {
               </div>
               <div className="use-card">
                 <div className="use-card-img-wrapper">
-                  <Image src="/studio-images/canvas-rental-space-v1775096416.jpg" alt="Canvas rental studio space ready for your project" fill className="object-cover" />
+                  <Image src="/studio-images/canvas-rental-space-v20260509.jpg" alt="Canvas rental studio space ready for your project" fill className="object-cover" />
                 </div>
                 <div className="bg-zinc-900 p-4">
                   <p className="text-white font-bold text-sm">Your Project Here</p>
@@ -156,7 +170,7 @@ export default function CanvasRentalPage() {
           <div className="h-1 w-16 rounded-full mx-auto mb-8" style={{backgroundColor: '#14b8a6'}} />
           <h2 className="text-5xl sm:text-6xl font-black text-white mb-6" style={{letterSpacing: '-0.03em'}}>Ready to Create?</h2>
           <p className="text-gray-400 text-lg mb-8">Book your studio time. No production crew needed. Full control. 24/7 access.</p>
-          <a href="/book?studio=canvas-rental" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer">
+          <a href="/book/?studio=canvas-rental" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer">
             Reserve Canvas Rental
           </a>
         </div>

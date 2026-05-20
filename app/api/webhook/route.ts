@@ -1,298 +1,553 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { google } from 'googleapis'
-import fs from 'fs'
+import { addBookingEvents, type BookingCartItem } from '@/lib/booking/calendar'
+import { getStudioById } from '@/lib/booking/catalog'
+import { buildReferralInfo, formatMoneyFromCents, type ReferralInfo } from '@/lib/booking/referrals'
+import { addHours, describeSlotRanges, formatDateForDisplay, isValidBookingDate, slotIsoSetForDate } from '@/lib/booking/time'
+import { escapeHtml, isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-02-25.clover',
-})
-
-interface CartItem {
-  studioId: string
-  studioName: string
-  date: string
-  slots: string[]
-  hours: number
-  price: number
+function getStripe() {
+  const secret = process.env.STRIPE_SECRET_KEY
+  if (!secret) throw new Error('STRIPE_SECRET_KEY is not configured')
+  return new Stripe(secret, { apiVersion: '2026-02-25.clover' })
 }
 
-async function addToCalendar(cartItems: CartItem[], customerName: string, customerEmail: string, customerPhone: string) {
-  try {
-    const tokenPath = process.env.GCAL_TOKEN_PATH || '/root/.openclaw/workspace/scripts/gcal/token.json'
-    if (!fs.existsSync(tokenPath)) return
+function parseCartItems(metadata: Record<string, string>) {
+  const items: BookingCartItem[] = []
+  const totalSessions = Number.parseInt(metadata.totalSessions || '0', 10)
+  const limit = Number.isFinite(totalSessions) && totalSessions > 0 ? totalSessions : 20
 
-    const tokenData = JSON.parse(fs.readFileSync(tokenPath, 'utf8'))
-    const auth = new google.auth.OAuth2()
-    auth.setCredentials(tokenData)
-    const calendar = google.calendar({ version: 'v3', auth })
-
-    for (const item of cartItems) {
-      try {
-        const firstSlot = item.slots[0]
-        const lastSlot = item.slots[item.slots.length - 1]
-        const startTime = new Date(firstSlot)
-        const endTime = new Date(lastSlot)
-        endTime.setHours(endTime.getHours() + 1)
-
-        const dateStr = new Date(item.date + 'T12:00:00').toLocaleDateString('en-US', {
-          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-        })
-
-        await calendar.events.insert({
-          calendarId: process.env.GCAL_CALENDAR_ID || 'founder@vibeshackstudios.com',
-          requestBody: {
-            summary: `📹 ${item.studioName} — ${customerName}`,
-            description: `Studio: ${item.studioName}\nClient: ${customerName}\nEmail: ${customerEmail}\nPhone: ${customerPhone}\nDate: ${dateStr}\nDuration: ${item.hours}hr\nAmount: $${item.price}\n\nBooked via VibeShack website`,
-            start: { dateTime: startTime.toISOString(), timeZone: 'America/Los_Angeles' },
-            end: { dateTime: endTime.toISOString(), timeZone: 'America/Los_Angeles' },
-            attendees: [{ email: customerEmail, displayName: customerName }],
-            colorId: '11',
-          },
-        })
-      } catch (err) {
-        console.error(`Calendar event creation failed for ${item.studioName}:`, err)
-      }
+  for (let i = 0; i < Math.min(limit, 20); i++) {
+    const raw = metadata[`cart_${i}`]
+    if (!raw) break
+    try {
+      const compact = JSON.parse(raw)
+      const slots = Array.isArray(compact.s ?? compact.slots) ? (compact.s ?? compact.slots) : []
+      items.push({
+        studioId: stripControlChars(compact.id ?? compact.studioId, 80),
+        studioName: stripControlChars(compact.n ?? compact.studioName, 120),
+        date: stripControlChars(compact.d ?? compact.date, 20),
+        slots: slots.map((slot: unknown) => stripControlChars(slot, 40)).filter(Boolean),
+        hours: Number(compact.h ?? compact.hours ?? slots.length),
+        price: Number(compact.p ?? compact.price ?? 0),
+      })
+    } catch (error) {
+      console.error('Failed to parse cart metadata item:', error)
     }
-  } catch (err) {
-    console.error('Calendar setup error:', err)
+  }
+
+  if (!items.length && metadata.cartJson) {
+    try {
+      const legacy = JSON.parse(metadata.cartJson)
+      if (Array.isArray(legacy)) {
+        for (const item of legacy.slice(0, 20)) {
+          items.push({
+            studioId: stripControlChars(item.studioId, 80),
+            studioName: stripControlChars(item.studioName, 120),
+            date: stripControlChars(item.date, 20),
+            slots: Array.isArray(item.slots) ? item.slots.map((slot: unknown) => stripControlChars(slot, 40)).filter(Boolean) : [],
+            hours: Number(item.hours || item.slots?.length || 1),
+            price: Number(item.price || 0),
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Failed to parse legacy cart metadata:', error)
+    }
+  }
+
+  return items.filter((item) => item.studioName && item.date && item.slots.length)
+}
+
+function parseReferralInfo(metadata: Record<string, string>, amountTotal: number): ReferralInfo | null {
+  const referral = buildReferralInfo(metadata.referralSource, amountTotal)
+  if (!referral) return null
+
+  const metadataCommission = Number.parseInt(metadata.referralCommissionCents || '', 10)
+  const metadataRate = Number.parseFloat(metadata.referralCommissionRate || '')
+
+  return {
+    ...referral,
+    partnerName: stripControlChars(metadata.referralPartner || referral.partnerName, 120),
+    commissionRate: Number.isFinite(metadataRate) && metadataRate > 0 ? metadataRate : referral.commissionRate,
+    commissionCents: Number.isFinite(metadataCommission) && metadataCommission >= 0
+      ? metadataCommission
+      : referral.commissionCents,
   }
 }
 
-async function sendConfirmationEmail(
-  cartItems: CartItem[],
-  customerName: string,
+function validateCompletedSession(
+  session: Stripe.Checkout.Session,
+  cartItems: BookingCartItem[],
   customerEmail: string,
-  customerPhone: string,
-  amountTotal: number,
+  metadata: Record<string, string>,
 ) {
+  if (session.payment_status !== 'paid') {
+    return { ok: false, status: 200, error: `Checkout session is not paid: ${session.payment_status}` }
+  }
+
+  if (!isEmail(customerEmail)) {
+    return { ok: false, status: 400, error: 'Checkout session is missing a valid customer email' }
+  }
+
+  const expectedTotalCents = Number.parseInt(metadata.computedTotalCents || '', 10)
+  if (!Number.isFinite(expectedTotalCents) || expectedTotalCents <= 0) {
+    return { ok: false, status: 400, error: 'Checkout session is missing server-computed total metadata' }
+  }
+
+  if (typeof session.amount_total !== 'number' || session.amount_total !== expectedTotalCents) {
+    return { ok: false, status: 400, error: 'Checkout amount did not match server-computed metadata' }
+  }
+
+  const seenSlots = new Set<string>()
+  for (const item of cartItems) {
+    const studio = getStudioById(item.studioId)
+    if (!studio) return { ok: false, status: 400, error: 'Checkout session contains an invalid studio' }
+    if (!isValidBookingDate(item.date)) return { ok: false, status: 400, error: 'Checkout session contains an invalid date' }
+    if (!Array.isArray(item.slots) || item.slots.length < 1 || item.slots.length > 24) {
+      return { ok: false, status: 400, error: 'Checkout session contains invalid slot count' }
+    }
+
+    const validSlots = slotIsoSetForDate(item.date)
+    for (const slot of item.slots) {
+      if (!validSlots.has(slot)) {
+        return { ok: false, status: 400, error: 'Checkout session contains a slot outside the booked date' }
+      }
+
+      const key = `${item.studioId}|${item.date}|${slot}`
+      if (seenSlots.has(key)) {
+        return { ok: false, status: 400, error: 'Checkout session contains duplicate slots' }
+      }
+      seenSlots.add(key)
+    }
+
+    item.studioName = studio.name
+    item.hours = item.slots.length
+    item.price = studio.price * item.slots.length
+  }
+
+  return { ok: true, status: 200, error: '' }
+}
+
+function attributionHtml(metadata: Record<string, string>) {
+  const rows = [
+    ['Source', metadata.trackingSource],
+    ['Medium', metadata.trackingMedium],
+    ['Campaign', metadata.trackingCampaign],
+    ['Content', metadata.trackingContent],
+    ['Term', metadata.trackingTerm],
+    ['Landing path', metadata.trackingLandingPath],
+    ['Referrer', metadata.trackingReferrer],
+    ['Click ID', metadata.trackingClickId],
+    ['Captured at', metadata.trackingCapturedAt],
+  ].filter(([, value]) => value)
+
+  if (!rows.length) return ''
+
+  return `
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px;margin:24px 0;color:#111;">
+        <p style="font-weight:900;font-size:14px;margin:0 0 8px;">Booking attribution</p>
+        <p style="font-size:14px;line-height:1.7;margin:0;">
+          ${rows.map(([label, value]) => `<strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}<br>`).join('')}
+        </p>
+      </div>`
+}
+
+async function getStripeReceiptUrl(session: Stripe.Checkout.Session) {
+  const paymentIntentId = typeof session.payment_intent === 'string'
+    ? session.payment_intent
+    : session.payment_intent?.id
+
+  if (!paymentIntentId) return ''
+
   try {
-    const nodemailer = await import('nodemailer')
-    const transporter = nodemailer.default.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER || 'ncogrid@gmail.com',
-        pass: process.env.GMAIL_APP_PASSWORD || '',
-      },
+    const paymentIntent = await getStripe().paymentIntents.retrieve(paymentIntentId, {
+      expand: ['latest_charge'],
     })
+    const charge = paymentIntent.latest_charge
 
-    // Build booking rows for each cart item
-    const bookingRows = cartItems.map(item => {
-      const dateStr = new Date(item.date + 'T12:00:00').toLocaleDateString('en-US', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-      })
-      const firstSlot = item.slots[0]
-      const lastSlot = item.slots[item.slots.length - 1]
-      const startTime = new Date(firstSlot).toLocaleTimeString('en-US', {
-        hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles',
-      })
-      const endDate = new Date(lastSlot)
-      endDate.setHours(endDate.getHours() + 1)
-      const endTime = endDate.toLocaleTimeString('en-US', {
-        hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles',
-      })
+    if (charge && typeof charge !== 'string') {
+      return charge.receipt_url || ''
+    }
+  } catch (error) {
+    console.error('Stripe receipt lookup failed:', error)
+  }
 
-      return `
-        <div style="background: #111; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #222;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-            <div>
-              <p style="color: #fff; font-weight: 900; font-size: 16px; margin: 0 0 4px;">${item.studioName}</p>
-              <p style="color: #e11d48; font-size: 12px; margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">VibeShack Studios</p>
-            </div>
-            <span style="color: #fff; font-weight: 900; font-size: 18px;">$${item.price}</span>
-          </div>
-          <div style="border-top: 1px solid #222; padding-top: 12px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-              <span style="color: #666; font-size: 13px;">Date</span>
-              <span style="color: #fff; font-size: 13px; font-weight: 600;">${dateStr}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-              <span style="color: #666; font-size: 13px;">Time</span>
-              <span style="color: #fff; font-size: 13px; font-weight: 600;">${startTime} – ${endTime} PT</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: #666; font-size: 13px;">Duration</span>
-              <span style="color: #fff; font-size: 13px; font-weight: 600;">${item.hours} hour${item.hours > 1 ? 's' : ''}</span>
-            </div>
-          </div>
-        </div>`
-    }).join('')
+  return ''
+}
 
-    const firstName = customerName.split(' ')[0]
-    const totalFormatted = `$${(amountTotal / 100).toFixed(2)}`
+function emailLogoHtml() {
+  return `
+    <a href="https://www.vibeshackstudios.com" style="display:inline-block;color:#ef1100;text-decoration:none;font-size:20px;font-weight:950;letter-spacing:-0.055em;line-height:1;">
+      VibeShack Studios
+    </a>`
+}
 
-    // Subject line — use first studio name if only one, otherwise "Multiple Studios"
-    const subjectStudio = cartItems.length === 1 ? cartItems[0].studioName : `${cartItems.length} Studios`
-    const firstDate = new Date(cartItems[0].date + 'T12:00:00').toLocaleDateString('en-US', {
-      month: 'short', day: 'numeric',
-    })
+function getPrepBlocks(cartItems: BookingCartItem[]) {
+  const seen = new Set<string>()
 
-    const emailHtml = `
+  return cartItems.flatMap((item) => {
+    const key = item.studioId || item.studioName
+    if (seen.has(key)) return []
+    seen.add(key)
+
+    const studio = getStudioById(item.studioId)
+    return [{
+      studioName: item.studioName,
+      prep: studio?.prep?.length ? studio.prep : [
+        'Bring your shot list, script, talking points, or creative brief so the session has a clear target.',
+        'Confirm guests, crew, wardrobe, products, props, and file backups before arrival.',
+        'Send any brand direction, reference images, or special setup notes before your session if possible.',
+      ],
+    }]
+  })
+}
+
+function buildPrepEmailHtml(cartItems: BookingCartItem[], customer: { name: string; email: string; phone: string }) {
+  const firstName = escapeHtml(customer.name.split(' ')[0] || customer.name)
+  const sessionRows = cartItems.map((item) => {
+    const dateStr = formatDateForDisplay(item.date)
+    const slotRanges = describeSlotRanges(item.slots)
+
+    return `
+      <tr>
+        <td style="padding:18px 0;border-top:1px solid #e5e7eb;">
+          <p style="color:#111827;font-size:16px;font-weight:900;margin:0 0 6px;">${escapeHtml(item.studioName)}</p>
+          <p style="color:#4b5563;font-size:14px;line-height:1.65;margin:0;">${escapeHtml(dateStr)}<br>${escapeHtml(slotRanges)} PT</p>
+        </td>
+        <td align="right" style="padding:18px 0;border-top:1px solid #e5e7eb;color:#111827;font-size:14px;font-weight:800;vertical-align:top;white-space:nowrap;">
+          ${escapeHtml(String(item.hours))} hr${item.hours === 1 ? '' : 's'}
+        </td>
+      </tr>`
+  }).join('')
+
+  const prepBlocks = getPrepBlocks(cartItems).map((block, index) => `
+    <div style="background:#0b0b0b;border:1px solid #232323;border-radius:18px;padding:22px;margin:0 0 14px;">
+      <p style="color:#ff2b1c;font-size:11px;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;margin:0 0 12px;">${String(index + 1).padStart(2, '0')} / ${escapeHtml(block.studioName)}</p>
+      <ul style="padding-left:18px;margin:0;color:#d8dde7;font-size:14px;line-height:1.75;">
+        ${block.prep.map((tip) => `<li style="margin:0 0 9px;">${escapeHtml(tip)}</li>`).join('')}
+      </ul>
+    </div>`).join('')
+
+  return `
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Booking Confirmation — VibeShack Studios</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0;">
-  <div style="max-width: 560px; margin: 0 auto; padding: 40px 20px;">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#050505;color:#fff;margin:0;padding:0;">
+  <div style="display:none;max-height:0;overflow:hidden;color:#050505;">A short preparation note for your upcoming VibeShack Studios session.</div>
+  <div style="max-width:660px;margin:0 auto;padding:36px 22px 48px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 26px;">
+      <tr>
+        <td style="vertical-align:middle;">${emailLogoHtml()}</td>
+        <td align="right" style="vertical-align:middle;color:#6b7280;font-size:12px;line-height:1.55;">
+          <span style="color:#f3f4f6;font-weight:800;">Booking Preparation</span><br>
+          San Francisco / 950 Battery St
+        </td>
+      </tr>
+    </table>
 
-    <!-- Header -->
-    <div style="border-bottom: 1px solid #222; padding-bottom: 28px; margin-bottom: 32px;">
-      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-        <span style="font-size: 18px; font-weight: 900; letter-spacing: -0.04em; color: #fff;">Vibe<span style="color: #e11d48;">Shack</span></span>
-        <span style="color: #333; font-size: 12px;">·</span>
-        <span style="color: #555; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em;">Studios</span>
-      </div>
-      <h1 style="font-size: 36px; font-weight: 900; letter-spacing: -0.04em; margin: 0 0 8px; line-height: 1.1;">You're booked.</h1>
-      <p style="color: #666; font-size: 15px; margin: 0;">See you at the studio, ${firstName}.</p>
+    <div style="background:#0c0c0c;border:1px solid #1f1f1f;border-radius:28px;padding:32px;margin:0 0 18px;">
+      <p style="display:inline-block;border:1px solid #333;color:#aeb6c5;font-size:11px;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;margin:0 0 18px;padding:8px 10px;">Session prep</p>
+      <h1 style="font-size:38px;font-weight:950;letter-spacing:-0.045em;line-height:1.02;margin:0 0 16px;color:#fff;">Your session is confirmed. Here&apos;s how to arrive ready.</h1>
+      <p style="color:#aeb6c5;font-size:16px;line-height:1.7;margin:0;">${firstName}, this is your production prep note. It keeps the day focused: what to bring, what the room needs, and how to help the team start on time.</p>
     </div>
 
-    <!-- Booking Summary -->
-    <div style="margin-bottom: 32px;">
-      <p style="color: #555; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; margin: 0 0 16px;">
-        ${cartItems.length > 1 ? `${cartItems.length} Sessions Booked` : 'Your Session'}
-      </p>
-      ${bookingRows}
+    <div style="background:#fff;color:#111827;border-radius:24px;padding:26px;margin:18px 0 28px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="padding:0 0 14px;">
+            <p style="font-size:11px;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;color:#ef1100;margin:0 0 8px;">Confirmed session</p>
+            <p style="font-size:24px;font-weight:950;letter-spacing:-0.035em;line-height:1.1;margin:0;color:#111827;">Your studio time</p>
+          </td>
+        </tr>
+        ${sessionRows}
+      </table>
     </div>
 
-    <!-- Total -->
-    <div style="display: flex; justify-content: space-between; padding: 16px 20px; background: #0a0a0a; border: 1px solid #222; border-radius: 8px; margin-bottom: 32px;">
-      <span style="color: #fff; font-weight: 700; font-size: 15px;">Total Paid</span>
-      <span style="color: #fff; font-weight: 900; font-size: 20px;">${totalFormatted}</span>
+    <div style="margin:0 0 28px;">
+      <p style="font-size:12px;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;color:#6b7280;margin:0 0 10px;">Room-specific notes</p>
+      <h2 style="font-size:28px;font-weight:950;letter-spacing:-0.04em;line-height:1.05;margin:0 0 18px;color:#fff;">Details that protect the shoot.</h2>
+      ${prepBlocks}
     </div>
 
-    <!-- Studio Address -->
-    <div style="background: #111; border-radius: 12px; padding: 20px; margin-bottom: 32px; border: 1px solid #222;">
-      <p style="color: #fff; font-weight: 700; margin: 0 0 8px;">📍 VibeShack Studios</p>
-      <p style="color: #999; font-size: 14px; margin: 0 0 4px;">950 Battery St, San Francisco, CA 94111</p>
-      <p style="color: #555; font-size: 13px; margin: 0;">Northern Waterfront · Open 24/7</p>
+    <div style="background:#111;border:1px solid #252525;border-radius:22px;padding:24px;margin:0 0 18px;">
+      <p style="font-size:12px;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;color:#6b7280;margin:0 0 16px;">Production checklist</p>
+      <p style="font-size:15px;line-height:1.7;color:#e5e7eb;margin:0 0 14px;"><strong style="color:#fff;">Arrive 10 minutes early.</strong> That gives the team time to get you settled without taking time from the session.</p>
+      <p style="font-size:15px;line-height:1.7;color:#e5e7eb;margin:0 0 14px;"><strong style="color:#fff;">Bring the assets.</strong> Scripts, shot lists, products, wardrobe, props, slides, logo files, reference images, and backup drives all help the room move faster.</p>
+      <p style="font-size:15px;line-height:1.7;color:#e5e7eb;margin:0;"><strong style="color:#fff;">Know the deliverables.</strong> Full episodes, clips, headshots, product stills, vertical edits, thumbnails, campaign assets: the clearer the target, the better the session.</p>
     </div>
 
-    <!-- Contact info -->
-    <p style="color: #555; font-size: 14px; line-height: 1.7; margin-bottom: 32px;">
-      Questions? Reply to this email or reach us at
-      <a href="mailto:founder@vibeshackstudios.com" style="color: #e11d48; text-decoration: none;">founder@vibeshackstudios.com</a>
-    </p>
-
-    <!-- Footer -->
-    <div style="border-top: 1px solid #111; padding-top: 24px; color: #333; font-size: 12px; line-height: 1.8;">
-      <p style="margin: 0 0 4px;">Free cancellation up to 48 hours before your session.</p>
-      <p style="margin: 0;">© VibeShack Studios · San Francisco</p>
+    <div style="background:#080808;border:1px solid #202020;border-radius:22px;padding:24px;margin:0 0 24px;">
+      <p style="color:#fff;font-size:16px;font-weight:900;margin:0 0 10px;">VibeShack Studios</p>
+      <p style="color:#aeb6c5;font-size:14px;line-height:1.7;margin:0;">950 Battery St, San Francisco, CA 94111<br>Northern Waterfront<br>Open 24/7</p>
+      <p style="color:#6b7280;font-size:13px;line-height:1.7;margin:16px 0 0;">Street parking is usually the simplest option. If guests, crew, or setup notes change before the session, reply to this email and we will route it to the team.</p>
     </div>
 
+    <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0 0 26px;">Questions or setup notes? Reply to this email or reach us at <a href="mailto:founder@vibeshackstudios.com" style="color:#ff2b1c;text-decoration:none;font-weight:800;">founder@vibeshackstudios.com</a>.</p>
+    <div style="border-top:1px solid #111;padding-top:22px;color:#444;font-size:12px;line-height:1.8;">
+      <p style="margin:0 0 4px;">Free cancellation up to 48 hours before your session.</p>
+      <p style="margin:0;">VibeShack Studios - San Francisco</p>
+    </div>
+  </div>
+</body>
+</html>`
+}
+
+async function sendConfirmationEmail(
+  cartItems: BookingCartItem[],
+  customer: { name: string; email: string; phone: string },
+  amountTotal: number,
+  teamEmails: string[],
+  referralInfo: ReferralInfo | null,
+  attributionDetails = '',
+  receiptUrl = '',
+) {
+  const gmailUser = process.env.GMAIL_USER || 'founder@vibeshackstudios.com'
+  const gmailPass = process.env.GMAIL_APP_PASSWORD
+  if (!gmailPass) throw new Error('GMAIL_APP_PASSWORD is not configured')
+
+  const nodemailer = await import('nodemailer')
+  const transporter = nodemailer.default.createTransport({
+    service: 'gmail',
+    auth: { user: gmailUser, pass: gmailPass },
+  })
+  const sendMail = async (label: string, mailOptions: Parameters<typeof transporter.sendMail>[0]) => {
+    try {
+      await transporter.sendMail(mailOptions)
+    } catch (error) {
+      console.error(`${label} email failed:`, error)
+    }
+  }
+
+  const firstName = escapeHtml(customer.name.split(' ')[0] || customer.name)
+  const subjectStudio = cartItems.length === 1 ? cartItems[0].studioName : `${cartItems.length} Studios`
+  const firstDate = formatDateForDisplay(cartItems[0].date).replace(/^\w+,\s*/, '')
+  const totalFormatted = `$${(amountTotal / 100).toFixed(2)}`
+  const internalSubjectPrefix = referralInfo ? `[${referralInfo.partnerName}] ` : ''
+  const receiptHtml = receiptUrl ? `
+    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;margin:28px 0;color:#111;">
+      <p style="font-size:12px;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;margin:0 0 8px;">Stripe receipt</p>
+      <p style="font-size:14px;line-height:1.6;color:#334155;margin:0 0 18px;">Stripe will also send the official payment receipt to ${escapeHtml(customer.email)}. You can view it anytime here:</p>
+      <a href="${escapeHtml(receiptUrl)}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;border-radius:999px;padding:12px 18px;font-size:13px;font-weight:800;">View Stripe receipt</a>
+    </div>` : `
+    <div style="background:#0a0a0a;border:1px solid #222;border-radius:14px;padding:18px;margin:28px 0;color:#fff;">
+      <p style="font-size:13px;line-height:1.7;color:#999;margin:0;">Stripe will also send the official payment receipt to ${escapeHtml(customer.email)}.</p>
+    </div>`
+  const referralHtml = referralInfo ? `
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:18px;margin:24px 0;color:#111;">
+        <p style="font-weight:900;font-size:14px;margin:0 0 8px;">Partner referral</p>
+        <p style="font-size:14px;line-height:1.7;margin:0;">
+          <strong>Partner:</strong> ${escapeHtml(referralInfo.partnerName)}<br>
+          <strong>Source:</strong> ${escapeHtml(referralInfo.source)}<br>
+          <strong>Commission:</strong> ${escapeHtml(formatMoneyFromCents(referralInfo.commissionCents))} (${escapeHtml(String(Math.round(referralInfo.commissionRate * 100)))}%)
+        </p>
+      </div>` : ''
+
+  const bookingRows = cartItems.map((item) => {
+    const dateStr = formatDateForDisplay(item.date)
+    const slotRanges = describeSlotRanges(item.slots)
+    return `
+      <div style="background:#111;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid #222;">
+        <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:12px;">
+          <div>
+            <p style="color:#fff;font-weight:900;font-size:16px;margin:0 0 4px;">${escapeHtml(item.studioName)}</p>
+            <p style="color:#e11d48;font-size:12px;margin:0;text-transform:uppercase;letter-spacing:0.1em;">VibeShack Studios</p>
+          </div>
+          <span style="color:#fff;font-weight:900;font-size:18px;">$${escapeHtml(item.price)}</span>
+        </div>
+        <div style="border-top:1px solid #222;padding-top:12px;">
+          <p style="color:#fff;font-size:13px;font-weight:600;margin:0 0 8px;">${escapeHtml(dateStr)}</p>
+          <p style="color:#999;font-size:13px;margin:0 0 8px;">${escapeHtml(slotRanges)} PT</p>
+          <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(item.hours)} hour${item.hours === 1 ? '' : 's'}</p>
+        </div>
+      </div>`
+  }).join('')
+  const teamBookingRows = cartItems.map((item) => {
+    const dateStr = formatDateForDisplay(item.date)
+    const slotRanges = describeSlotRanges(item.slots)
+    return `
+      <div style="background:#111;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid #222;">
+        <p style="color:#fff;font-weight:900;font-size:16px;margin:0 0 4px;">${escapeHtml(item.studioName)}</p>
+        <p style="color:#e11d48;font-size:12px;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.1em;">VibeShack Studios</p>
+        <div style="border-top:1px solid #222;padding-top:12px;">
+          <p style="color:#fff;font-size:13px;font-weight:600;margin:0 0 8px;">${escapeHtml(dateStr)}</p>
+          <p style="color:#999;font-size:13px;margin:0 0 8px;">${escapeHtml(slotRanges)} PT</p>
+          <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(item.hours)} hour${item.hours === 1 ? '' : 's'}</p>
+        </div>
+      </div>`
+  }).join('')
+
+  const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#000;color:#fff;margin:0;padding:0;">
+  <div style="max-width:560px;margin:0 auto;padding:40px 20px;">
+    <div style="border-bottom:1px solid #222;padding-bottom:28px;margin-bottom:32px;">
+      <div style="margin:0 0 24px;">${emailLogoHtml()}</div>
+      <h1 style="font-size:36px;font-weight:900;letter-spacing:-0.04em;margin:0 0 8px;line-height:1.1;">You're booked.</h1>
+      <p style="color:#666;font-size:15px;margin:0;">See you at the studio, ${firstName}.</p>
+    </div>
+    ${bookingRows}
+    <div style="display:flex;justify-content:space-between;padding:16px 20px;background:#0a0a0a;border:1px solid #222;border-radius:8px;margin:32px 0;">
+      <span style="color:#fff;font-weight:700;font-size:15px;">Total Paid</span>
+      <span style="color:#fff;font-weight:900;font-size:20px;">${escapeHtml(totalFormatted)}</span>
+    </div>
+    ${receiptHtml}
+    <div style="background:#111;border-radius:12px;padding:20px;margin-bottom:32px;border:1px solid #222;">
+      <p style="color:#fff;font-weight:700;margin:0 0 8px;">VibeShack Studios</p>
+      <p style="color:#999;font-size:14px;margin:0 0 4px;">950 Battery St, San Francisco, CA 94111</p>
+      <p style="color:#555;font-size:13px;margin:0;">Northern Waterfront - Open 24/7</p>
+    </div>
+    <p style="color:#555;font-size:14px;line-height:1.7;margin-bottom:32px;">Questions? Reply to this email or reach us at <a href="mailto:founder@vibeshackstudios.com" style="color:#e11d48;text-decoration:none;">founder@vibeshackstudios.com</a></p>
+    <div style="border-top:1px solid #111;padding-top:24px;color:#333;font-size:12px;line-height:1.8;">
+      <p style="margin:0 0 4px;">Free cancellation up to 48 hours before your session.</p>
+      <p style="margin:0;">VibeShack Studios - San Francisco</p>
+    </div>
   </div>
 </body>
 </html>`
 
-    // Internal notification HTML
-    const internalHtml = cartItems.map(item => {
-      const dateStr = new Date(item.date + 'T12:00:00').toLocaleDateString('en-US', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-      })
-      const firstSlot = item.slots[0]
-      const startTime = new Date(firstSlot).toLocaleTimeString('en-US', {
-        hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles',
-      })
-      return `<li>📹 <strong>${item.studioName}</strong> — ${dateStr} at ${startTime} PT — $${item.price}/hr × ${item.hours}hr</li>`
-    }).join('')
+  const internalHtml = cartItems.map((item) => {
+    const dateStr = formatDateForDisplay(item.date)
+    const start = new Date(item.slots[0])
+    const end = addHours(new Date(item.slots[item.slots.length - 1]), 1)
+    return `<li><strong>${escapeHtml(item.studioName)}</strong> - ${escapeHtml(dateStr)} - ${escapeHtml(start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))}-${escapeHtml(end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))} PT - $${escapeHtml(item.price)}</li>`
+  }).join('')
+  const prepEmailHtml = buildPrepEmailHtml(cartItems, customer)
 
-    // Send to customer
-    await transporter.sendMail({
-      from: '"VibeShack Studios" <founder@vibeshackstudios.com>',
-      to: customerEmail,
-      subject: `You're booked — ${subjectStudio} · ${firstDate}`,
-      html: emailHtml,
-    })
+  await sendMail('Booking confirmation', {
+    from: `"VibeShack Studios" <${gmailUser}>`,
+    to: customer.email,
+    subject: `You're booked - ${subjectStudio} - ${firstDate}`,
+    html: emailHtml,
+  })
 
-    // Internal notification
-    await transporter.sendMail({
-      from: '"VibeShack Booking" <founder@vibeshackstudios.com>',
-      to: 'founder@vibeshackstudios.com',
-      subject: `🎬 New Booking: ${customerName} — ${subjectStudio} — ${firstDate}`,
+  await sendMail('Session prep', {
+    from: `"VibeShack Studios" <${gmailUser}>`,
+    to: customer.email,
+    subject: `Session prep - ${subjectStudio} - ${firstDate}`,
+    html: prepEmailHtml,
+  })
+
+  if (teamEmails.length) {
+    await sendMail('Team session details', {
+      from: `"VibeShack Studios" <${gmailUser}>`,
+      to: teamEmails,
+      subject: `Session details - ${subjectStudio} - ${firstDate}`,
       html: `
-        <p><strong>New booking received.</strong></p>
-        <p>
-          <strong>Client:</strong> ${customerName}<br>
-          <strong>Email:</strong> ${customerEmail}<br>
-          <strong>Phone:</strong> ${customerPhone || 'N/A'}<br>
-          <strong>Total:</strong> ${totalFormatted}
-        </p>
-        <ul style="line-height: 2;">${internalHtml}</ul>
-      `,
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#000;color:#fff;margin:0;padding:0;">
+  <div style="max-width:560px;margin:0 auto;padding:40px 20px;">
+    <div style="border-bottom:1px solid #222;padding-bottom:28px;margin-bottom:32px;">
+      <div style="margin:0 0 24px;">${emailLogoHtml()}</div>
+      <h1 style="font-size:34px;font-weight:900;letter-spacing:-0.04em;margin:0 0 8px;line-height:1.1;">Session details.</h1>
+      <p style="color:#666;font-size:15px;line-height:1.7;margin:0;">${escapeHtml(customer.name)} added you to a VibeShack Studios booking.</p>
+    </div>
+    ${teamBookingRows}
+    <div style="background:#111;border-radius:12px;padding:20px;margin:32px 0;border:1px solid #222;">
+      <p style="color:#fff;font-weight:700;margin:0 0 8px;">VibeShack Studios</p>
+      <p style="color:#999;font-size:14px;margin:0 0 4px;">950 Battery St, San Francisco, CA 94111</p>
+      <p style="color:#555;font-size:13px;margin:0;">Northern Waterfront - Open 24/7</p>
+    </div>
+    <p style="color:#555;font-size:14px;line-height:1.7;margin-bottom:32px;">Questions? Reply to this email or reach us at <a href="mailto:founder@vibeshackstudios.com" style="color:#e11d48;text-decoration:none;">founder@vibeshackstudios.com</a></p>
+    <div style="border-top:1px solid #111;padding-top:24px;color:#333;font-size:12px;line-height:1.8;">
+      <p style="margin:0;">VibeShack Studios - San Francisco</p>
+    </div>
+  </div>
+</body>
+</html>`,
     })
-  } catch (err) {
-    console.error('Email error:', err)
   }
+
+  await sendMail('Internal booking', {
+    from: `"VibeShack Booking" <${gmailUser}>`,
+    to: 'founder@vibeshackstudios.com',
+    subject: `${internalSubjectPrefix}New Booking: ${customer.name} - ${subjectStudio} - ${firstDate}`,
+    html: `
+      <p><strong>New booking received.</strong></p>
+      <p>
+        <strong>Client:</strong> ${escapeHtml(customer.name)}<br>
+        <strong>Email:</strong> ${escapeHtml(customer.email)}<br>
+        <strong>Phone:</strong> ${escapeHtml(customer.phone || 'N/A')}<br>
+        <strong>Team confirmations:</strong> ${escapeHtml(teamEmails.join(', ') || 'none')}<br>
+        <strong>Total:</strong> ${escapeHtml(totalFormatted)}
+      </p>
+      ${receiptUrl ? `<p><strong>Stripe receipt:</strong> <a href="${escapeHtml(receiptUrl)}">${escapeHtml(receiptUrl)}</a></p>` : ''}
+      ${referralHtml}
+      ${attributionDetails}
+      <ul style="line-height:2;">${internalHtml}</ul>
+    `,
+  })
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
-  const sig = req.headers.get('stripe-signature')!
+  const signature = req.headers.get('stripe-signature')
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
-  let event: Stripe.Event
+  if (!webhookSecret || !signature) {
+    return NextResponse.json({ error: 'Webhook signature required' }, { status: 400 })
+  }
 
+  let event: Stripe.Event
   try {
-    if (webhookSecret && sig) {
-      event = stripe.webhooks.constructEvent(body, sig, webhookSecret)
-    } else {
-      event = JSON.parse(body)
-    }
-  } catch (err) {
+    event = getStripe().webhooks.constructEvent(body, signature, webhookSecret)
+  } catch (error) {
+    console.error('Stripe webhook signature failed:', error)
     return NextResponse.json({ error: 'Webhook signature failed' }, { status: 400 })
   }
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
-    const metadata = session.metadata as Record<string, string>
-    const amountTotal = session.amount_total || 0
+    const metadata = (session.metadata || {}) as Record<string, string>
+    const cartItems = parseCartItems(metadata)
 
-    const customerName = metadata.customerName || 'Guest'
-    const customerEmail = metadata.customerEmail || ''
-    const customerPhone = metadata.customerPhone || ''
-
-    // Parse cart items from split metadata keys (cart_0, cart_1, ...)
-    let cartItems: CartItem[] = []
-    try {
-      const totalSessions = parseInt(metadata.totalSessions || '0', 10)
-      for (let i = 0; i < Math.max(totalSessions, 20); i++) {
-        const key = `cart_${i}`
-        if (!metadata[key]) break
-        const compact = JSON.parse(metadata[key])
-        // Support both compact keys (id/n/d/s/h/p) and full keys for backwards compat
-        cartItems.push({
-          studioId: compact.id ?? compact.studioId ?? '',
-          studioName: compact.n ?? compact.studioName ?? '',
-          date: compact.d ?? compact.date ?? '',
-          slots: compact.s ?? compact.slots ?? [],
-          hours: compact.h ?? compact.hours ?? 1,
-          price: compact.p ?? compact.price ?? 0,
-        })
-      }
-    } catch (err) {
-      console.error('Failed to parse cart metadata:', err)
-    }
-
-    // Fallback: try legacy cartJson if present
-    if (cartItems.length === 0 && metadata.cartJson) {
-      try {
-        cartItems = JSON.parse(metadata.cartJson)
-      } catch (err) {
-        console.error('Failed to parse legacy cartJson:', err)
-      }
-    }
-
-    if (cartItems.length === 0) {
+    if (!cartItems.length) {
       console.error('No cart items found in webhook metadata')
       return NextResponse.json({ received: true })
     }
 
-    // Send email regardless of calendar success
-    await sendConfirmationEmail(cartItems, customerName, customerEmail, customerPhone, amountTotal)
+    const customer = {
+      name: stripControlChars(metadata.customerName || 'Guest', 120),
+      email: stripControlChars(metadata.customerEmail || session.customer_email || '', 254).toLowerCase(),
+      phone: stripControlChars(metadata.customerPhone || '', 40),
+    }
 
-    // Calendar — errors are caught per-event inside the function
-    await addToCalendar(cartItems, customerName, customerEmail, customerPhone)
+    const validation = validateCompletedSession(session, cartItems, customer.email, metadata)
+    if (!validation.ok) {
+      console.error('Rejected checkout webhook:', validation.error, {
+        sessionId: session.id,
+        eventId: event.id,
+        bookingRef: metadata.bookingRef,
+      })
+      return NextResponse.json({ error: validation.error }, { status: validation.status })
+    }
+
+    let teamEmails: string[] = []
+    try {
+      teamEmails = parseEmailList(JSON.parse(metadata.teamEmails || '[]'), 10)
+    } catch {
+      teamEmails = []
+    }
+
+    const referralInfo = parseReferralInfo(metadata, session.amount_total || 0)
+    const attributionDetails = attributionHtml(metadata)
+    const receiptUrl = await getStripeReceiptUrl(session)
+
+    try {
+      await sendConfirmationEmail(cartItems, customer, session.amount_total || 0, teamEmails, referralInfo, attributionDetails, receiptUrl)
+    } catch (error) {
+      console.error('Booking email failed:', error)
+    }
+
+    try {
+      await addBookingEvents(cartItems, customer, teamEmails, referralInfo, metadata.bookingRef || session.id, event.id)
+    } catch (error) {
+      console.error('Calendar event creation failed:', error)
+    }
   }
 
   return NextResponse.json({ received: true })

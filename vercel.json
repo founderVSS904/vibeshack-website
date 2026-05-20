@@ -1,37 +1,7 @@
 {
   "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
   "devCommand": "next dev",
-  "installCommand": "npm install --legacy-peer-deps",
+  "installCommand": "npm install",
   "framework": "nextjs",
-  "outputDirectory": ".next",
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/phone",
-      "destination": "tel:+1-415-XXX-XXXX",
-      "permanent": false
-    }
-  ]
+  "outputDirectory": ".next"
 }

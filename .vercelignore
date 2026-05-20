@@ -1,0 +1,12 @@
+.git
+.next
+node_modules
+.env
+.env.*
+!.env.example
+.vercel/output
+audit-screenshots-*
+test-results
+*.log
+tsconfig.tsbuildinfo
+public/studio-images/drive

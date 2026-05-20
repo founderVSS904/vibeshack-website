@@ -1,1 +1,16 @@
-{"projectId":"prj_x4OS0sdwAhMjngiZTtI1wWBWhTMG","orgId":"team_bCNlyMCShXZTLR5Xn1FiY8eg","projectName":"vibeshack-website"}
+{
+  "projectId": "prj_x4OS0sdwAhMjngiZTtI1wWBWhTMG",
+  "orgId": "team_bCNlyMCShXZTLR5Xn1FiY8eg",
+  "projectName": "vibeshack-website",
+  "settings": {
+    "createdAt": 1774488247387,
+    "framework": null,
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "24.x"
+  }
+}

@@ -1,0 +1,148 @@
+import { NextResponse } from 'next/server'
+import { comparisons } from '@/lib/seo/comparisons'
+import { absoluteUrl } from '@/lib/seo/site'
+import { studioGuides } from '@/lib/seo/studioGuides'
+import { useCases } from '@/lib/seo/useCases'
+
+export const dynamic = 'force-static'
+
+const pageImages = [
+  {
+    loc: '/',
+    images: [
+      ['/studio-images/the-executive-hero.jpg', 'The Executive podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', 'Two-person podcast recording at VibeShack Studios San Francisco'],
+      ['/studio-images/sunset-hero-v20260509.jpg', 'Sunset color podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/inside-green-screen-v20260509.jpg', 'Green screen studio at VibeShack Studios San Francisco'],
+      ['/studio-images/inside-photography-red-v20260509.jpg', 'Photography studio at VibeShack Studios San Francisco'],
+      ['/studio-images/homepage-creative-photography-gradient-motion-v20260509.jpg', 'Creative movement photography created at VibeShack Studios San Francisco'],
+      ['/studio-images/homepage-creative-photography-gradient-editorial-v20260510.jpg', 'Full-body editorial portrait photography created at VibeShack Studios San Francisco'],
+      ['/studio-images/homepage-creative-photography-beauty-gel-v20260510.jpg', 'Beauty portrait with red and blue gel lighting created at VibeShack Studios San Francisco'],
+      ['/studio-images/shot-here-red-fabric-portrait-v20260509.jpg', 'Editorial portrait photography created at VibeShack Studios San Francisco'],
+      ['/studio-images/shot-here-joshua-blue-v20260509.jpg', 'Blue gel portrait photography created at VibeShack Studios San Francisco'],
+      ['/studio-images/parlor-production-v20260509.jpg', 'Parlor premium interview studio at VibeShack Studios San Francisco'],
+      ['/studio-images/horizon-wide-v20260509.jpg', 'Horizon sunset LED podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/inside-canvas-cyc-v20260509.jpg', 'Canvas white cyc studio at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/services/',
+    images: [
+      ['/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg', 'Blue-lit production services set at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg', 'Photo services and creative photoshoots at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg', 'Video production lighting setup at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', 'Podcast production services at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/podcast-studio-san-francisco/',
+    images: [
+      ['/studio-images/podcast-cyc-duo.jpg', 'Two-person podcast recording at VibeShack Studios San Francisco'],
+      ['/studio-images/the-wing-hero.jpg', 'The Wing podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/the-executive-hero.jpg', 'The Executive podcast studio at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/green-screen-studio-sf/',
+    images: [['/studio-images/inside-green-screen-v20260509.jpg', 'Green screen studio rental in San Francisco at VibeShack Studios']],
+  },
+  {
+    loc: '/photo-services/',
+    images: [
+      ['/studio-images/photography-hero-service-v20260509.jpg', 'Photo services for headshots portraits and campaign photography at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg', 'Creative photo services at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-photography-headshot-black-blazer-v20260510.jpg', 'Professional headshot services at VibeShack Studios San Francisco'],
+      ['/studio-images/photography-spotlight-portrait-v20260509.jpg', 'Studio portrait photography services at VibeShack Studios San Francisco'],
+      ['/studio-images/shot-here-red-fabric-portrait-v20260509.jpg', 'Editorial portrait photoshoot at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/sunset-studio/',
+    images: [['/studio-images/sunset-hero-v20260509.jpg', 'Sunset color podcast studio rental in San Francisco at VibeShack Studios']],
+  },
+  {
+    loc: '/photography-studio-san-francisco/',
+    images: [
+      ['/studio-images/photography-hero-service-v20260509.jpg', 'Fashion campaign photography created at VibeShack Studios San Francisco'],
+      ['/studio-images/photography-room-red-backdrop-v20260509.jpg', 'Photography room rental in San Francisco at VibeShack Studios'],
+      ['/studio-images/photography-spotlight-portrait-v20260509.jpg', 'Spotlight portrait photography created at VibeShack Studios San Francisco'],
+      ['/studio-images/photography-cyc-editorial-v20260509.jpg', 'Editorial cyc photography created at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/video-production/',
+    images: [
+      ['/studio-images/usecase-brand-content-v20260509.jpg', 'Video production studio in San Francisco at VibeShack Studios'],
+      ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg', 'Behind the scenes video production lighting at VibeShack Studios San Francisco'],
+      ['/studio-images/inside-green-screen-v20260509.jpg', 'Green screen video production studio at VibeShack Studios San Francisco'],
+      ['/studio-images/inside-canvas-cyc-v20260509.jpg', 'White cyc video production studio at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/canvas-rental/',
+    images: [['/studio-images/canvas-rental-hero-v1775094073.jpg', 'White cyc studio rental in San Francisco at VibeShack Studios']],
+  },
+  {
+    loc: '/parlor/',
+    images: [
+      ['/studio-images/parlor-hero.jpg', 'Parlor interview studio with Chesterfield seating at VibeShack Studios San Francisco'],
+      ['/studio-images/parlor-production-v20260509.jpg', 'Parlor podcast microphones and premium seating at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/horizon/',
+    images: [
+      ['/studio-images/horizon-hero.jpg', 'Horizon LED studio at VibeShack Studios San Francisco'],
+      ['/studio-images/horizon-wide-v20260509.jpg', 'Horizon sunset LED wall podcast studio at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/made-at-vibeshack/',
+    images: [
+      ['/studio-images/shot-here-beatrice-motion-v20260509.jpg', 'White cyc movement photography created at VibeShack Studios San Francisco'],
+      ['/studio-images/shot-here-red-fabric-portrait-v20260509.jpg', 'Red fabric portrait photography created at VibeShack Studios San Francisco'],
+      ['/studio-images/shot-here-joshua-spotlight-v20260509.jpg', 'Spotlight portrait photography created at VibeShack Studios San Francisco'],
+    ],
+  },
+  ...studioGuides.map((guide) => ({
+    loc: `/studio-guides/${guide.slug}/`,
+    images: [[guide.image, guide.imageAlt]],
+  })),
+  ...useCases.map((useCase) => ({
+    loc: `/use-cases/${useCase.slug}/`,
+    images: [[useCase.image, useCase.imageAlt]],
+  })),
+  ...comparisons.map((comparison) => ({
+    loc: `/compare/${comparison.slug}/`,
+    images: [[comparison.image, comparison.imageAlt]],
+  })),
+]
+
+function escapeXml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
+export async function GET() {
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${pageImages.map((page) => `  <url>
+    <loc>${escapeXml(absoluteUrl(page.loc))}</loc>
+${page.images.map(([src, caption]) => `    <image:image>
+      <image:loc>${escapeXml(absoluteUrl(src))}</image:loc>
+      <image:caption>${escapeXml(caption)}</image:caption>
+    </image:image>`).join('\n')}
+  </url>`).join('\n')}
+</urlset>`
+
+  return new NextResponse(xml, {
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+    },
+  })
+}

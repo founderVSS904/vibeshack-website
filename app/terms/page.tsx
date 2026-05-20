@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Terms of Service | VibeShack Studios',
   description: 'Booking policies, cancellation, studio rules, and terms of use for VibeShack Studios.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/terms' }
+  alternates: { canonical: 'https://www.vibeshackstudios.com/terms/' }
 }
 
 export default function TermsPage() {

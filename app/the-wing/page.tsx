@@ -2,22 +2,22 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-  title: 'The Wing: Intimate Podcast Studio | VibeShack Studios SF',
+  title: 'The Wing Podcast Studio',
   description: 'Walnut Series. Cozy 2-person setup with premium lighting and acoustics. $300/hr. Cameraman included. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/the-wing' },
+  alternates: { canonical: 'https://www.vibeshackstudios.com/the-wing/' },
   openGraph: {
     title: 'The Wing | VibeShack Studios SF',
     description: 'Walnut Series intimate 2-person podcast studio with cognac leather, warm lighting, and premium acoustics. Cameraman included. $300/hr in San Francisco.',
     url: 'https://www.vibeshackstudios.com/the-wing',
     siteName: 'VibeShack Studios',
-    images: [{ url: '/studio-images/the-wing-hero.jpg', width: 1200, height: 630, alt: 'The Wing at VibeShack Studios SF' }],
+    images: [{ url: '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg', width: 1200, height: 630, alt: 'The Wing at VibeShack Studios SF' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'The Wing | VibeShack Studios SF',
     description: 'Walnut Series intimate 2-person podcast studio with cognac leather, warm lighting, and premium acoustics. Cameraman included. $300/hr in San Francisco.',
-    images: ['/studio-images/the-wing-hero.jpg'],
+    images: ['/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg'],
   },
 }
 
@@ -38,7 +38,7 @@ export default function TheWingPage() {
           <p className="text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
             Cozy intimacy. Premium quality. Built for duos and close conversations.
           </p>
-          <a href="/book?studio=the-wing" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+          <a href="/book/?studio=the-wing" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
             Book This Studio
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -73,7 +73,7 @@ export default function TheWingPage() {
             </div>
             {/* Right: Full Room Photo */}
             <div>
-              <Image src="/studio-images/the-wing-detail-02.jpg" alt="The Wing full room with professional lighting and cozy setup — VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
+              <Image src="/studio-images/the-wing-3.jpg" alt="The Wing full room with professional lighting and cozy setup — VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
             </div>
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function TheWingPage() {
             {/* Detail 1: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/the-wing-detail-01.jpg" alt="Cognac leather seating in The Wing, VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg" alt="Cognac leather seating in The Wing, VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>The Leather Gets Better With Time</h3>
@@ -147,7 +147,7 @@ export default function TheWingPage() {
               </div>
             ))}
           </div>
-          <a href="/book?studio=the-wing" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+          <a href="/book/?studio=the-wing" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
             Book The Wing
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -168,8 +168,8 @@ export default function TheWingPage() {
               Also in the<br/><span style={{color: '#fcd34d'}}>Walnut Series.</span>
             </h2>
           </div>
-          <a href="/the-executive" className="relative overflow-hidden rounded-3xl group block w-full" style={{height: '400px'}}>
-            <Image src="/studio-images/the-executive-hero.jpg" alt="The Executive — Walnut Series podcast studio, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+          <a href="/the-executive/" className="relative overflow-hidden rounded-3xl group block w-full" style={{height: '400px'}}>
+            <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg" alt="The Executive — Walnut Series podcast studio, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%)'}} />
             <div className="absolute bottom-0 left-0 right-0 p-12">
               <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{color: '#fcd34d'}}>Walnut Series</p>
@@ -189,13 +189,13 @@ export default function TheWingPage() {
           </h2>
           <p className="text-gray-500 text-lg mb-10" data-reveal="fade">$300/hr. Cameraman included. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book?studio=the-wing" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+            <a href="/book/?studio=the-wing" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
               Book Your Session
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </a>
-            <a href="/contact" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →
+            <a href="/tour/?studio=the-wing" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →
             </a>
           </div>
         </div>

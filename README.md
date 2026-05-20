@@ -86,6 +86,32 @@ npm run build
 3. Publish directory: `out`
 4. Contact form already has `data-netlify="true"` attribute — Netlify Forms will auto-capture submissions
 
+## Booking Calendar Configuration
+
+The paid booking flow stays on `vibeshackstudios.com/book/`, checks Google Calendar before creating Stripe Embedded Checkout, and creates Google Calendar events only after Stripe confirms payment.
+
+By default, the site uses `GCAL_CALENDAR_ID` as a shared booking calendar. To support parallel room bookings, configure per-studio calendar IDs with one JSON env var:
+
+```bash
+GCAL_STUDIO_CALENDAR_IDS='{
+  "the-executive": "the-executive-calendar-id",
+  "the-wing": "the-wing-calendar-id",
+  "encore": "encore-calendar-id",
+  "sunset": "sunset-calendar-id",
+  "premier": "premier-calendar-id",
+  "parlor": "parlor-calendar-id",
+  "horizon": "horizon-calendar-id",
+  "canvas-podcast": "canvas-podcast-calendar-id",
+  "green-screen": "green-screen-calendar-id",
+  "photography": "photography-calendar-id",
+  "canvas-rental": "canvas-rental-calendar-id"
+}'
+```
+
+You can also set individual env vars like `GCAL_CALENDAR_ID_THE_EXECUTIVE` or `GCAL_CALENDAR_ID_CANVAS_RENTAL`.
+
+If no per-studio calendar is configured, the shared calendar still behaves studio-aware for website-created events: events tagged with a studio only block that studio, while untagged/manual calendar holds block every studio. This lets the team create whole-building holds without losing parallel booking support for tagged room bookings.
+
 ## SEO Configuration
 
 Every page includes:
@@ -105,7 +131,7 @@ Homepage additionally includes:
 - [ ] Add real phone number (currently `+1-415-000-0000`)
 - [ ] Create `/public/og-image.jpg` (1200×630px) for social previews
 - [ ] Add studio photography to `/public/` and update pages with `<Image>` components
-- [ ] Verify Calendly link: `https://calendly.com/founder-vibeshackstudios/30min`
+- [ ] Verify custom booking flow at `https://www.vibeshackstudios.com/book/`
 - [ ] Set canonical URLs to actual production domain (already set to `https://www.vibeshackstudios.com`)
 - [ ] Submit `sitemap.xml` to Google Search Console
 - [ ] Add Google Analytics or Plausible (optional — zero tracking currently)
@@ -121,6 +147,12 @@ Homepage additionally includes:
 | `/photography-studio-san-francisco` | `photography studio san francisco` |
 | `/pricing` | `studio rental san francisco pricing` |
 
+## Partner Referral Links
+
+- Patriot Black: `https://www.vibeshackstudios.com/patriot-black/`
+- Commission: 20% of completed paid booking total
+- Tracking: the link stores `patriot-black` as the referral source, passes it into Stripe metadata, and flags completed-booking internal emails/calendar events.
+
 ## Design System
 
 | Token | Value |
@@ -135,5 +167,5 @@ Homepage additionally includes:
 ## Contact
 
 - Email: founder@vibeshackstudios.com
-- Booking: https://calendly.com/founder-vibeshackstudios/30min
+- Booking: https://www.vibeshackstudios.com/book/
 - Address: 950 Battery St, 3rd Floor, San Francisco, CA 94111

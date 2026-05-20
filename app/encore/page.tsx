@@ -2,22 +2,22 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-  title: 'Encore: Premium Production Studio | VibeShack Studios SF',
-  description: 'Vault Series. Full-scale production studio with dual green screens, 4K cinema cameras, and professional crew. $300/hr. Cameraman and director included. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/encore' },
+  title: 'Encore Production Studio',
+  description: 'Vault Series. Full-scale production studio with dual green screens, 4K cinema cameras, and professional crew. $300/hr. Cameraman and audio tech included. Open 24/7.',
+  alternates: { canonical: 'https://www.vibeshackstudios.com/encore/' },
   openGraph: {
     title: 'Encore | VibeShack Studios SF',
-    description: 'Vault Series full-scale production studio with dual green screens and 4K cinema cameras. Cameraman and director included. $300/hr in San Francisco.',
+    description: 'Vault Series full-scale production studio with dual green screens and 4K cinema cameras. Cameraman and audio tech included. $300/hr in San Francisco.',
     url: 'https://www.vibeshackstudios.com/encore',
     siteName: 'VibeShack Studios',
-    images: [{ url: '/studio-images/encore-wide.jpg', width: 1200, height: 630, alt: 'Encore at VibeShack Studios SF' }],
+    images: [{ url: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg', width: 1200, height: 630, alt: 'Encore at VibeShack Studios SF' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Encore | VibeShack Studios SF',
-    description: 'Vault Series full-scale production studio with dual green screens and 4K cinema cameras. Cameraman and director included. $300/hr in San Francisco.',
-    images: ['/studio-images/encore-wide.jpg'],
+    description: 'Vault Series full-scale production studio with dual green screens and 4K cinema cameras. Cameraman and audio tech included. $300/hr in San Francisco.',
+    images: ['/studio-images/enhanced-encore-podcast-wide-v20260510.jpg'],
   },
 }
 
@@ -26,7 +26,7 @@ export default function EncorePage() {
     <>
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
-        <Image src="/studio-images/encore-wide.jpg"
+        <Image src="/studio-images/enhanced-encore-podcast-wide-v20260510.jpg"
           alt="Encore production studio hero shot — VibeShack Studios San Francisco"
           fill className="object-cover opacity-85" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
@@ -38,7 +38,7 @@ export default function EncorePage() {
           <p className="text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
             Full production firepower. Green screen flexibility. Everything you need to make broadcast-quality content.
           </p>
-          <a href="/book?studio=encore" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+          <a href="/book/?studio=encore" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
             Book This Studio
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -60,7 +60,7 @@ export default function EncorePage() {
                 {[
                   'Dual 4K cinema cameras',
                   'Dual green screens, independent control',
-                  'Cameraman and director included',
+                  'Cameraman and audio tech included',
                   'Professional audio kit with wireless',
                   'Kino Flo lighting for large spaces',
                   'Professional color grading setup',
@@ -92,7 +92,7 @@ export default function EncorePage() {
             {/* Detail 1: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/encore-wide.jpg" alt="Encore studio wide view with green screens and cinema lighting" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/enhanced-encore-podcast-wide-v20260510.jpg" alt="Encore studio wide view with cinema lighting" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Two Stages, One Shoot</h3>
@@ -122,7 +122,7 @@ export default function EncorePage() {
           <span className="number-label mb-12 block">Pricing</span>
           <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$300</div>
           <p className="text-gray-500 text-lg mb-1" data-reveal="fade">per hour</p>
-          <p className="text-white font-semibold mb-12">Cameraman and director included. 2 hour minimum. Open 24/7.</p>
+          <p className="text-white font-semibold mb-12">Cameraman and audio tech included. 2 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
               { label: '2 Hours', price: '$600' },
@@ -135,7 +135,7 @@ export default function EncorePage() {
               </div>
             ))}
           </div>
-          <a href="/book?studio=encore" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded hover:bg-gray-200 transition-colors">
+          <a href="/book/?studio=encore" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded hover:bg-gray-200 transition-colors">
             Book Encore
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

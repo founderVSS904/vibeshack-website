@@ -334,7 +334,7 @@ Your obligation to indemnify shall survive termination of these Terms and any se
 - **UNLESS YOU EXPLICITLY OPT-OUT IN WRITING AT BOOKING**, the Studio may photograph or video-record your session
 - The Studio may use recorded Content for promotional purposes, including:
   - Studio website and landing pages
-  - Social media (@vibeshackstudios, @vibeshackhq, etc.)
+  - Social media (@vibeshackhq_, @vibeshackstudios_, etc.)
   - Marketing materials and advertisements
   - Studio showreel and portfolio
 - **Opting out does NOT change your session fee or service quality**

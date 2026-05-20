@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
-  title: 'Podcast Studios San Francisco | VibeShack Studios',
-  description: 'SF\'s best podcast studios. The Executive, The Wing, Encore, Sunset, Canvas. $300/hr, cameraman included. Northern Waterfront. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/podcast-studio-san-francisco' },
+  title: 'Podcast Studios San Francisco',
+  description: 'Eight podcast studios in San Francisco with 3-camera 4K, broadcast audio, and crew options. From $300/hr. Open 24/7.',
+  alternates: { canonical: 'https://www.vibeshackstudios.com/podcast-studio-san-francisco/' },
   openGraph: {
     title: 'Podcast Studios SF | VibeShack Studios',
-    description: 'Six podcast studios in SF. All with 3-camera 4K, broadcast audio, and cameraman included. $300/hr. Open 24/7.',
+    description: 'Eight podcast studios in SF with 3-camera 4K, broadcast audio, and crew options. Open 24/7.',
     url: 'https://www.vibeshackstudios.com/podcast-studio-san-francisco',
   },
 }
@@ -15,8 +16,8 @@ export const metadata: Metadata = {
 const studios = [
   {
     name: 'The Executive',
-    href: '/sunset-room',
-    bookHref: '/book?studio=sunset',
+    href: '/the-executive/',
+    bookHref: '/book/?studio=the-executive',
     img: '/studio-images/the-executive-hero.jpg',
     series: 'Walnut Series',
     seriesColor: '#fcd34d',
@@ -26,8 +27,8 @@ const studios = [
   },
   {
     name: 'The Wing',
-    href: '/cozy-podcast',
-    bookHref: '/book?studio=the-wing',
+    href: '/the-wing/',
+    bookHref: '/book/?studio=the-wing',
     img: '/studio-images/the-wing-1.jpg',
     series: 'Walnut Series',
     seriesColor: '#fcd34d',
@@ -36,9 +37,20 @@ const studios = [
     price: '$300',
   },
   {
+    name: 'Premier',
+    href: '/premier/',
+    bookHref: '/book/?studio=premier',
+    img: '/studio-images/premier-hero-v1775084326.jpg',
+    series: 'Vault Series',
+    seriesColor: '#e9d5ff',
+    seriesBg: 'rgba(88,28,135,0.4)',
+    desc: 'Premium studio suite. Full 4K production. Cameraman included.',
+    price: '$300',
+  },
+  {
     name: 'Encore',
-    href: '/encore',
-    bookHref: '/book?studio=encore',
+    href: '/encore/',
+    bookHref: '/book/?studio=encore',
     img: '/studio-images/encore-wide.jpg',
     series: 'Vault Series',
     seriesColor: '#e9d5ff',
@@ -48,9 +60,9 @@ const studios = [
   },
   {
     name: 'Sunset',
-    href: '/sunset-studio',
-    bookHref: '/book?studio=sunset',
-    img: '/studio-images/sunset-red.jpg',
+    href: '/sunset-studio/',
+    bookHref: '/book/?studio=sunset',
+    img: '/studio-images/sunset-hero-v20260509.jpg',
     series: 'Creative Series',
     seriesColor: '#99f6e4',
     seriesBg: 'rgba(13,148,136,0.3)',
@@ -58,21 +70,79 @@ const studios = [
     price: '$300',
   },
   {
-    name: 'Canvas',
-    href: '/white-backdrop-studio',
-    bookHref: '/book?studio=canvas-rental',
+    name: 'Parlor',
+    href: '/parlor/',
+    bookHref: '/book/?studio=parlor',
+    img: '/studio-images/parlor-hero.jpg',
+    series: 'Premium',
+    seriesColor: '#fecaca',
+    seriesBg: 'rgba(127,29,29,0.35)',
+    desc: 'Premium interview setup. Chesterfield seating. Full crew included.',
+    price: '$400',
+  },
+  {
+    name: 'Horizon',
+    href: '/horizon/',
+    bookHref: '/book/?studio=horizon',
+    img: '/studio-images/horizon-hero.jpg',
+    series: 'Premium',
+    seriesColor: '#fecaca',
+    seriesBg: 'rgba(127,29,29,0.35)',
+    desc: 'Immersive setup. Sunset LED wall. Full crew included.',
+    price: '$400',
+  },
+  {
+    name: 'Canvas Podcast',
+    href: '/canvas-podcast/',
+    bookHref: '/book/?studio=canvas-podcast',
     img: '/studio-images/podcast-cyc-duo.jpg',
-    series: 'Creative Series',
-    seriesColor: '#99f6e4',
-    seriesBg: 'rgba(13,148,136,0.3)',
-    desc: 'White cyc wall. Clean, minimal backdrop. Three cameras. Cameraman included.',
-    price: '$300',
+    series: 'Premium',
+    seriesColor: '#fed7aa',
+    seriesBg: 'rgba(154,52,18,0.4)',
+    desc: 'Custom LED backdrop. Cinema-grade lighting. Full crew included.',
+    price: '$400',
   },
 ]
+
+const podcastFaqs = [
+  {
+    question: 'How much does a podcast studio cost at VibeShack?',
+    answer: 'Most podcast studios are $300 per hour. Parlor, Horizon, and Canvas Podcast are $400 per hour. Rates include the studio setup and crew options listed on each room page.',
+  },
+  {
+    question: 'Can I book a podcast studio at night or on weekends?',
+    answer: 'Yes. VibeShack is open 24/7, so you can book podcast studio time during the day, at night, or on weekends.',
+  },
+  {
+    question: 'Do the podcast studios include cameras and audio?',
+    answer: 'Yes. Podcast rooms include 3-camera 4K production setups, broadcast microphones, lighting, and studio-ready audio routing.',
+  },
+  {
+    question: 'Where are the podcast studios located?',
+    answer: 'VibeShack Studios is at 950 Battery St in San Francisco, near the Northern Waterfront and a short walk from the Ferry Building.',
+  },
+]
+
+const podcastServiceSchema = studioServiceSchema({
+  name: 'Podcast Studio Rental in San Francisco',
+  description: 'Podcast studios in San Francisco with 3-camera 4K production, broadcast audio, lighting, and crew options.',
+  url: 'https://www.vibeshackstudios.com/podcast-studio-san-francisco/',
+  image: 'https://www.vibeshackstudios.com/studio-images/the-executive-hero.jpg',
+  price: '300',
+  serviceType: 'Podcast Studio Rental',
+})
 
 export default function PodcastStudiosPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(podcastFaqs)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(podcastServiceSchema) }}
+      />
       {/* Hero */}
       <section className="relative min-h-[70vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/the-executive-hero.jpg"
@@ -88,7 +158,7 @@ export default function PodcastStudiosPage() {
             Podcast<br /><span className="text-brand-red">Studios.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl" data-reveal="fade">
-            Six rooms. All 3-camera 4K. Broadcast audio. Cameraman included. $300/hr.
+            Eight rooms. 3-camera 4K. Broadcast audio. Crew options. From $300/hr.
           </p>
         </div>
       </section>
@@ -98,7 +168,7 @@ export default function PodcastStudiosPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-4">
           <div className="space-y-3">
             {studios.map((s, i) => (
-              <a key={s.name} href={s.href}
+              <div key={s.name}
                 className="relative block overflow-hidden rounded-2xl group studio-card" data-tilt
                 style={{height: '420px'}}>
                 <Image src={s.img} alt={s.name}
@@ -124,7 +194,7 @@ export default function PodcastStudiosPage() {
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 px-8 pb-8 flex items-end justify-between">
                   <div>
-                    <h2 data-reveal="up" className="text-white font-black mb-1" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em'}}>{s.name}</h2>
+                    <a href={s.href} data-reveal="up" className="text-white font-black mb-1 inline-block hover:text-gray-200 transition-colors" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em'}}>{s.name}</a>
                     <p className="text-gray-400 text-sm max-w-md">{s.desc}</p>
                   </div>
                   <div className="flex-shrink-0 ml-8 text-right">
@@ -136,7 +206,7 @@ export default function PodcastStudiosPage() {
                     </a>
                   </div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </div>
@@ -176,7 +246,7 @@ export default function PodcastStudiosPage() {
                 '/studio-images/the-executive-hero.jpg',
                 '/studio-images/encore-wide.jpg',
                 '/studio-images/sunset-blue.jpg',
-                '/studio-images/the-wing-2.jpg',
+                '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg',
               ].map((src, i) => (
                 <div key={i} className="overflow-hidden rounded-xl relative" style={{height: '180px'}}>
                   <Image src={src} alt="VibeShack Podcast Studios" fill className="object-cover" />
@@ -187,19 +257,42 @@ export default function PodcastStudiosPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="py-32 bg-black border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex items-end justify-between mb-16">
+            <h2 className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
+              Podcast studio<br /><span className="text-brand-red">questions.</span>
+            </h2>
+            <span className="number-label">FAQ</span>
+          </div>
+          <div className="divide-y divide-white/10 border-y border-white/10">
+            {podcastFaqs.map(({ question, answer }) => (
+              <div key={question} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-16 py-8">
+                <p className="text-white font-semibold text-base">{question}</p>
+                <p className="text-gray-500 text-sm leading-relaxed">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
           <h2 data-reveal="up" className="font-black text-white leading-tight mb-6" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
             Not sure which room?<br /><span className="text-brand-red">We&apos;ll help you choose.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">Free studio tours available 24/7.</p>
+          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">Pick a live tour time and we&apos;ll help you choose the right room.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 transition-colors">
+            <a href="/book/" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 transition-colors">
               Book a Session →
             </a>
-            <a href="/find-your-studio" className="inline-flex items-center gap-3 px-8 py-4 border border-white/20 text-white font-semibold text-sm rounded-full hover:border-white/40 transition-colors">
+            <a href="/find-your-studio/" className="inline-flex items-center gap-3 px-8 py-4 border border-white/20 text-white font-semibold text-sm rounded-full hover:border-white/40 transition-colors">
               Find your studio
+            </a>
+            <a href="/tour/" className="inline-flex items-center gap-3 px-8 py-4 border border-white/20 text-white font-semibold text-sm rounded-full hover:border-white/40 transition-colors">
+              Book a free tour
             </a>
           </div>
         </div>
