@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { BrandMark } from '@/components/BrandMark'
 
@@ -67,6 +70,16 @@ const menuButtonClass =
   'flex items-center gap-1.5 text-sm tracking-wide whitespace-nowrap text-gray-400 transition-colors duration-200 group-hover:text-white group-focus-within:text-white'
 
 export default function Header() {
+  const [dismissedMenu, setDismissedMenu] = useState<string | null>(null)
+
+  const dismissMenu = (menuId: string) => {
+    setDismissedMenu(menuId)
+  }
+
+  const resetMenu = (menuId: string) => {
+    setDismissedMenu((currentMenu) => currentMenu === menuId ? null : currentMenu)
+  }
+
   return (
     <header
       className="site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black/85 transition-colors duration-200"
@@ -82,12 +95,24 @@ export default function Header() {
           </Link>
 
           <nav className="hidden items-center justify-center gap-7 xl:flex 2xl:gap-10" aria-label="Primary">
-            <DesktopMenuTrigger label="Studios">
-              <DesktopStudiosMenu />
+            <DesktopMenuTrigger
+              dismissed={dismissedMenu === 'studios'}
+              label="Studios"
+              menuId="studios"
+              onDismiss={() => dismissMenu('studios')}
+              onReset={() => resetMenu('studios')}
+            >
+              <DesktopStudiosMenu onNavigate={() => dismissMenu('studios')} />
             </DesktopMenuTrigger>
 
-            <DesktopMenuTrigger label="Services">
-              <DesktopServicesMenu />
+            <DesktopMenuTrigger
+              dismissed={dismissedMenu === 'services'}
+              label="Services"
+              menuId="services"
+              onDismiss={() => dismissMenu('services')}
+              onReset={() => resetMenu('services')}
+            >
+              <DesktopServicesMenu onNavigate={() => dismissMenu('services')} />
             </DesktopMenuTrigger>
 
             <Link href="/find-your-studio/" className={navLinkClass}>Find a Studio</Link>
@@ -132,49 +157,68 @@ export default function Header() {
 }
 
 function DesktopMenuTrigger({
+  dismissed,
   label,
+  menuId,
+  onDismiss,
+  onReset,
   children,
 }: {
+  dismissed: boolean
   label: string
+  menuId: string
+  onDismiss: () => void
+  onReset: () => void
   children: ReactNode
 }) {
   return (
-    <div className="desktop-menu-trigger group flex h-20 items-center">
+    <div
+      className={`desktop-menu-trigger group flex h-20 items-center ${dismissed ? 'desktop-menu-trigger--dismissed' : ''}`}
+      data-menu-id={menuId}
+      onFocusCapture={onReset}
+      onMouseEnter={onReset}
+      onMouseLeave={onReset}
+    >
       <button type="button" className={menuButtonClass}>
         {label}
-        <svg className="h-3 w-3 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="desktop-menu-caret h-3 w-3 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed bottom-0 left-0 right-0 top-20 hidden bg-black/35 opacity-0 backdrop-blur-[3px] transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 xl:block"
+        className="desktop-menu-scrim pointer-events-none fixed bottom-0 left-0 right-0 top-20 hidden bg-black/35 opacity-0 backdrop-blur-[3px] transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 xl:block"
+        onClick={onDismiss}
       />
       {children}
     </div>
   )
 }
 
-function DesktopStudiosMenu() {
+function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
     <DesktopMegaMenu className="max-w-7xl grid-cols-[1fr_1fr_1fr_1fr] gap-10">
-      <MegaColumn eyebrow="Browse" links={studioHubLinks} large />
-      <MegaColumn eyebrow="Podcast Rooms" links={corePodcastStudios} />
-      <MegaColumn eyebrow="Premium & Custom" links={premiumPodcastStudios} />
-      <MegaColumn eyebrow="Rental Studios" links={rentalStudios} />
+      <MegaColumn eyebrow="Browse" links={studioHubLinks} large onNavigate={onNavigate} />
+      <MegaColumn eyebrow="Podcast Rooms" links={corePodcastStudios} onNavigate={onNavigate} />
+      <MegaColumn eyebrow="Premium & Custom" links={premiumPodcastStudios} onNavigate={onNavigate} />
+      <MegaColumn eyebrow="Rental Studios" links={rentalStudios} onNavigate={onNavigate} />
     </DesktopMegaMenu>
   )
 }
 
-function DesktopServicesMenu() {
+function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
     <DesktopMegaMenu className="max-w-6xl grid-cols-[1.1fr_0.9fr_0.85fr] gap-14">
-      <MegaColumn eyebrow="Production Services" links={serviceLinks} large />
-      <MegaColumn eyebrow="Planning Tools" links={proofLinks} />
+      <MegaColumn eyebrow="Production Services" links={serviceLinks} large onNavigate={onNavigate} />
+      <MegaColumn eyebrow="Planning Tools" links={proofLinks} onNavigate={onNavigate} />
       <div>
         <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Best First Step</p>
         <Link
           href="/find-your-studio/"
+          onClick={(event) => {
+            onNavigate()
+            event.currentTarget.blur()
+          }}
           className="group/card block rounded-2xl border border-black/10 bg-white/65 p-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
         >
           <span className="block text-2xl font-black tracking-tight text-black">Match the room to the outcome.</span>
@@ -198,7 +242,7 @@ function DesktopMegaMenu({
   children: ReactNode
 }) {
   return (
-    <div className="pointer-events-none invisible fixed left-0 right-0 top-[calc(5rem-1px)] hidden max-h-0 -translate-y-3 overflow-hidden border-b border-white/10 bg-[#f5f5f2] text-black opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.42)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[540px] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[540px] group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
+    <div className="desktop-mega-menu pointer-events-none invisible fixed left-0 right-0 top-[calc(5rem-1px)] hidden max-h-0 -translate-y-3 overflow-hidden border-b border-white/10 bg-[#f5f5f2] text-black opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.42)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[540px] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[540px] group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
       <div className={`mx-auto grid px-10 py-9 lg:px-16 ${className}`}>
         {children}
       </div>
@@ -210,10 +254,12 @@ function MegaColumn({
   eyebrow,
   links,
   large,
+  onNavigate,
 }: {
   eyebrow: string
   links: HeaderLink[]
   large?: boolean
+  onNavigate?: () => void
 }) {
   return (
     <div>
@@ -224,6 +270,10 @@ function MegaColumn({
             key={href + label}
             href={href}
             prefetch={href === '/book/' ? false : undefined}
+            onClick={(event) => {
+              onNavigate?.()
+              event.currentTarget.blur()
+            }}
             className="group/link block text-zinc-700 transition-colors duration-200 hover:text-black"
           >
             <span className={`flex items-baseline justify-between gap-4 ${large ? 'text-[1.45rem] font-black leading-[1.08] tracking-tight' : 'text-[0.95rem] font-bold'}`}>
