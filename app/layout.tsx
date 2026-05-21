@@ -75,8 +75,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@vibeshackhq_',
-    creator: '@vibeshackhq_',
+    site: '@vibeshackhq',
+    creator: '@vibeshackhq',
     title: 'VibeShack Studios | San Francisco Production Studio',
     description:
       'VibeShack Studios is VibeShack\'s SF production arm: green screen, podcast, photo services, video, and studio rentals.',

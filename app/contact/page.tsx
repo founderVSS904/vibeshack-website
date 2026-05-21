@@ -142,12 +142,12 @@ export default function ContactPage() {
               <div className="py-8">
                 <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Instagram</p>
                 <a
-                  href="https://instagram.com/vibeshackhq_"
+                  href="https://instagram.com/vibeshackhq/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-white font-semibold hover:text-brand-red transition-colors"
                 >
-                  @vibeshackhq_
+                  @vibeshackhq
                 </a>
                 <a
                   href="https://instagram.com/vibeshackstudios_"

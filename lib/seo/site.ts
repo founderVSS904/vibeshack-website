@@ -75,7 +75,7 @@ export const peerspaceListings = [
 ]
 
 export const externalProfiles = [
-  { label: 'Instagram @vibeshackhq_', href: 'https://www.instagram.com/vibeshackhq_' },
+  { label: 'Instagram @vibeshackhq', href: 'https://www.instagram.com/vibeshackhq/' },
   { label: 'Instagram @vibeshackstudios_', href: 'https://www.instagram.com/vibeshackstudios_' },
   { label: 'YouTube @VibeShackStudios', href: 'https://www.youtube.com/@VibeShackStudios' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/company/vibeshack-studios' },
