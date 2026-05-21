@@ -7,7 +7,7 @@ import { absoluteUrl, business, citationTargets, externalProfiles, founders, mon
 export const metadata: Metadata = {
   title: 'Press & Media Kit',
   description:
-    'Official VibeShack and VibeShack Studios press facts, brand architecture, address, services, and media references for coverage.',
+    'Official VibeShack and VibeShack Studios press facts, brand architecture, address, phone, services, and media references for coverage.',
   alternates: { canonical: absoluteUrl('/press/') },
   openGraph: {
     title: 'Press & Media Kit | VibeShack Studios',
@@ -31,7 +31,12 @@ export default function PressPage() {
     about: { '@id': 'https://www.vibeshackstudios.com/#business' },
     mainEntity: { '@id': 'https://www.vibeshackstudios.com/#business' },
     mentions: [
-      ...founders.map((founder) => ({ '@type': 'Person', name: founder.name, jobTitle: founder.role, sameAs: founder.sameAs })),
+      ...founders.map((founder) => ({
+        '@type': 'Person',
+        name: founder.name,
+        jobTitle: founder.role,
+        ...(founder.sameAs ? { sameAs: founder.sameAs } : {}),
+      })),
       ...peerspaceListings.map((listing) => ({ '@type': 'WebPage', name: listing.name, url: listing.href })),
     ],
   }
@@ -50,7 +55,7 @@ export default function PressPage() {
             VibeShack Studios.
           </h1>
           <p className="text-gray-300 text-lg leading-relaxed max-w-2xl mt-8">
-            Official facts, links, and language for covering VibeShack, the media company and brand studio, and VibeShack Studios, its 24/7 San Francisco production arm at 950 Battery St.
+            Official facts, links, and language for covering VibeShack, the media company and brand studio, and VibeShack Studios, its 24/7 San Francisco production arm at 950 Battery St, San Francisco, CA 94111.
           </p>
         </div>
       </section>
@@ -92,6 +97,7 @@ export default function PressPage() {
                 ['Legal name', business.legalName],
                 ['Tagline', business.tagline],
                 ['Address', `${business.address.streetAddress}, ${business.address.addressLocality}, ${business.address.addressRegion} ${business.address.postalCode}`],
+                ['Phone', business.phone],
                 ['Neighborhood', business.neighborhood],
                 ['Hours', 'Open 24/7'],
                 ['Booking', 'Hourly studio bookings from $100/hr'],
@@ -104,14 +110,26 @@ export default function PressPage() {
             </div>
 
             <div>
-              <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Leadership Signals</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {founders.map((founder) => (
-                  <a key={founder.name} href={founder.sameAs} target="_blank" rel="noopener noreferrer" className="block rounded-2xl border border-white/10 p-6 hover:border-white/30 transition-colors">
-                    <h2 className="text-white font-black text-xl mb-2" style={{ letterSpacing: '-0.02em' }}>{founder.name}</h2>
-                    <p className="text-gray-500 text-sm">{founder.role}</p>
-                  </a>
-                ))}
+              <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Founders</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {founders.map((founder) => {
+                  const card = (
+                    <>
+                      <h2 className="text-white font-black text-xl mb-2" style={{ letterSpacing: '-0.02em' }}>{founder.name}</h2>
+                      <p className="text-gray-500 text-sm">{founder.role}</p>
+                    </>
+                  )
+
+                  return founder.sameAs ? (
+                    <a key={founder.name} href={founder.sameAs} target="_blank" rel="noopener noreferrer" className="block rounded-2xl border border-white/10 p-6 hover:border-white/30 transition-colors">
+                      {card}
+                    </a>
+                  ) : (
+                    <div key={founder.name} className="block rounded-2xl border border-white/10 p-6">
+                      {card}
+                    </div>
+                  )
+                })}
               </div>
             </div>
 
@@ -163,6 +181,7 @@ export default function PressPage() {
                   </a>
                 ))}
                 <a href={`mailto:${business.email}`} className="block text-gray-400 hover:text-white transition-colors">{business.email}</a>
+                <a href={`tel:${business.phone.replace(/[^\d+]/g, '')}`} className="block text-gray-400 hover:text-white transition-colors">{business.phone}</a>
               </div>
               <div className="border-t border-white/10 mt-8 pt-8">
                 <Link href="/book/" prefetch={false} className="inline-flex items-center justify-center w-full bg-white text-black font-bold rounded-full px-6 py-4 hover:bg-gray-100 transition-colors">

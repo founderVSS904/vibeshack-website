@@ -33,6 +33,7 @@ export const baseBusinessSchema = {
   image: business.image,
   logo: business.logo,
   email: business.email,
+  telephone: business.phone,
   address: { '@type': 'PostalAddress', ...business.address },
   geo: {
     '@type': 'GeoCoordinates',
@@ -112,7 +113,7 @@ export const baseBusinessSchema = {
     '@type': 'Person',
     name: founder.name,
     jobTitle: founder.role,
-    sameAs: founder.sameAs,
+    ...(founder.sameAs ? { sameAs: founder.sameAs } : {}),
   })),
   subjectOf: peerspaceListings.map((listing) => ({
     '@type': 'WebPage',
@@ -140,7 +141,7 @@ export const organizationSchema = {
     '@type': 'Person',
     name: founder.name,
     jobTitle: founder.role,
-    sameAs: founder.sameAs,
+    ...(founder.sameAs ? { sameAs: founder.sameAs } : {}),
   })),
   subjectOf: externalProfiles.map((profile) => ({
     '@type': 'WebPage',
@@ -151,6 +152,7 @@ export const organizationSchema = {
   contactPoint: {
     '@type': 'ContactPoint',
     email: business.email,
+    telephone: business.phone,
     contactType: 'customer service',
     areaServed: 'US',
     availableLanguage: 'English',

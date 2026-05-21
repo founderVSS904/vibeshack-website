@@ -1,7 +1,7 @@
 # TERMS OF SERVICE
 
 **VibeShack Studios, Inc.**  
-950 Battery Street, San Francisco, CA 94111
+950 Battery St, San Francisco, CA 94111
 
 **Last Updated: April 4, 2026**  
 **Effective Date: April 4, 2026**
@@ -34,7 +34,7 @@ NOW, THEREFORE, in consideration of the mutual covenants and agreements containe
 
 **"Services"** — The provision of studio space, equipment, and optional services (cameraman, crew, teleprompter operation, etc.) as described on the Studio's website and pricing page.
 
-**"Studio"** — The physical production facility located at 950 Battery Street, San Francisco, CA 94111, including all studios, equipment, and related facilities.
+**"Studio"** — The physical production facility located at 950 Battery St, San Francisco, CA 94111, including all studios, equipment, and related facilities.
 
 **"User Content"** — Any information, data, images, or communications you provide to the Studio, including booking details, contact information, and session-related communications.
 
@@ -334,7 +334,7 @@ Your obligation to indemnify shall survive termination of these Terms and any se
 - **UNLESS YOU EXPLICITLY OPT-OUT IN WRITING AT BOOKING**, the Studio may photograph or video-record your session
 - The Studio may use recorded Content for promotional purposes, including:
   - Studio website and landing pages
-  - Social media (@vibeshackhq_, @vibeshackstudios_, etc.)
+  - Social media (@vibeshackhq, @vibeshackstudios_, etc.)
   - Marketing materials and advertisements
   - Studio showreel and portfolio
 - **Opting out does NOT change your session fee or service quality**
@@ -514,7 +514,7 @@ If a dispute arises regarding your booking or session, you agree to attempt info
 ### 14.1 Notices
 **Notices to the Studio:**
 - Email: founder@vibeshackstudios.com
-- Mailing Address: VibeShack Studios, Inc., 950 Battery Street, San Francisco, CA 94111
+- Mailing Address: VibeShack Studios, Inc., 950 Battery St, San Francisco, CA 94111
 - Email notice is effective upon receipt; mailing is effective 5 business days after postage
 
 **Notices to You:**
@@ -603,7 +603,7 @@ The Studio complies with the Americans with Disabilities Act (ADA). Reasonable a
 ## 16. CONTACT INFORMATION
 
 **VibeShack Studios, Inc.**  
-950 Battery Street  
+950 Battery St
 San Francisco, CA 94111  
 United States
 

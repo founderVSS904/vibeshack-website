@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { comparisons } from '@/lib/seo/comparisons'
 import { studioGuides } from '@/lib/seo/studioGuides'
-import { peerspaceUrl } from '@/lib/seo/site'
+import { business, peerspaceUrl } from '@/lib/seo/site'
 import { useCases } from '@/lib/seo/useCases'
 import { BrandMark } from '@/components/BrandMark'
 
@@ -28,6 +28,10 @@ export default function Footer() {
             <div className="space-y-1 text-sm text-gray-600">
               <p>950 Battery St</p>
               <p>San Francisco, CA 94111</p>
+              <a href={`tel:${business.phone.replace(/[^\d+]/g, '')}`}
+                className="block hover:text-white transition-colors duration-200">
+                {business.phone}
+              </a>
               <a href="mailto:founder@vibeshackstudios.com"
                 className="block hover:text-white transition-colors duration-200">
                 founder@vibeshackstudios.com

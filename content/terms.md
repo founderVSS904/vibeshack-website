@@ -285,7 +285,7 @@ These Terms & Services ("Terms") govern all bookings, rentals, and services prov
 ## 16. Contact Us
 
 **VibeShack Studios**
-950 Battery Street
+950 Battery St
 San Francisco, CA 94111
 Email: founder@vibeshackstudios.com
 

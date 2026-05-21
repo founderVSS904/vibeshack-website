@@ -40,6 +40,7 @@ const pageImages = [
       ['/studio-images/podcast-cyc-duo.jpg', 'Two-person podcast recording at VibeShack Studios San Francisco'],
       ['/studio-images/the-wing-hero.jpg', 'The Wing podcast studio at VibeShack Studios San Francisco'],
       ['/studio-images/the-executive-hero.jpg', 'The Executive podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/encore-wide.jpg', 'Encore podcast studio at VibeShack Studios San Francisco'],
     ],
   },
   {
@@ -50,10 +51,17 @@ const pageImages = [
     loc: '/photo-services/',
     images: [
       ['/studio-images/photography-hero-service-v20260509.jpg', 'Photo services for headshots portraits and campaign photography at VibeShack Studios San Francisco'],
-      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg', 'Creative photo services at VibeShack Studios San Francisco'],
-      ['/studio-images/enhanced-photography-headshot-black-blazer-v20260510.jpg', 'Professional headshot services at VibeShack Studios San Francisco'],
-      ['/studio-images/photography-spotlight-portrait-v20260509.jpg', 'Studio portrait photography services at VibeShack Studios San Francisco'],
-      ['/studio-images/shot-here-red-fabric-portrait-v20260509.jpg', 'Editorial portrait photoshoot at VibeShack Studios San Francisco'],
+      ['/studio-images/photo-gallery-white-cyc-glam-portrait-v20260520.jpg', 'White cyc glam portrait photographed at VibeShack Studios San Francisco'],
+      ['/studio-images/photo-gallery-black-red-afro-portrait-v20260520.jpg', 'Black and red studio portrait photographed at VibeShack Studios San Francisco'],
+      ['/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg', 'Direct beauty portrait photographed at VibeShack Studios San Francisco'],
+      ['/studio-images/photo-gallery-red-sunglasses-portrait-v20260520.jpg', 'Red backdrop sunglasses portrait photographed at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/about/',
+    images: [
+      ['/brand/vibeshack/dream-factory-rooftop-wide-v20260520.jpg', 'VibeShack Dream Factory hoodie on a San Francisco rooftop'],
+      ['/brand/vibeshack/dream-factory-rooftop-detail-v20260520.jpg', 'Dream Factory hoodie detail with red and blue production light'],
     ],
   },
   {
@@ -83,6 +91,13 @@ const pageImages = [
     images: [['/studio-images/canvas-rental-hero-v1775094073.jpg', 'White cyc studio rental in San Francisco at VibeShack Studios']],
   },
   {
+    loc: '/rental-studios/',
+    images: [
+      ['/studio-images/inside-canvas-cyc-v20260509.jpg', 'Canvas Rental white cyc studio at VibeShack Studios San Francisco'],
+      ['/studio-images/inside-green-screen-v20260509.jpg', 'Green Screen studio at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
     loc: '/parlor/',
     images: [
       ['/studio-images/parlor-hero.jpg', 'Parlor interview studio with Chesterfield seating at VibeShack Studios San Francisco'],
@@ -95,6 +110,18 @@ const pageImages = [
       ['/studio-images/horizon-hero.jpg', 'Horizon LED studio at VibeShack Studios San Francisco'],
       ['/studio-images/horizon-wide-v20260509.jpg', 'Horizon sunset LED wall podcast studio at VibeShack Studios San Francisco'],
     ],
+  },
+  {
+    loc: '/the-executive/',
+    images: [['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', 'The Executive podcast studio at VibeShack Studios San Francisco']],
+  },
+  {
+    loc: '/the-wing/',
+    images: [['/studio-images/the-wing-hero.jpg', 'The Wing podcast studio at VibeShack Studios San Francisco']],
+  },
+  {
+    loc: '/encore/',
+    images: [['/studio-images/enhanced-encore-podcast-wide-v20260510.jpg', 'Encore podcast studio at VibeShack Studios San Francisco']],
   },
   {
     loc: '/made-at-vibeshack/',

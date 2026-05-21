@@ -82,7 +82,7 @@ export default function Header() {
 
   return (
     <header
-      className="site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black/85 transition-colors duration-200"
+      className="site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black transition-colors duration-200"
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
         <div className="grid h-20 grid-cols-[auto_1fr_auto] items-center gap-6">

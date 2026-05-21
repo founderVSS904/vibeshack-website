@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl('/press/24-7-san-francisco-production-studio/') },
   openGraph: {
     title: 'VibeShack Studios Builds a 24/7 Production Studio in San Francisco',
-    description: 'The San Francisco production arm of VibeShack: a 24/7 studio for creators, brands, and production teams at 950 Battery St.',
+    description: 'The San Francisco production arm of VibeShack: a 24/7 studio for creators, brands, and production teams at 950 Battery St, San Francisco, CA 94111.',
     url: absoluteUrl('/press/24-7-san-francisco-production-studio/'),
     images: ['/og-image.jpg'],
   },

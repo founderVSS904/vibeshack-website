@@ -109,7 +109,7 @@ export default function TheExecutivePage() {
                 <p className="text-gray-400 text-lg leading-relaxed">All locked down. All rolling. That's the standard setup for a reason.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/the-executive-detail-02.jpg" alt="Three camera setup in The Executive at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg" alt="Two hosts recording in The Executive podcast studio at VibeShack Studios San Francisco" width={1678} height={937} className="w-full h-auto rounded-3xl object-cover" />
               </div>
             </div>
 

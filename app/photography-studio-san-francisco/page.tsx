@@ -384,7 +384,7 @@ export default function PhotographyStudioPage() {
             Book the room that makes the photo look intentional.
           </h2>
           <p className="text-gray-500 text-lg mb-10">
-            Room-only photography studio rental in San Francisco from $100/hr. Open 24/7 at 950 Battery St.
+            Room-only photography studio rental in San Francisco from $100/hr. Open 24/7 at 950 Battery St, San Francisco, CA 94111.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">

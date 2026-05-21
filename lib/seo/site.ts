@@ -13,13 +13,17 @@ export const parentBrand = {
 export const founders = [
   {
     name: 'Emmanuel Tay',
-    role: 'CEO',
+    role: 'CEO, Brand and Systems Architect',
     sameAs: 'https://contra.com/emmanuel_tay_xq77ex4m',
   },
   {
     name: 'Prabhnoor Gill',
-    role: 'Co-founder / Producer',
+    role: 'President, Chief Operations Officer',
     sameAs: 'https://2025springshow.academyart.edu/student/prabhnoor-gill/',
+  },
+  {
+    name: 'Akar Sharma',
+    role: 'VP, Chief Financial Officer',
   },
 ]
 
@@ -108,8 +112,9 @@ export const business = {
   description:
     "The San Francisco production arm of VibeShack, a media company and brand studio. VibeShack Studios offers professional podcast, green screen, photo, video, photography, and white cyc production spaces in the Northern Waterfront. Open 24/7.",
   entityRelationship:
-    'VibeShack is the media company and brand studio. VibeShack Studios is its San Francisco production arm at 950 Battery St.',
+    'VibeShack is the media company and brand studio. VibeShack Studios is its San Francisco production arm at 950 Battery St, San Francisco, CA 94111.',
   email: 'founder@vibeshackstudios.com',
+  phone: '+1 (845) 381-2289',
   address: {
     streetAddress: '950 Battery St',
     addressLocality: 'San Francisco',
@@ -128,7 +133,7 @@ export const business = {
   image: `${siteUrl}/og-image.jpg`,
   sameAs: [
     ...externalProfiles.map((profile) => profile.href),
-    ...founders.map((founder) => founder.sameAs),
+    ...founders.map((founder) => founder.sameAs).filter((href): href is string => Boolean(href)),
   ],
 }
 

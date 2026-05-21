@@ -69,13 +69,30 @@ export default function AboutPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { src: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', alt: 'Podcast Studio' },
-                { src: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg', alt: 'Blue-lit production set' },
-                { src: '/studio-images/shot-here-red-fabric-wide-v20260509.jpg', alt: 'Creative photography shoot at VibeShack Studios' },
-                { src: '/studio-images/enhanced-canvas-podcast-parlor-gold-wide-v20260510.jpg', alt: 'Parlor podcast production at VibeShack Studios' },
-              ].map(({ src, alt }) => (
-                <div key={src} className="overflow-hidden rounded-xl">
-                  <Image src={src} alt={alt} width={400} height={180} className="w-full object-cover" style={{height: '180px'}} />
+                {
+                  src: '/brand/vibeshack/dream-factory-rooftop-wide-v20260520.jpg',
+                  alt: 'VibeShack Dream Factory hoodie on a San Francisco rooftop',
+                  className: 'col-span-2',
+                  height: 260,
+                  objectPosition: 'center center',
+                },
+                {
+                  src: '/brand/vibeshack/dream-factory-rooftop-detail-v20260520.jpg',
+                  alt: 'Dream Factory hoodie detail with red and blue production light',
+                  className: 'col-span-2',
+                  height: 300,
+                  objectPosition: 'center center',
+                },
+              ].map(({ src, alt, className, height, objectPosition }) => (
+                <div key={src} className={`overflow-hidden rounded-xl ${className}`}>
+                  <Image
+                    src={src}
+                    alt={alt}
+                    width={800}
+                    height={height}
+                    className="w-full object-cover"
+                    style={{ height, objectPosition }}
+                  />
                 </div>
               ))}
             </div>
@@ -146,7 +163,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">The Space</span>
           <h2 data-reveal="up" className="font-black text-white leading-tight mb-16" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
-            950 Battery St.<br />
+            950 Battery St<br />
             <span className="text-brand-red">Northern Waterfront.</span>
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
