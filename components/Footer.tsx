@@ -124,8 +124,8 @@ export default function Footer() {
               <p className="text-gray-400 text-xs tracking-[0.2em] uppercase mb-5 font-bold">Follow</p>
               <ul className="space-y-3">
                 <li>
-                  <a href="https://www.instagram.com/vibeshackhq_" target="_blank" rel="noopener noreferrer"
-                    className="text-gray-500 text-sm hover:text-white hover:underline transition-colors duration-200">@vibeshackhq_</a>
+                  <a href="https://www.instagram.com/vibeshackhq/" target="_blank" rel="noopener noreferrer"
+                    className="text-gray-500 text-sm hover:text-white hover:underline transition-colors duration-200">@vibeshackhq</a>
                 </li>
                 <li>
                   <a href="https://www.instagram.com/vibeshackstudios_" target="_blank" rel="noopener noreferrer"
