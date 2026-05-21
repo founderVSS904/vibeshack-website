@@ -1,7 +1,7 @@
 # VibeShack Studios Local SEO Execution Tracker
 
 Audit execution date: 2026-05-20
-Last execution update: 2026-05-20 23:01 PT
+Last execution update: 2026-05-20 23:45 PT
 
 This file is the operating source for VibeShack Studios local citations, profile edits, and off-site SEO cleanup. Use it before creating or editing any public listing so the business entity stays consistent.
 
@@ -19,7 +19,7 @@ Category positioning: Production studio
 
 Google Business Profile primary category: Video production service
 
-Secondary categories: Recording studio, photography studio, video production service, podcast studio, film production studio, event venue
+Secondary categories: Media company, recording studio, photography studio, film production company
 
 Address: 950 Battery St, San Francisco, CA 94111
 
@@ -41,7 +41,7 @@ Secondary/studio Instagram: https://www.instagram.com/vibeshackstudios_/
 
 YouTube: https://www.youtube.com/@VibeshackStudios
 
-LinkedIn: no editable company page confirmed in browser; direct `/company/vibeshack-studios/` currently resolves to LinkedIn's unavailable page.
+LinkedIn: https://www.linkedin.com/company/vibeshack-studios/ (public page confirmed; current logged-in browser session cannot access the company page or admin URL)
 
 IMDbPro: https://pro.imdb.com/company/co1101816/
 
@@ -91,9 +91,9 @@ Use-case modifiers:
 | P0 | Google Business Profile | Optimized; monitor pending edits | No | Primary category, secondary categories, phone, opening date, address, photos, products, services, reviews, attributes, service areas, messaging, and UTM website link have been updated. Instagram social edit is pending review. |
 | P0 | Apple Business Connect | Claim/verify | Yes | Strong local entity signal for Apple Maps and iOS search. |
 | P0 | Bing Places | Claim/verify | Yes | Feeds Bing, Copilot, Yahoo, and Windows local results. |
-| P0 | Yelp | Claim/create and normalize NAP | Yes | Public audit did not confirm a strong Yelp listing. |
+| P0 | Yelp | Create and normalize NAP | Yes | The website's old Yelp URL returns a 404, and Yelp search does not show VibeShack Studios. The dead URL was removed from official site sameAs/external profile signals until a real page exists. |
 | P0 | Peerspace | Normalize all listing titles/prices/cross-links | Yes | Public listings already rank and should become a review and booking funnel. |
-| P1 | LinkedIn company page | Create or recover page, then normalize NAP | Yes | Google sees a LinkedIn directory mention for VibeShack Studios, but in-browser company search returned no active company result and the direct page is unavailable. |
+| P1 | LinkedIn company page | Recover/admin access, then normalize page | Yes | Public page exists at `/company/vibeshack-studios/`, but the logged-in browser redirects it to LinkedIn's unavailable page and `/admin/` is not accessible. Do not create a duplicate page. |
 | P1 | YouTube channel | Add site, booking URL, location keywords, channel description | Maybe | Public result exists for `@VibeshackStudios`. |
 | P1 | IMDbPro | Add website/contact/details if possible | Yes | Public company profile exists with one title. |
 | P1 | ProductionHUB | Create/claim | Yes | High-relevance production directory. |
@@ -102,7 +102,7 @@ Use-case modifiers:
 | P2 | Tagvenue | Create listing | Yes | Venue discovery and long-tail searches. |
 | P2 | The Vendry | Create profile | Yes | Brand/event/production discovery. |
 | P2 | Eventective | Create listing | Yes | Secondary venue citation. |
-| P2 | MapQuest/iBegin/local aggregators | Claim and correct where possible | Yes | iBegin is live with the confirmed phone and first/third-floor note. MapQuest exact search did not surface a VibeShack listing, so the next step is create/claim through MapQuest's listing flow. |
+| P2 | MapQuest/iBegin/local aggregators | Claim and correct where possible | Yes | iBegin is live with the confirmed phone and first/third-floor note. MapQuest exact search did not surface a VibeShack listing; MapQuest now routes add/claim flows through a Yext-powered scan. |
 
 ## Current Execution Status
 
@@ -128,10 +128,25 @@ External citation findings:
 - Website and press page are the current canonical source for public NAP and service language.
 - Latest website source was corrected so schema, press, footer, contact, and llms.txt point the main Instagram signal to `https://www.instagram.com/vibeshackhq/`.
 - Peerspace listings are live and rank for multiple studio/rental queries.
-- iBegin listing is live with `950 Battery St Floor # 1 & 3`, confirmed phone, and website.
-- MapQuest exact search did not show a live VibeShack listing.
-- LinkedIn company page could not be opened or found from the logged-in browser search, despite a LinkedIn directory search result mentioning VibeShack Studios.
+- iBegin listing is live with `950 Battery St Floor # 1 & 3`, confirmed phone, website, and Recording Studios category. The old agency-style description still needs a claim/update.
+- MapQuest exact search did not show a live VibeShack listing. MapQuest's current business listing path uses Yext, so treat this as a create/claim workflow rather than a simple direct edit.
+- LinkedIn public page is live at `https://www.linkedin.com/company/vibeshack-studios/`, but the logged-in browser cannot access the company page or admin route. Current public LinkedIn data still says Media Production, founded 2023, website `https://www.vibeshackstudios.com`, and address `950 Battery St, 3rd floor, San Francisco, CA 94111`.
+- LinkedIn should be edited after admin access is recovered: update the headline/about language toward the physical San Francisco production studio, add/confirm phone if supported, and change the address away from "3rd floor only" toward `950 Battery St, San Francisco, CA 94111` with floor 1 and 3 only if LinkedIn supports a secondary address line.
+- Yelp exact URL returns a 404 and Yelp search does not show VibeShack Studios. Remove/avoid this external profile URL until a real Yelp business page is created and published.
 - Secondary Instagram `https://www.instagram.com/vibeshackstudios_/` has public business email, phone, and category aligned; keep it secondary to `https://www.instagram.com/vibeshackhq/`.
+
+## LinkedIn Cleanup Copy
+
+Use this once admin access is available:
+
+Tagline:
+24/7 San Francisco production studio for podcasts, photo, video, green screen, and creative rentals.
+
+About:
+VibeShack Studios is a 24/7 production studio at 950 Battery St in San Francisco's Northern Waterfront. We build studio spaces for creators, brands, agencies, and production teams, including podcast rooms, green screen, photography, video production, white cyc, interview setups, and hourly rental studios.
+
+Specialties:
+Podcast studio, video production, photography studio rental, green screen studio, white cyc studio, interview studio, content day production, San Francisco production studio
 
 ## Peerspace Cleanup Rules
 
@@ -203,6 +218,8 @@ Recorded at VibeShack Studios in San Francisco. Please credit the studio with th
 
 ## Deployment Note
 
-The current production deployment at `www.vibeshackstudios.com` was verified on 2026-05-20 and appears to come from the richer worktree at `/Users/emmanueltay/Developer/vibeshack-website-fixes`, which includes `.vercel/output`, `/services`, `/studio-guides`, `/use-cases`, `/compare`, `/press`, and `/image-sitemap.xml`.
+The current production source was synced into `/Users/emmanueltay/Documents/Vibeshack agents/vibeshack-website-seo-social-cleanup`, merged to `founderVSS904/vibeshack-website:main` on 2026-05-20 at 23:37 PT, and deployed/aliased to:
+- https://www.vibeshackstudios.com
+- https://vibeshackstudios.com
 
 Do not deploy from `/Users/emmanueltay/Documents/Vibeshack agents/vibeshack-website`; that checkout is behind the live site and would risk removing production pages.

@@ -79,7 +79,6 @@ export const externalProfiles = [
   { label: 'Instagram @vibeshackstudios_', href: 'https://www.instagram.com/vibeshackstudios_' },
   { label: 'YouTube @VibeShackStudios', href: 'https://www.youtube.com/@VibeShackStudios' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/company/vibeshack-studios' },
-  { label: 'Yelp', href: 'https://www.yelp.com/biz/vibeshack-studios-san-francisco-3' },
   { label: 'Linktree', href: 'https://linktr.ee/Vibeshack_studios' },
   { label: 'Peerspace white cyc listing', href: peerspaceListings[0].href },
   { label: 'Peerspace green screen listing', href: peerspaceListings[1].href },
