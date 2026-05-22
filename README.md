@@ -90,6 +90,15 @@ npm run build
 
 The paid booking flow stays on `vibeshackstudios.com/book/`, checks Google Calendar before creating Stripe Embedded Checkout, and creates Google Calendar events only after Stripe confirms payment.
 
+Required production env vars:
+
+- `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, and `STRIPE_WEBHOOK_SECRET`
+- `GMAIL_USER` and `GMAIL_APP_PASSWORD`
+- `GCAL_CALENDAR_ID` plus one Google Calendar credential source: `GCAL_TOKEN_B64`, `GCAL_TOKEN_JSON`, or `GCAL_TOKEN_PATH`
+- `CRON_SECRET` for the protected `/api/cron/booking-reminders/` route
+
+Stripe Checkout receives the customer's email as `receipt_email`, and the webhook sends both the customer confirmation/prep emails and the internal founder booking notification after payment. The Vercel cron job checks website-created Google Calendar events every hour and sends the customer 24-hour reminder once per booking.
+
 By default, the site uses `GCAL_CALENDAR_ID` as a shared booking calendar. To support parallel room bookings, configure per-studio calendar IDs with one JSON env var:
 
 ```bash

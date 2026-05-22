@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
       const error = availability.status === 409
         ? availability.error === 'Selected sessions overlap for the same studio.'
           ? 'That room is already in your cart for that time. Please choose a different room or another open slot.'
-          : 'Sorry, that time was just booked or is no longer available. Please choose another open slot.'
+          : 'This slot is not available. Please choose another open time.'
         : availability.error
       return NextResponse.json({ error }, { status: availability.status })
     }

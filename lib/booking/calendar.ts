@@ -31,6 +31,20 @@ export interface TourBookingDetails {
   notes?: string
 }
 
+export interface BookingReminderEvent {
+  calendarId: string
+  eventId: string
+  bookingRef: string
+  studioId: string
+  studioName: string
+  customerName: string
+  customerEmail: string
+  start: string
+  end: string
+  summary: string
+  privateProperties: Record<string, string>
+}
+
 export const TOUR_DURATION_MINUTES = 30
 const TOUR_START_HOUR = 8
 const TOUR_END_HOUR = 20
@@ -228,6 +242,60 @@ function eventBusyRange(event: calendar_v3.Schema$Event) {
   const end = eventBoundaryToDate(event.end, true)
   if (!start || !end) return null
   return { start: start.toISOString(), end: end.toISOString() }
+}
+
+function descriptionField(description: string | null | undefined, label: string) {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const match = new RegExp(`^${escaped}:\\s*(.+)$`, 'im').exec(description || '')
+  return match?.[1]?.trim() || ''
+}
+
+function looksLikeEmail(value: string | null | undefined) {
+  return Boolean(value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+}
+
+function eventToBookingReminder(calendarId: string, event: calendar_v3.Schema$Event): BookingReminderEvent | null {
+  const privateProperties = Object.fromEntries(
+    Object.entries(event.extendedProperties?.private || {})
+      .filter((entry): entry is [string, string] => typeof entry[0] === 'string' && typeof entry[1] === 'string'),
+  )
+
+  if (event.status === 'cancelled') return null
+  if (privateProperties.source !== 'vibeshack-website') return null
+  if (privateProperties.reminder24hSentAt) return null
+
+  const start = event.start?.dateTime
+  const end = event.end?.dateTime
+  if (!event.id || !start || !end) return null
+
+  const description = event.description || ''
+  const customerEmail = event.attendees?.map((attendee) => attendee.email || '').find(looksLikeEmail)
+    || descriptionField(description, 'Email')
+  if (!looksLikeEmail(customerEmail)) return null
+
+  const customerName = event.attendees?.find((attendee) => attendee.email === customerEmail)?.displayName
+    || descriptionField(description, 'Client')
+    || 'there'
+  const studioId = privateProperties.studioId || eventStudioId(event) || ''
+  const studioName = privateProperties.studioName
+    || descriptionField(description, 'Studio')
+    || (studioId ? getStudioById(studioId)?.name : '')
+    || event.summary?.split(' - ')[0]
+    || 'VibeShack Studios'
+
+  return {
+    calendarId,
+    eventId: event.id,
+    bookingRef: privateProperties.bookingRef || event.id,
+    studioId,
+    studioName,
+    customerName,
+    customerEmail,
+    start: new Date(start).toISOString(),
+    end: new Date(end).toISOString(),
+    summary: event.summary || studioName,
+    privateProperties,
+  }
 }
 
 export async function getBusyTimesForDate(date: string, studioId?: string) {
@@ -546,6 +614,55 @@ export async function addBookingEvents(
         },
       })
     }
+  }
+}
+
+export async function listBookingEventsForReminderWindow(now = new Date(), startHours = 23, endHours = 25) {
+  const config = await getCalendarConfig()
+  if (!config) return null
+
+  const timeMin = addHours(now, startHours).toISOString()
+  const timeMax = addHours(now, endHours).toISOString()
+  const reminderEvents: BookingReminderEvent[] = []
+
+  for (const calendarId of configuredCalendarIds()) {
+    const response = await config.client.events.list({
+      calendarId,
+      timeMin,
+      timeMax,
+      timeZone: BOOKING_TIME_ZONE,
+      privateExtendedProperty: ['source=vibeshack-website'],
+      singleEvents: true,
+      orderBy: 'startTime',
+      showDeleted: false,
+    })
+
+    for (const event of response.data.items || []) {
+      const reminderEvent = eventToBookingReminder(calendarId, event)
+      if (reminderEvent) reminderEvents.push(reminderEvent)
+    }
+  }
+
+  return reminderEvents
+}
+
+export async function markBookingReminderSent(events: BookingReminderEvent[], sentAt = new Date().toISOString()) {
+  const config = await getCalendarConfig()
+  if (!config) throw new Error('Calendar credentials are not configured')
+
+  for (const event of events) {
+    await config.client.events.patch({
+      calendarId: event.calendarId,
+      eventId: event.eventId,
+      requestBody: {
+        extendedProperties: {
+          private: {
+            ...event.privateProperties,
+            reminder24hSentAt: sentAt,
+          },
+        },
+      },
+    })
   }
 }
 

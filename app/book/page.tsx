@@ -75,8 +75,8 @@ function groupConsecutive(sorted: string[]): string[][] {
 
 function checkoutErrorMessage(message: unknown) {
   if (typeof message !== 'string' || !message) return 'Payment could not be started. Please try again.'
-  if (message.includes('no longer available')) {
-    return 'Sorry, that time was just booked or is no longer available. Please choose another open slot.'
+  if (message.includes('no longer available') || message.includes('not available')) {
+    return 'This slot is not available. Please choose another open time.'
   }
   return message
 }
