@@ -177,8 +177,8 @@ export async function POST(req: NextRequest) {
     const availability = await assertCartSlotsAvailable(cart)
     if (!availability.ok) {
       const error = availability.status === 409
-        ? availability.error === 'Selected sessions overlap for the same studio.'
-          ? 'That room is already in your cart for that time. Please choose a different room or another open slot.'
+        ? availability.error.startsWith('Selected sessions overlap')
+          ? 'Those rooms share the same studio resources at that time. Please choose a different room group or another open slot.'
           : 'This slot is not available. Please choose another open time.'
         : availability.error
       return NextResponse.json({ error }, { status: availability.status })

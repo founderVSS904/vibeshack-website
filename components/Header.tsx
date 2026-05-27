@@ -19,7 +19,7 @@ const podcastStudios: HeaderLink[] = [
   { href: '/encore/', label: 'Encore', detail: 'Vault-style room with strong audio', price: '$300/hr' },
   { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast room', price: '$300/hr' },
   { href: '/parlor/', label: 'Parlor', detail: 'Premium lounge interview set', price: '$400/hr' },
-  { href: '/horizon/', label: 'Horizon', detail: 'Immersive LED wall podcast set', price: '$400/hr' },
+  { href: '/horizon/', label: 'Horizon', detail: 'Warm curated sunset podcast set', price: '$400/hr' },
   { href: '/premier/', label: 'Premier', detail: 'Premium studio suite', price: '$300/hr' },
   { href: '/canvas-podcast/', label: 'Canvas Podcast', detail: 'Custom LED backdrop podcast studio', price: '$400/hr' },
 ]

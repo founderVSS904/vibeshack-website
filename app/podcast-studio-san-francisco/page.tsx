@@ -88,7 +88,7 @@ const studios = [
     series: 'Premium',
     seriesColor: '#fecaca',
     seriesBg: 'rgba(127,29,29,0.35)',
-    desc: 'Immersive setup. Sunset LED wall. Full crew included.',
+    desc: 'Immersive setup. Warm sunset environment. Full crew included.',
     price: '$400',
   },
   {

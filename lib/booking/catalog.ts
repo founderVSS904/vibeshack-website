@@ -132,10 +132,10 @@ export const STUDIOS: Studio[] = [
     name: 'Horizon',
     price: 400,
     tag: 'Premium',
-    description: 'Immersive setup. Sunset LED wall. Full crew included.',
+    description: 'Immersive setup. Warm sunset environment. Full crew included.',
     heroImage: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
     photos: ['/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg', '/studio-images/enhanced-horizon-orange-guest-closeup-v20260510.jpg', '/studio-images/enhanced-horizon-warm-guest-closeup-v20260510.jpg'],
-    includes: ['Custom setup', 'Full 4K production', 'Cameraman + producer', 'LED sunset wall', '6-12hr footage turnaround'],
+    includes: ['Custom setup', 'Full 4K production', 'Cameraman + producer', 'Curated sunset environment', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
       'Schedule a strategy call before your session.',

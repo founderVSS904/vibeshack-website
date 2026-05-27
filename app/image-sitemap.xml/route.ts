@@ -21,7 +21,7 @@ const pageImages = [
       ['/studio-images/shot-here-red-fabric-portrait-v20260509.jpg', 'Editorial portrait photography created at VibeShack Studios San Francisco'],
       ['/studio-images/shot-here-joshua-blue-v20260509.jpg', 'Blue gel portrait photography created at VibeShack Studios San Francisco'],
       ['/studio-images/parlor-production-v20260509.jpg', 'Parlor premium interview studio at VibeShack Studios San Francisco'],
-      ['/studio-images/horizon-wide-v20260509.jpg', 'Horizon sunset LED podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/horizon-wide-v20260509.jpg', 'Horizon warm sunset podcast studio at VibeShack Studios San Francisco'],
       ['/studio-images/inside-canvas-cyc-v20260509.jpg', 'Canvas white cyc studio at VibeShack Studios San Francisco'],
     ],
   },
@@ -107,8 +107,8 @@ const pageImages = [
   {
     loc: '/horizon/',
     images: [
-      ['/studio-images/horizon-hero.jpg', 'Horizon LED studio at VibeShack Studios San Francisco'],
-      ['/studio-images/horizon-wide-v20260509.jpg', 'Horizon sunset LED wall podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/horizon-hero.jpg', 'Horizon warm sunset studio at VibeShack Studios San Francisco'],
+      ['/studio-images/horizon-wide-v20260509.jpg', 'Horizon curated podcast studio at VibeShack Studios San Francisco'],
     ],
   },
   {

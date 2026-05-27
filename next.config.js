@@ -1,4 +1,6 @@
-const isVercelRuntime = process.env.VERCEL === '1' || Boolean(process.env.VERCEL_ENV)
+const isVercelRuntime =
+  (process.env.VERCEL === '1' || Boolean(process.env.VERCEL_ENV)) &&
+  Boolean(process.env.VERCEL_URL)
 
 const contentSecurityPolicy = [
   "default-src 'self'",

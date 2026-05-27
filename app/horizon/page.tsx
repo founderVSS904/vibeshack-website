@@ -3,12 +3,12 @@ import Image from 'next/image'
 import { studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
-  title: 'Horizon LED Studio',
-  description: 'Sunset LED wall. Full 4K production. Cameraman included. Immersive studio setup in San Francisco. $400/hr. Open 24/7.',
+  title: 'Horizon Studio',
+  description: 'Curated sunset environment. Full 4K production. Cameraman included. Immersive studio setup in San Francisco. $400/hr. Open 24/7.',
   alternates: { canonical: 'https://www.vibeshackstudios.com/horizon/' },
   openGraph: {
     title: 'Horizon | VibeShack Studios SF',
-    description: 'Immersive LED studio with programmable sunset wall and full 4K production. Cameraman included. $400/hr in San Francisco.',
+    description: 'Immersive warm sunset studio environment with full 4K production. Cameraman included. $400/hr in San Francisco.',
     url: 'https://www.vibeshackstudios.com/horizon',
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg', width: 1200, height: 630, alt: 'Horizon at VibeShack Studios SF' }],
@@ -17,18 +17,18 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Horizon | VibeShack Studios SF',
-    description: 'Immersive LED studio with programmable sunset wall and full 4K production. Cameraman included. $400/hr in San Francisco.',
+    description: 'Immersive warm sunset studio environment with full 4K production. Cameraman included. $400/hr in San Francisco.',
     images: ['/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg'],
   },
 }
 
 const horizonServiceSchema = studioServiceSchema({
-  name: 'Horizon LED Studio Rental in San Francisco',
-  description: 'Immersive LED wall podcast and video studio in San Francisco with full 4K production and crew included.',
+  name: 'Horizon Studio Rental in San Francisco',
+  description: 'Immersive curated sunset podcast and video studio in San Francisco with full 4K production and crew included.',
   url: 'https://www.vibeshackstudios.com/horizon/',
   image: 'https://www.vibeshackstudios.com/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
   price: '400',
-  serviceType: 'LED Studio Rental',
+  serviceType: 'Creative Studio Rental',
 })
 
 export default function HorizonPage() {
@@ -41,7 +41,7 @@ export default function HorizonPage() {
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg"
-          alt="Horizon immersive LED studio — VibeShack Studios San Francisco"
+          alt="Horizon immersive warm sunset studio at VibeShack Studios San Francisco"
           fill className="object-cover opacity-80" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
@@ -50,7 +50,7 @@ export default function HorizonPage() {
             Horizon.
           </h1>
           <p className="revealed text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
-            Immersive setup. Sunset LED wall. Full crew included.
+            Immersive setup. Warm sunset environment. Full crew included.
           </p>
           <a href="/book/?studio=horizon" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
             Book This Studio
@@ -75,7 +75,7 @@ export default function HorizonPage() {
                   'Custom setup — built around your vision',
                   'Full 4K production, all angles covered',
                   'Cameraman + producer included',
-                  'LED sunset wall — programmable, cinematic',
+                  'Curated sunset environment, warm and cinematic',
                   'Broadcast microphones, zero compromise',
                   'Immersive ambient lighting control',
                   '6–12hr footage turnaround',
@@ -87,7 +87,7 @@ export default function HorizonPage() {
             </div>
             {/* Right: Photo */}
             <div>
-              <Image src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg" alt="Horizon LED sunset wall podcast setup — VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
+              <Image src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg" alt="Horizon warm sunset podcast setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
             </div>
           </div>
         </div>
@@ -100,16 +100,16 @@ export default function HorizonPage() {
           <h2 data-reveal="up" className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
             Where content becomes<br/><span className="text-brand-red">an experience.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-20 max-w-2xl">Horizon is built for productions that want more than a clean background. The sunset LED wall shifts the whole energy of the room — warm amber, deep violet, whatever the scene calls for. Your audience feels it through the screen.</p>
+          <p className="text-gray-500 text-lg mb-20 max-w-2xl">Horizon is built for productions that want more than a clean background. It is a fully curated environment with a warm summer-evening feel, layered atmosphere, and cinematic color built into the room. Your audience feels it through the screen.</p>
 
           <div className="space-y-24">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/enhanced-horizon-orange-guest-closeup-v20260510.jpg" alt="LED sunset wall and microphones in Horizon at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/enhanced-horizon-orange-guest-closeup-v20260510.jpg" alt="Warm sunset backdrop and microphones in Horizon at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
               </div>
               <div className="order-2">
-                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Sunset LED Wall That Sets the Mood</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">A programmable LED wall that wraps your content in color. Golden hour at noon. Deep sunset at midnight. The kind of background that doesn't look like a background — it looks like a location.</p>
+                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>A Sunset Environment That Sets the Mood</h3>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">A fully customized and curated room that wraps your content in warmth. Golden hour energy, soft summer-evening color, and an atmosphere that feels designed rather than staged.</p>
                 <p className="text-gray-400 text-lg leading-relaxed">No green screen. No post-production compositing. Real light. Real atmosphere. Real on camera.</p>
               </div>
             </div>
@@ -117,11 +117,11 @@ export default function HorizonPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Full Crew. Zero Setup Stress.</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">Your cameraman and producer are already set up before you walk in. Horizon is dialed in — LED tuned, cameras locked, audio checked. All you do is show up and perform.</p>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">Your cameraman and producer are already set up before you walk in. Horizon is dialed in with the room, cameras, lighting, and audio ready. All you do is show up and perform.</p>
                 <p className="text-gray-400 text-lg leading-relaxed">We handle the technical. You own the creative.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/enhanced-horizon-warm-guest-closeup-v20260510.jpg" alt="Horizon production setup with sunset LED wall at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/enhanced-horizon-warm-guest-closeup-v20260510.jpg" alt="Horizon warm production setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
               </div>
             </div>
           </div>

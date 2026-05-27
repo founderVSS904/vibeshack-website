@@ -112,7 +112,7 @@ const recommendedRooms = [
     href: '/horizon/',
     title: 'Warm Interview Sets',
     image: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
-    alt: 'Horizon warm LED studio for brand video production at VibeShack Studios San Francisco',
+    alt: 'Horizon warm sunset studio for brand video production at VibeShack Studios San Francisco',
     fit: 'Founder videos, brand films, interviews, testimonials, executive thought leadership, and premium talking-head content.',
     price: '$400/hr',
   },

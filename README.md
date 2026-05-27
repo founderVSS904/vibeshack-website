@@ -121,6 +121,8 @@ You can also set individual env vars like `GCAL_CALENDAR_ID_THE_EXECUTIVE` or `G
 
 If no per-studio calendar is configured, the shared calendar still behaves studio-aware for website-created events: events tagged with a studio only block that studio, while untagged/manual calendar holds block every studio. This lets the team create whole-building holds without losing parallel booking support for tagged room bookings.
 
+Canvas Rental, Canvas Podcast, Parlor, Horizon, The Wing, and Green Screen share the same bookable stage resources. A booking for any one of those rooms automatically makes the matching time slot unavailable for the others, even when the rooms are mapped to separate Google calendars.
+
 ## SEO Configuration
 
 Every page includes:
