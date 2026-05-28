@@ -17,7 +17,7 @@ export default function TermsProfessionalPage() {
             Terms of Service
           </h1>
           <p className="text-gray-400 text-sm mb-2"><strong>VibeShack Studios, Inc.</strong></p>
-          <p className="text-gray-500 text-sm">950 Battery Street, San Francisco, CA 94111</p>
+          <p className="text-gray-500 text-sm">950 Battery St, San Francisco, CA 94111</p>
           <p className="text-gray-600 text-xs mt-4">Last Updated: April 4, 2026 | Effective Date: April 4, 2026</p>
         </div>
 
@@ -58,7 +58,7 @@ export default function TermsProfessionalPage() {
               <li><strong>Guest</strong> — Any individual invited by you to attend your session, including production crew, talent, or observers.</li>
               <li><strong>Session</strong> — The period of time during which you are authorized to occupy and use the Studio.</li>
               <li><strong>Services</strong> — The provision of studio space, equipment, and optional services (cameraman, crew, teleprompter operation, etc.).</li>
-              <li><strong>Studio</strong> — The physical production facility at 950 Battery Street, San Francisco, CA 94111, including all studios, equipment, and related facilities.</li>
+              <li><strong>Studio</strong> — The physical production facility at 950 Battery St, San Francisco, CA 94111, including all studios, equipment, and related facilities.</li>
             </ul>
           </section>
 
@@ -302,7 +302,7 @@ export default function TermsProfessionalPage() {
           <section>
             <h2>14. GENERAL PROVISIONS</h2>
             <h3>14.1 Notices</h3>
-            <p><strong>Notices to the Studio:</strong> founder@vibeshackstudios.com or 950 Battery Street, San Francisco, CA 94111</p>
+            <p><strong>Notices to the Studio:</strong> founder@vibeshackstudios.com or 950 Battery St, San Francisco, CA 94111</p>
             <p><strong>Notices to You:</strong> Email to the address on file in your booking</p>
             
             <h3>14.2 Governing Law</h3>
@@ -340,7 +340,7 @@ export default function TermsProfessionalPage() {
             <h2>16. CONTACT INFORMATION</h2>
             <p>
               <strong>VibeShack Studios, Inc.</strong><br />
-              950 Battery Street<br />
+              950 Battery St<br />
               San Francisco, CA 94111<br />
               United States<br />
               <br />

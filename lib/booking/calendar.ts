@@ -31,11 +31,34 @@ export interface TourBookingDetails {
   notes?: string
 }
 
+export interface BookingReminderEvent {
+  calendarId: string
+  eventId: string
+  bookingRef: string
+  studioId: string
+  studioName: string
+  customerName: string
+  customerEmail: string
+  start: string
+  end: string
+  summary: string
+  privateProperties: Record<string, string>
+}
+
 export const TOUR_DURATION_MINUTES = 30
 const TOUR_START_HOUR = 8
 const TOUR_END_HOUR = 20
 const TOUR_INTERVAL_MINUTES = 30
 const TOUR_MIN_LEAD_MINUTES = 120
+const SHARED_STAGE_GROUP_ID = 'shared-stage'
+const SHARED_STAGE_STUDIO_IDS = new Set([
+  'canvas-rental',
+  'canvas-podcast',
+  'parlor',
+  'horizon',
+  'the-wing',
+  'green-screen',
+])
 
 function readCalendarCredentials() {
   const inlineJson = process.env.GCAL_TOKEN_JSON
@@ -141,6 +164,18 @@ function configuredCalendarIds() {
   return Array.from(ids).filter(Boolean)
 }
 
+function studioResourceGroup(studioId: string | undefined) {
+  return studioId && SHARED_STAGE_STUDIO_IDS.has(studioId) ? SHARED_STAGE_GROUP_ID : `studio:${studioId || 'all'}`
+}
+
+function studioIdsThatAffectAvailability(studioId: string | undefined) {
+  if (studioId && SHARED_STAGE_STUDIO_IDS.has(studioId)) {
+    return Array.from(SHARED_STAGE_STUDIO_IDS)
+  }
+
+  return studioId ? [studioId] : []
+}
+
 async function getBusyTimesForRange(start: Date, end: Date, calendarIds: string[]) {
   const config = await getCalendarConfig()
   if (!config) return null
@@ -208,12 +243,25 @@ function eventStudioId(event: calendar_v3.Schema$Event) {
   return null
 }
 
-function eventBlocksStudio(event: calendar_v3.Schema$Event, studioId: string | undefined, isStudioSpecificCalendar: boolean) {
+function eventBlocksStudio(
+  event: calendar_v3.Schema$Event,
+  studioId: string | undefined,
+  calendarStudioIds: Set<string>,
+  isStudioSpecificCalendar: boolean,
+) {
   if (event.status === 'cancelled' || event.transparency === 'transparent') return false
-  if (!studioId || isStudioSpecificCalendar) return true
+  if (!studioId) return true
 
   const eventStudio = eventStudioId(event)
-  return eventStudio ? eventStudio === studioId : true
+  if (eventStudio) return studioResourceGroup(eventStudio) === studioResourceGroup(studioId)
+
+  if (isStudioSpecificCalendar) {
+    return Array.from(calendarStudioIds).some((calendarStudioId) => (
+      studioResourceGroup(calendarStudioId) === studioResourceGroup(studioId)
+    ))
+  }
+
+  return true
 }
 
 function eventBoundaryToDate(boundary: calendar_v3.Schema$EventDateTime | undefined, isEnd = false) {
@@ -230,6 +278,60 @@ function eventBusyRange(event: calendar_v3.Schema$Event) {
   return { start: start.toISOString(), end: end.toISOString() }
 }
 
+function descriptionField(description: string | null | undefined, label: string) {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const match = new RegExp(`^${escaped}:\\s*(.+)$`, 'im').exec(description || '')
+  return match?.[1]?.trim() || ''
+}
+
+function looksLikeEmail(value: string | null | undefined) {
+  return Boolean(value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+}
+
+function eventToBookingReminder(calendarId: string, event: calendar_v3.Schema$Event): BookingReminderEvent | null {
+  const privateProperties = Object.fromEntries(
+    Object.entries(event.extendedProperties?.private || {})
+      .filter((entry): entry is [string, string] => typeof entry[0] === 'string' && typeof entry[1] === 'string'),
+  )
+
+  if (event.status === 'cancelled') return null
+  if (privateProperties.source !== 'vibeshack-website') return null
+  if (privateProperties.reminder24hSentAt) return null
+
+  const start = event.start?.dateTime
+  const end = event.end?.dateTime
+  if (!event.id || !start || !end) return null
+
+  const description = event.description || ''
+  const customerEmail = event.attendees?.map((attendee) => attendee.email || '').find(looksLikeEmail)
+    || descriptionField(description, 'Email')
+  if (!looksLikeEmail(customerEmail)) return null
+
+  const customerName = event.attendees?.find((attendee) => attendee.email === customerEmail)?.displayName
+    || descriptionField(description, 'Client')
+    || 'there'
+  const studioId = privateProperties.studioId || eventStudioId(event) || ''
+  const studioName = privateProperties.studioName
+    || descriptionField(description, 'Studio')
+    || (studioId ? getStudioById(studioId)?.name : '')
+    || event.summary?.split(' - ')[0]
+    || 'VibeShack Studios'
+
+  return {
+    calendarId,
+    eventId: event.id,
+    bookingRef: privateProperties.bookingRef || event.id,
+    studioId,
+    studioName,
+    customerName,
+    customerEmail,
+    start: new Date(start).toISOString(),
+    end: new Date(end).toISOString(),
+    summary: event.summary || studioName,
+    privateProperties,
+  }
+}
+
 export async function getBusyTimesForDate(date: string, studioId?: string) {
   if (!isValidBookingDate(date)) {
     throw new Error('Invalid date')
@@ -241,21 +343,50 @@ export async function getBusyTimesForDate(date: string, studioId?: string) {
   const daySlots = getTimeSlotsForDay(date)
   const timeMin = daySlots[0].start.toISOString()
   const timeMax = daySlots[daySlots.length - 1].end.toISOString()
+  const calendarContexts = new Map<string, {
+    calendarId: string
+    isStudioSpecificCalendar: boolean
+    studioIds: Set<string>
+  }>()
 
-  const response = await config.client.events.list({
-    calendarId: config.calendarId,
-    timeMin,
-    timeMax,
-    timeZone: BOOKING_TIME_ZONE,
-    singleEvents: true,
-    orderBy: 'startTime',
-    showDeleted: false,
-  })
+  const studioIdsToCheck = studioIdsThatAffectAvailability(studioId)
+  if (studioIdsToCheck.length) {
+    for (const affectedStudioId of studioIdsToCheck) {
+      const resolved = resolveCalendarId(affectedStudioId)
+      const context = calendarContexts.get(resolved.calendarId) || {
+        calendarId: resolved.calendarId,
+        isStudioSpecificCalendar: resolved.isStudioSpecificCalendar,
+        studioIds: new Set<string>(),
+      }
+      context.isStudioSpecificCalendar = context.isStudioSpecificCalendar || resolved.isStudioSpecificCalendar
+      context.studioIds.add(affectedStudioId)
+      calendarContexts.set(resolved.calendarId, context)
+    }
+  } else {
+    calendarContexts.set(config.calendarId, {
+      calendarId: config.calendarId,
+      isStudioSpecificCalendar: config.isStudioSpecificCalendar,
+      studioIds: new Set<string>(),
+    })
+  }
 
-  const busyTimes = (response.data.items || [])
-    .filter((event) => eventBlocksStudio(event, studioId, config.isStudioSpecificCalendar))
-    .map(eventBusyRange)
-    .filter((range): range is { start: string; end: string } => Boolean(range))
+  const busyTimes: { start: string; end: string }[] = []
+  for (const context of calendarContexts.values()) {
+    const response = await config.client.events.list({
+      calendarId: context.calendarId,
+      timeMin,
+      timeMax,
+      timeZone: BOOKING_TIME_ZONE,
+      singleEvents: true,
+      orderBy: 'startTime',
+      showDeleted: false,
+    })
+
+    busyTimes.push(...(response.data.items || [])
+      .filter((event) => eventBlocksStudio(event, studioId, context.studioIds, context.isStudioSpecificCalendar))
+      .map(eventBusyRange)
+      .filter((range): range is { start: string; end: string } => Boolean(range)))
+  }
 
   const tourCalendarId = getTourCalendarId()
   if (studioId && tourCalendarId !== config.calendarId) {
@@ -439,9 +570,9 @@ export async function assertCartSlotsAvailable(cartItems: BookingCartItem[]) {
         return { ok: false, status: 400, error: 'Selected slots do not match the booking date' }
       }
 
-      const requestedSlotKey = `${item.studioId}|${item.date}|${slot}`
+      const requestedSlotKey = `${studioResourceGroup(item.studioId)}|${item.date}|${slot}`
       if (requestedSlotKeys.has(requestedSlotKey)) {
-        return { ok: false, status: 409, error: 'Selected sessions overlap for the same studio.' }
+        return { ok: false, status: 409, error: 'Selected sessions overlap for the same studio resources.' }
       }
       requestedSlotKeys.add(requestedSlotKey)
     }
@@ -536,6 +667,7 @@ export async function addBookingEvents(
               stripeEventId,
               studioId: item.studioId,
               studioName: item.studioName,
+              resourceGroup: studioResourceGroup(item.studioId),
             },
           },
           attendees: [
@@ -546,6 +678,55 @@ export async function addBookingEvents(
         },
       })
     }
+  }
+}
+
+export async function listBookingEventsForReminderWindow(now = new Date(), startHours = 23, endHours = 25) {
+  const config = await getCalendarConfig()
+  if (!config) return null
+
+  const timeMin = addHours(now, startHours).toISOString()
+  const timeMax = addHours(now, endHours).toISOString()
+  const reminderEvents: BookingReminderEvent[] = []
+
+  for (const calendarId of configuredCalendarIds()) {
+    const response = await config.client.events.list({
+      calendarId,
+      timeMin,
+      timeMax,
+      timeZone: BOOKING_TIME_ZONE,
+      privateExtendedProperty: ['source=vibeshack-website'],
+      singleEvents: true,
+      orderBy: 'startTime',
+      showDeleted: false,
+    })
+
+    for (const event of response.data.items || []) {
+      const reminderEvent = eventToBookingReminder(calendarId, event)
+      if (reminderEvent) reminderEvents.push(reminderEvent)
+    }
+  }
+
+  return reminderEvents
+}
+
+export async function markBookingReminderSent(events: BookingReminderEvent[], sentAt = new Date().toISOString()) {
+  const config = await getCalendarConfig()
+  if (!config) throw new Error('Calendar credentials are not configured')
+
+  for (const event of events) {
+    await config.client.events.patch({
+      calendarId: event.calendarId,
+      eventId: event.eventId,
+      requestBody: {
+        extendedProperties: {
+          private: {
+            ...event.privateProperties,
+            reminder24hSentAt: sentAt,
+          },
+        },
+      },
+    })
   }
 }
 

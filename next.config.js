@@ -1,4 +1,6 @@
-const isVercelRuntime = process.env.VERCEL === '1' || Boolean(process.env.VERCEL_ENV)
+const isVercelRuntime =
+  (process.env.VERCEL === '1' || Boolean(process.env.VERCEL_ENV)) &&
+  Boolean(process.env.VERCEL_URL)
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -53,6 +55,7 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   trailingSlash: true,
+  skipTrailingSlashRedirect: true,
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: false },
   poweredByHeader: false,

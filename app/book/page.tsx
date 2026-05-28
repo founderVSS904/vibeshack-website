@@ -75,8 +75,8 @@ function groupConsecutive(sorted: string[]): string[][] {
 
 function checkoutErrorMessage(message: unknown) {
   if (typeof message !== 'string' || !message) return 'Payment could not be started. Please try again.'
-  if (message.includes('no longer available')) {
-    return 'Sorry, that time was just booked or is no longer available. Please choose another open slot.'
+  if (message.includes('no longer available') || message.includes('not available')) {
+    return 'This slot is not available. Please choose another open time.'
   }
   return message
 }
@@ -509,7 +509,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                           <>
                             {!availabilityVerified && (
                               <div className="mb-4 rounded-xl border border-yellow-900/60 bg-yellow-950/30 px-4 py-3">
-                                <p className="text-yellow-300 text-xs font-semibold">Calendar verification is unavailable. Booking is paused until live availability is confirmed.</p>
+                                <p className="text-yellow-300 text-xs font-semibold">Live availability is temporarily unavailable. Please refresh, or contact us and we will help you book.</p>
                               </div>
                             )}
                             <p className="text-gray-600 text-xs mb-4">Tap to select · multiple for longer or split sessions</p>

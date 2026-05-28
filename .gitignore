@@ -10,3 +10,4 @@ out/
 audit-screenshots-*/
 test-results/
 *.log
+.env*

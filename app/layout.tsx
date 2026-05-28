@@ -112,7 +112,7 @@ const localBusinessSchema = {
   image: business.image,
   logo: business.logo,
   email: business.email,
-  // Telephone removed until a real public phone number is confirmed.
+  telephone: business.phone,
   address: { '@type': 'PostalAddress', ...business.address },
   geo: {
     '@type': 'GeoCoordinates',
@@ -170,7 +170,7 @@ const localBusinessSchema = {
     '@type': 'Person',
     name: founder.name,
     jobTitle: founder.role,
-    sameAs: founder.sameAs,
+    ...(founder.sameAs ? { sameAs: founder.sameAs } : {}),
   })),
   subjectOf: peerspaceListings.map((listing) => ({
     '@type': 'WebPage',
@@ -213,7 +213,7 @@ const organizationSchema = {
     '@type': 'Person',
     name: founder.name,
     jobTitle: founder.role,
-    sameAs: founder.sameAs,
+    ...(founder.sameAs ? { sameAs: founder.sameAs } : {}),
   })),
   subjectOf: externalProfiles.map((profile) => ({
     '@type': 'WebPage',

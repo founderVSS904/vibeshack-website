@@ -107,52 +107,100 @@ const scopes = [
 
 const gallery = [
   {
-    src: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
-    alt: 'Fashion campaign photography produced at VibeShack Studios San Francisco',
-    objectPosition: '42% center',
-    tileClass: 'md:col-span-2 md:row-span-2',
-  },
-  {
-    src: '/studio-images/enhanced-photography-headshot-black-blazer-v20260510.jpg',
-    alt: 'Professional headshot photographed at VibeShack Studios San Francisco',
-    objectPosition: 'center 38%',
-    tileClass: '',
-  },
-  {
-    src: '/studio-images/homepage-creative-photography-beauty-gel-v20260510.jpg',
-    alt: 'Color gel beauty portrait created at VibeShack Studios San Francisco',
+    src: '/studio-images/photo-gallery-white-cyc-glam-portrait-v20260520.jpg',
+    alt: 'White cyc glam portrait photographed at VibeShack Studios San Francisco',
     objectPosition: 'center center',
-    tileClass: '',
+    frameClass: 'aspect-[3/2]',
   },
   {
-    src: '/studio-images/shot-here-red-fabric-wide-v20260509.jpg',
-    alt: 'Red fabric editorial portrait photographed at VibeShack Studios San Francisco',
-    objectPosition: 'center center',
-    tileClass: 'md:col-span-2',
-  },
-  {
-    src: '/studio-images/enhanced-photography-editorial-male-portrait-v20260510.jpg',
-    alt: 'Editorial brand portrait photographed at VibeShack Studios San Francisco',
+    src: '/studio-images/photo-gallery-black-white-cap-portrait-v20260520.jpg',
+    alt: 'Black and white editorial portrait photographed at VibeShack Studios San Francisco',
     objectPosition: 'center 34%',
-    tileClass: '',
+    frameClass: 'aspect-[4/5]',
   },
   {
-    src: '/studio-images/shot-here-beatrice-cyc-v20260509.jpg',
-    alt: 'Full-body creative portrait photographed at VibeShack Studios San Francisco',
+    src: '/studio-images/photo-gallery-editorial-makeup-closeup-v20260520.jpg',
+    alt: 'Editorial makeup close-up photographed at VibeShack Studios San Francisco',
     objectPosition: 'center 38%',
-    tileClass: '',
+    frameClass: 'aspect-[4/5]',
   },
   {
-    src: '/studio-images/homepage-creative-photography-gradient-editorial-v20260510.jpg',
-    alt: 'Gradient editorial portrait photographed at VibeShack Studios San Francisco',
+    src: '/studio-images/photo-gallery-red-blue-sunglasses-v20260520.jpg',
+    alt: 'Red and blue gel portrait photographed at VibeShack Studios San Francisco',
     objectPosition: 'center center',
-    tileClass: 'md:col-span-2',
+    frameClass: 'aspect-[4/5]',
   },
   {
-    src: '/studio-images/shot-here-sarah-portrait-v20260509.jpg',
-    alt: 'Studio portrait photographed at VibeShack Studios San Francisco',
+    src: '/studio-images/photo-gallery-pole-form-white-cyc-v20260520.jpg',
+    alt: 'White cyc movement portrait photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center center',
+    frameClass: 'aspect-[4/5]',
+  },
+  {
+    src: '/studio-images/photo-gallery-beauty-jewelry-closeup-v20260520.jpg',
+    alt: 'Beauty jewelry close-up photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center center',
+    frameClass: 'aspect-[5/6]',
+  },
+  {
+    src: '/studio-images/photo-gallery-beauty-expression-closeup-v20260520.jpg',
+    alt: 'Beauty portrait close-up photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center center',
+    frameClass: 'aspect-[5/6]',
+  },
+  {
+    src: '/studio-images/photo-gallery-red-sunglasses-portrait-v20260520.jpg',
+    alt: 'Red backdrop sunglasses portrait photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center 34%',
+    frameClass: 'aspect-[4/5]',
+  },
+  {
+    src: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg',
+    alt: 'Direct beauty portrait photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center 34%',
+    frameClass: 'aspect-[4/5]',
+  },
+  {
+    src: '/studio-images/photo-gallery-side-beauty-black-bg-v20260520.jpg',
+    alt: 'Side-profile beauty portrait photographed at VibeShack Studios San Francisco',
     objectPosition: 'center 42%',
-    tileClass: '',
+    frameClass: 'aspect-[4/5]',
+  },
+  {
+    src: '/studio-images/photo-gallery-black-red-afro-portrait-v20260520.jpg',
+    alt: 'Black and red studio portrait photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center 38%',
+    frameClass: 'aspect-[5/6]',
+  },
+  {
+    src: '/studio-images/photo-gallery-mens-shadow-portrait-v20260520.jpg',
+    alt: "Men's shadow portrait photographed at VibeShack Studios San Francisco",
+    objectPosition: 'center 40%',
+    frameClass: 'aspect-[5/6]',
+  },
+  {
+    src: '/studio-images/photo-gallery-pink-profile-v20260520.jpg',
+    alt: 'Pink profile portrait photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center center',
+    frameClass: 'aspect-[5/6]',
+  },
+  {
+    src: '/studio-images/photo-gallery-pink-studio-portrait-v20260520.jpg',
+    alt: 'Pink studio portrait photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center 34%',
+    frameClass: 'aspect-[4/5]',
+  },
+  {
+    src: '/studio-images/photo-gallery-gesture-portrait-v20260520.jpg',
+    alt: 'Gesture portrait photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center 38%',
+    frameClass: 'aspect-[3/4]',
+  },
+  {
+    src: '/studio-images/photo-gallery-black-white-sunglasses-v20260520.jpg',
+    alt: 'Black and white sunglasses portrait photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center 38%',
+    frameClass: 'aspect-[4/5]',
   },
 ]
 
@@ -359,18 +407,20 @@ export default function PhotoServicesPage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 md:auto-rows-[260px] md:grid-cols-4 lg:auto-rows-[320px]" aria-label="Photo services gallery">
-            {gallery.map(({ src, alt, objectPosition, tileClass }) => (
-              <div key={src} className={`relative min-h-[220px] overflow-hidden rounded-lg bg-black aspect-[4/5] md:aspect-auto md:h-full md:min-h-0 ${tileClass}`}>
-                <Image
-                  src={src}
-                  alt={alt}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out hover:scale-[1.035]"
-                  style={{ objectPosition }}
-                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 50vw"
-                />
-              </div>
+          <div className="columns-1 gap-3 sm:columns-2 lg:columns-3 xl:columns-4" aria-label="Photo services gallery">
+            {gallery.map(({ src, alt, objectPosition, frameClass }) => (
+              <figure key={src} className="mb-3 break-inside-avoid overflow-hidden rounded-lg bg-black ring-1 ring-white/5">
+                <div className={`relative w-full ${frameClass}`}>
+                  <Image
+                    src={src}
+                    alt={alt}
+                    fill
+                    className="object-cover transition-transform duration-700 ease-out hover:scale-[1.035]"
+                    style={{ objectPosition }}
+                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  />
+                </div>
+              </figure>
             ))}
           </div>
         </div>

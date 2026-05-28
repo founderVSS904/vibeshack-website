@@ -1,18 +1,18 @@
 import type { Metadata } from 'next'
 import ContactForm from './ContactForm'
-import { peerspaceUrl } from '@/lib/seo/site'
+import { business, peerspaceUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Contact',
   description:
-    'Contact VibeShack Studios. Book a studio session or schedule a tour. 950 Battery St, San Francisco, CA 94111. founder@vibeshackstudios.com',
+    'Contact VibeShack Studios. Book a studio session or schedule a tour. 950 Battery St, San Francisco, CA 94111. +1 (845) 381-2289. founder@vibeshackstudios.com',
   alternates: {
     canonical: 'https://www.vibeshackstudios.com/contact/',
   },
   openGraph: {
     title: 'Contact VibeShack Studios | San Francisco',
     description:
-      'Book a studio or schedule a tour. Northern Waterfront SF. founder@vibeshackstudios.com',
+      'Book a studio or schedule a tour. Northern Waterfront SF. +1 (845) 381-2289. founder@vibeshackstudios.com',
     url: 'https://www.vibeshackstudios.com/contact',
   },
 }
@@ -124,6 +124,18 @@ export default function ContactPage() {
                 >
                   Open in Google Maps →
                 </a>
+              </div>
+
+              {/* Phone */}
+              <div className="py-8">
+                <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Phone</p>
+                <a
+                  href={`tel:${business.phone.replace(/[^\d+]/g, '')}`}
+                  className="text-white font-semibold hover:text-brand-red transition-colors"
+                >
+                  {business.phone}
+                </a>
+                <p className="text-gray-500 text-sm mt-1">Call or text for booking questions.</p>
               </div>
 
               {/* Email */}

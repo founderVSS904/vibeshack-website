@@ -19,7 +19,7 @@ const podcastStudios: HeaderLink[] = [
   { href: '/encore/', label: 'Encore', detail: 'Vault-style room with strong audio', price: '$300/hr' },
   { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast room', price: '$300/hr' },
   { href: '/parlor/', label: 'Parlor', detail: 'Premium lounge interview set', price: '$400/hr' },
-  { href: '/horizon/', label: 'Horizon', detail: 'Immersive LED wall podcast set', price: '$400/hr' },
+  { href: '/horizon/', label: 'Horizon', detail: 'Warm curated sunset podcast set', price: '$400/hr' },
   { href: '/premier/', label: 'Premier', detail: 'Premium studio suite', price: '$300/hr' },
   { href: '/canvas-podcast/', label: 'Canvas Podcast', detail: 'Custom LED backdrop podcast studio', price: '$400/hr' },
 ]
@@ -82,7 +82,7 @@ export default function Header() {
 
   return (
     <header
-      className="site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black/85 transition-colors duration-200"
+      className="site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black transition-colors duration-200"
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
         <div className="grid h-20 grid-cols-[auto_1fr_auto] items-center gap-6">

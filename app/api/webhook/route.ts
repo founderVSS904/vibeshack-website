@@ -176,6 +176,24 @@ async function getStripeReceiptUrl(session: Stripe.Checkout.Session) {
   return ''
 }
 
+async function getCurrentSessionMetadata(session: Stripe.Checkout.Session) {
+  try {
+    const currentSession = await getStripe().checkout.sessions.retrieve(session.id)
+    return (currentSession.metadata || {}) as Record<string, string>
+  } catch (error) {
+    console.error('Stripe session metadata lookup failed:', error)
+    return (session.metadata || {}) as Record<string, string>
+  }
+}
+
+async function markSessionFulfillmentStep(sessionId: string, key: string) {
+  await getStripe().checkout.sessions.update(sessionId, {
+    metadata: {
+      [key]: new Date().toISOString(),
+    },
+  })
+}
+
 function emailLogoHtml() {
   return `
     <a href="https://www.vibeshackstudios.com" style="display:inline-block;color:#ef1100;text-decoration:none;font-size:20px;font-weight:950;letter-spacing:-0.055em;line-height:1;">
@@ -311,11 +329,17 @@ async function sendConfirmationEmail(
     service: 'gmail',
     auth: { user: gmailUser, pass: gmailPass },
   })
-  const sendMail = async (label: string, mailOptions: Parameters<typeof transporter.sendMail>[0]) => {
+  const criticalFailures: string[] = []
+  const sendMail = async (
+    label: string,
+    mailOptions: Parameters<typeof transporter.sendMail>[0],
+    critical = false,
+  ) => {
     try {
       await transporter.sendMail(mailOptions)
     } catch (error) {
       console.error(`${label} email failed:`, error)
+      if (critical) criticalFailures.push(label)
     }
   }
 
@@ -421,7 +445,7 @@ async function sendConfirmationEmail(
     to: customer.email,
     subject: `You're booked - ${subjectStudio} - ${firstDate}`,
     html: emailHtml,
-  })
+  }, true)
 
   await sendMail('Session prep', {
     from: `"VibeShack Studios" <${gmailUser}>`,
@@ -480,7 +504,11 @@ async function sendConfirmationEmail(
       ${attributionDetails}
       <ul style="line-height:2;">${internalHtml}</ul>
     `,
-  })
+  }, true)
+
+  if (criticalFailures.length) {
+    throw new Error(`Critical booking emails failed: ${criticalFailures.join(', ')}`)
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -536,17 +564,35 @@ export async function POST(req: NextRequest) {
     const referralInfo = parseReferralInfo(metadata, session.amount_total || 0)
     const attributionDetails = attributionHtml(metadata)
     const receiptUrl = await getStripeReceiptUrl(session)
+    const currentMetadata = await getCurrentSessionMetadata(session)
+    const bookingRef = metadata.bookingRef || session.id
+    const fulfillmentErrors: string[] = []
 
-    try {
-      await sendConfirmationEmail(cartItems, customer, session.amount_total || 0, teamEmails, referralInfo, attributionDetails, receiptUrl)
-    } catch (error) {
-      console.error('Booking email failed:', error)
+    if (!currentMetadata.vbsCalendarSyncedAt) {
+      try {
+        await addBookingEvents(cartItems, customer, teamEmails, referralInfo, bookingRef, event.id)
+        await markSessionFulfillmentStep(session.id, 'vbsCalendarSyncedAt')
+      } catch (error) {
+        console.error('Calendar event creation failed:', error)
+        fulfillmentErrors.push('calendar')
+      }
     }
 
-    try {
-      await addBookingEvents(cartItems, customer, teamEmails, referralInfo, metadata.bookingRef || session.id, event.id)
-    } catch (error) {
-      console.error('Calendar event creation failed:', error)
+    if (!fulfillmentErrors.length && !currentMetadata.vbsConfirmationSentAt) {
+      try {
+        await sendConfirmationEmail(cartItems, customer, session.amount_total || 0, teamEmails, referralInfo, attributionDetails, receiptUrl)
+        await markSessionFulfillmentStep(session.id, 'vbsConfirmationSentAt')
+      } catch (error) {
+        console.error('Booking email failed:', error)
+        fulfillmentErrors.push('email')
+      }
+    }
+
+    if (fulfillmentErrors.length) {
+      return NextResponse.json(
+        { error: `Booking fulfillment failed: ${fulfillmentErrors.join(', ')}` },
+        { status: 500 },
+      )
     }
   }
 

@@ -141,7 +141,6 @@ export default function RentalStudiosPage() {
                     <p className="text-white font-black text-2xl">{s.price}</p>
                     <p className="text-gray-500 text-xs">per hour</p>
                     <a href={s.bookHref}
-                      
                       className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 bg-white text-black font-bold text-xs rounded-full hover:bg-gray-100 transition-colors">
                       Book →
                     </a>

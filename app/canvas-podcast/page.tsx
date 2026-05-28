@@ -144,7 +144,7 @@ export default function CanvasPodcastPage() {
                 <span className="text-white font-black text-2xl">$400<span className="text-sm text-gray-400">/hr</span></span>
               </div>
               <ul className="space-y-3 text-gray-500 text-sm mt-6 mb-8">
-                <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Sunset LED wall + cloud projection</span></li>
+                <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Curated sunset environment + warm atmosphere</span></li>
                 <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Perfect for creative storytelling</span></li>
                 <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Modern sage seating + impact</span></li>
               </ul>
