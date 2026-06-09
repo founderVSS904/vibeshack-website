@@ -9,10 +9,23 @@ function ConfirmationContent() {
 
   if (!sessionId) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center px-6">
-        <div className="text-center">
-          <p className="text-white text-2xl font-bold mb-4">Something went wrong.</p>
-          <Link href="/book/" prefetch={false} className="text-brand-red hover:underline text-sm">← Back to booking</Link>
+      <div className="min-h-screen bg-black flex items-center justify-center px-6 py-20">
+        <div className="max-w-lg w-full">
+          <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-3">VibeShack Studios · Booking confirmation</p>
+          <h1 className="text-white font-black leading-none mb-5" style={{fontSize: 'clamp(2.75rem, 7vw, 4.75rem)', letterSpacing: '-0.05em'}}>
+            Booking confirmation page
+          </h1>
+          <p className="text-gray-500 text-lg leading-relaxed mb-10">
+            This is the page customers reach after a successful paid booking. If you just completed payment, check your email for your VibeShack booking confirmation and Stripe receipt.
+          </p>
+
+          <div className="flex flex-wrap gap-4 items-center">
+            <Link href="/book/" prefetch={false}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 transition-colors">
+              Book a session
+            </Link>
+            <Link href="/" className="text-gray-600 hover:text-white transition-colors text-sm">← Back to home</Link>
+          </div>
         </div>
       </div>
     )
