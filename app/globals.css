@@ -253,6 +253,7 @@ body .placeholder-gray-700::placeholder {
   opacity: 1;
   transform: translateZ(0);
   contain: layout paint;
+  container-type: inline-size;
 }
 
 .dynamic-frame-image {
@@ -371,6 +372,7 @@ body .placeholder-gray-700::placeholder {
   color: #fff;
   font-family: var(--font-brand-sans);
   font-size: 3.35rem;
+  font-size: clamp(2.1rem, 10cqi, 3.35rem);
   font-weight: 900;
   font-stretch: normal;
   line-height: 0.88;
@@ -378,6 +380,7 @@ body .placeholder-gray-700::placeholder {
   letter-spacing: 0;
   text-wrap: balance;
   max-width: 9.8em;
+  max-width: 100%;
   text-shadow: none;
   -webkit-font-smoothing: antialiased;
   text-rendering: geometricPrecision;
@@ -432,7 +435,7 @@ body .placeholder-gray-700::placeholder {
 
 @media (max-width: 1023px) {
   .dynamic-frame-label {
-    font-size: 2.8rem;
+    font-size: clamp(2.1rem, 10cqi, 2.8rem);
   }
 
   .dynamic-frame-grid {
@@ -512,13 +515,13 @@ body .placeholder-gray-700::placeholder {
   }
 
   .dynamic-frame-label {
-    font-size: 3rem;
+    font-size: clamp(2.1rem, 10cqi, 2.55rem);
   }
 }
 
 @media (min-width: 1440px) {
   .dynamic-frame-label {
-    font-size: 3.75rem;
+    font-size: clamp(2.1rem, 10cqi, 3.75rem);
   }
 }
 

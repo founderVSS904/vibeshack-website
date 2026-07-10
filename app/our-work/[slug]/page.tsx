@@ -61,11 +61,11 @@ export default async function WorkProjectPage({ params }: PageProps) {
 
       <section className="bg-black pt-20 text-white">
         <div className="mx-auto max-w-[1536px] px-6 pb-12 pt-7 sm:px-10 lg:px-[70px]">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-5">
+          <div className="mb-6 flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-5 sm:items-center">
             <Link href="/our-work/" className="text-sm font-semibold text-white/48 transition-colors hover:text-white">
               Back to Our Work
             </Link>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/35">
+            <p className="w-full text-left text-xs font-bold uppercase tracking-[0.16em] text-white/35 sm:w-auto sm:text-right">
               {project.categoryLabel} / {project.year}
             </p>
           </div>

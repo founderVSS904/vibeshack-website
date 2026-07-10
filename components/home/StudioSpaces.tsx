@@ -3,7 +3,6 @@ import Link from 'next/link'
 
 // Same layout and hover behavior as the classic homepage studio grid:
 // .studio-grid-card lift, .homepage-studio-thumb-img zoom, gradient fade.
-// Canvas Podcast sits where Premier used to; Premier is gone from the lineup.
 const studios = [
   { src: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', label: 'The Executive', href: '/the-executive/', alt: 'The Executive — Podcast table setup in use — VibeShack Studios SF' },
   { src: '/studio-images/sunset-hero-v20260509.jpg', label: 'Sunset', href: '/sunset-studio/', alt: 'Sunset — Warm programmable podcast set in use — VibeShack Studios SF' },
