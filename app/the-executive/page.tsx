@@ -86,7 +86,7 @@ export default function TheExecutivePage() {
           <h2 data-reveal="up" className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
             Where three people<br/>sound <span className="text-brand-red">like legends.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-20 max-w-2xl">The Executive is the room where your show stops being a podcast and becomes a broadcast. Three cameras, three angles, three voices that cut through the noise.</p>
+          <p className="text-gray-500 text-lg mb-20 max-w-2xl">The Executive is the set where your show stops being a podcast and becomes a broadcast. Three cameras, three angles, three voices that cut through the noise.</p>
           
           <div className="space-y-24">
             {/* Detail 1: Image Left, Text Right */}

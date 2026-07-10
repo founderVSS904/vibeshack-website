@@ -168,7 +168,7 @@ export default function AboutPage() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             <div className="col-span-2 row-span-2 overflow-hidden rounded-xl">
-              <Image src="/studio-images/horizon-wide-v20260509.jpg" alt="Horizon podcast room at VibeShack Studios" width={800} height={480} className="w-full object-cover" style={{ height: '480px' }} />
+              <Image src="/studio-images/horizon-wide-v20260509.jpg" alt="Horizon podcast set at VibeShack Studios" width={800} height={480} className="w-full object-cover" style={{ height: '480px' }} />
             </div>
             <div className="overflow-hidden rounded-xl">
               <Image src="/studio-images/parlor-side-v20260509.jpg" alt="Parlor lounge production set at VibeShack Studios" width={400} height={234} className="w-full object-cover" style={{ height: '234px' }} />

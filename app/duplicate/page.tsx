@@ -25,7 +25,7 @@ const serviceHighlights = [
     href: '/podcast-studio-san-francisco/',
     label: 'Podcasts',
     kicker: 'Rooms, cameras, crew',
-    description: 'Book podcast rooms built for filmed conversations, interviews, branded shows, creators, and repeatable episode production.',
+    description: 'Book podcast sets built for filmed conversations, interviews, branded shows, creators, and repeatable episode production.',
     price: '$300-$400/hr',
     image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
     alt: 'Two-host podcast production setup at VibeShack Studios San Francisco',
@@ -164,7 +164,7 @@ export default function HomePage() {
               Production studios in San Francisco for every kind of shoot.
             </h2>
             <p className="text-gray-500 text-base leading-relaxed">
-              VibeShack Studios brings podcast rooms, green screen production, photo services, video, and white cyc rental studios together at 950 Battery St in San Francisco's Northern Waterfront.
+              VibeShack Studios brings podcast sets, green screen production, photo services, video, and white cyc rental studios together at 950 Battery St in San Francisco's Northern Waterfront.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/8" data-stagger>

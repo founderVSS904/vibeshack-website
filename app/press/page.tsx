@@ -47,7 +47,7 @@ export default function PressPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pressSchema) }} />
 
       <section className="relative min-h-[78vh] flex items-end bg-black overflow-hidden">
-        <Image src="/studio-images/the-executive-hero.jpg" alt="VibeShack Studios podcast room in San Francisco" fill priority className="object-cover opacity-70" />
+        <Image src="/studio-images/the-executive-hero.jpg" alt="VibeShack Studios podcast set in San Francisco" fill priority className="object-cover opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-black/10" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-32 w-full">
           <p className="text-brand-red text-xs font-bold tracking-[0.25em] uppercase mb-6">Official Media Kit</p>
@@ -66,7 +66,7 @@ export default function PressPage() {
             <div>
               <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Boilerplate</p>
               <p className="text-white text-2xl sm:text-3xl font-light leading-relaxed max-w-4xl">
-                VibeShack is a media company and brand studio for creators, founders, and companies that need content, campaigns, and production support. VibeShack Studios is the San Francisco production arm: a 24/7 production studio with podcast rooms, green screen, photo services, video production, photography studio rental, and white cyc rental spaces at 950 Battery St in the Northern Waterfront.
+                VibeShack is a media company and brand studio for creators, founders, and companies that need content, campaigns, and production support. VibeShack Studios is the San Francisco production arm: a 24/7 production studio with podcast sets, green screen, photo services, video production, photography studio rental, and white cyc rental spaces at 950 Battery St in the Northern Waterfront.
               </p>
               <Link href="/press/24-7-san-francisco-production-studio/" className="inline-flex text-brand-red font-bold text-sm hover:text-white transition-colors mt-6">
                 Read the launch press release →

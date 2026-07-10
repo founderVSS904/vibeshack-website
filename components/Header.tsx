@@ -14,14 +14,14 @@ type HeaderLink = {
 }
 
 const podcastStudios: HeaderLink[] = [
-  { href: '/podcast-studio-san-francisco/', label: 'All Podcast Studios', detail: 'Compare every podcast room' },
-  { href: '/the-executive/', label: 'The Executive', detail: 'Boardroom table, three cameras', price: '$300/hr' },
+  { href: '/podcast-studio-san-francisco/', label: 'All Podcast Studios', detail: 'Compare every podcast set' },
+  { href: '/the-executive/', label: 'The Executive', detail: 'Boardroom set, three cameras', price: '$300/hr' },
   { href: '/the-wing/', label: 'The Wing', detail: 'Warm two-person conversation set', price: '$300/hr' },
-  { href: '/encore/', label: 'Encore', detail: 'Vault-style room with strong audio', price: '$300/hr' },
-  { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast room', price: '$300/hr' },
-  { href: '/parlor/', label: 'Parlor', detail: 'Premium lounge interview set', price: '$400/hr' },
+  { href: '/encore/', label: 'Encore', detail: 'Treated set with clean sightlines', price: '$300/hr' },
+  { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast set', price: '$300/hr' },
+  { href: '/parlor/', label: 'Parlor', detail: 'Signature lounge interview set', price: '$400/hr' },
   { href: '/horizon/', label: 'Horizon', detail: 'Warm curated sunset podcast set', price: '$400/hr' },
-  { href: '/canvas-podcast/', label: 'Canvas Podcast', detail: 'Custom LED backdrop podcast studio', price: '$400/hr' },
+  { href: '/canvas-podcast/', label: 'Canvas Podcast', detail: 'Large-format custom podcast set', price: '$400/hr' },
 ]
 
 const rentalStudios: HeaderLink[] = [
@@ -36,7 +36,7 @@ const serviceLinks: HeaderLink[] = [
   { href: '/commercials/', label: 'Commercials', detail: 'Launch ads, talking heads, product demos' },
   { href: '/editorials/', label: 'Editorials', detail: 'Fashion, beauty, portraits, campaign stills' },
   { href: '/branding/', label: 'Branding', detail: 'Creative direction, launches, content systems' },
-  { href: '/podcast-studio-san-francisco/', label: 'Podcast Production', detail: 'Rooms with cameras, audio, and crew' },
+  { href: '/podcast-studio-san-francisco/', label: 'Podcast Production', detail: 'Sets with cameras, audio, and crew' },
   { href: '/rental-studios/', label: 'Studio Rentals', detail: 'White cyc, green screen, photo rooms' },
   { href: '/video-production/', label: 'All Video Production', detail: 'Social content, music videos, brand video' },
   { href: '/photo-services/', label: 'All Photo Services', detail: 'Headshots, portraits, products, campaigns' },
@@ -50,7 +50,7 @@ const planningLinks: HeaderLink[] = [
 ]
 
 const studioHubLinks: HeaderLink[] = [
-  { href: '/podcast-studio-san-francisco/', label: 'Podcast Studios', detail: 'Rooms built for interviews and shows' },
+  { href: '/podcast-studio-san-francisco/', label: 'Podcast Studios', detail: 'Sets built for interviews and shows' },
   { href: '/rental-studios/', label: 'Rental Studios', detail: 'White cyc, green screen, photo rooms' },
   { href: '/find-your-studio/', label: 'Find a Studio', detail: 'Choose by outcome, not guesswork' },
   { href: '/book/', label: 'Book a Session', detail: 'Live availability and checkout' },
@@ -64,8 +64,8 @@ const proofLinks: HeaderLink[] = [
   { href: '/compare/', label: 'Compare Studios', detail: 'Understand the tradeoffs before booking' },
 ]
 
-const corePodcastStudios = podcastStudios.slice(1, 6)
-const premiumPodcastStudios = podcastStudios.slice(6)
+const corePodcastStudios = podcastStudios.slice(1, 5)
+const signaturePodcastStudios = podcastStudios.slice(5)
 
 const navLinkClass =
   'relative text-sm tracking-wide whitespace-nowrap text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none'
@@ -217,8 +217,8 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
     <DesktopMegaMenu className="max-w-7xl grid-cols-[1fr_1fr_1fr_1fr] gap-10">
       <MegaColumn eyebrow="Browse" links={studioHubLinks} large onNavigate={onNavigate} />
-      <MegaColumn eyebrow="Podcast Rooms" links={corePodcastStudios} onNavigate={onNavigate} />
-      <MegaColumn eyebrow="Premium & Custom" links={premiumPodcastStudios} onNavigate={onNavigate} />
+      <MegaColumn eyebrow="Podcast Sets" links={corePodcastStudios} onNavigate={onNavigate} />
+      <MegaColumn eyebrow="Signature & Custom" links={signaturePodcastStudios} onNavigate={onNavigate} />
       <MegaColumn eyebrow="Rental Studios" links={rentalStudios} onNavigate={onNavigate} />
     </DesktopMegaMenu>
   )

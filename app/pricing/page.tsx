@@ -4,7 +4,7 @@ import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 export const metadata: Metadata = {
   title: 'Studio Pricing',
   description:
-    'Studio rentals from $100/hr, podcast rooms from $300/hr, Canvas Podcast $400/hr. Production services quoted by request in San Francisco.',
+    'Studio rentals from $100/hr, podcast sets from $300/hr, Canvas Podcast $400/hr. Production services quoted by request in San Francisco.',
   alternates: {
     canonical: 'https://www.vibeshackstudios.com/pricing/',
   },
@@ -35,8 +35,8 @@ const studios = [
   { name: 'The Wing', price: '$300', note: 'cameraman included · Walnut Series', href: '/the-wing/', category: 'Podcast' },
   { name: 'Encore', price: '$300', note: 'cameraman included · Vault Series', href: '/encore/', category: 'Podcast' },
   { name: 'Sunset', price: '$300', note: 'cameraman included · Creative Series', href: '/sunset-studio/', category: 'Podcast' },
-  { name: 'Parlor', price: '$400', note: 'full crew included · Premium', href: '/parlor/', category: 'Podcast' },
-  { name: 'Horizon', price: '$400', note: 'full crew included · Premium', href: '/horizon/', category: 'Podcast' },
+  { name: 'Parlor', price: '$400', note: 'full crew included · Signature Series', href: '/parlor/', category: 'Podcast' },
+  { name: 'Horizon', price: '$400', note: 'full crew included · Signature Series', href: '/horizon/', category: 'Podcast' },
   { name: 'Canvas Podcast', price: '$400', note: 'LED backdrop · full crew included', href: '/canvas-podcast/', category: 'Podcast' },
   { name: 'Green Screen', price: '$100', note: 'floor-to-ceiling · Creative Series', href: '/green-screen-studio-sf/', category: 'Rental' },
   { name: 'Photography Studio', price: '$100', note: 'room-only rental · Creative Series', href: '/photography-studio-san-francisco/', category: 'Rental' },
@@ -53,10 +53,10 @@ const productionServices = [
 
 const pricingFaqs = [
   { question: 'Are there hourly minimums?', answer: 'No minimums. Book one hour, several hours, or a full day.' },
-  { question: 'What does the rate include?', answer: 'The rate includes the studio and the equipment listed on each studio page. Podcast rooms include crew options and production setup.' },
+  { question: 'What does the rate include?', answer: 'The rate includes the studio and the equipment listed on each studio page. Podcast sets include crew options and production setup.' },
   { question: 'How are photo and video services priced?', answer: 'Photo and video services are quoted after the brief, shot list, deliverables, crew needs, usage, and timeline are clear.' },
   { question: 'How do I book?', answer: 'Book directly on the website. Choose your studio, pick a date and time, add any options, and confirm online.' },
-  { question: 'Can I book multiple studios in one day?', answer: 'Yes. You can book multiple studios for the same day, such as a podcast room plus photography studio rental time.' },
+  { question: 'Can I book multiple studios in one day?', answer: 'Yes. You can book multiple studios for the same day, such as a podcast set plus photography studio rental time.' },
   { question: 'Is there a cancellation policy?', answer: 'Free cancellation up to 48 hours before your session. Cancellations within 48 hours are subject to a 50% charge.' },
   { question: 'Do you offer monthly rates?', answer: 'Yes. Contact us for recurring bookings or blocks of hours with priority access to the calendar.' },
   { question: 'Is parking available?', answer: 'Street parking is available on Battery St. The studio is also about a 10-minute walk from the Ferry Building.' },
@@ -65,7 +65,7 @@ const pricingFaqs = [
 
 const pricingServiceSchema = studioServiceSchema({
   name: 'Studio Rental Pricing in San Francisco',
-  description: 'Hourly pricing for VibeShack Studios podcast rooms, green screen, photography studio rental, Canvas Podcast, white cyc rentals, and production service quote requests in San Francisco.',
+  description: 'Hourly pricing for VibeShack Studios podcast sets, green screen, photography studio rental, Canvas Podcast, white cyc rentals, and production service quote requests in San Francisco.',
   url: 'https://www.vibeshackstudios.com/pricing/',
   image: 'https://www.vibeshackstudios.com/og-image.jpg',
   price: '100',

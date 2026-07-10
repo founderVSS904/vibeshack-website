@@ -1326,73 +1326,122 @@ a {
 }
 
 /* Podcast page editorial motion */
-.podcast-room-nav a.is-active {
+html.podcast-motion-ready,
+body.podcast-page-active {
+  overflow-x: clip;
+}
+
+.podcast-set-nav a.is-active {
   border-color: rgba(255, 255, 255, 0.48);
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
+.podcast-set-panel.is-current {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
 .podcast-motion-ready [data-podcast-reveal] {
   opacity: 0;
-  transform: translateY(38px);
-  filter: blur(10px);
+  transform: translateY(28px);
   transition:
-    opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
-    filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 800ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 800ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .podcast-motion-ready [data-podcast-reveal].is-visible {
   opacity: 1;
   transform: none;
-  filter: none;
 }
 
-.podcast-room-panel {
+.podcast-set-panel {
   scroll-margin-top: 112px;
 }
 
-.podcast-motion-ready .podcast-room-panel {
-  opacity: 0.72;
-  transform: translateY(28px) scale(0.992);
+.podcast-motion-ready .podcast-set-panel {
+  opacity: 0.82;
+  transform: translateY(24px) scale(0.994);
   transition:
-    opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 850ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 850ms cubic-bezier(0.16, 1, 0.3, 1),
     border-color 400ms ease;
 }
 
-.podcast-motion-ready .podcast-room-panel.is-visible {
+.podcast-motion-ready .podcast-set-panel.is-visible {
   opacity: 1;
   transform: none;
 }
 
-.podcast-room-media {
-  transform: scale(1.055);
-  transition: transform 1400ms cubic-bezier(0.16, 1, 0.3, 1);
+.podcast-set-media {
+  backface-visibility: hidden;
+  transform: scale(1.03);
+  transition: transform 1500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.podcast-room-panel.is-visible .podcast-room-media {
-  transform: scale(1.01);
+.podcast-set-panel.is-visible .podcast-set-media {
+  transform: scale(1);
 }
 
-.podcast-room-panel:hover .podcast-room-media,
+.podcast-set-panel:hover .podcast-set-media,
 .podcast-feature-panel:hover img {
-  transform: scale(1.04);
+  transform: scale(1.022);
 }
 
 .podcast-feature-panel img {
-  transform: scale(1.02);
-  transition: transform 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+  backface-visibility: hidden;
+  transform: scale(1.012);
+  transition: transform 1400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes podcast-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes podcast-hero-image-in {
+  from {
+    opacity: 0.82;
+    transform: scale(1.035);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .podcast-hero-image {
+    animation: podcast-hero-image-in 1600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .podcast-hero-copy {
+    animation: podcast-hero-rise 900ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .podcast-hero-stats {
+    animation: podcast-hero-rise 900ms 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .podcast-set-rail-inner {
+    animation: podcast-hero-rise 900ms 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .podcast-motion-ready [data-podcast-reveal],
-  .podcast-motion-ready .podcast-room-panel,
-  .podcast-room-media,
+  .podcast-motion-ready .podcast-set-panel,
+  .podcast-set-media,
   .podcast-feature-panel img {
     opacity: 1 !important;
     transform: none !important;
-    filter: none !important;
     transition: none !important;
   }
 }

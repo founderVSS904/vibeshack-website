@@ -28,7 +28,7 @@ export default function PressReleasePage() {
     '@type': 'NewsArticle',
     '@id': `${canonical}#article`,
     headline: 'VibeShack Studios Builds a 24/7 Production Studio in San Francisco',
-    description: 'VibeShack Studios is the San Francisco production arm of VibeShack, offering podcast rooms, green screen, photo services, video, photography studio rental, and white cyc studio rentals.',
+    description: 'VibeShack Studios is the San Francisco production arm of VibeShack, offering podcast sets, green screen, photo services, video, photography studio rental, and white cyc studio rentals.',
     image: absoluteUrl('/og-image.jpg'),
     datePublished: '2026-05-09',
     dateModified: '2026-05-09',
@@ -57,7 +57,7 @@ export default function PressReleasePage() {
       <section className="bg-zinc-950 py-20 px-6 sm:px-10 lg:px-16">
         <article className="max-w-4xl mx-auto space-y-10 text-gray-300 text-lg leading-relaxed">
           <p>
-            {parentBrand.name} operates as a media company and brand studio for teams that need content, campaigns, and production support. VibeShack Studios is the physical production arm, bringing multiple production environments together at one address: podcast rooms, green screen, photo services, video, photography studio rental, and white cyc rental spaces. The studio is designed for teams that need professional infrastructure without losing time to fragmented vendors, uncertain availability, or gear-heavy setup days.
+            {parentBrand.name} operates as a media company and brand studio for teams that need content, campaigns, and production support. VibeShack Studios is the physical production arm, bringing multiple production environments together at one address: podcast sets, green screen, photo services, video, photography studio rental, and white cyc rental spaces. The studio is designed for teams that need professional infrastructure without losing time to fragmented vendors, uncertain availability, or gear-heavy setup days.
           </p>
           <p>
             The facility supports hourly bookings, 24/7 availability, professional lighting, broadcast audio, camera-ready sets, and crew options. Use cases include podcast interviews, founder videos, social media campaigns, product photography, green screen explainers, music videos, commercials, and brand content days.

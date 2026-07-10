@@ -85,7 +85,7 @@ const RECOMMENDATIONS: Record<string, Recommendation> = {
   'notsure-two-no':         { primary: 'the-executive',   others: ['parlor', 'photography'], reason: 'Start with a tour and we will match the room to your format, crew, and final deliverables.' },
   'notsure-small-no':       { primary: 'canvas-podcast',  others: ['horizon', 'green-screen'], reason: 'Start with a tour because setup choice matters more once guests, crew, and gear increase.' },
   'notsure-large-no':       { primary: 'green-screen',    others: ['canvas-rental', 'canvas-podcast'], reason: 'For larger productions, tour first so the studio choice matches the real footprint.' },
-  'notsure-solo-yes':       { primary: 'photography',     others: ['sunset', 'canvas-rental'], reason: 'Tour first, then choose between a clean rental room and a more produced podcast/video room.' },
+  'notsure-solo-yes':       { primary: 'photography',     others: ['sunset', 'canvas-rental'], reason: 'Tour first, then choose between a clean rental studio and a more produced podcast or video set.' },
   'notsure-two-yes':        { primary: 'the-executive',   others: ['photography', 'canvas-rental'], reason: 'Tour first so your team can compare the controlled rooms against the open rental spaces.' },
   'notsure-small-yes':      { primary: 'canvas-rental',   others: ['green-screen', 'canvas-podcast'], reason: 'A tour will help decide whether you need open floor space or a fully produced room.' },
   'notsure-large-yes':      { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Tour first. Larger shoots are about space, staging, crew movement, and lighting control.' },
@@ -149,7 +149,7 @@ STUDIOS['photo-services'] = {
 }
 
 const STUDIO_GROUPS = [
-  { title: 'Premium Podcast Studios — $400/hr', ids: ['parlor', 'horizon', 'canvas-podcast'] },
+  { title: 'Signature Podcast Sets, $400/hr', ids: ['parlor', 'horizon', 'canvas-podcast'] },
   { title: 'Podcast Studios — $300/hr', ids: ['the-executive', 'the-wing', 'encore', 'sunset'] },
   { title: 'Rental Studios — $100/hr', ids: ['green-screen', 'photography', 'canvas-rental'] },
 ]

@@ -142,7 +142,7 @@ export const moneyPages = [
     href: '/podcast-studio-san-francisco/',
     label: 'Podcast Studio San Francisco',
     keyword: 'podcast studio san francisco',
-    description: 'Podcast rooms with broadcast microphones, 4K cameras, and crew options.',
+    description: 'Podcast sets with broadcast microphones, 4K cameras, and crew options.',
   },
   {
     href: '/commercials/',

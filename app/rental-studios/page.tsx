@@ -54,7 +54,7 @@ const rentalFaqs = [
   },
   {
     question: 'How much do rental studios cost?',
-    answer: 'Rental studios start at $100 per hour with no minimums. Podcast production rooms start at $300 per hour.',
+    answer: 'Rental studios start at $100 per hour with no minimums. Podcast production sets start at $300 per hour.',
   },
   {
     question: 'Are rental studios available 24/7?',

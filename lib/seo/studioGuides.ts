@@ -62,7 +62,7 @@ export const studioGuides = [
       {
         question: 'Do I need to bring microphones or cameras?',
         answer:
-          'No. VibeShack podcast rooms include professional studio gear, and podcast packages include crew options so you can focus on the conversation.',
+          'No. VibeShack podcast sets include professional studio gear, and podcast packages include crew options so you can focus on the conversation.',
       },
     ],
   },
@@ -266,7 +266,7 @@ export const studioGuides = [
     title: 'How to Choose the Best Studio for Your Shoot',
     shortTitle: 'Choose Your Studio',
     description:
-      'A decision guide for choosing between podcast rooms, green screen, photo services, photography studio rental, and white cyc rental studios in San Francisco.',
+      'A decision guide for choosing between podcast sets, green screen, photo services, photography studio rental, and white cyc rental studios in San Francisco.',
     keyword: 'best production studio san francisco',
     image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
     imageAlt: 'Parlor studio room prepared for a premium production at VibeShack Studios in San Francisco',
@@ -275,7 +275,7 @@ export const studioGuides = [
       'The right studio is the one that matches the asset you actually need. Start with the final deliverable, not the prettiest room. A podcast, product campaign, green screen composite, and white cyc social shoot all need different production conditions.',
     sections: [
       {
-        heading: 'Choose a podcast room for conversations',
+        heading: 'Choose a podcast set for conversations',
         body:
           'If the main asset is a conversation, interview, founder video, show episode, testimonial, or thought-leadership session, start with a podcast studio. The room design, seating, microphones, and camera angles are already built for people talking on camera.',
       },
@@ -317,7 +317,7 @@ export const studioGuides = [
       {
         question: 'Which VibeShack studio should I book first?',
         answer:
-          'Book a podcast room for interviews, green screen for virtual backgrounds, photography for stills, and Canvas Rental for clean white cyc photo or video.',
+          'Book a podcast set for interviews, green screen for virtual backgrounds, photography for stills, and Canvas Rental for clean white cyc photo or video.',
       },
       {
         question: 'Can I book multiple studios in one session?',

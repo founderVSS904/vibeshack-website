@@ -198,7 +198,7 @@ const deliverables = [
 const videoFaqs = [
   {
     question: 'Is VibeShack a full-service video production company?',
-    answer: 'VibeShack is a production studio with rooms built for video, photo, podcast, green screen, and content work. You can book rooms directly, bring your own crew, or contact us before booking if you want help scoping crew, cameras, lighting, creative direction, or production support.',
+    answer: 'VibeShack is a production studio with purpose-built sets for video, photo, podcast, green screen, and content work. You can book a studio directly, bring your own crew, or contact us before booking if you want help scoping crew, cameras, lighting, creative direction, or production support.',
   },
   {
     question: 'What video formats work best at VibeShack?',

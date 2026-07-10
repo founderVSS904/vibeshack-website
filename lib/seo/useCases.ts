@@ -9,14 +9,14 @@ export const useCases = [
     description:
       'For founders, hosts, agencies, and expert guests who need a conversation to look credible on camera and sound clean enough to publish.',
     image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
-    imageAlt: 'Premium podcast interview room with microphones at VibeShack Studios in San Francisco',
+    imageAlt: 'Signature podcast interview set with microphones at VibeShack Studios in San Francisco',
     imagePosition: '34% center',
     primaryPage: '/podcast-studio-san-francisco/',
     bookHref: '/book/?studio=the-executive',
     serviceType: 'Podcast Studio Rental',
     audience: ['Podcast hosts', 'Founders', 'Brand teams', 'Agencies', 'YouTube creators'],
     fastAnswer:
-      'Choose a podcast room when the conversation itself is the product: a founder interview, guest episode, expert panel, or thought-leadership recording that needs clean sound, flattering angles, and clips that can travel.',
+      'Choose a podcast set when the conversation itself is the product: a founder interview, guest episode, expert panel, or thought-leadership recording that needs clean sound, flattering angles, and clips that can travel.',
     clientNeed:
       'Most interview shoots fail in the invisible details: echo, awkward eyelines, lighting that makes guests look tired, and no plan for clips. The room should make the guest comfortable, the host confident, and the footage useful after the full episode is done.',
     decisionPoints: [
@@ -35,7 +35,7 @@ export const useCases = [
     ],
     idealFor: [
       'Founder or executive interviews that need to look credible on LinkedIn and YouTube',
-      'Guest podcasts where the room needs to make a non-professional guest feel relaxed',
+      'Guest podcasts where the set needs to make a non-professional guest feel relaxed',
       'Agency or brand interviews that need a clean long-form episode plus short-form clips',
     ],
     notFor: [
@@ -123,14 +123,14 @@ export const useCases = [
     proof: ['Broadcast microphones', 'Multi-camera rooms', 'Camera-ready sets', 'Crew options', '24/7 booking'],
     faqs: [
       {
-        question: 'What is the best VibeShack room for a two-person podcast?',
+        question: 'What is the best VibeShack set for a two-person podcast?',
         answer:
           'The Executive, The Wing, Parlor, Horizon, and Canvas Podcast can all work. The right choice depends on tone: executive table, intimate lounge, premium guest interview, LED backdrop, or clean cyc look.',
       },
       {
         question: 'Can I record video and audio at the same time?',
         answer:
-          'Yes. VibeShack podcast rooms are built for video podcasts, interviews, founder content, and social clips with professional audio and camera-ready setups.',
+          'Yes. VibeShack podcast sets are built for video podcasts, interviews, founder content, and social clips with professional audio and camera-ready setups.',
       },
     ],
   },
@@ -176,7 +176,7 @@ export const useCases = [
     ],
     roomMatches: [
       {
-        name: 'Podcast rooms',
+        name: 'Podcast sets',
         href: '/podcast-studio-san-francisco/',
         fit: 'Use for founder videos, interviews, expert clips, testimonials, and thought-leadership content.',
         price: '$300-$400/hr',
@@ -316,7 +316,7 @@ export const useCases = [
       {
         name: 'Encore',
         href: '/encore/',
-        fit: 'Best for productions that want a podcast-style room with green screen flexibility and crew-supported capture.',
+        fit: 'Best for productions that want a podcast-style set with green screen flexibility and crew-supported capture.',
         price: '$300/hr',
       },
       {

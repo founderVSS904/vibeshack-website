@@ -34,7 +34,7 @@ export const comparisons = [
     secondaryPage: '/book/',
     winner: 'Use a podcast studio when the content needs to look and sound like a real brand asset.',
     sections: [
-      { heading: 'Audio is the first quality signal', body: 'Offices have HVAC noise, glass reflections, hard walls, and interruptions. Podcast rooms are built around microphones, controlled sound, and camera-ready conversations.' },
+      { heading: 'Audio is the first quality signal', body: 'Offices have HVAC noise, glass reflections, hard walls, and interruptions. Podcast sets are built around microphones, controlled sound, and camera-ready conversations.' },
       { heading: 'Visual consistency is hard to fake', body: 'A dedicated studio keeps lighting, seating, camera positions, and background choices consistent across episodes and clips.' },
       { heading: 'Your team moves faster', body: 'When cameras, mics, and lighting are ready, the session becomes about content instead of troubleshooting gear.' },
     ],
