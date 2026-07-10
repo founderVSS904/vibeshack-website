@@ -175,7 +175,7 @@ export default function PodcastStudiosPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(podcastServiceSchema) }}
       />
 
-      <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-black pt-[70px] text-white">
+      <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-black pt-20 text-white">
         <Image
           src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg"
           alt="Podcast recording in The Executive at VibeShack Studios"
@@ -186,8 +186,8 @@ export default function PodcastStudiosPage() {
           style={{ objectPosition: 'center center' }}
         />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_95%_38%,rgba(0,46,255,0.3),transparent_17%),linear-gradient(90deg,rgba(0,0,0,0.66)_0%,rgba(0,0,0,0.22)_34%,rgba(0,0,0,0.06)_64%,rgba(0,0,0,0.68)_100%),linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.1)_47%,rgba(0,0,0,0.84)_100%)]" />
-        <div className="absolute inset-y-[70px] left-0 hidden w-24 bg-[linear-gradient(90deg,rgba(0,0,0,0.86),transparent)] lg:block" />
-        <div className="absolute inset-y-[70px] right-0 hidden w-36 bg-[linear-gradient(270deg,rgba(0,0,0,0.94),transparent)] lg:block" />
+        <div className="absolute inset-y-20 left-0 hidden w-24 bg-[linear-gradient(90deg,rgba(0,0,0,0.86),transparent)] lg:block" />
+        <div className="absolute inset-y-20 right-0 hidden w-36 bg-[linear-gradient(270deg,rgba(0,0,0,0.94),transparent)] lg:block" />
 
         <div className="relative z-10 mx-auto flex w-full flex-1 flex-col justify-end px-6 pb-0 pt-16 sm:px-10 lg:px-[110px]">
           <div className="grid flex-1 items-end gap-8 pb-6 lg:grid-cols-1 lg:pb-[33px]">
