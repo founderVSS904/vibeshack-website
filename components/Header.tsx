@@ -77,8 +77,9 @@ export default function Header() {
   const pathname = usePathname()
   const [dismissedMenu, setDismissedMenu] = useState<string | null>(null)
   const isOurWorkPage = pathname === '/our-work' || pathname === '/our-work/'
-  // The landing page uses the same header as every other page, matching the
-  // production site look Tay signed off on.
+  const isPodcastLandingPage = pathname === '/podcast-studio-san-francisco' || pathname === '/podcast-studio-san-francisco/'
+  // Most pages use the signed-off shared header. The podcast landing page uses
+  // a tighter campaign header to match its reference mockup.
   const headerClassName = 'site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black transition-colors duration-200'
   const headerContainerClassName = isOurWorkPage
     ? 'mx-auto w-full px-9'
@@ -100,6 +101,56 @@ export default function Header() {
         ? 'text-white after:absolute after:left-0 after:right-0 after:-bottom-2 after:h-0.5 after:bg-brand-red'
         : ''
     }`
+  }
+
+  if (isPodcastLandingPage) {
+    return (
+      <header className="site-header fixed left-0 right-0 top-0 z-50 bg-black">
+        <div className="mx-auto flex h-[70px] w-full max-w-[1440px] items-center justify-between px-0 max-[1500px]:px-8">
+          <Link
+            href="/"
+            aria-label="VibeShack Studios home"
+            className="flex w-[160px] flex-shrink-0 flex-col items-center justify-center leading-none transition-opacity duration-200 hover:opacity-80"
+          >
+            <span className="block text-[27px] font-black uppercase tracking-[-0.04em] text-white">Vibeshack</span>
+            <span className="-mt-0.5 block text-[15px] font-black uppercase tracking-[0.18em] text-brand-red">Studios</span>
+          </Link>
+
+          <nav className="hidden translate-x-[135px] items-center gap-[50px] xl:flex" aria-label="Podcast page primary">
+            <Link href="/podcast-studio-san-francisco/" className="text-[13px] font-black uppercase tracking-[0.02em] text-white transition-colors hover:text-brand-red">Studios</Link>
+            <Link href="/video-production/" className="text-[13px] font-black uppercase tracking-[0.02em] text-white transition-colors hover:text-brand-red">Production</Link>
+            <Link href="/services/" className="text-[13px] font-black uppercase tracking-[0.02em] text-white transition-colors hover:text-brand-red">Crew</Link>
+            <Link href="/pricing/" className="text-[13px] font-black uppercase tracking-[0.02em] text-white transition-colors hover:text-brand-red">Pricing</Link>
+            <Link href="/about/" className="text-[13px] font-black uppercase tracking-[0.02em] text-white transition-colors hover:text-brand-red">About</Link>
+            <Link href="/contact/" className="text-[13px] font-black uppercase tracking-[0.02em] text-white transition-colors hover:text-brand-red">Contact</Link>
+          </nav>
+
+          <div className="flex items-center">
+            <Link
+              href="/book/?service=podcast"
+              prefetch={false}
+              className="hidden h-[38px] w-[172px] items-center justify-center rounded-full bg-brand-red text-[13px] font-black uppercase tracking-[0.02em] text-white transition-colors hover:bg-red-700 sm:inline-flex"
+            >
+              Book a Session
+            </Link>
+
+            <details className="group xl:hidden">
+              <summary className="ml-4 list-none p-2 text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+                <span className="sr-only">Toggle menu</span>
+                <svg className="h-5 w-5 group-open:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <svg className="hidden h-5 w-5 group-open:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </summary>
+
+              <MobileMenu />
+            </details>
+          </div>
+        </div>
+      </header>
+    )
   }
 
   return (

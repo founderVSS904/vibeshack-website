@@ -22,6 +22,7 @@ const studios = [
     href: '/the-executive/',
     bookHref: '/book/?studio=the-executive',
     img: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
+    thumb: '/studio-images/the-executive-hero.jpg',
     series: 'Walnut Series',
     desc: 'Boardroom table, wood slat walls, and a polished interview look.',
     price: '$300/hr',
@@ -32,6 +33,7 @@ const studios = [
     href: '/the-wing/',
     bookHref: '/book/?studio=the-wing',
     img: '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg',
+    thumb: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg',
     series: 'Walnut Series',
     desc: 'Warm two-person conversation set with a close, natural feel.',
     price: '$300/hr',
@@ -42,6 +44,7 @@ const studios = [
     href: '/encore/',
     bookHref: '/book/?studio=encore',
     img: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg',
+    thumb: '/studio-images/parlor-hero.jpg',
     series: 'Vault Series',
     desc: 'Black acoustic room with a clean, cinematic podcast setup.',
     price: '$300/hr',
@@ -52,6 +55,7 @@ const studios = [
     href: '/sunset-studio/',
     bookHref: '/book/?studio=sunset',
     img: '/studio-images/sunset-hero-v20260509.jpg',
+    thumb: '/studio-images/horizon-hero.jpg',
     series: 'Creative Series',
     desc: 'Programmable color backdrop for a show with its own mood.',
     price: '$300/hr',
@@ -62,6 +66,7 @@ const studios = [
     href: '/parlor/',
     bookHref: '/book/?studio=parlor',
     img: '/studio-images/parlor-production-v20260509.jpg',
+    thumb: '/studio-images/parlor-production-v20260509.jpg',
     series: 'Premium',
     desc: 'Lounge-style interview setup with premium seating and crew.',
     price: '$400/hr',
@@ -72,6 +77,7 @@ const studios = [
     href: '/horizon/',
     bookHref: '/book/?studio=horizon',
     img: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
+    thumb: '/studio-images/sunset-blue.jpg',
     series: 'Premium',
     desc: 'Immersive warm set for conversations with a show-level look.',
     price: '$400/hr',
@@ -82,6 +88,7 @@ const studios = [
     href: '/canvas-podcast/',
     bookHref: '/book/?studio=canvas-podcast',
     img: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg',
+    thumb: '/studio-images/the-wing-hero.jpg',
     series: 'Premium',
     desc: 'Custom LED backdrop, cinema lighting, and room to scale.',
     price: '$400/hr',
@@ -109,7 +116,7 @@ const heroStats = [
     ),
   },
   {
-    label: 'Crew Ready',
+    label: 'Crew Optional',
     value: 'Crew',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
@@ -168,7 +175,7 @@ export default function PodcastStudiosPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(podcastServiceSchema) }}
       />
 
-      <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-black pt-20 text-white">
+      <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-black pt-[70px] text-white">
         <Image
           src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg"
           alt="Podcast recording in The Executive at VibeShack Studios"
@@ -176,54 +183,53 @@ export default function PodcastStudiosPage() {
           priority
           className="object-cover"
           sizes="100vw"
-          style={{ objectPosition: 'center 42%' }}
+          style={{ objectPosition: 'center center' }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_88%_40%,rgba(0,64,255,0.26),transparent_17%),linear-gradient(90deg,rgba(0,0,0,0.78)_0%,rgba(0,0,0,0.56)_28%,rgba(0,0,0,0.08)_58%,rgba(0,0,0,0.58)_100%),linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.18)_44%,#000_100%)]" />
-        <div className="absolute inset-y-20 left-0 hidden w-24 bg-[linear-gradient(90deg,rgba(0,0,0,0.92),transparent)] lg:block" />
-        <div className="absolute inset-y-20 right-0 hidden w-32 bg-[linear-gradient(270deg,rgba(0,0,0,0.9),transparent)] lg:block" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_95%_38%,rgba(0,46,255,0.3),transparent_17%),linear-gradient(90deg,rgba(0,0,0,0.66)_0%,rgba(0,0,0,0.22)_34%,rgba(0,0,0,0.06)_64%,rgba(0,0,0,0.68)_100%),linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.1)_47%,rgba(0,0,0,0.84)_100%)]" />
+        <div className="absolute inset-y-[70px] left-0 hidden w-24 bg-[linear-gradient(90deg,rgba(0,0,0,0.86),transparent)] lg:block" />
+        <div className="absolute inset-y-[70px] right-0 hidden w-36 bg-[linear-gradient(270deg,rgba(0,0,0,0.94),transparent)] lg:block" />
 
-        <div className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-1 flex-col justify-end px-6 pb-0 pt-16 sm:px-10 lg:px-16">
-          <div className="grid flex-1 items-end gap-8 pb-6 lg:grid-cols-[minmax(0,0.62fr)_minmax(360px,0.38fr)] lg:pb-10">
-            <div className="max-w-4xl">
-              <p className="mb-5 text-xs font-black uppercase tracking-[0.26em] text-white/60">
-                VibeShack Studios / SF Northern Waterfront
-              </p>
-              <h1 className="max-w-5xl font-black uppercase leading-[0.84] text-white" style={{ fontSize: 'clamp(4.25rem, 10.2vw, 10.8rem)', letterSpacing: 0 }}>
-                Podcast<br />
-                <span className="text-brand-red">Studios</span>
+        <div className="relative z-10 mx-auto flex w-full flex-1 flex-col justify-end px-6 pb-0 pt-16 sm:px-10 lg:px-[110px]">
+          <div className="grid flex-1 items-end gap-8 pb-6 lg:grid-cols-1 lg:pb-[33px]">
+            <div className="max-w-[650px]">
+              <h1 className="font-black uppercase leading-[0.91] text-white" style={{ fontSize: 'clamp(4.25rem, 6vw, 6.5rem)', letterSpacing: 0 }}>
+                <span className="inline-block origin-left scale-x-[1.21]">Podcast</span><br />
+                <span className="inline-block origin-left scale-x-[1.2] text-brand-red">Studios</span>
               </h1>
-              <div className="mt-6 h-1 w-20 bg-brand-red" />
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/90 sm:text-2xl">
+              <div className="mt-4 h-[4px] w-[72px] bg-brand-red" />
+              <p className="mt-4 max-w-[620px] text-lg leading-[1.2] text-white/90 sm:text-[26px]">
                 3-camera 4K. Broadcast audio. Crew ready.
               </p>
-              <div className="mt-7 flex flex-wrap items-center gap-4">
+              <div className="mt-7 flex flex-wrap items-center gap-[18px]">
                 <Link
                   href="/book/?service=podcast"
                   prefetch={false}
-                  className="inline-flex min-h-12 items-center justify-center rounded-md bg-brand-red px-7 text-sm font-black uppercase tracking-[0.08em] text-white transition-colors hover:bg-red-700"
+                  className="inline-flex h-[52px] w-[216px] items-center justify-center rounded-md bg-brand-red text-[15px] font-black uppercase tracking-[0.03em] text-white transition-colors hover:bg-red-700"
                 >
                   Book a Session
                 </Link>
                 <Link
                   href="#rooms"
-                  className="inline-flex min-h-12 items-center justify-center rounded-md border border-white/70 px-7 text-sm font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-white hover:bg-white/10"
+                  className="inline-flex h-[52px] w-[228px] items-center justify-center rounded-md border border-white/80 text-[15px] font-black uppercase tracking-[0.03em] text-white transition-colors hover:border-white hover:bg-white/10"
                 >
                   Compare Rooms
                 </Link>
               </div>
             </div>
 
-            <aside className="rounded-md border border-white/20 bg-black/50 p-5 shadow-2xl backdrop-blur-md lg:self-end">
-              <div className="grid grid-cols-3 divide-x divide-white/20 border-b border-white/10 pb-5">
+            <aside className="rounded-md border border-white/20 bg-black/55 px-5 py-6 shadow-2xl backdrop-blur-md lg:absolute lg:bottom-[188px] lg:right-[68px] lg:w-[510px]">
+              <div className="grid grid-cols-3 divide-x divide-white/20 border-b border-white/20 pb-4">
                 {heroStats.map(({ label, value, icon }) => (
-                  <div key={label} className="flex flex-col items-center gap-2 px-2 text-center">
+                  <div key={label} className="flex items-center justify-center gap-3 px-2 text-left">
                     <span className="text-white/90">{icon}</span>
-                    <span className="text-3xl font-black leading-none text-white">{value}</span>
-                    <span className="text-[10px] font-bold uppercase leading-tight tracking-[0.12em] text-white/70">{label}</span>
+                    <span>
+                      <span className="block text-[28px] font-black uppercase leading-none text-white">{value}</span>
+                      <span className="block text-[10px] font-bold uppercase leading-tight tracking-[0.08em] text-white/80">{label}</span>
+                    </span>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-white/70">
+              <div className="mt-4 flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-[0.12em] text-white/80">
                 <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
                   <path d="M12 21s7-6.1 7-12A7 7 0 1 0 5 9c0 5.9 7 12 7 12Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
                   <path d="M12 11.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
@@ -233,21 +239,21 @@ export default function PodcastStudiosPage() {
             </aside>
           </div>
 
-          <div id="rooms" className="border-t border-white/10 bg-black/80 py-5 backdrop-blur-md">
-            <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-center">
+          <div id="rooms" className="relative left-1/2 w-screen -translate-x-1/2 border-t border-white/10 bg-black/80 py-[17px] backdrop-blur-md">
+            <div className="relative mx-auto grid gap-5 px-6 sm:px-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-center lg:px-[110px]">
               <div>
-                <h2 className="text-lg font-black uppercase tracking-[0.03em] text-white">Choose your room</h2>
-                <p className="mt-2 text-sm leading-relaxed text-white/60">Each studio. Each vibe. Built for your show.</p>
+                <h2 className="text-[18px] font-black uppercase tracking-[0.02em] text-white">Choose your room</h2>
+                <p className="mt-3 text-[15px] leading-[1.35] text-white/70">Each studio. Each vibe.<br className="hidden lg:block" /> Built for your show.</p>
               </div>
-              <div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {studios.map((studio) => (
                   <Link
                     key={studio.name}
                     href={studio.href}
-                    className="group relative h-[118px] w-[214px] shrink-0 overflow-hidden rounded border border-white/10 bg-zinc-950 transition-colors hover:border-brand-red"
+                    className="group relative h-[136px] w-[196px] shrink-0 overflow-hidden rounded border border-white/10 bg-zinc-950 transition-colors hover:border-brand-red"
                   >
                     <Image
-                      src={studio.img}
+                      src={studio.thumb}
                       alt={`${studio.fullName} podcast studio`}
                       width={428}
                       height={236}
@@ -264,6 +270,9 @@ export default function PodcastStudiosPage() {
                   </Link>
                 ))}
               </div>
+              <span aria-hidden="true" className="absolute right-8 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-2xl leading-none text-white/90 backdrop-blur 2xl:flex">
+                &rsaquo;
+              </span>
             </div>
           </div>
         </div>
