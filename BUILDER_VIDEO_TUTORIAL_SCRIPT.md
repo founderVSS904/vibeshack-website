@@ -104,7 +104,7 @@ A complete script for creating tutorial videos. Each section is ~2-3 minutes.
 **[Edit red text]**
 
 **Voiceover:**
-"Perfect. And finally, the location. 'San Francisco's Premier Studio'."
+"Perfect. And finally, the location. 'San Francisco's Production Studio'."
 
 **[Edit location]**
 

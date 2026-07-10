@@ -20,8 +20,6 @@ const studios = [
     bookHref: '/book/?studio=canvas-rental',
     img: '/studio-images/inside-canvas-cyc-v20260509.jpg',
     series: 'Creative Series',
-    seriesColor: '#99f6e4',
-    seriesBg: 'rgba(13,148,136,0.3)',
     desc: 'Seamless white cyc wall. Overhead lighting grid. Podcast and photo ready.',
     price: '$100',
   },
@@ -31,8 +29,6 @@ const studios = [
     bookHref: '/book/?studio=photography',
     img: '/studio-images/inside-photography-red-v20260509.jpg',
     series: 'Creative Series',
-    seriesColor: '#99f6e4',
-    seriesBg: 'rgba(13,148,136,0.3)',
     desc: 'Professional lighting. White backdrop. Hair & Makeup room on-site.',
     price: '$100',
   },
@@ -42,8 +38,6 @@ const studios = [
     bookHref: '/book/?studio=green-screen',
     img: '/studio-images/inside-green-screen-v20260509.jpg',
     series: 'Creative Series',
-    seriesColor: '#99f6e4',
-    seriesBg: 'rgba(13,148,136,0.3)',
     desc: '750 sqft floor-to-ceiling green screen. Full lighting grid.',
     price: '$100',
   },
@@ -118,10 +112,9 @@ export default function RentalStudiosPage() {
                   fill className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out" />
                 <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)'}} />
 
-                {/* Series badge */}
+                {/* Series label */}
                 <div className="absolute top-5 left-5">
-                  <span className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full"
-                    style={{background: s.seriesBg, color: s.seriesColor}}>
+                  <span className="text-xs font-bold tracking-widest uppercase text-white/70">
                     {s.series}
                   </span>
                 </div>

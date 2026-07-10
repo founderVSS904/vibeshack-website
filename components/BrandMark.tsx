@@ -45,6 +45,7 @@ export function BrandMark({
       height={mark.height}
       sizes={mark.sizes}
       priority={priority}
+      fetchPriority={priority ? 'high' : undefined}
       className={className}
     />
   )

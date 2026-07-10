@@ -600,6 +600,27 @@ export async function assertCartSlotsAvailable(cartItems: BookingCartItem[]) {
   return { ok: true, status: 200, error: '' }
 }
 
+export async function hasBookingEventsForRef(bookingRef: string, studioIds: string[]) {
+  if (!bookingRef) return false
+
+  const checkedCalendarIds = new Set<string>()
+  for (const studioId of studioIds) {
+    const config = await getCalendarConfig(studioId)
+    if (!config || checkedCalendarIds.has(config.calendarId)) continue
+    checkedCalendarIds.add(config.calendarId)
+
+    const existing = await config.client.events.list({
+      calendarId: config.calendarId,
+      privateExtendedProperty: [`bookingRef=${bookingRef}`],
+      showDeleted: false,
+      maxResults: 1,
+    })
+    if (existing.data.items?.length) return true
+  }
+
+  return false
+}
+
 export async function addBookingEvents(
   cartItems: BookingCartItem[],
   customer: { name: string; email: string; phone: string },

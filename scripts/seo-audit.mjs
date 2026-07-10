@@ -1,5 +1,9 @@
 const baseUrl = (process.env.SEO_AUDIT_BASE_URL || 'https://www.vibeshackstudios.com').replace(/\/$/, '')
 const productionUrl = 'https://www.vibeshackstudios.com'
+
+if (!process.env.SEO_AUDIT_BASE_URL) {
+  console.warn('SEO_AUDIT_BASE_URL is not set, so this run audits PRODUCTION. Set SEO_AUDIT_BASE_URL=http://localhost:3011 to audit a local build.')
+}
 const requiredPaths = [
   '/',
   '/podcast-studio-san-francisco/',

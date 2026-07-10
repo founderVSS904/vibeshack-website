@@ -7,25 +7,60 @@ import { breadcrumbSchema, faqSchema, studioServiceSchema } from '@/lib/schemas'
 export const metadata: Metadata = {
   title: 'Video Production SF',
   description:
-    'San Francisco video production for social content, music videos, commercials, founder videos, and product demos. Contact us for a scoped quote.',
+    'San Francisco video production for product launch commercials, social content, micro documentaries, music videos, talking-head videos, commercials, and product demos.',
   alternates: {
     canonical: 'https://www.vibeshackstudios.com/video-production/',
   },
   openGraph: {
     title: 'Video Production San Francisco | VibeShack Studios',
     description:
-      'Plan social content, music videos, commercials, founder films, product demos, green screen, interviews, and campaign video days at VibeShack Studios. Contact us for a scoped quote.',
+      'Plan product launch commercials, social content, documentaries, music videos, talking-head videos, product demos, interviews, and campaign video days at VibeShack Studios.',
     url: 'https://www.vibeshackstudios.com/video-production/',
     images: ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg'],
   },
 }
 
 const serviceTabs = [
+  { href: '/commercials/', label: 'Commercials', active: false },
   { href: '/photo-services/', label: 'Photo Services', active: false },
   { href: '/video-production/', label: 'Video Production', active: true },
+  { href: '/branding/', label: 'Branding', active: false },
   { href: '/podcast-studio-san-francisco/', label: 'Podcast', active: false },
   { href: '/green-screen-studio-sf/', label: 'Green Screen', active: false },
   { href: '/canvas-rental/', label: 'White Cyc', active: false },
+]
+
+const subServices = [
+  {
+    eyebrow: 'Launch',
+    title: 'Product launch commercials',
+    body: 'Hero launch spots, product beauty shots, landing-page video, paid ads, and launch cutdowns.',
+  },
+  {
+    eyebrow: 'Social',
+    title: 'Social media content',
+    body: 'Reels, TikToks, Shorts, creator-style batches, hooks, thumbnails, stills, and campaign variations.',
+  },
+  {
+    eyebrow: 'Story',
+    title: 'Documentaries and micro docs',
+    body: 'Short 5 to 10 minute pieces for founders, artists, local stories, nonprofits, and brand stories with a human spine.',
+  },
+  {
+    eyebrow: 'Artist',
+    title: 'Music videos',
+    body: 'Performance videos, artist visuals, cover frames, teasers, vertical moments, and rollout content.',
+  },
+  {
+    eyebrow: 'Ad',
+    title: 'Commercials',
+    body: 'Scripted spots, campaign videos, product ads, service explainers, testimonials, and web hero videos.',
+  },
+  {
+    eyebrow: 'Authority',
+    title: 'Talking-head videos',
+    body: 'Founder videos, expert content, executive messages, course modules, training clips, and interview-led brand films.',
+  },
 ]
 
 const videoFormats = [
@@ -48,7 +83,16 @@ const videoFormats = [
     bestRoom: 'Canvas, Green Screen, Photography Studio, or a warm interview set depending on whether the spot needs product clarity, performance, or brand presence.',
   },
   {
-    eyebrow: '03 / Music',
+    eyebrow: '03 / Documentary',
+    title: 'Documentaries and micro docs',
+    image: '/studio-images/work-beyond-map-documentary-v20260623.png',
+    alt: 'Cinematic micro documentary concept image for VibeShack Studios video production',
+    objectPosition: 'center 38%',
+    pressure: 'A 10-minute story still needs structure: a clear subject, emotional arc, interview spine, supporting visuals, and a reason for the viewer to stay.',
+    bestRoom: 'Use warm rooms for interviews, controlled studio space for portrait moments, and planned B-roll days when the story needs outside context.',
+  },
+  {
+    eyebrow: '04 / Music',
     title: 'Music videos and artist visuals',
     image: '/studio-images/canvas-rental-music-v1775095665.jpg',
     alt: 'Minimal white cyc music video visual made at VibeShack Studios San Francisco',
@@ -57,16 +101,16 @@ const videoFormats = [
     bestRoom: 'Canvas works for clean performance visuals, green screen works for world-building, and warm rooms can carry intimate acoustic or interview-style artist content.',
   },
   {
-    eyebrow: '04 / Brand',
+    eyebrow: '05 / Brand',
     title: 'Founder videos and brand films',
     image: '/studio-images/enhanced-horizon-warm-guest-closeup-v20260510.jpg',
     alt: 'Founder-style on-camera interview setup for brand films at VibeShack Studios',
     objectPosition: 'center center',
     pressure: 'The person on camera has to feel credible, human, and visually aligned with the brand. The wrong background can make good messaging feel small.',
-    bestRoom: 'Horizon, Parlor, Sunset, The Executive, or Premier when you want a more finished editorial interview or founder-led brand piece.',
+    bestRoom: 'Horizon, Parlor, Sunset, or The Executive when you want a more finished editorial interview or founder-led brand piece.',
   },
   {
-    eyebrow: '05 / Product',
+    eyebrow: '06 / Product',
     title: 'Product demos and explainers',
     image: '/studio-images/guide-green-screen-prep-v20260509.jpg',
     alt: 'Green screen studio for product demo and explainer video production at VibeShack Studios',
@@ -142,6 +186,7 @@ const productionPricing = [
 const deliverables = [
   '15s, 30s, and 60s ad cuts',
   'Vertical Reels, TikToks, and Shorts',
+  '5 to 10 minute micro documentaries',
   'Music video scenes and artist teasers',
   'Founder videos and brand story films',
   'Product demos and launch explainers',
@@ -176,7 +221,7 @@ const videoFaqs = [
 const videoServiceSchema = studioServiceSchema({
   name: 'Video Production Services in San Francisco',
   description:
-    'Video production services and studio spaces in San Francisco for social media content, music videos, commercials, founder videos, product demos, training content, green screen, video podcasts, and brand content.',
+    'Video production services and studio spaces in San Francisco for product launch commercials, social media content, micro documentaries, music videos, talking-head videos, commercials, product demos, green screen, video podcasts, and brand content.',
   url: 'https://www.vibeshackstudios.com/video-production/',
   image: 'https://www.vibeshackstudios.com/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
   serviceType: 'Video Production Services',
@@ -222,10 +267,10 @@ export default function VideoProductionPage() {
           <div className="max-w-4xl">
             <p className="number-label mb-8">Video Production San Francisco</p>
             <h1 className="font-black text-white leading-[0.95] mb-8" style={{ fontSize: 'clamp(2.45rem, 5.7vw, 5.8rem)', letterSpacing: 0 }}>
-              Social content, commercials, music videos.
+              Product launches, commercials, micro docs.
             </h1>
             <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mb-10">
-              Plan video production at VibeShack for social media content, music videos, commercials, founder videos, product demos, interviews, green screen, and full brand content days.
+              Plan video production at VibeShack for product launch videos, social media content, documentaries, music videos, commercials, founder videos, product demos, interviews, green screen, and full brand content days.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 border-y border-white/10 mb-10 max-w-3xl">
               {[
@@ -267,6 +312,30 @@ export default function VideoProductionPage() {
               >
                 {label}
               </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 sm:py-24 bg-black border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="max-w-4xl mb-12">
+            <span className="number-label mb-6 block">Video services</span>
+            <h2 className="text-white font-black leading-tight mb-6 text-4xl sm:text-5xl lg:text-6xl" style={{ letterSpacing: 0 }}>
+              Make the video page sell the thing they already need.
+            </h2>
+            <p className="text-gray-500 text-base sm:text-lg leading-relaxed max-w-2xl">
+              Video production can cover a lot, so the first screen after the click should name the profitable paths clearly.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {subServices.map(({ eyebrow, title, body }) => (
+              <article key={title} className="rounded-lg border border-white/10 bg-zinc-950 p-6">
+                <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-red">{eyebrow}</p>
+                <h3 className="mb-4 text-2xl font-black leading-tight text-white" style={{ letterSpacing: 0 }}>{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-500">{body}</p>
+              </article>
             ))}
           </div>
         </div>

@@ -1,0 +1,239 @@
+export type WorkCategorySlug =
+  | 'all'
+  | 'music-videos'
+  | 'series'
+  | 'sports'
+  | 'events'
+
+export type WorkProject = {
+  slug: string
+  title: string
+  category: Exclude<WorkCategorySlug, 'all'>
+  categoryLabel: string
+  client: string
+  detail?: string
+  image: string
+  alt: string
+  objectPosition?: string
+  year: string
+  youtubeId: string
+  serviceHref: string
+  serviceLabel: string
+  summary: string
+  credits: string[]
+}
+
+export type ShotAtVibeshackItem = {
+  title: string
+  detail: string
+  youtubeId: string
+  image: string
+  alt: string
+  objectPosition?: string
+}
+
+export const workCategories: { slug: WorkCategorySlug; label: string }[] = [
+  { slug: 'all', label: 'All Work' },
+  { slug: 'music-videos', label: 'Music Videos' },
+  { slug: 'series', label: 'Series' },
+  { slug: 'sports', label: 'Sports' },
+  { slug: 'events', label: 'Events' },
+]
+
+export const featuredWorkProject: WorkProject = {
+  slug: 'body-is-tea',
+  title: 'Body Is Tea',
+  category: 'music-videos',
+  categoryLabel: 'Music Video',
+  client: 'Varii x Josh Sidhu',
+  image: '/studio-images/work-body-is-tea-music-v20260708b.jpg',
+  alt: 'Body Is Tea music video title card with dancers in a sunny driveway',
+  objectPosition: 'center',
+  year: '2026',
+  youtubeId: '3Rbir7bu408',
+  serviceHref: '/video-production/',
+  serviceLabel: 'Video production',
+  summary:
+    'A summer-soaked music video for Varii and Josh Sidhu: lowriders, dancers, and golden-hour driveways, presented by VibeShack Studios.',
+  credits: ['Presented by VibeShack Studios', 'Directed by Gill'],
+}
+
+export const workProjects: WorkProject[] = [
+  {
+    slug: 'the-buzzer',
+    title: 'The Buzzer',
+    category: 'series',
+    categoryLabel: 'Series',
+    client: 'Silicon Mania',
+    image: '/studio-images/work-the-buzzer-silicon-mania-v20260708.jpg',
+    alt: 'The Buzzer title card over the Silicon Mania pitch show set',
+    year: '2026',
+    youtubeId: '3mLFnCovlF8',
+    serviceHref: '/video-production/',
+    serviceLabel: 'Video production',
+    summary:
+      'A pitch show where founders pitch real investors, and the investors hold a buzzer that can end the meeting. Shot on a clean white set at VibeShack.',
+    credits: ['A Silicon Mania production', 'Shot at VibeShack Studios'],
+  },
+  {
+    slug: 'wing-battle',
+    title: 'Wing Battle',
+    category: 'events',
+    categoryLabel: 'Event Film',
+    client: "Melinda's Foods",
+    image: '/studio-images/work-wing-battle-melindas-v20260708b.jpg',
+    alt: "Melinda's Hot Sauce Wing Battle title card over grilled wings",
+    year: '2025',
+    youtubeId: 'tX5nk9EEBHs',
+    serviceHref: '/video-production/',
+    serviceLabel: 'Video production',
+    summary:
+      "Event coverage of Melinda's Hot Sauce Wing Battle in Hayward, CA: pit smoke, hot sauce, competitors, and the crown.",
+    credits: ["A Melinda's Hot Sauce event", 'Filmed in Hayward, CA'],
+  },
+  {
+    slug: 'damian-stone',
+    title: 'Damian Stone',
+    category: 'sports',
+    categoryLabel: 'Sports Film',
+    client: 'Oakland Ballers',
+    image: '/studio-images/work-damian-stone-film-v20260709.jpg',
+    alt: 'Damian Stone title card over an Oakland Ballers portrait',
+    year: '2026',
+    youtubeId: 'i-YfBQia7UI',
+    serviceHref: '/video-production/',
+    serviceLabel: 'Video production',
+    summary:
+      'A locker-room hype film for Oakland Ballers pitcher Damian Stone, built on ritual, texture, and game-day focus.',
+    credits: ['For the Oakland Ballers'],
+  },
+  {
+    slug: 'damian-stone-feature',
+    title: 'Damian Stone: Player Feature',
+    category: 'sports',
+    categoryLabel: 'Player Feature',
+    client: 'Oakland Ballers',
+    image: '/studio-images/work-damian-stone-feature-v20260709.jpg',
+    alt: 'Damian Stone player feature title card over the Oakland ballpark',
+    year: '2026',
+    youtubeId: 'WWF3sDSyLJw',
+    serviceHref: '/video-production/',
+    serviceLabel: 'Video production',
+    summary:
+      'A sit-down player feature with Oakland Ballers pitcher Damian Stone, cut between the interview chair and the ballpark.',
+    credits: ['Directed by Akar', 'For the Oakland Ballers'],
+  },
+  {
+    slug: 'evil-eye',
+    title: 'Evil Eye',
+    category: 'music-videos',
+    categoryLabel: 'Music Video',
+    client: 'Varii',
+    image: '/studio-images/work-evil-eye-varii-v20260709.jpg',
+    alt: 'Evil Eye title in red over the San Francisco waterfront at night',
+    year: '2026',
+    youtubeId: 'uNwd86wwgtc',
+    serviceHref: '/video-production/',
+    serviceLabel: 'Video production',
+    summary:
+      'A night-drenched music video for Varii: city skylines, a white Hummer under hard light, and red typography over San Francisco.',
+    credits: ['Presented by VibeShack', 'Night exteriors across San Francisco'],
+  },
+  {
+    slug: 'betrayed',
+    title: 'Betrayed',
+    category: 'music-videos',
+    categoryLabel: 'Visualizer',
+    client: 'Varii',
+    image: '/studio-images/work-betrayed-varii-v20260709.jpg',
+    alt: 'Betrayed title card beside a motorcycle helmet at night',
+    year: '2025',
+    youtubeId: 'Lmp5XUxPGYY',
+    serviceHref: '/video-production/',
+    serviceLabel: 'Video production',
+    summary:
+      'A moody motorcycle visualizer for Varii, shot at night on San Francisco streets in teal and sodium light.',
+    credits: ['Directed by Gill'],
+  },
+]
+
+export const allWorkProjects: WorkProject[] = [featuredWorkProject, ...workProjects]
+
+export function getWorkProject(slug: string) {
+  return allWorkProjects.find((project) => project.slug === slug)
+}
+
+// Client shows and sessions filmed at VibeShack, linked straight to YouTube.
+export const shotAtVibeshack: ShotAtVibeshackItem[] = [
+  {
+    title: 'unPAUSED',
+    detail: 'Toxins, stress, and your hormones',
+    youtubeId: 'ReIQcS8L6Hs',
+    image: '/studio-images/work-unpaused-haver-podcast-v20260708.jpg',
+    alt: 'unPAUSED podcast recording in The Executive at VibeShack Studios',
+    objectPosition: '80% center',
+  },
+  {
+    title: 'unPAUSED',
+    detail: 'Your biological clock and fertility',
+    youtubeId: 'EFNL3qdbuTY',
+    image: '/studio-images/work-unpaused-clock-v20260709.jpg',
+    alt: 'unPAUSED podcast host recording in The Executive at VibeShack Studios',
+  },
+  {
+    title: 'Second Nature',
+    detail: 'The AI world has a human problem',
+    youtubeId: 'QMXrpJteBXA',
+    image: '/studio-images/work-second-nature-insider-v20260709.jpg',
+    alt: 'Second Nature podcast title frame on a white set at VibeShack Studios',
+  },
+  {
+    title: 'Second Nature',
+    detail: 'Why AI companies will fund conservation',
+    youtubeId: 'wcw1iTPfsBM',
+    image: '/studio-images/work-second-nature-conservation-v20260709.jpg',
+    alt: 'Second Nature podcast two-shot on a white set at VibeShack Studios',
+  },
+  {
+    title: 'Second Nature',
+    detail: '400 carbon accounting companies',
+    youtubeId: 'nkpMFBT1zV4',
+    image: '/studio-images/work-second-nature-carbon-v20260709.jpg',
+    alt: 'Second Nature podcast conversation at VibeShack Studios',
+  },
+  {
+    title: 'Vegas Veteran Voices',
+    detail: 'The man behind Terminal Lance',
+    youtubeId: 'E893IZTGmrQ',
+    image: '/studio-images/work-vegas-veteran-voices-v20260709.jpg',
+    alt: 'Vegas Veteran Voices interview at VibeShack Studios',
+  },
+  {
+    title: 'Scott Stephenson AI Show',
+    detail: 'Protecting your IP from AI training',
+    youtubeId: 'dKY24SpeYKo',
+    image: '/studio-images/work-scott-stephenson-v20260709.jpg',
+    alt: 'Scott Stephenson talk recorded at VibeShack Studios',
+  },
+  {
+    title: 'Jason Tartick',
+    detail: 'Ross Pomerantz, the BTS of Corporate Bro',
+    youtubeId: '4zd17_NxABw',
+    image: '/studio-images/work-tartick-corporate-bro-v20260709.jpg',
+    alt: 'Jason Tartick podcast conversation at VibeShack Studios',
+  },
+  {
+    title: 'Gavriella',
+    detail: 'Supernova, official music video',
+    youtubeId: 'J4ZKUYv4JqY',
+    image: '/studio-images/work-supernova-gavriella-v20260709.jpg',
+    alt: 'Gavriella Supernova music video frame',
+  },
+  {
+    title: 'Varii',
+    detail: 'Ballin Out, official video',
+    youtubeId: '2nJD5lCXbuo',
+    image: '/studio-images/work-ballin-out-varii-v20260709.jpg',
+    alt: 'Varii Ballin Out music video frame',
+  },
+]

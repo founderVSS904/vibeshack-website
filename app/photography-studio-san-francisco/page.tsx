@@ -313,7 +313,7 @@ export default function PhotographyStudioPage() {
                 Real photo work, not placeholder polish.
               </h2>
             </div>
-            <Link href="/made-at-vibeshack/" className="hidden md:block text-gray-600 hover:text-white text-sm transition-colors">More work made here</Link>
+            <Link href="/our-work/" className="hidden md:block text-gray-600 hover:text-white text-sm transition-colors">More work made here</Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">

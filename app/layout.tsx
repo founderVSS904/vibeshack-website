@@ -131,6 +131,9 @@ const localBusinessSchema = {
   knowsAbout: [
     'Podcast studio rental',
     'Green screen studio rental',
+    'Commercial video production',
+    'Editorial photoshoots',
+    'Branding and creative direction',
     'Photo services',
     'Headshot photography',
     'Portrait photography',

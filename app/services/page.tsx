@@ -7,12 +7,12 @@ import { breadcrumbSchema } from '@/lib/schemas'
 export const metadata: Metadata = {
   title: 'Production Services San Francisco',
   description:
-    "Choose the right VibeShack service for photoshoots, video production, podcast production, green screen, white cyc, and studio rentals in San Francisco.",
+    "Choose the right VibeShack service for podcasts, commercials, editorials, branding, portfolio proof, and studio rentals in San Francisco.",
   alternates: { canonical: 'https://www.vibeshackstudios.com/services/' },
   openGraph: {
     title: 'Production Services San Francisco | VibeShack Studios',
     description:
-      'Choose the right VibeShack path: photo services, video production, podcast production, green screen, white cyc, and studio rentals.',
+      'Choose the right VibeShack path: podcasts, commercials, editorials, branding, portfolio proof, and studio rentals.',
     url: 'https://www.vibeshackstudios.com/services/',
     images: ['/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg'],
   },
@@ -20,70 +20,70 @@ export const metadata: Metadata = {
 
 const services = [
   {
-    href: '/photo-services/',
-    title: 'Photo Services',
-    eyebrow: 'Headshots, portraits, products',
-    image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
-    alt: 'Creative photoshoot produced at VibeShack Studios San Francisco',
-    body:
-      'For clients who want help making the images, not just renting the room: headshots, founder portraits, product photos, campaign stills, press images, lookbooks, and content-day photography.',
-    price: 'Contact us',
-    fit: 'Done-for-you',
-  },
-  {
-    href: '/video-production/',
-    title: 'Video Production',
-    eyebrow: 'Social, music videos, commercials',
-    image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
-    alt: 'Production crew setting lights inside VibeShack Studios San Francisco',
-    body:
-      'For social media content, music videos, commercials, founder videos, product demos, launch content, interviews, and green screen work where the room has to support the edit.',
-    price: 'Contact us',
-    fit: 'Production path',
-  },
-  {
     href: '/podcast-studio-san-francisco/',
-    title: 'Podcast Production',
-    eyebrow: 'Cameras, microphones, crew',
+    title: 'Podcasts',
+    eyebrow: 'Rooms, cameras, crew',
     image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
-    alt: 'Two-person podcast production at VibeShack Studios San Francisco',
+    alt: 'Podcast production at VibeShack Studios San Francisco',
     body:
       'For video podcasts, interview series, internal shows, creator episodes, and branded conversations that need clean sound, cameras, lighting, and a repeatable setup.',
     price: '$300-$400/hr',
-    fit: 'Recorded content',
+    fit: 'Direct booking',
   },
   {
-    href: '/green-screen-studio-sf/',
-    title: 'Green Screen',
-    eyebrow: 'Clean key, controlled background',
-    image: '/studio-images/inside-green-screen-v20260509.jpg',
-    alt: 'Green screen studio at VibeShack Studios San Francisco',
+    href: '/commercials/',
+    title: 'Commercials',
+    eyebrow: 'Launches, ads, product',
+    image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
+    alt: 'Production crew setting lights inside VibeShack Studios San Francisco',
     body:
-      'For training modules, explainers, product demos, app walkthroughs, virtual sets, and composite work where separation, lighting, and control matter.',
-    price: '$100/hr',
-    fit: 'Room rental',
+      'For product launches, talking-head ads, founder videos, product demos, social ad batches, testimonials, and campaign video work.',
+    price: 'Contact us',
+    fit: 'Custom quote',
   },
   {
-    href: '/canvas-rental/',
-    title: 'White Cyc Rental',
-    eyebrow: 'Seamless white stage',
+    href: '/editorials/',
+    title: 'Editorials',
+    eyebrow: 'Fashion, beauty, portraits',
+    image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg',
+    alt: 'Editorial portrait photographed at VibeShack Studios San Francisco',
+    body:
+      'For fashion, beauty, cover art, lookbooks, founder portraits, campaign stills, and content-day photography with a stronger point of view.',
+    price: 'Contact us',
+    fit: 'Custom quote',
+  },
+  {
+    href: '/branding/',
+    title: 'Branding',
+    eyebrow: 'Identity, systems, launches',
+    image: '/studio-images/photo-gallery-red-blue-sunglasses-v20260520.jpg',
+    alt: 'Color-driven brand content at VibeShack Studios San Francisco',
+    body:
+      'For creative direction, visual identity, launch creative, content systems, pitch decks, campaign direction, and founder brand systems.',
+    price: 'Contact us',
+    fit: 'Custom quote',
+  },
+  {
+    href: '/rental-studios/',
+    title: 'Rentals',
+    eyebrow: 'White cyc, green screen, photo rooms',
     image: '/studio-images/inside-canvas-cyc-v20260509.jpg',
-    alt: 'White cyc wall rental studio at VibeShack Studios San Francisco',
+    alt: 'White cyc rental studio at VibeShack Studios San Francisco',
     body:
-      'For product shoots, social content, fashion tests, interviews, movement, and visual systems that need a clean seamless background.',
-    price: '$100/hr',
-    fit: 'Room rental',
+      'For crews who already have the photographer, operator, producer, shot list, and gear plan, and need the room, lighting, staging, and 24/7 access.',
+    price: 'From $100/hr',
+    fit: 'Direct booking',
   },
   {
-    href: '/photography-studio-san-francisco/',
-    title: 'Photography Studio Rental',
-    eyebrow: 'Bring your own photographer',
-    image: '/studio-images/inside-photography-red-v20260509.jpg',
-    alt: 'Photography studio rental room at VibeShack Studios San Francisco',
+    href: '/our-work/',
+    title: 'Our Work',
+    eyebrow: 'Portfolio, proof, taste',
+    image: '/studio-images/canvas-rental-music-v1775095665.jpg',
+    alt: 'Portfolio work made at VibeShack Studios San Francisco',
     body:
-      'For photographers and crews who already have the talent, camera, lighting plan, and team, and need the room, backdrops, makeup space, and staging area.',
-    price: '$100/hr',
-    fit: 'Room rental',
+      'For buyers who need to see the taste first: commercials, music videos, editorials, podcasts, brand content, and production proof.',
+    price: 'Explore',
+    fit: 'Proof path',
   },
 ]
 
@@ -116,15 +116,15 @@ const serviceItemList = {
 const routes = [
   {
     label: 'Need VibeShack to help make it?',
-    body: 'Start with Photo Services or Video Production when you want help planning the shoot, choosing the room, and shaping the final assets.',
+    body: 'Start with Commercials, Editorials, or Branding when you want help planning the work, choosing the room, and shaping final assets.',
   },
   {
     label: 'Need a polished recording setup?',
-    body: 'Start with Podcast Production when the format is a filmed conversation with cameras, microphones, lighting, and reliable turnaround.',
+    body: 'Start with Podcasts when the format is a filmed conversation with cameras, microphones, lighting, and reliable turnaround.',
   },
   {
     label: 'Already have the crew?',
-    body: 'Start with a rental room when your team has the photographer, operator, producer, shot list, and gear plan already handled.',
+    body: 'Start with Rentals when your team has the photographer, operator, producer, shot list, and gear plan already handled.',
   },
 ]
 
@@ -161,13 +161,13 @@ export default function ServicesPage() {
               Choose the right path for the shoot.
             </h1>
             <p className="text-gray-200 text-base leading-relaxed max-w-lg">
-              Start with the outcome, then pick the service or room that fits. VibeShack separates done-for-you production from room-only rentals so clients do not have to guess.
+              Start with the outcome, then pick the service or room that fits. VibeShack separates direct bookings, custom creative work, and proof-first portfolio browsing so clients do not have to guess.
             </p>
           </div>
 
           <div className="mt-12 flex flex-wrap gap-2 lg:max-w-3xl">
             {[
-              ['01', 'Photo and video services'],
+              ['01', 'Custom creative work'],
               ['02', 'Podcast production'],
               ['03', 'Room-only rentals'],
             ].map(([n, label]) => (
@@ -233,16 +233,16 @@ export default function ServicesPage() {
                 Start with what you need to leave with.
               </h2>
               <p className="text-gray-500 text-sm leading-relaxed max-w-md mt-6">
-                The cleanest booking experience happens when the service matches the final asset. A portrait session, a podcast episode, and a room rental should not be sold like the same product.
+                The cleanest buying experience happens when the service matches the final asset. A commercial, editorial shoot, podcast episode, branding project, and room rental should not be sold like the same product.
               </p>
             </div>
             <div className="divide-y divide-white/10 border-y border-white/10">
               {[
-                ['You need finished photos.', 'Choose Photo Services when the deliverable is headshots, portraits, product photos, campaign stills, album art, lookbook images, or press photos.'],
-                ['You need a finished video.', 'Choose Video Production when the deliverable is a founder video, interview, ad, training piece, demo, social cut, or green screen composite.'],
-                ['You need a filmed conversation.', 'Choose Podcast Production when the format depends on microphones, cameras, lighting, crew, and repeatable episode setup.'],
-                ['You already have the creative team.', 'Choose Photography Studio Rental, White Cyc Rental, or Green Screen when your photographer, producer, camera operator, or crew only needs the space.'],
-                ['You are not sure yet.', 'Use Find a Studio or book a tour. The goal is to choose the room after the shoot type is clear, not before.'],
+                ['You need a finished ad or launch video.', 'Choose Commercials when the deliverable is a product launch, talking-head ad, founder video, demo, testimonial, or social campaign.'],
+                ['You need campaign images.', 'Choose Editorials when the deliverable is fashion, beauty, portraits, cover art, lookbooks, press images, or campaign stills.'],
+                ['You need the brand system.', 'Choose Branding when the deliverable is creative direction, visual identity, launch assets, decks, or a repeatable content system.'],
+                ['You need a filmed conversation.', 'Choose Podcasts when the format depends on microphones, cameras, lighting, crew, and repeatable episode setup.'],
+                ['You already have the creative team.', 'Choose Rentals when your photographer, producer, camera operator, or crew only needs the space.'],
               ].map(([question, answer]) => (
                 <div key={question} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-12 py-7">
                   <p className="text-white font-semibold">{question}</p>

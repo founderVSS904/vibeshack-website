@@ -7,25 +7,60 @@ import { breadcrumbSchema, faqSchema } from '@/lib/schemas'
 export const metadata: Metadata = {
   title: 'Photo Services SF',
   description:
-    'Photo services in San Francisco for headshots, portraits, products, campaigns, lookbooks, press photos, and content days. Contact us for a scoped quote.',
+    'Photo services in San Francisco for product photography, headshots, food, portraits, weddings and events, campaigns, lookbooks, press photos, and content days.',
   alternates: {
     canonical: 'https://www.vibeshackstudios.com/photo-services/',
   },
   openGraph: {
     title: 'Photo Services San Francisco | VibeShack Studios',
     description:
-      'Book a produced photoshoot for headshots, portraits, products, campaigns, press photos, and content days. Contact us for a scoped quote.',
+      'Book a produced photoshoot for product photography, headshots, food, portraits, weddings and events, campaigns, press photos, and content days.',
     url: 'https://www.vibeshackstudios.com/photo-services/',
     images: ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg'],
   },
 }
 
 const serviceTabs = [
+  { href: '/editorials/', label: 'Editorials', active: false },
   { href: '/photo-services/', label: 'Photo Services', active: true },
+  { href: '/branding/', label: 'Branding', active: false },
   { href: '/video-production/', label: 'Video Production', active: false },
   { href: '/podcast-studio-san-francisco/', label: 'Podcast', active: false },
   { href: '/green-screen-studio-sf/', label: 'Green Screen', active: false },
   { href: '/canvas-rental/', label: 'White Cyc', active: false },
+]
+
+const subServices = [
+  {
+    eyebrow: 'Product',
+    title: 'Product photography',
+    body: 'Clean product stills, launch images, ecommerce crops, detail shots, campaign frames, and social assets.',
+  },
+  {
+    eyebrow: 'People',
+    title: 'Headshots and portraits',
+    body: 'Founder portraits, team headshots, press photos, artist portraits, executive profiles, and brand images.',
+  },
+  {
+    eyebrow: 'Food',
+    title: 'Food and beverage',
+    body: 'Menu images, packaged goods, drink launches, tabletop scenes, delivery-app crops, and social content.',
+  },
+  {
+    eyebrow: 'Fashion',
+    title: 'Editorials and lookbooks',
+    body: 'Lookbook images, wardrobe stories, model tests, beauty crops, campaign stills, and full-body frames.',
+  },
+  {
+    eyebrow: 'Events',
+    title: 'Wedding and event content',
+    body: 'Engagement portraits, editorial wedding details, announcement images, event portraits, and polished recap stills.',
+  },
+  {
+    eyebrow: 'Brand',
+    title: 'Content days',
+    body: 'A planned photo day for the images a brand needs across website, ads, social, decks, and launch material.',
+  },
 ]
 
 const shootTypes = [
@@ -239,7 +274,7 @@ const photoServiceSchema = {
   name: 'Photo Services in San Francisco',
   serviceType: 'Photography Services',
   description:
-    'Photoshoot services in San Francisco for headshots, portraits, product photography, brand campaigns, lookbooks, press photos, and content days.',
+    'Photoshoot services in San Francisco for product photography, food photography, headshots, portraits, weddings and events, brand campaigns, lookbooks, press photos, and content days.',
   url: 'https://www.vibeshackstudios.com/photo-services/',
   image: 'https://www.vibeshackstudios.com/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
   provider: {
@@ -351,6 +386,30 @@ export default function PhotoServicesPage() {
         </div>
       </section>
 
+      <section className="py-20 sm:py-24 bg-black border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="max-w-3xl mb-12">
+            <span className="number-label mb-6 block">Photography services</span>
+            <h2 className="text-white font-black leading-tight mb-6 text-4xl sm:text-5xl lg:text-6xl" style={{ letterSpacing: 0 }}>
+              Pick the photo job first, then we build the shoot.
+            </h2>
+            <p className="text-gray-500 text-base sm:text-lg leading-relaxed max-w-2xl">
+              The homepage tile should not lead to a vague gallery. It should lead to clear, buyable photo paths people already understand.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {subServices.map(({ eyebrow, title, body }) => (
+              <article key={title} className="rounded-lg border border-white/10 bg-zinc-950 p-6">
+                <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-red">{eyebrow}</p>
+                <h3 className="mb-4 text-2xl font-black leading-tight text-white" style={{ letterSpacing: 0 }}>{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-500">{body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-28 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="max-w-3xl mb-20">
@@ -402,7 +461,7 @@ export default function PhotoServicesPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="mb-8 flex items-center justify-between gap-6">
             <span className="number-label">Gallery</span>
-            <Link href="/made-at-vibeshack/" className="text-gray-600 hover:text-white text-sm font-semibold transition-colors">
+            <Link href="/our-work/" className="text-gray-600 hover:text-white text-sm font-semibold transition-colors">
               See more work
             </Link>
           </div>

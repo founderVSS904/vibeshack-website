@@ -145,6 +145,24 @@ export const moneyPages = [
     description: 'Podcast rooms with broadcast microphones, 4K cameras, and crew options.',
   },
   {
+    href: '/commercials/',
+    label: 'Commercial Video Production San Francisco',
+    keyword: 'commercial video production san francisco',
+    description: 'Launch ads, talking-head videos, product demos, founder videos, and campaign spots produced at VibeShack.',
+  },
+  {
+    href: '/editorials/',
+    label: 'Editorial Photoshoots San Francisco',
+    keyword: 'editorial photoshoot san francisco',
+    description: 'Fashion, beauty, portraits, lookbooks, cover art, campaign stills, and content-day photography.',
+  },
+  {
+    href: '/branding/',
+    label: 'Branding and Creative Direction',
+    keyword: 'branding creative direction san francisco',
+    description: 'Creative direction, launch systems, visual identity, content systems, and brand decks.',
+  },
+  {
     href: '/green-screen-studio-sf/',
     label: 'Green Screen Studio SF',
     keyword: 'green screen studio san francisco',
@@ -180,6 +198,12 @@ export const moneyPages = [
     keyword: 'studio rental san francisco',
     description: 'Hourly production spaces for clients bringing their own crew.',
   },
+  {
+    href: '/our-work/',
+    label: 'VibeShack Our Work',
+    keyword: 'vibeshack portfolio',
+    description: 'Portfolio proof for commercials, documentaries, editorials, podcasts, music videos, and branding.',
+  },
 ]
 
 type StudioOffer = {
@@ -193,6 +217,9 @@ type StudioOffer = {
 
 export const studioOffers: StudioOffer[] = [
   { name: 'Podcast Studio Rental', serviceType: 'Podcast Studio Rental', href: '/podcast-studio-san-francisco/', minPrice: '300', maxPrice: '400', unitText: 'hour' },
+  { name: 'Commercial Video Production', serviceType: 'Commercial Video Production', href: '/commercials/' },
+  { name: 'Editorial Photoshoots', serviceType: 'Editorial Photography Services', href: '/editorials/' },
+  { name: 'Branding and Creative Direction', serviceType: 'Branding and Creative Direction', href: '/branding/' },
   { name: 'Green Screen Studio Rental', serviceType: 'Green Screen Studio Rental', href: '/green-screen-studio-sf/', minPrice: '100', maxPrice: '100', unitText: 'hour' },
   { name: 'Photography Studio Rental', serviceType: 'Photography Studio Rental', href: '/photography-studio-san-francisco/', minPrice: '100', maxPrice: '100', unitText: 'hour' },
   { name: 'Photo Services', serviceType: 'Photography Services', href: '/photo-services/' },

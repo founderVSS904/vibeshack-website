@@ -107,7 +107,6 @@ GCAL_STUDIO_CALENDAR_IDS='{
   "the-wing": "the-wing-calendar-id",
   "encore": "encore-calendar-id",
   "sunset": "sunset-calendar-id",
-  "premier": "premier-calendar-id",
   "parlor": "parlor-calendar-id",
   "horizon": "horizon-calendar-id",
   "canvas-podcast": "canvas-podcast-calendar-id",

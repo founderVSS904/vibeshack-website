@@ -146,6 +146,389 @@ body .placeholder-gray-700::placeholder {
 .animation-delay-400 { animation-delay: 0.4s; }
 .animation-delay-500 { animation-delay: 0.5s; }
 
+.project-video-player [data-fullview] {
+  cursor: zoom-in;
+}
+
+.project-video-player:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  border-radius: 0;
+}
+
+.project-video-player:fullscreen [data-fullview] {
+  cursor: zoom-out;
+}
+
+.project-video-player:fullscreen .project-video-player-inner {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  aspect-ratio: auto;
+}
+
+.project-video-player:fullscreen video {
+  object-fit: contain;
+}
+
+@keyframes dynamicFrameEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dynamic-frame-hero {
+  min-height: 0;
+  padding-top: 5rem;
+  background: #050505;
+}
+
+.home-landing-page {
+  min-height: 100svh;
+  background: #050505;
+}
+
+.dynamic-frame-grid {
+  --dynamic-frame-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dynamic-frame-duration: 760ms;
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  height: calc(100svh - 5rem);
+  min-height: min(760px, calc(100svh - 5rem));
+  max-height: none;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: #050505;
+  padding: 4px;
+  transition: grid-template-rows var(--dynamic-frame-duration) var(--dynamic-frame-ease);
+}
+
+@media (min-width: 1024px) {
+  .dynamic-frame-grid[data-active-row="1"] {
+    grid-template-rows: minmax(0, 1.14fr) minmax(0, 0.92fr);
+  }
+
+  .dynamic-frame-grid[data-active-row="2"] {
+    grid-template-rows: minmax(0, 0.92fr) minmax(0, 1.14fr);
+  }
+
+  .dynamic-frame-grid[data-active-column="1"] .dynamic-frame-row {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 0.9fr);
+  }
+
+  .dynamic-frame-grid[data-active-column="2"] .dynamic-frame-row {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 0.9fr);
+  }
+
+  .dynamic-frame-grid[data-active-column="3"] .dynamic-frame-row {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.2fr);
+  }
+
+}
+
+.dynamic-frame-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  min-height: 0;
+  transition: grid-template-columns var(--dynamic-frame-duration) var(--dynamic-frame-ease);
+}
+
+.dynamic-frame-tile {
+  --frame-accent: #ff2a1f;
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: #080808;
+  opacity: 1;
+  transform: translateZ(0);
+  contain: layout paint;
+}
+
+.dynamic-frame-image {
+  object-fit: cover;
+  /* Slight overscan hides tile edges while the grid tracks resize. One clock
+     for the whole hero: transform and opacity only, both compositor-friendly.
+     No filters, no keyframe animation; a running animation on transform would
+     override the hover transition and read as glitching. */
+  transform: scale(1.02);
+  transition:
+    transform var(--dynamic-frame-duration) var(--dynamic-frame-ease),
+    opacity var(--dynamic-frame-duration) var(--dynamic-frame-ease);
+  will-change: transform, opacity;
+}
+
+.dynamic-frame-grid[data-active] .dynamic-frame-tile:not([data-state="active"]) .dynamic-frame-image {
+  opacity: 0.5;
+}
+
+/* Hover loop: sits above the still, fades in while its tile is active. */
+.dynamic-frame-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 420ms var(--dynamic-frame-ease);
+}
+
+.dynamic-frame-tile[data-state="active"] .dynamic-frame-video {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dynamic-frame-tile[data-state="active"] .dynamic-frame-video {
+    opacity: 0;
+  }
+}
+
+.dynamic-frame-grid[data-active] .dynamic-frame-tile:not([data-state="active"]) .dynamic-frame-label {
+  opacity: 0.7;
+}
+
+.dynamic-frame-tile[data-state="active"] .dynamic-frame-image,
+.dynamic-frame-tile:hover .dynamic-frame-image,
+.dynamic-frame-tile:focus-visible .dynamic-frame-image {
+  transform: scale(1.045);
+}
+
+.dynamic-frame-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.48) 0%, rgba(0, 0, 0, 0.28) 30%, transparent 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.18) 45%, rgba(0, 0, 0, 0.58) 100%);
+}
+
+/* Gradient stacks cannot interpolate, so the active look lives on an overlay
+   that fades in with opacity instead of swapping background images. */
+.dynamic-frame-vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, 0.32) 100%);
+  transition: opacity var(--dynamic-frame-duration) var(--dynamic-frame-ease);
+}
+
+.dynamic-frame-tile[data-state="active"] .dynamic-frame-vignette::after,
+.dynamic-frame-tile:hover .dynamic-frame-vignette::after,
+.dynamic-frame-tile:focus-visible .dynamic-frame-vignette::after {
+  opacity: 1;
+}
+
+.dynamic-frame-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+  background-size: 100% 6px, 180px 180px;
+}
+
+.dynamic-frame-copy {
+  position: absolute;
+  inset: clamp(1.1rem, 2.4vw, 2rem);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.62rem;
+  text-align: center;
+}
+
+.dynamic-frame-eyebrow {
+  color: rgba(255, 255, 255, 0.76);
+  font-family: var(--font-brand-mono);
+  font-size: clamp(0.62rem, 0.75vw, 0.72rem);
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition: opacity 360ms ease 60ms, transform var(--dynamic-frame-duration) var(--dynamic-frame-ease);
+}
+
+.dynamic-frame-label {
+  color: #fff;
+  font-family: var(--font-brand-sans);
+  font-size: 3.35rem;
+  font-weight: 900;
+  font-stretch: normal;
+  line-height: 0.88;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  text-wrap: balance;
+  max-width: 9.8em;
+  text-shadow: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  transition: opacity 360ms ease;
+}
+
+.dynamic-frame-tile[data-state="active"] .dynamic-frame-eyebrow,
+.dynamic-frame-tile:hover .dynamic-frame-eyebrow,
+.dynamic-frame-tile:focus-visible .dynamic-frame-eyebrow {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.dynamic-frame-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--frame-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition: opacity 360ms ease 110ms, transform var(--dynamic-frame-duration) var(--dynamic-frame-ease), color 360ms ease;
+}
+
+.dynamic-frame-cta::after {
+  content: '→';
+  font-size: 1rem;
+  line-height: 0;
+}
+
+.dynamic-frame-tile[data-state="active"] .dynamic-frame-cta,
+.dynamic-frame-tile:hover .dynamic-frame-cta,
+.dynamic-frame-tile:focus-visible .dynamic-frame-cta {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dynamic-frame-grid,
+  .dynamic-frame-row,
+  .dynamic-frame-image,
+  .dynamic-frame-vignette::after,
+  .dynamic-frame-eyebrow,
+  .dynamic-frame-label,
+  .dynamic-frame-cta {
+    transition: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .dynamic-frame-label {
+    font-size: 2.8rem;
+  }
+
+  .dynamic-frame-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(240px, 1fr));
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .dynamic-frame-row {
+    display: contents;
+  }
+
+  .dynamic-frame-tile {
+    flex: initial;
+  }
+
+  .dynamic-frame-grid[data-active="1"],
+  .dynamic-frame-grid[data-active="3"],
+  .dynamic-frame-grid[data-active="5"] {
+    grid-template-columns: minmax(0, 1.24fr) minmax(0, 0.86fr);
+  }
+
+  .dynamic-frame-grid[data-active="2"],
+  .dynamic-frame-grid[data-active="4"],
+  .dynamic-frame-grid[data-active="6"] {
+    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.24fr);
+  }
+
+  .dynamic-frame-grid[data-active="1"],
+  .dynamic-frame-grid[data-active="2"] {
+    grid-template-rows: minmax(260px, 1.18fr) minmax(220px, 0.91fr) minmax(220px, 0.91fr);
+  }
+
+  .dynamic-frame-grid[data-active="3"],
+  .dynamic-frame-grid[data-active="4"] {
+    grid-template-rows: minmax(220px, 0.91fr) minmax(260px, 1.18fr) minmax(220px, 0.91fr);
+  }
+
+  .dynamic-frame-grid[data-active="5"],
+  .dynamic-frame-grid[data-active="6"] {
+    grid-template-rows: minmax(220px, 0.91fr) minmax(220px, 0.91fr) minmax(260px, 1.18fr);
+  }
+
+  .dynamic-frame-tile:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .dynamic-frame-tile:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .dynamic-frame-tile:nth-child(n + 4) {
+    border-bottom: 0;
+  }
+
+  .dynamic-frame-tile:nth-child(n + 5) {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 639px) {
+  .dynamic-frame-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    min-height: 0;
+  }
+
+  .dynamic-frame-tile {
+    min-height: 34svh;
+  }
+
+  .dynamic-frame-tile:last-child {
+    border-bottom: 0;
+  }
+
+  .dynamic-frame-label {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .dynamic-frame-label {
+    font-size: 3.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dynamic-frame-tile,
+  .dynamic-frame-image {
+    animation: none;
+  }
+}
+
 /* Studio card hover lift */
 .studio-card {
   transition: transform 0.2s ease, border-color 0.2s ease;
@@ -291,6 +674,17 @@ a.bg-brand-red:hover, button.bg-brand-red:hover {
 
 .shot-logo-marquee:hover .shot-logo-track {
   animation-play-state: paused;
+}
+
+/* Slim trusted-by strip variant: shorter track, quicker crawl. */
+.trusted-strip-marquee .shot-logo-track {
+  animation-duration: 30s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot-logo-track {
+    animation: none;
+  }
 }
 
 .shot-logo-group {

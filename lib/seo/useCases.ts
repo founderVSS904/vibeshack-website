@@ -125,7 +125,7 @@ export const useCases = [
       {
         question: 'What is the best VibeShack room for a two-person podcast?',
         answer:
-          'The Executive, The Wing, Premier, Parlor, Horizon, and Canvas Podcast can all work. The right choice depends on tone: executive table, intimate lounge, premium guest interview, LED backdrop, or clean cyc look.',
+          'The Executive, The Wing, Parlor, Horizon, and Canvas Podcast can all work. The right choice depends on tone: executive table, intimate lounge, premium guest interview, LED backdrop, or clean cyc look.',
       },
       {
         question: 'Can I record video and audio at the same time?',

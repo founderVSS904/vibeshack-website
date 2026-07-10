@@ -4,11 +4,11 @@ import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
   title: 'Podcast Studios San Francisco',
-  description: 'Eight podcast studios in San Francisco with 3-camera 4K, broadcast audio, and crew options. From $300/hr. Open 24/7.',
+  description: 'Seven podcast studios in San Francisco with 3-camera 4K, broadcast audio, and crew options. From $300/hr. Open 24/7.',
   alternates: { canonical: 'https://www.vibeshackstudios.com/podcast-studio-san-francisco/' },
   openGraph: {
     title: 'Podcast Studios SF | VibeShack Studios',
-    description: 'Eight podcast studios in SF with 3-camera 4K, broadcast audio, and crew options. Open 24/7.',
+    description: 'Seven podcast studios in SF with 3-camera 4K, broadcast audio, and crew options. Open 24/7.',
     url: 'https://www.vibeshackstudios.com/podcast-studio-san-francisco',
   },
 }
@@ -20,8 +20,6 @@ const studios = [
     bookHref: '/book/?studio=the-executive',
     img: '/studio-images/the-executive-hero.jpg',
     series: 'Walnut Series',
-    seriesColor: '#fcd34d',
-    seriesBg: 'rgba(120,53,15,0.5)',
     desc: 'Wood slat walls. Leather seating. Three cameras. Cameraman included.',
     price: '$300',
   },
@@ -31,20 +29,7 @@ const studios = [
     bookHref: '/book/?studio=the-wing',
     img: '/studio-images/the-wing-1.jpg',
     series: 'Walnut Series',
-    seriesColor: '#fcd34d',
-    seriesBg: 'rgba(120,53,15,0.5)',
     desc: 'Intimate format. Wood slat walls. Three cameras. Cameraman included.',
-    price: '$300',
-  },
-  {
-    name: 'Premier',
-    href: '/premier/',
-    bookHref: '/book/?studio=premier',
-    img: '/studio-images/premier-hero-v1775084326.jpg',
-    series: 'Vault Series',
-    seriesColor: '#e9d5ff',
-    seriesBg: 'rgba(88,28,135,0.4)',
-    desc: 'Premium studio suite. Full 4K production. Cameraman included.',
     price: '$300',
   },
   {
@@ -53,8 +38,6 @@ const studios = [
     bookHref: '/book/?studio=encore',
     img: '/studio-images/encore-wide.jpg',
     series: 'Vault Series',
-    seriesColor: '#e9d5ff',
-    seriesBg: 'rgba(88,28,135,0.4)',
     desc: 'Black acoustic studio. White cyc backdrop. Three cameras. Cameraman included.',
     price: '$300',
   },
@@ -64,8 +47,6 @@ const studios = [
     bookHref: '/book/?studio=sunset',
     img: '/studio-images/sunset-hero-v20260509.jpg',
     series: 'Creative Series',
-    seriesColor: '#99f6e4',
-    seriesBg: 'rgba(13,148,136,0.3)',
     desc: 'Programmable color backdrop. Pick your mood. Three cameras. Cameraman included.',
     price: '$300',
   },
@@ -75,8 +56,6 @@ const studios = [
     bookHref: '/book/?studio=parlor',
     img: '/studio-images/parlor-hero.jpg',
     series: 'Premium',
-    seriesColor: '#fecaca',
-    seriesBg: 'rgba(127,29,29,0.35)',
     desc: 'Premium interview setup. Chesterfield seating. Full crew included.',
     price: '$400',
   },
@@ -86,8 +65,6 @@ const studios = [
     bookHref: '/book/?studio=horizon',
     img: '/studio-images/horizon-hero.jpg',
     series: 'Premium',
-    seriesColor: '#fecaca',
-    seriesBg: 'rgba(127,29,29,0.35)',
     desc: 'Immersive setup. Warm sunset environment. Full crew included.',
     price: '$400',
   },
@@ -97,8 +74,6 @@ const studios = [
     bookHref: '/book/?studio=canvas-podcast',
     img: '/studio-images/podcast-cyc-duo.jpg',
     series: 'Premium',
-    seriesColor: '#fed7aa',
-    seriesBg: 'rgba(154,52,18,0.4)',
     desc: 'Custom LED backdrop. Cinema-grade lighting. Full crew included.',
     price: '$400',
   },
@@ -176,11 +151,10 @@ export default function PodcastStudiosPage() {
                   className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out" />
                 <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)'}} />
 
-                {/* Series badge */}
+                {/* Series label */}
                 {s.series && (
                   <div className="absolute top-5 left-5">
-                    <span className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full"
-                      style={{background: s.seriesBg!, color: s.seriesColor!}}>
+                    <span className="text-xs font-bold tracking-widest uppercase text-white/70">
                       {s.series}
                     </span>
                   </div>

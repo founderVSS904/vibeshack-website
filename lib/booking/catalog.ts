@@ -94,23 +94,6 @@ export const STUDIOS: Studio[] = [
     ],
   },
   {
-    id: 'premier',
-    name: 'Premier',
-    price: 300,
-    tag: 'Premium',
-    description: 'Premium studio suite. Top-tier production quality.',
-    heroImage: '/studio-images/premier-hero-v1775084326.jpg',
-    photos: ['/studio-images/premier-hero-v1775084326.jpg', '/studio-images/premier-wide-v1775084326.jpg', '/studio-images/premier-setup-v1775084326.jpg'],
-    includes: ['Custom setup', 'Full 4K production', 'Cameraman + producer', 'Premium sound design', '6-12hr footage turnaround'],
-    type: 'podcast',
-    prep: [
-      'Schedule a strategy call before your session.',
-      'Bring any visuals, slides, or graphics you want on screen.',
-      'Have your guest confirmed and briefed.',
-      'Everything else is on us.',
-    ],
-  },
-  {
     id: 'parlor',
     name: 'Parlor',
     price: 400,

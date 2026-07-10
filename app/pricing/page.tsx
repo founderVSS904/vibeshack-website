@@ -4,14 +4,14 @@ import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 export const metadata: Metadata = {
   title: 'Studio Pricing',
   description:
-    'Studio rentals from $100/hr, podcast rooms from $300/hr, Canvas Podcast $400/hr, and photo or video services quoted by request in San Francisco.',
+    'Studio rentals from $100/hr, podcast rooms from $300/hr, Canvas Podcast $400/hr. Production services quoted by request in San Francisco.',
   alternates: {
     canonical: 'https://www.vibeshackstudios.com/pricing/',
   },
   openGraph: {
     title: 'Studio Pricing | VibeShack Studios San Francisco',
     description:
-      'Studios from $100-$400/hr, plus photo and video production services quoted by request. Professional production studios in San Francisco.',
+      'Studios from $100-$400/hr, plus commercials, editorials, branding, photo, and video production services quoted by request.',
     url: 'https://www.vibeshackstudios.com/pricing/',
     images: [
       {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Studio Pricing | VibeShack Studios San Francisco',
-    description: 'Studios from $100-$400/hr. Photo and video services quoted by request.',
+    description: 'Studios from $100-$400/hr. Commercials, editorials, branding, photo, and video services quoted by request.',
     images: ['https://www.vibeshackstudios.com/og-image.jpg'],
   },
 }
@@ -34,7 +34,6 @@ const studios = [
   { name: 'The Executive', price: '$300', note: 'cameraman included · Walnut Series', href: '/the-executive/', category: 'Podcast' },
   { name: 'The Wing', price: '$300', note: 'cameraman included · Walnut Series', href: '/the-wing/', category: 'Podcast' },
   { name: 'Encore', price: '$300', note: 'cameraman included · Vault Series', href: '/encore/', category: 'Podcast' },
-  { name: 'Premier', price: '$300', note: 'cameraman included · Vault Series', href: '/premier/', category: 'Podcast' },
   { name: 'Sunset', price: '$300', note: 'cameraman included · Creative Series', href: '/sunset-studio/', category: 'Podcast' },
   { name: 'Parlor', price: '$400', note: 'full crew included · Premium', href: '/parlor/', category: 'Podcast' },
   { name: 'Horizon', price: '$400', note: 'full crew included · Premium', href: '/horizon/', category: 'Podcast' },
@@ -45,6 +44,9 @@ const studios = [
 ]
 
 const productionServices = [
+  { name: 'Commercials', price: 'Contact us', note: 'launch ads · talking heads · product demos · paid social', href: '/commercials/' },
+  { name: 'Editorials', price: 'Contact us', note: 'fashion · beauty · cover art · campaign stills', href: '/editorials/' },
+  { name: 'Branding', price: 'Contact us', note: 'creative direction · visual systems · launches · decks', href: '/branding/' },
   { name: 'Photo Services', price: 'Contact us', note: 'headshots · portraits · products · campaigns', href: '/photo-services/' },
   { name: 'Video Production', price: 'Contact us', note: 'social content · music videos · commercials · brand films', href: '/video-production/' },
 ]

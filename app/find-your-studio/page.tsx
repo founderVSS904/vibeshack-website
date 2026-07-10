@@ -49,11 +49,11 @@ const QUESTIONS = [
 ]
 
 const RECOMMENDATIONS: Record<string, Recommendation> = {
-  'podcast-solo-no':        { primary: 'sunset',          others: ['encore', 'premier'],            reason: 'Best for a solo host who wants a polished look without bringing a production team.' },
+  'podcast-solo-no':        { primary: 'sunset',          others: ['encore', 'the-executive'],      reason: 'Best for a solo host who wants a polished look without bringing a production team.' },
   'podcast-two-no':         { primary: 'the-executive',   others: ['the-wing', 'parlor'],           reason: 'A clean two-person interview layout with cameras, audio, lighting, and operator handled.' },
   'podcast-small-no':       { primary: 'canvas-podcast',  others: ['parlor', 'horizon'],            reason: 'A stronger fit when you need more control over layout, backdrop, talent, and camera lanes.' },
   'podcast-large-no':       { primary: 'green-screen',    others: ['canvas-rental', 'canvas-podcast'], reason: 'Large podcast productions need floor space first. Start here, then let us shape the setup.' },
-  'podcast-solo-yes':       { primary: 'encore',          others: ['sunset', 'premier'],            reason: 'A controlled room for a solo show when your team wants to run the session.' },
+  'podcast-solo-yes':       { primary: 'encore',          others: ['sunset', 'the-executive'],      reason: 'A controlled room for a solo show when your team wants to run the session.' },
   'podcast-two-yes':        { primary: 'the-wing',        others: ['the-executive', 'parlor'],      reason: 'Intimate, focused, and easy for a lean crew to operate around.' },
   'podcast-small-yes':      { primary: 'canvas-podcast',  others: ['parlor', 'horizon'],            reason: 'Flexible enough for extra guests, crew, brand visuals, and a more produced podcast look.' },
   'podcast-large-yes':      { primary: 'canvas-rental',   others: ['green-screen', 'canvas-podcast'], reason: 'The most sensible starting point when your own crew needs space to build a larger setup.' },
@@ -94,7 +94,6 @@ const RECOMMENDATIONS: Record<string, Recommendation> = {
 const STUDIO_HREFS: Record<string, string> = {
   'the-executive': '/the-executive/',
   'the-wing': '/the-wing/',
-  premier: '/premier/',
   encore: '/encore/',
   sunset: '/sunset-studio/',
   parlor: '/parlor/',
@@ -108,7 +107,6 @@ const STUDIO_HREFS: Record<string, string> = {
 const STUDIO_ORDER = [
   'the-executive',
   'the-wing',
-  'premier',
   'encore',
   'sunset',
   'parlor',
@@ -152,7 +150,7 @@ STUDIOS['photo-services'] = {
 
 const STUDIO_GROUPS = [
   { title: 'Premium Podcast Studios — $400/hr', ids: ['parlor', 'horizon', 'canvas-podcast'] },
-  { title: 'Podcast Studios — $300/hr', ids: ['the-executive', 'the-wing', 'premier', 'encore', 'sunset'] },
+  { title: 'Podcast Studios — $300/hr', ids: ['the-executive', 'the-wing', 'encore', 'sunset'] },
   { title: 'Rental Studios — $100/hr', ids: ['green-screen', 'photography', 'canvas-rental'] },
 ]
 

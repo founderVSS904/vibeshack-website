@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { addBookingEvents, type BookingCartItem } from '@/lib/booking/calendar'
+import { addBookingEvents, assertCartSlotsAvailable, hasBookingEventsForRef, type BookingCartItem } from '@/lib/booking/calendar'
 import { getStudioById } from '@/lib/booking/catalog'
 import { buildReferralInfo, formatMoneyFromCents, type ReferralInfo } from '@/lib/booking/referrals'
 import { addHours, describeSlotRanges, formatDateForDisplay, isValidBookingDate, slotIsoSetForDate } from '@/lib/booking/time'
@@ -22,10 +22,26 @@ function parseCartItems(metadata: Record<string, string>) {
     if (!raw) break
     try {
       const compact = JSON.parse(raw)
-      const slots = Array.isArray(compact.s ?? compact.slots) ? (compact.s ?? compact.slots) : []
+      // Current format stores the first slot plus hour offsets so long sessions
+      // fit in Stripe's 500-char metadata cap; older sessions carry full slot
+      // arrays. Every reconstructed slot is re-validated against the booking
+      // date in validateCompletedSession.
+      let slots: string[] = []
+      if (typeof compact.t0 === 'string' && Array.isArray(compact.off)) {
+        const baseMs = Date.parse(compact.t0)
+        if (Number.isFinite(baseMs)) {
+          slots = compact.off
+            .filter((offset: unknown): offset is number => Number.isInteger(offset) && (offset as number) >= 0 && (offset as number) < 48)
+            .map((offset: number) => new Date(baseMs + offset * 3600000).toISOString())
+        }
+      } else if (Array.isArray(compact.s ?? compact.slots)) {
+        slots = compact.s ?? compact.slots
+      }
+
+      const studioId = stripControlChars(compact.id ?? compact.studioId, 80)
       items.push({
-        studioId: stripControlChars(compact.id ?? compact.studioId, 80),
-        studioName: stripControlChars(compact.n ?? compact.studioName, 120),
+        studioId,
+        studioName: stripControlChars(compact.n ?? compact.studioName, 120) || getStudioById(studioId)?.name || '',
         date: stripControlChars(compact.d ?? compact.date, 20),
         slots: slots.map((slot: unknown) => stripControlChars(slot, 40)).filter(Boolean),
         hours: Number(compact.h ?? compact.hours ?? slots.length),
@@ -311,6 +327,44 @@ function buildPrepEmailHtml(cartItems: BookingCartItem[], customer: { name: stri
 </html>`
 }
 
+async function sendDoubleBookingAlert(
+  cartItems: BookingCartItem[],
+  customer: { name: string; email: string; phone: string },
+  bookingRef: string,
+  reason: string,
+  calendarInserted: boolean,
+) {
+  const gmailUser = process.env.GMAIL_USER || 'founder@vibeshackstudios.com'
+  const gmailPass = process.env.GMAIL_APP_PASSWORD
+  if (!gmailPass) throw new Error('GMAIL_APP_PASSWORD is not configured')
+
+  const nodemailer = await import('nodemailer')
+  const transporter = nodemailer.default.createTransport({
+    service: 'gmail',
+    auth: { user: gmailUser, pass: gmailPass },
+  })
+
+  const sessionRows = cartItems
+    .map((item) => `<li style="margin:0 0 6px;">${escapeHtml(item.studioName)} on ${escapeHtml(formatDateForDisplay(item.date))}: ${escapeHtml(describeSlotRanges(item.slots))}</li>`)
+    .join('')
+
+  await transporter.sendMail({
+    from: `VibeShack Studios <${gmailUser}>`,
+    to: gmailUser,
+    subject: `[ACTION NEEDED] Possible double booking - ${bookingRef}`,
+    html: `
+      <h2 style="margin:0 0 12px;">Possible double booking</h2>
+      <p style="margin:0 0 12px;">A completed payment overlaps a slot that is no longer free. ${calendarInserted ? 'The booking was still added to the calendar.' : 'The calendar insert failed on this attempt; the webhook will retry it.'} Review the overlap and contact the customer to resolve it.</p>
+      <p style="margin:0 0 12px;"><strong>Reason:</strong> ${escapeHtml(reason)}</p>
+      <p style="margin:0 0 12px;">
+        <strong>Booking ref:</strong> ${escapeHtml(bookingRef)}<br>
+        <strong>Customer:</strong> ${escapeHtml(customer.name)} (${escapeHtml(customer.email)}${customer.phone ? `, ${escapeHtml(customer.phone)}` : ''})
+      </p>
+      <ul style="margin:0;padding-left:18px;">${sessionRows}</ul>
+    `,
+  })
+}
+
 async function sendConfirmationEmail(
   cartItems: BookingCartItem[],
   customer: { name: string; email: string; phone: string },
@@ -533,9 +587,30 @@ export async function POST(req: NextRequest) {
     const metadata = (session.metadata || {}) as Record<string, string>
     const cartItems = parseCartItems(metadata)
 
-    if (!cartItems.length) {
-      console.error('No cart items found in webhook metadata')
-      return NextResponse.json({ received: true })
+    // Sessions this site did not create (payment links, dashboard sales) carry
+    // no bookingRef and have nothing to fulfill; unpaid sessions are handled by
+    // validateCompletedSession. Both get acknowledged, never retried.
+    const isPaidWebsiteBooking = session.payment_status === 'paid' && Boolean(metadata.bookingRef)
+    const expectedSessions = Number.parseInt(metadata.totalSessions || '0', 10)
+    const cartIncomplete = !cartItems.length
+      || (Number.isFinite(expectedSessions) && expectedSessions > 0 && cartItems.length !== expectedSessions)
+
+    if (cartIncomplete) {
+      if (!isPaidWebsiteBooking) {
+        return NextResponse.json({ received: true })
+      }
+      // A paid website booking with a missing or partially parsed cart must not
+      // be acknowledged, or it silently vanishes (or fulfills only part of what
+      // the customer paid for). A 5xx keeps Stripe retrying and flags the
+      // endpoint as failing in the dashboard so a human investigates.
+      console.error('Cart metadata missing or incomplete for paid booking', {
+        sessionId: session.id,
+        eventId: event.id,
+        bookingRef: metadata.bookingRef,
+        parsedItems: cartItems.length,
+        expectedSessions,
+      })
+      return NextResponse.json({ error: 'Cart metadata missing or incomplete' }, { status: 500 })
     }
 
     const customer = {
@@ -569,12 +644,52 @@ export async function POST(req: NextRequest) {
     const fulfillmentErrors: string[] = []
 
     if (!currentMetadata.vbsCalendarSyncedAt) {
+      // Availability was checked when the checkout session was created, but a
+      // competing payment can land in between. The customer has already paid,
+      // so a conflict here never blocks fulfillment; it alerts the team to
+      // resolve the overlap by hand. Two false-positive guards: skip the check
+      // when this booking's own events already exist (a retry after a partial
+      // failure would see them as conflicts), and only re-check slots that have
+      // not started yet (getAvailabilityForDate marks past-start slots
+      // unavailable even when nothing is booked).
+      let conflictReason = ''
+      try {
+        const alreadyInserted = await hasBookingEventsForRef(bookingRef, cartItems.map((item) => item.studioId))
+        const futureCart = cartItems
+          .map((item) => ({ ...item, slots: item.slots.filter((slot) => Date.parse(slot) > Date.now()) }))
+          .filter((item) => item.slots.length)
+        if (!alreadyInserted && futureCart.length) {
+          const availability = await assertCartSlotsAvailable(futureCart)
+          if (!availability.ok && availability.status === 409) {
+            conflictReason = availability.error
+            console.error('Possible double booking detected after payment:', {
+              bookingRef,
+              sessionId: session.id,
+              error: availability.error,
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Post-payment availability check failed:', error)
+      }
+
+      let calendarInserted = false
       try {
         await addBookingEvents(cartItems, customer, teamEmails, referralInfo, bookingRef, event.id)
+        calendarInserted = true
         await markSessionFulfillmentStep(session.id, 'vbsCalendarSyncedAt')
       } catch (error) {
         console.error('Calendar event creation failed:', error)
         fulfillmentErrors.push('calendar')
+      }
+
+      if (conflictReason && !currentMetadata.vbsDoubleBookingAlertedAt) {
+        try {
+          await sendDoubleBookingAlert(cartItems, customer, bookingRef, conflictReason, calendarInserted)
+          await markSessionFulfillmentStep(session.id, 'vbsDoubleBookingAlertedAt')
+        } catch (alertError) {
+          console.error('Double booking alert email failed:', alertError)
+        }
       }
     }
 

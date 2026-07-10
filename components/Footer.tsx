@@ -52,7 +52,6 @@ export default function Footer() {
                   { href: '/encore/', label: 'Encore' },
                   { href: '/sunset-studio/', label: 'Sunset' },
                   { href: '/canvas-podcast/', label: 'Canvas Podcast' },
-                  { href: '/premier/', label: 'Premier' },
                 ].map(({ href, label }) => (
                   <li key={href}>
                     <Link href={href} prefetch={href === '/book/' ? false : undefined} className="text-gray-500 text-sm hover:text-white hover:underline transition-colors duration-200">{label}</Link>
@@ -67,9 +66,13 @@ export default function Footer() {
               <ul className="space-y-3">
                 {[
                   { href: '/services/', label: 'All Services' },
-                  { href: '/photo-services/', label: 'Photo Services' },
-                  { href: '/video-production/', label: 'Video Production' },
+                  { href: '/commercials/', label: 'Commercials' },
+                  { href: '/editorials/', label: 'Editorials' },
+                  { href: '/branding/', label: 'Branding' },
+                  { href: '/our-work/', label: 'Our Work' },
                   { href: '/rental-studios/', label: 'All Rental Studios' },
+                  { href: '/video-production/', label: 'Video Production' },
+                  { href: '/photo-services/', label: 'Photo Services' },
                   { href: '/photography-studio-san-francisco/', label: 'Photography Studio Rental' },
                   { href: '/canvas-rental/', label: 'Canvas Rental' },
                   { href: '/green-screen-studio-sf/', label: 'Green Screen' },
@@ -111,6 +114,7 @@ export default function Footer() {
                   { href: '/contact/', label: 'Contact' },
                   { href: '/book/', label: 'Book a Session' },
                   { href: '/tour/', label: 'Book a Tour' },
+                  { href: '/our-work/', label: 'Our Work' },
                   { href: '/made-at-vibeshack/', label: 'Trusted By' },
                   { href: '/press/', label: 'Press & Media' },
                   { href: '/terms/', label: 'Terms & Services' },

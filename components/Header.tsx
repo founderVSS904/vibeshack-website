@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { BrandMark } from '@/components/BrandMark'
@@ -20,7 +21,6 @@ const podcastStudios: HeaderLink[] = [
   { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast room', price: '$300/hr' },
   { href: '/parlor/', label: 'Parlor', detail: 'Premium lounge interview set', price: '$400/hr' },
   { href: '/horizon/', label: 'Horizon', detail: 'Warm curated sunset podcast set', price: '$400/hr' },
-  { href: '/premier/', label: 'Premier', detail: 'Premium studio suite', price: '$300/hr' },
   { href: '/canvas-podcast/', label: 'Canvas Podcast', detail: 'Custom LED backdrop podcast studio', price: '$400/hr' },
 ]
 
@@ -33,10 +33,13 @@ const rentalStudios: HeaderLink[] = [
 
 const serviceLinks: HeaderLink[] = [
   { href: '/services/', label: 'All Services', detail: 'Choose the right path before the room' },
-  { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, campaigns' },
-  { href: '/video-production/', label: 'Video Production', detail: 'Social content, commercials, music videos' },
+  { href: '/commercials/', label: 'Commercials', detail: 'Launch ads, talking heads, product demos' },
+  { href: '/editorials/', label: 'Editorials', detail: 'Fashion, beauty, portraits, campaign stills' },
+  { href: '/branding/', label: 'Branding', detail: 'Creative direction, launches, content systems' },
   { href: '/podcast-studio-san-francisco/', label: 'Podcast Production', detail: 'Rooms with cameras, audio, and crew' },
-  { href: '/green-screen-studio-sf/', label: 'Green Screen Video', detail: 'Controlled keying and compositing' },
+  { href: '/rental-studios/', label: 'Studio Rentals', detail: 'White cyc, green screen, photo rooms' },
+  { href: '/video-production/', label: 'All Video Production', detail: 'Social content, music videos, brand video' },
+  { href: '/photo-services/', label: 'All Photo Services', detail: 'Headshots, portraits, products, campaigns' },
 ]
 
 const planningLinks: HeaderLink[] = [
@@ -54,6 +57,7 @@ const studioHubLinks: HeaderLink[] = [
 ]
 
 const proofLinks: HeaderLink[] = [
+  { href: '/our-work/', label: 'Our Work', detail: 'Portfolio, music videos, campaigns, proof' },
   { href: '/made-at-vibeshack/', label: 'Brands That Trust Us', detail: 'See the trusted-by wall' },
   { href: '/studio-guides/', label: 'Studio Guides', detail: 'Prep smarter before the session' },
   { href: '/use-cases/', label: 'Use Cases', detail: 'Choose by outcome and client need' },
@@ -64,13 +68,21 @@ const corePodcastStudios = podcastStudios.slice(1, 6)
 const premiumPodcastStudios = podcastStudios.slice(6)
 
 const navLinkClass =
-  'text-sm tracking-wide whitespace-nowrap text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none'
+  'relative text-sm tracking-wide whitespace-nowrap text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none'
 
 const menuButtonClass =
   'flex items-center gap-1.5 text-sm tracking-wide whitespace-nowrap text-gray-400 transition-colors duration-200 group-hover:text-white group-focus-within:text-white'
 
 export default function Header() {
+  const pathname = usePathname()
   const [dismissedMenu, setDismissedMenu] = useState<string | null>(null)
+  const isOurWorkPage = pathname === '/our-work' || pathname === '/our-work/'
+  // The landing page uses the same header as every other page, matching the
+  // production site look Tay signed off on.
+  const headerClassName = 'site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black transition-colors duration-200'
+  const headerContainerClassName = isOurWorkPage
+    ? 'mx-auto w-full px-9'
+    : 'mx-auto max-w-7xl px-6 sm:px-10 lg:px-16'
 
   const dismissMenu = (menuId: string) => {
     setDismissedMenu(menuId)
@@ -80,12 +92,20 @@ export default function Header() {
     setDismissedMenu((currentMenu) => currentMenu === menuId ? null : currentMenu)
   }
 
+  const primaryNavClass = (href: string) => {
+    const normalizedHref = href.replace(/\/$/, '') || '/'
+    const isActive = pathname === normalizedHref || (normalizedHref !== '/' && pathname.startsWith(`${normalizedHref}/`))
+    return `${navLinkClass} ${
+      isActive
+        ? 'text-white after:absolute after:left-0 after:right-0 after:-bottom-2 after:h-0.5 after:bg-brand-red'
+        : ''
+    }`
+  }
+
   return (
-    <header
-      className="site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black transition-colors duration-200"
-    >
-      <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
-        <div className="grid h-20 grid-cols-[auto_1fr_auto] items-center gap-6">
+    <header className={headerClassName}>
+      <div className={headerContainerClassName}>
+        <div className="site-header-inner grid h-20 grid-cols-[auto_1fr_auto] items-center gap-6">
           <Link
             href="/"
             aria-label="VibeShack Studios home"
@@ -115,13 +135,13 @@ export default function Header() {
               <DesktopServicesMenu onNavigate={() => dismissMenu('services')} />
             </DesktopMenuTrigger>
 
-            <Link href="/find-your-studio/" className={navLinkClass}>Find a Studio</Link>
-            <Link href="/pricing/" className={navLinkClass}>Pricing</Link>
-            <Link href="/about/" className={navLinkClass}>About</Link>
-            <Link href="/made-at-vibeshack/" className={navLinkClass}>Trusted By</Link>
-            <Link href="/studio-guides/" className={navLinkClass}>Guides</Link>
-            <Link href="/use-cases/" className={navLinkClass}>Use Cases</Link>
-            <Link href="/support/" className={navLinkClass}>Support</Link>
+            <Link href="/find-your-studio/" className={primaryNavClass('/find-your-studio/')}>Find a Studio</Link>
+            <Link href="/pricing/" className={primaryNavClass('/pricing/')}>Pricing</Link>
+            <Link href="/about/" className={primaryNavClass('/about/')}>About</Link>
+            <Link href="/our-work/" className={primaryNavClass('/our-work/')}>Our Work</Link>
+            <Link href="/studio-guides/" className={primaryNavClass('/studio-guides/')}>Guides</Link>
+            <Link href="/use-cases/" className={primaryNavClass('/use-cases/')}>Use Cases</Link>
+            <Link href="/support/" className={primaryNavClass('/support/')}>Support</Link>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -291,7 +311,7 @@ function MegaColumn({
 
 function MobileMenu() {
   return (
-    <div className="absolute left-0 right-0 top-full h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain border-t border-white/8 bg-black">
+    <div className="mobile-menu-panel absolute left-0 right-0 top-full h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain border-t border-white/8 bg-black">
       <div className="mx-auto max-w-7xl px-6 pb-10 pt-6 sm:px-10">
         <MobileSection title="Studios" links={[...podcastStudios, ...rentalStudios]} />
         <MobileSection title="Services" links={serviceLinks} />

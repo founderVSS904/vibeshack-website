@@ -1,10 +1,28 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useEffect, useState, FormEvent } from 'react'
 
 export default function ContactForm() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const [startedAt] = useState(() => Date.now())
+  const [projectType, setProjectType] = useState('')
+
+  useEffect(() => {
+    const service = new URLSearchParams(window.location.search).get('service')
+    const serviceMap: Record<string, string> = {
+      branding: 'branding',
+      commercials: 'brand-commercial',
+      documentary: 'documentary',
+      editorials: 'editorial',
+      'photo-services': 'photo-services',
+      'portfolio-inquiry': 'other',
+      'video-production': 'video-interview',
+    }
+
+    if (service && serviceMap[service]) {
+      setProjectType(serviceMap[service])
+    }
+  }, [])
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -102,17 +120,22 @@ export default function ContactForm() {
         <select
           id="project_type"
           name="project_type"
+          value={projectType}
+          onChange={(event) => setProjectType(event.target.value)}
           className="input-clean appearance-none bg-transparent"
           style={{ backgroundImage: 'none' }}
         >
           <option value="" style={{ background: '#111' }}>Select your project type</option>
           <option value="podcast" style={{ background: '#111' }}>Podcast / Video Podcast</option>
+          <option value="brand-commercial" style={{ background: '#111' }}>Commercial / Product Launch / Ad</option>
+          <option value="documentary" style={{ background: '#111' }}>Documentary / Micro Documentary</option>
+          <option value="editorial" style={{ background: '#111' }}>Editorial / Fashion / Beauty / Campaign</option>
+          <option value="branding" style={{ background: '#111' }}>Branding / Creative Direction</option>
           <option value="green-screen" style={{ background: '#111' }}>Green Screen / VFX</option>
           <option value="photo-services" style={{ background: '#111' }}>Photo Services / Headshots / Portraits</option>
           <option value="photography-studio-rental" style={{ background: '#111' }}>Photography Studio Rental / Room Only</option>
           <option value="video-interview" style={{ background: '#111' }}>Video / Interview / Corporate</option>
           <option value="music-video" style={{ background: '#111' }}>Music Video</option>
-          <option value="brand-commercial" style={{ background: '#111' }}>Brand Commercial</option>
           <option value="content-creation" style={{ background: '#111' }}>Social Media Content</option>
           <option value="tour" style={{ background: '#111' }}>Studio Tour</option>
           <option value="other" style={{ background: '#111' }}>Other</option>

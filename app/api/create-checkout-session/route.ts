@@ -224,14 +224,18 @@ export async function POST(req: NextRequest) {
     const attributionMetadata = readAttributionMetadata(req)
     const cartMetadata: Record<string, string> = {}
     cart.forEach((item, index) => {
+      // Stripe caps metadata values at 500 chars. Full ISO slot arrays overflow
+      // that for 16+ hour sessions and truncate into unparseable JSON, so slots
+      // are stored as the first slot plus hour offsets (slots arrive sorted from
+      // normalizeSlots). The webhook reconstructs and re-validates every slot,
+      // and derives name/hours/price from the catalog.
+      const firstSlotMs = Date.parse(item.slots[0])
       cartMetadata[`cart_${index}`] = JSON.stringify({
         id: item.studioId,
-        n: item.studioName,
         d: item.date,
-        s: item.slots,
-        h: item.hours,
-        p: item.price,
-      }).slice(0, 500)
+        t0: item.slots[0],
+        off: item.slots.map((slot) => Math.round((Date.parse(slot) - firstSlotMs) / 3600000)),
+      })
     })
 
     const baseUrl = getBaseUrl(req)
@@ -284,11 +288,11 @@ export async function POST(req: NextRequest) {
     const bodyError = jsonBodyErrorResponse(err)
     if (bodyError) return bodyError
 
+    if (err instanceof Error && err.message === 'Invalid cart item') {
+      return NextResponse.json({ error: 'Invalid booking selection' }, { status: 400 })
+    }
+
     console.error('Stripe checkout error:', err)
-    const message = err instanceof Error && err.message === 'Invalid cart item'
-      ? 'Invalid booking selection'
-      : 'Payment session failed'
-    const status = message === 'Invalid booking selection' ? 400 : 500
-    return NextResponse.json({ error: message }, { status })
+    return NextResponse.json({ error: 'Payment session failed' }, { status: 500 })
   }
 }
