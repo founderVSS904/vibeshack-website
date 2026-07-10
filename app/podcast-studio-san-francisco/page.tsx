@@ -245,7 +245,7 @@ export default function PodcastStudiosPage() {
           className="podcast-hero-image object-cover object-[83%_center] sm:object-center"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_95%_38%,rgba(0,46,255,0.3),transparent_17%),linear-gradient(90deg,rgba(0,0,0,0.66)_0%,rgba(0,0,0,0.22)_34%,rgba(0,0,0,0.06)_64%,rgba(0,0,0,0.68)_100%),linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.1)_47%,rgba(0,0,0,0.84)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.66)_0%,rgba(0,0,0,0.22)_34%,rgba(0,0,0,0.06)_64%,rgba(0,0,0,0.68)_100%),linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.1)_47%,rgba(0,0,0,0.84)_100%)]" />
         <div className="absolute inset-y-20 left-0 hidden w-24 bg-[linear-gradient(90deg,rgba(0,0,0,0.86),transparent)] lg:block" />
         <div className="absolute inset-y-20 right-0 hidden w-36 bg-[linear-gradient(270deg,rgba(0,0,0,0.94),transparent)] lg:block" />
 
