@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 
 type Frame = {
   label: string
+  labelLines?: string[]
   eyebrow: string
   href: string
   image: string
@@ -30,6 +31,7 @@ const frames: Frame[] = [
   },
   {
     label: 'Video Production',
+    labelLines: ['Video', 'Production'],
     eyebrow: 'Brand films, ads, product',
     href: '/video-production/',
     image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
@@ -170,7 +172,15 @@ export function DynamicFrameHero() {
                   <div className="dynamic-frame-noise" aria-hidden="true" />
                   <div className="dynamic-frame-copy">
                     <p className="dynamic-frame-eyebrow">{frame.eyebrow}</p>
-                    <p className="dynamic-frame-label">{frame.label}</p>
+                    <p className="dynamic-frame-label" aria-label={frame.label}>
+                      {frame.labelLines
+                        ? frame.labelLines.map((line) => (
+                            <span key={line} aria-hidden="true" className="block">
+                              {line}
+                            </span>
+                          ))
+                        : frame.label}
+                    </p>
                     <span className="dynamic-frame-cta">Explore</span>
                   </div>
                 </Link>
