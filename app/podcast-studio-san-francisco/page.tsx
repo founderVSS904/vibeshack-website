@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+import PodcastPageMotion from '@/components/PodcastPageMotion'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 
 const studios = [
   {
+    id: 'executive',
     name: 'Executive',
     fullName: 'The Executive',
     href: '/the-executive/',
@@ -25,9 +27,12 @@ const studios = [
     thumb: '/studio-images/the-executive-hero.jpg',
     series: 'Walnut Series',
     desc: 'Boardroom table, wood slat walls, and a polished interview look.',
+    line: 'A flagship table set for serious interviews, founder shows, and brand conversations.',
     price: '$300/hr',
+    specs: ['Boardroom table', 'Wood slat wall', '3-camera ready'],
   },
   {
+    id: 'wing',
     name: 'Wing',
     fullName: 'The Wing',
     href: '/the-wing/',
@@ -36,9 +41,12 @@ const studios = [
     thumb: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg',
     series: 'Walnut Series',
     desc: 'Warm two-person conversation set with a close, natural feel.',
+    line: 'A smaller walnut room for intimate shows that should feel close and human.',
     price: '$300/hr',
+    specs: ['Two-person set', 'Warm leather seating', 'Broadcast audio'],
   },
   {
+    id: 'encore',
     name: 'Encore',
     fullName: 'Encore',
     href: '/encore/',
@@ -47,9 +55,12 @@ const studios = [
     thumb: '/studio-images/parlor-hero.jpg',
     series: 'Vault Series',
     desc: 'Black acoustic room with a clean, cinematic podcast setup.',
+    line: 'A controlled black room for clean contrast, crisp audio, and direct-to-camera clarity.',
     price: '$300/hr',
+    specs: ['Acoustic room', 'Minimal black set', 'Clean interview angles'],
   },
   {
+    id: 'sunset',
     name: 'Sunset',
     fullName: 'Sunset',
     href: '/sunset-studio/',
@@ -58,40 +69,51 @@ const studios = [
     thumb: '/studio-images/horizon-hero.jpg',
     series: 'Creative Series',
     desc: 'Programmable color backdrop for a show with its own mood.',
+    line: 'Color-backed podcast energy for creator shows, social clips, and visual-first episodes.',
     price: '$300/hr',
+    specs: ['Programmable color', 'Creator set', 'Short-form friendly'],
   },
   {
+    id: 'parlor',
     name: 'Parlor',
     fullName: 'Parlor',
     href: '/parlor/',
     bookHref: '/book/?studio=parlor',
     img: '/studio-images/parlor-production-v20260509.jpg',
     thumb: '/studio-images/parlor-production-v20260509.jpg',
-    series: 'Premium',
+    series: 'Signature Series',
     desc: 'Lounge-style interview setup with premium seating and crew.',
+    line: 'A premium lounge set for conversations that need polish without feeling corporate.',
     price: '$400/hr',
+    specs: ['Chesterfield seating', 'Premium lounge look', 'Crew options'],
   },
   {
+    id: 'horizon',
     name: 'Horizon',
     fullName: 'Horizon',
     href: '/horizon/',
     bookHref: '/book/?studio=horizon',
     img: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
     thumb: '/studio-images/sunset-blue.jpg',
-    series: 'Premium',
+    series: 'Signature Series',
     desc: 'Immersive warm set for conversations with a show-level look.',
+    line: 'A warm immersive set built for episodes that should feel like their own world.',
     price: '$400/hr',
+    specs: ['Immersive wall', 'Warm sunset palette', 'Wide conversation setup'],
   },
   {
+    id: 'canvas-podcast',
     name: 'Canvas Podcast',
     fullName: 'Canvas Podcast',
     href: '/canvas-podcast/',
     bookHref: '/book/?studio=canvas-podcast',
     img: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg',
     thumb: '/studio-images/the-wing-hero.jpg',
-    series: 'Premium',
+    series: 'Signature Series',
     desc: 'Custom LED backdrop, cinema lighting, and room to scale.',
+    line: 'The large-format podcast room when the show needs scale, custom visuals, and crew.',
     price: '$400/hr',
+    specs: ['Custom LED backdrop', 'Cinema lighting', 'Room to scale'],
   },
 ]
 
@@ -126,13 +148,50 @@ const heroStats = [
   },
 ]
 
-const included = [
-  '3-camera 4K production setup',
-  'Broadcast microphones and studio audio',
-  'Professional lighting in every room',
-  'Crew options for camera and production',
-  'Hair and makeup room on-site',
-  'Open 24/7 by booking',
+const productionStack = [
+  {
+    title: 'Three angles without the setup day.',
+    eyebrow: '3 Cameras',
+    body: 'Host, guest, and wide coverage are already planned around the room so the edit has rhythm from the first take.',
+    img: '/studio-images/instagram-podcast-studio-cameras.jpg',
+  },
+  {
+    title: 'Audio that makes the room disappear.',
+    eyebrow: 'Broadcast Audio',
+    body: 'Studio microphones, clean routing, and treated rooms keep the conversation present without sounding like a rented office.',
+    img: '/studio-images/enhanced-executive-podcast-guest-closeup-v20260510.jpg',
+  },
+  {
+    title: 'Lighting matched to the set.',
+    eyebrow: 'Look',
+    body: 'Each room is lit around its own visual language: walnut, black acoustic, color, lounge, or immersive LED.',
+    img: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
+  },
+  {
+    title: 'Crew when the show needs hands.',
+    eyebrow: 'Crew Optional',
+    body: 'Bring your own operator or add support for camera, production flow, and session confidence.',
+    img: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
+  },
+]
+
+const deliverables = [
+  {
+    title: 'Clean multi-camera footage',
+    body: 'Files that already make sense in the edit, not a pile of disconnected angles.',
+  },
+  {
+    title: 'Broadcast-ready sound',
+    body: 'Dialogue captured like the show matters, because it does.',
+  },
+  {
+    title: 'A room with a point of view',
+    body: 'Every set tells the audience what kind of conversation they are watching.',
+  },
+  {
+    title: 'A repeatable production day',
+    body: 'Book it again and the show keeps its look, cadence, and standard.',
+  },
 ]
 
 const podcastFaqs = [
@@ -174,6 +233,7 @@ export default function PodcastStudiosPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(podcastServiceSchema) }}
       />
+      <PodcastPageMotion />
 
       <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-black pt-20 text-white">
         <Image
@@ -279,75 +339,119 @@ export default function PodcastStudiosPage() {
       </section>
 
       <main className="bg-black text-white">
-        <section className="border-b border-white/10 py-20 sm:py-24">
-          <div className="mx-auto grid max-w-[1536px] gap-10 px-6 sm:px-10 lg:grid-cols-[minmax(0,0.36fr)_minmax(0,0.64fr)] lg:px-16">
-            <div>
-              <p className="number-label mb-6">Every Room</p>
-              <h2 className="text-4xl font-black leading-tight text-white sm:text-5xl">
-                The studio is already wired.
+        <section className="border-b border-white/10 px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
+          <div className="mx-auto max-w-[1420px]">
+            <div data-podcast-reveal className="max-w-5xl">
+              <p className="number-label mb-7">Built Like A Show</p>
+              <h2 className="text-5xl font-black leading-[0.92] text-white sm:text-7xl lg:text-8xl">
+                Pick a room with a point of view.
               </h2>
-              <p className="mt-5 max-w-md text-base leading-relaxed text-white/60">
-                Walk in with a topic. Leave with clean multi-camera footage, broadcast-ready sound, and a set that looks like a real show.
+              <p className="mt-8 max-w-3xl text-xl leading-relaxed text-white/60 sm:text-2xl">
+                Each podcast room has its own visual language. The cameras, microphones, lighting, and room tone are already built around it.
               </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {included.map((item) => (
-                <div key={item} className="flex items-center gap-3 border-t border-white/10 py-4">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-red text-xs font-black text-white">✓</span>
-                  <span className="text-sm font-semibold text-white/75">{item}</span>
-                </div>
-              ))}
             </div>
           </div>
         </section>
 
-        <section className="border-b border-white/10 py-20 sm:py-24" aria-label="Podcast studio room details">
-          <div className="mx-auto max-w-[1536px] px-6 sm:px-10 lg:px-16">
-            <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="number-label mb-5">Rooms</p>
-                <h2 className="text-3xl font-black leading-tight text-white sm:text-5xl">
-                  Pick the visual language of your show.
-                </h2>
+        <nav className="podcast-room-nav sticky top-20 z-30 border-y border-white/10 bg-black/80 px-4 py-3 backdrop-blur-xl" aria-label="Podcast room sections">
+          <div className="mx-auto flex max-w-[1420px] gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {studios.map((studio) => (
+              <a
+                key={studio.id}
+                href={`#room-${studio.id}`}
+                data-room-link={studio.id}
+                className="shrink-0 rounded-full border border-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.08em] text-white/50 transition-colors hover:border-white/40 hover:text-white"
+              >
+                {studio.name}
+              </a>
+            ))}
+          </div>
+        </nav>
+
+        <section className="space-y-5 px-4 py-5 sm:px-6 lg:px-8" aria-label="Podcast studio room details">
+          {studios.map((studio, index) => (
+            <article
+              key={studio.id}
+              id={`room-${studio.id}`}
+              data-room-panel={studio.id}
+              className="podcast-room-panel group mx-auto grid max-w-[1660px] overflow-hidden rounded-lg border border-white/10 bg-zinc-950 lg:min-h-[760px] lg:grid-cols-[minmax(0,1.1fr)_minmax(420px,0.9fr)]"
+            >
+              <div className={`relative min-h-[420px] overflow-hidden lg:min-h-full ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                <Image
+                  src={studio.img}
+                  alt={`${studio.fullName} at VibeShack Studios`}
+                  fill
+                  loading="eager"
+                  className="podcast-room-media object-cover"
+                  sizes="(min-width: 1024px) 58vw, 100vw"
+                  style={{ objectPosition: index === 2 ? 'center 38%' : 'center' }}
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_42%,rgba(0,0,0,0.55)_100%)] lg:bg-[linear-gradient(90deg,rgba(0,0,0,0)_42%,rgba(0,0,0,0.18)_100%)]" />
+                <p className="absolute left-5 top-5 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/80 backdrop-blur">
+                  {studio.series}
+                </p>
               </div>
-              <Link href="/find-your-studio/" className="text-sm font-bold text-white/60 transition-colors hover:text-white">
-                Find your studio -&gt;
-              </Link>
+
+              <div className="flex min-h-[420px] flex-col justify-between p-7 sm:p-10 lg:p-14">
+                <div>
+                  <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red">{studio.price}</p>
+                  <h3 className="mt-6 text-6xl font-black leading-[0.88] text-white sm:text-7xl lg:text-8xl">
+                    {studio.fullName}
+                  </h3>
+                  <p className="mt-7 max-w-xl text-xl leading-relaxed text-white/70 sm:text-2xl">
+                    {studio.line}
+                  </p>
+                </div>
+
+                <div className="mt-12">
+                  <div className="grid gap-3 sm:grid-cols-3" data-podcast-reveal data-delay="120">
+                    {studio.specs.map((spec) => (
+                      <div key={spec} className="border-t border-white/20 pt-4">
+                        <p className="text-sm font-semibold leading-snug text-white/70">{spec}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-9 flex flex-wrap gap-3">
+                    <Link href={studio.bookHref} prefetch={false} className="inline-flex h-12 items-center justify-center rounded-md bg-white px-6 text-sm font-black uppercase tracking-[0.08em] text-black transition-colors hover:bg-zinc-200">
+                      Book
+                    </Link>
+                    <Link href={studio.href} className="inline-flex h-12 items-center justify-center rounded-md border border-white/20 px-6 text-sm font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-white/50 hover:bg-white/10">
+                      View Room
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <section className="px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
+          <div className="mx-auto max-w-[1420px]">
+            <div data-podcast-reveal className="mb-12 max-w-4xl">
+              <p className="number-label mb-7">Production Stack</p>
+              <h2 className="text-5xl font-black leading-[0.92] text-white sm:text-7xl">
+                The technical parts are already solved.
+              </h2>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {studios.map((studio) => (
-                <article key={studio.name} className="group overflow-hidden rounded-md border border-white/10 bg-zinc-950">
-                  <Link href={studio.href} className="block">
-                    <div className="relative aspect-[16/10] overflow-hidden">
-                      <Image
-                        src={studio.img}
-                        alt={`${studio.fullName} at VibeShack Studios`}
-                        fill
-                        loading="lazy"
-                        className="object-cover transition-transform duration-700 group-hover:scale-[1.035]"
-                        sizes="(min-width: 1280px) 32vw, (min-width: 768px) 50vw, 100vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
-                      <p className="absolute left-4 top-4 text-xs font-black uppercase tracking-[0.16em] text-white/80">{studio.series}</p>
-                    </div>
-                  </Link>
-                  <div className="p-5">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="text-2xl font-black text-white">{studio.fullName}</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-white/60">{studio.desc}</p>
-                      </div>
-                      <p className="shrink-0 text-sm font-black text-brand-red">{studio.price}</p>
-                    </div>
-                    <div className="mt-5 flex items-center gap-4">
-                      <Link href={studio.bookHref} prefetch={false} className="rounded bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-black transition-colors hover:bg-zinc-200">
-                        Book
-                      </Link>
-                      <Link href={studio.href} className="text-xs font-bold uppercase tracking-[0.1em] text-white/50 transition-colors hover:text-white">
-                        View room
-                      </Link>
-                    </div>
+            <div className="grid gap-5 lg:grid-cols-2">
+              {productionStack.map((item, index) => (
+                <article key={item.title} data-podcast-reveal data-delay={String(index * 80)} className="podcast-feature-panel overflow-hidden rounded-lg border border-white/10 bg-zinc-950">
+                  <div className="relative aspect-[16/9] overflow-hidden">
+                    <Image
+                      src={item.img}
+                      alt={`${item.eyebrow} at VibeShack Studios`}
+                      fill
+                      loading="lazy"
+                      className="object-cover"
+                      sizes="(min-width: 1024px) 50vw, 100vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+                  </div>
+                  <div className="p-7 sm:p-10">
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red">{item.eyebrow}</p>
+                    <h3 className="mt-5 text-4xl font-black leading-[0.95] text-white sm:text-5xl">{item.title}</h3>
+                    <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">{item.body}</p>
                   </div>
                 </article>
               ))}
@@ -355,40 +459,71 @@ export default function PodcastStudiosPage() {
           </div>
         </section>
 
-        <section className="border-b border-white/10 py-20 sm:py-24">
-          <div className="mx-auto max-w-[1536px] px-6 sm:px-10 lg:px-16">
-            <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <h2 className="text-3xl font-black leading-tight text-white sm:text-5xl">
-                Podcast studio questions.
+        <section className="border-y border-white/10 px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
+          <div className="mx-auto grid max-w-[1420px] gap-12 lg:grid-cols-[0.85fr_1.15fr]">
+            <div data-podcast-reveal className="lg:sticky lg:top-36 lg:self-start">
+              <p className="number-label mb-7">What You Leave With</p>
+              <h2 className="text-5xl font-black leading-[0.92] text-white sm:text-7xl">
+                The episode feels finished before the edit starts.
               </h2>
-              <span className="number-label">FAQ</span>
             </div>
-            <div className="divide-y divide-white/10 border-y border-white/10">
-              {podcastFaqs.map(({ question, answer }) => (
-                <div key={question} className="grid grid-cols-1 gap-4 py-8 md:grid-cols-2 md:gap-16">
-                  <p className="text-base font-semibold text-white">{question}</p>
-                  <p className="text-sm leading-relaxed text-white/60">{answer}</p>
+            <div className="divide-y divide-white/10">
+              {deliverables.map((item, index) => (
+                <div key={item.title} data-podcast-reveal data-delay={String(index * 80)} className="py-9 first:pt-0">
+                  <h3 className="text-4xl font-black leading-tight text-white sm:text-5xl">{item.title}</h3>
+                  <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/60">{item.body}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="py-24 text-center sm:py-28">
-          <div className="mx-auto max-w-4xl px-6">
-            <p className="number-label mb-6">Ready</p>
-            <h2 className="text-4xl font-black leading-tight text-white sm:text-6xl">
-              Not sure which room? We will help you choose.
+        <section className="px-6 py-24 sm:px-10 sm:py-28 lg:px-16">
+          <div className="mx-auto max-w-[1100px]">
+            <div data-podcast-reveal className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <h2 className="text-4xl font-black leading-tight text-white sm:text-6xl">
+                Podcast studio questions.
+              </h2>
+              <span className="number-label">FAQ</span>
+            </div>
+            <div className="divide-y divide-white/10 border-y border-white/10">
+              {podcastFaqs.map(({ question, answer }) => (
+                <details key={question} className="group py-6">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-semibold text-white marker:hidden [&::-webkit-details-marker]:hidden">
+                    {question}
+                    <span className="text-2xl font-light text-white/40 transition-transform group-open:rotate-45">+</span>
+                  </summary>
+                  <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/60">{answer}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="relative isolate overflow-hidden px-6 py-28 text-center sm:px-10 sm:py-36 lg:px-16">
+          <Image
+            src="/studio-images/drive-podcast-hero.jpg"
+            alt="Podcast studio setup at VibeShack Studios"
+            fill
+            loading="lazy"
+            className="object-cover opacity-45"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,#000_0%,rgba(0,0,0,0.62)_42%,#000_100%)]" />
+          <div data-podcast-reveal className="relative z-10 mx-auto max-w-5xl">
+            <p className="number-label mb-7">Ready</p>
+            <h2 className="text-5xl font-black leading-[0.92] text-white sm:text-7xl lg:text-8xl">
+              Pick the room. Bring the conversation.
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/60">
-              Book a session if you already know the room, or book a tour and we will match your show to the right set.
+            <p className="mx-auto mt-8 max-w-2xl text-xl leading-relaxed text-white/70">
+              We will make the production feel simple from the moment you walk in.
             </p>
-            <div className="mt-9 flex flex-wrap justify-center gap-4">
-              <Link href="/book/?service=podcast" prefetch={false} className="inline-flex min-h-12 items-center justify-center rounded bg-brand-red px-7 text-sm font-black uppercase tracking-[0.08em] text-white transition-colors hover:bg-red-700">
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
+              <Link href="/book/?service=podcast" prefetch={false} className="inline-flex min-h-[52px] items-center justify-center rounded-md bg-brand-red px-8 py-4 text-sm font-black uppercase tracking-[0.08em] text-white transition-colors hover:bg-red-700">
                 Book a Session
               </Link>
-              <Link href="/tour/" className="inline-flex min-h-12 items-center justify-center rounded border border-white/20 px-7 text-sm font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-white/50 hover:bg-white/10">
-                Book a Tour
+              <Link href="#room-executive" className="inline-flex min-h-[52px] items-center justify-center rounded-md border border-white/25 px-8 py-4 text-sm font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-white/50 hover:bg-white/10">
+                Compare Rooms
               </Link>
             </div>
           </div>
