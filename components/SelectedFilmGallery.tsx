@@ -28,7 +28,7 @@ export default function SelectedFilmGallery({ films }: SelectedFilmGalleryProps)
   if (!activeFilm) return null
 
   return (
-    <div className="grid overflow-hidden rounded-lg border border-white/10 bg-zinc-950 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="grid overflow-hidden border-y border-white/10 bg-black lg:grid-cols-[minmax(0,1fr)_360px]">
       <div
         id="selected-film-player"
         role="tabpanel"

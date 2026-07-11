@@ -40,8 +40,8 @@ const selectedFilms: SelectedFilm[] = selectedFilmSlugs.flatMap((slug) => {
 })
 
 const videoFacts = [
-  ['$100/hr', 'studio-only from'],
-  ['Scoped', 'crew + production'],
+  ['From $100/hr', 'studio rental'],
+  ['Scoped', 'crew and production'],
   ['24/7', 'studio access'],
 ]
 
@@ -103,7 +103,7 @@ const videoFormats: VideoFormat[] = [
 ]
 
 const productionRules = [
-  ['Start with the deliverables', 'A commercial, a reel package, a music video, and a founder film should not be planned the same way. Define format, aspect ratios, length, usage, and must-have shots before choosing the studio.'],
+  ['Define the deliverables', 'A commercial, a reel package, a music video, and a founder film should not be planned the same way. Define format, aspect ratios, length, usage, and must-have shots before choosing the studio.'],
   ['Design the visual language', 'White cyc feels clean and flexible. Green screen creates worlds. Warm sets feel human and premium. Black curtains and controlled light feel cinematic. Pick the set for the story, not just availability.'],
   ['Protect sound and pacing', 'If anyone speaks on camera, sound is part of the image. Build the schedule around mics, camera resets, lighting moves, wardrobe changes, props, and social cutaways.'],
   ['Capture more than the hero take', 'A strong production day leaves with the main video plus thumbnails, stills, cutdowns, behind-the-scenes, vertical clips, and extra hooks when the campaign needs them.'],
@@ -153,13 +153,13 @@ const productionPricing = [
   },
   {
     label: 'Scoped production support',
-    price: 'Contact us',
+    price: 'Quoted',
     detail:
       'Scoped in-studio video support for social clips, short interviews, product demos, or creator content where the brief is contained.',
   },
   {
     label: 'Music videos, commercials, content days',
-    price: 'Contact us',
+    price: 'Quoted',
     detail:
       'Larger shoots are quoted after the brief because direction, crew size, set changes, editing, usage, and deliverables change the actual production load.',
   },
@@ -180,7 +180,7 @@ const deliverables = [
 const videoFaqs = [
   {
     question: 'Is VibeShack a full-service video production company?',
-    answer: 'VibeShack is a production studio with purpose-built sets for video, photo, podcast, green screen, and content work. You can book a studio directly, bring your own crew, or contact us before booking if you want help scoping crew, cameras, lighting, creative direction, or production support.',
+    answer: 'VibeShack is a production studio with purpose-built sets. Book the studio, bring your own crew, or contact us to scope cameras, lighting, crew, and creative support.',
   },
   {
     question: 'What video formats work best at VibeShack?',
@@ -195,8 +195,8 @@ const videoFaqs = [
     answer: 'Often, yes. The cleanest approach is to define the priority deliverables first, then build the schedule around wardrobe changes, set changes, lighting moves, product shots, interview moments, and vertical cutdowns.',
   },
   {
-    question: 'Can I keep the whole booking on the VibeShack website?',
-    answer: 'Yes. Studio booking, availability, and payment are handled on the VibeShack website, with Google Calendar used privately in the background for availability.',
+    question: 'How do I book the studio?',
+    answer: 'Studio-only bookings use the live availability calendar on this site. For production support, send the brief first so we can confirm the studio, crew, and scope before you book.',
   },
 ]
 
@@ -246,26 +246,26 @@ export default function VideoProductionPage() {
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.54)_44%,rgba(0,0,0,0.12)_78%),linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.08)_48%,rgba(0,0,0,0.9)_100%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-12 pt-32 sm:px-10 sm:pb-16 lg:px-16 lg:pb-20">
+        <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-10 pt-28 sm:px-10 sm:pb-12 lg:px-16 lg:pb-14">
           <div className="video-hero-copy max-w-[830px]">
-            <p className="mb-6 text-sm font-semibold text-white/70">San Francisco / Production studio</p>
+            <p className="mb-6 text-sm font-semibold text-white/70">950 Battery St / San Francisco</p>
             <h1 className="font-black uppercase leading-[0.88] text-white" style={{ fontSize: 'clamp(4.1rem, 9vw, 8.8rem)', letterSpacing: 0 }}>
               Video<br />
               <span className="text-brand-red">Production</span>
             </h1>
-            <p className="mt-7 max-w-[700px] text-lg leading-relaxed text-white/75 sm:text-2xl">
-              Commercials, music videos, social campaigns, and documentaries made in a San Francisco studio built for production days.
+            <p className="mt-6 max-w-[700px] text-lg leading-relaxed text-white/75 sm:text-2xl">
+              Commercials, music videos, branded content, and documentaries produced at VibeShack Studios.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-6">
+            <div className="mt-7 flex flex-wrap items-center gap-6">
               <Link href="/contact/?service=video-production" className="inline-flex min-h-[52px] items-center justify-center rounded-md bg-brand-red px-8 text-sm font-bold text-white transition-colors hover:bg-red-700">
-                Start a project
+                Discuss a project
               </Link>
               <Link href="#selected-films" className="text-sm font-semibold text-white/70 transition-colors hover:text-white">
-                Watch the work <span className="ml-2" aria-hidden="true">-&gt;</span>
+                View selected work <span className="ml-2" aria-hidden="true">-&gt;</span>
               </Link>
             </div>
 
-            <div className="mt-10 grid max-w-3xl grid-cols-3 border-t border-white/15">
+            <div className="mt-8 grid max-w-3xl grid-cols-3 border-t border-white/15">
               {videoFacts.map(([value, label], index) => (
                 <div key={label} className={`px-3 py-4 sm:px-5 sm:py-5 ${index > 0 ? 'border-l border-white/10' : ''} first:pl-0`}>
                   <p className="text-sm font-semibold text-white sm:text-base">{value}</p>
@@ -277,18 +277,18 @@ export default function VideoProductionPage() {
         </div>
       </section>
 
-      <section className="bg-black border-t border-white/5 sticky top-20 z-30" data-carousel>
-        <div className="scrollbar-hide max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 overflow-x-auto">
-          <div className="flex gap-2 min-w-max pr-6" role="list" aria-label="Service pages">
+      <section className="border-y border-white/10 bg-black" data-carousel>
+        <div className="scrollbar-hide mx-auto max-w-7xl overflow-x-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex min-w-max" role="list" aria-label="Service pages">
             {serviceTabs.map(({ href, label, active }) => (
               <Link
                 key={href}
                 href={href}
                 role="listitem"
-                className={`px-4 py-2 rounded-full border text-sm font-semibold transition-colors ${
+                className={`relative px-5 py-4 text-sm font-medium transition-colors after:absolute after:inset-x-5 after:bottom-0 after:h-[2px] after:bg-brand-red after:content-[''] after:transition-transform ${
                   active
-                    ? 'border-brand-red bg-brand-red text-white'
-                    : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
+                    ? 'text-white after:scale-x-100'
+                    : 'text-white/40 after:scale-x-0 hover:text-white/80'
                 }`}
               >
                 {label}
@@ -302,13 +302,13 @@ export default function VideoProductionPage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="mb-12 grid gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.55fr)] lg:items-end lg:gap-16">
             <div>
-              <span className="number-label mb-6 block">Selected films</span>
-              <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl lg:text-7xl" style={{ letterSpacing: 0 }}>
-                Start with the work.
+              <span className="mb-5 block text-sm font-semibold text-white/45">Selected work</span>
+              <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl" style={{ letterSpacing: 0 }}>
+                Recent productions.
               </h2>
             </div>
             <p className="max-w-xl text-base leading-relaxed text-gray-500 sm:text-lg">
-              Sports films, music videos, and original series made by VibeShack. Choose a film to watch without leaving the page.
+              Films for Oakland Ballers, Varii x Josh Sidhu, and Silicon Mania. Select a project to watch it here.
             </p>
           </div>
 
@@ -320,13 +320,13 @@ export default function VideoProductionPage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.58fr)] lg:items-end lg:gap-16">
             <div>
-              <span className="number-label mb-6 block">Production formats</span>
-              <h2 className="brand-sans max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-6xl lg:text-7xl">
-                Choose the format before the set.
+              <span className="mb-5 block text-sm font-semibold text-white/45">Formats</span>
+              <h2 className="brand-sans max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+                Built around the brief.
               </h2>
             </div>
             <p className="max-w-xl text-base leading-relaxed text-gray-500 sm:text-lg">
-              A commercial, social batch, documentary, and founder film ask different things of the studio, schedule, and crew. Start with the job the video needs to do.
+              The shot list, crew, set, and schedule change with the deliverable. Choose the closest format to see how we would plan it.
             </p>
           </div>
 
@@ -338,12 +338,12 @@ export default function VideoProductionPage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="grid gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
             <div>
-              <span className="number-label mb-6 block">Plan the production</span>
-              <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl">
-                Organize the day around every cut.
+              <span className="mb-5 block text-sm font-semibold text-white/45">Production planning</span>
+              <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-5xl">
+                Plan from the deliverables back.
               </h2>
               <p className="mt-6 max-w-md text-base leading-relaxed text-gray-500">
-                The hero video gets priority. The schedule still protects the verticals, thumbnails, stills, and cutdowns that make the campaign useful.
+                We lock the primary deliverable first, then schedule vertical coverage, stills, thumbnails, and cutdowns around it.
               </p>
             </div>
 
@@ -360,13 +360,12 @@ export default function VideoProductionPage() {
 
           <div className="mt-20 border-t border-white/10 pt-10 sm:mt-24 sm:pt-12">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <h3 className="brand-sans text-3xl font-semibold text-white sm:text-4xl">In the delivery folder</h3>
+              <h3 className="brand-sans text-3xl font-semibold text-white sm:text-4xl">Typical deliverables</h3>
               <p className="max-w-lg text-sm leading-relaxed text-gray-500">Final deliverables are scoped to the brief, platform, and campaign plan.</p>
             </div>
             <div className="mt-9 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
-              {deliverables.map((deliverable, index) => (
-                <div key={deliverable} className="grid grid-cols-[36px_1fr] gap-3 border-t border-white/10 py-5">
-                  <p className="text-xs tabular-nums text-white/25">{String(index + 1).padStart(2, '0')}</p>
+              {deliverables.map((deliverable) => (
+                <div key={deliverable} className="border-t border-white/10 py-5">
                   <p className="text-sm font-semibold leading-snug text-white/80">{deliverable}</p>
                 </div>
               ))}
@@ -379,9 +378,9 @@ export default function VideoProductionPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-14">
             <div>
-              <span className="number-label mb-6 block">Production environments</span>
-              <h2 className="brand-sans max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-6xl">
-                Pick the environment before the camera angle.
+              <span className="mb-5 block text-sm font-semibold text-white/45">Studios and sets</span>
+              <h2 className="brand-sans max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl">
+                The set follows the shot list.
               </h2>
             </div>
             <Link href="/find-your-studio/" className="text-gray-600 hover:text-white text-sm transition-colors">Find your studio</Link>
@@ -411,9 +410,9 @@ export default function VideoProductionPage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="grid items-start gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
             <div>
-              <span className="number-label mb-6 block">Pricing</span>
-              <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl">
-                Scope the shoot, then price it.
+              <span className="mb-5 block text-sm font-semibold text-white/45">Pricing</span>
+              <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-5xl">
+                Quoted to the production scope.
               </h2>
               <p className="mt-6 max-w-lg text-base leading-relaxed text-gray-500">
                 Studio-only space starts at $100/hr. Production support is quoted after the brief because crew, cameras, set changes, editing, usage, and deliverables change the actual workload.
@@ -432,8 +431,8 @@ export default function VideoProductionPage() {
             </div>
 
             <div>
-              <span className="number-label mb-6 block">FAQ</span>
-              <h3 className="brand-sans text-3xl font-semibold text-white sm:text-4xl">Before production.</h3>
+              <span className="mb-5 block text-sm font-semibold text-white/45">FAQ</span>
+              <h3 className="brand-sans text-3xl font-semibold text-white sm:text-4xl">Common questions.</h3>
               <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
                 {videoFaqs.map(({ question, answer }) => (
                   <details key={question} className="group py-6">
@@ -462,19 +461,19 @@ export default function VideoProductionPage() {
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#000_0%,rgba(0,0,0,0.5)_42%,#000_100%)]" />
         <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <p className="number-label mb-8">Ready</p>
-          <h2 className="brand-sans mb-6 text-5xl font-semibold leading-tight text-white sm:text-7xl">
-            Bring the concept. Build the footage here.
+          <p className="mb-5 text-sm font-semibold text-white/50">Start a project</p>
+          <h2 className="brand-sans mb-6 text-4xl font-semibold leading-tight text-white sm:text-6xl">
+            Tell us what you are making.
           </h2>
           <p className="mb-10 text-lg text-white/60">
-            Video production support is quoted after the brief. Studio-only video space starts at $100/hr.
+            Send the brief. We will recommend the studio, crew, and production scope that fit it.
           </p>
           <div className="flex flex-wrap justify-center gap-6">
             <Link href="/contact/?service=video-production" className="inline-flex min-h-[52px] items-center justify-center rounded-md bg-brand-red px-8 text-sm font-bold text-white transition-colors hover:bg-red-700">
-              Start a project
+              Discuss the project
             </Link>
             <Link href="/book/" prefetch={false} className="self-center text-sm font-semibold text-white/60 transition-colors hover:text-white">
-              Book studio-only
+              Book the studio
             </Link>
           </div>
         </div>
