@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+import SelectedFilmGallery, { type SelectedFilm } from '@/components/SelectedFilmGallery'
 import { absoluteUrl } from '@/lib/seo/site'
+import { allWorkProjects } from '@/lib/seo/workProjects'
 import { breadcrumbSchema, faqSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
@@ -29,6 +31,12 @@ const serviceTabs = [
   { href: '/green-screen-studio-sf/', label: 'Green Screen', active: false },
   { href: '/canvas-rental/', label: 'White Cyc', active: false },
 ]
+
+const selectedFilmSlugs = ['damian-stone', 'body-is-tea', 'the-buzzer']
+const selectedFilms: SelectedFilm[] = selectedFilmSlugs.flatMap((slug) => {
+  const project = allWorkProjects.find((item) => item.slug === slug)
+  return project ? [project] : []
+})
 
 const subServices = [
   {
@@ -317,15 +325,33 @@ export default function VideoProductionPage() {
         </div>
       </section>
 
+      <section className="border-t border-white/5 bg-black py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
+          <div className="mb-12 grid gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.55fr)] lg:items-end lg:gap-16">
+            <div>
+              <span className="number-label mb-6 block">Selected films</span>
+              <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl lg:text-7xl" style={{ letterSpacing: 0 }}>
+                Start with the work.
+              </h2>
+            </div>
+            <p className="max-w-xl text-base leading-relaxed text-gray-500 sm:text-lg">
+              Sports films, music videos, and original series made by VibeShack. Choose a film to watch without leaving the page.
+            </p>
+          </div>
+
+          <SelectedFilmGallery films={selectedFilms} />
+        </div>
+      </section>
+
       <section className="py-20 sm:py-24 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="max-w-4xl mb-12">
             <span className="number-label mb-6 block">Video services</span>
             <h2 className="text-white font-black leading-tight mb-6 text-4xl sm:text-5xl lg:text-6xl" style={{ letterSpacing: 0 }}>
-              Make the video page sell the thing they already need.
+              One production day can carry the whole campaign.
             </h2>
             <p className="text-gray-500 text-base sm:text-lg leading-relaxed max-w-2xl">
-              Video production can cover a lot, so the first screen after the click should name the profitable paths clearly.
+              Build the hero film, the social cuts, the interview, and the product moments around one clear visual plan.
             </p>
           </div>
 
