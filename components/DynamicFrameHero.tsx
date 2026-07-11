@@ -39,8 +39,8 @@ const frames: Frame[] = [
     position: 'center 48%',
     accent: '#f6f6f6',
     videos: [
-      '/studio-videos/home-tile-damian-stone-loop-v20260710.mp4',
       '/studio-videos/home-tile-video-production-loop-v20260709b.mp4',
+      '/studio-videos/home-tile-damian-stone-loop-v20260710.mp4',
     ],
   },
   {
