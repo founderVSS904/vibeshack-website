@@ -14,8 +14,8 @@ type Frame = {
   alt: string
   position?: string
   accent: string
-  // Muted loop that fades in while the tile is hovered or focused.
-  video?: string
+  // Muted clips that play while the tile is hovered or focused.
+  videos?: string[]
 }
 
 const frames: Frame[] = [
@@ -27,7 +27,7 @@ const frames: Frame[] = [
     alt: 'Two-host podcast setup inside VibeShack Studios',
     position: 'center 45%',
     accent: '#ff2a1f',
-    video: '/studio-videos/home-tile-podcasts-loop-v20260709d.mp4',
+    videos: ['/studio-videos/home-tile-podcasts-loop-v20260709d.mp4'],
   },
   {
     label: 'Video Production',
@@ -38,7 +38,10 @@ const frames: Frame[] = [
     alt: 'Video production crew setting lights inside VibeShack Studios',
     position: 'center 48%',
     accent: '#f6f6f6',
-    video: '/studio-videos/home-tile-video-production-loop-v20260709b.mp4',
+    videos: [
+      '/studio-videos/home-tile-damian-stone-loop-v20260710.mp4',
+      '/studio-videos/home-tile-video-production-loop-v20260709b.mp4',
+    ],
   },
   {
     label: 'Our Work',
@@ -48,7 +51,7 @@ const frames: Frame[] = [
     alt: 'Portfolio work and music video production inside a VibeShack Studios rental space',
     position: 'center',
     accent: '#ff2a1f',
-    video: '/studio-videos/home-tile-our-work-loop-v20260709d.mp4',
+    videos: ['/studio-videos/home-tile-our-work-loop-v20260709d.mp4'],
   },
   {
     label: 'Photography',
@@ -58,7 +61,7 @@ const frames: Frame[] = [
     alt: 'Photography services portrait created at VibeShack Studios',
     position: 'center 42%',
     accent: '#f6f6f6',
-    video: '/studio-videos/home-tile-photography-loop-v20260709.mp4',
+    videos: ['/studio-videos/home-tile-photography-loop-v20260709.mp4'],
   },
   {
     label: 'Branding',
@@ -68,7 +71,7 @@ const frames: Frame[] = [
     alt: 'Pure Magic product branding image for VibeShack Studios',
     position: 'center',
     accent: '#ff2a1f',
-    video: '/studio-videos/home-tile-branding-loop-v20260709e.mp4',
+    videos: ['/studio-videos/home-tile-branding-loop-v20260709e.mp4'],
   },
   {
     label: 'Rentals',
@@ -83,6 +86,7 @@ const frames: Frame[] = [
 
 export function DynamicFrameHero() {
   const [activeFrame, setActiveFrame] = useState<string | null>(null)
+  const [videoIndices, setVideoIndices] = useState<Record<string, number>>({})
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map())
   const activeIndex = activeFrame ? Number(activeFrame) - 1 : null
   const activeColumn = activeIndex !== null ? String((activeIndex % 3) + 1) : undefined
@@ -99,7 +103,7 @@ export function DynamicFrameHero() {
         video.currentTime = 0
       }
     })
-  }, [activeFrame])
+  }, [activeFrame, videoIndices])
 
   const activateFrame = (frameIndex: string) => {
     setActiveFrame((currentFrame) => currentFrame === frameIndex ? currentFrame : frameIndex)
@@ -128,6 +132,11 @@ export function DynamicFrameHero() {
             {frames.slice(rowIndex * 3, rowIndex * 3 + 3).map((frame, columnIndex) => {
               const index = rowIndex * 3 + columnIndex
               const frameIndex = String(index + 1)
+              const frameVideos = frame.videos ?? []
+              const activeVideoIndex = videoIndices[frameIndex] ?? 0
+              const activeVideo = frameVideos.length > 0
+                ? frameVideos[activeVideoIndex % frameVideos.length]
+                : undefined
 
               return (
                 <Link
@@ -152,20 +161,28 @@ export function DynamicFrameHero() {
                     className="dynamic-frame-image"
                     style={{ objectPosition: frame.position || 'center' }}
                   />
-                  {frame.video && (
+                  {activeVideo && (
                     <video
+                      key={activeVideo}
                       ref={(el) => {
                         if (el) videoRefs.current.set(frameIndex, el)
                         else videoRefs.current.delete(frameIndex)
                       }}
-                      src={frame.video}
+                      src={activeVideo}
                       muted
-                      loop
+                      loop={frameVideos.length === 1}
                       playsInline
                       preload="metadata"
                       aria-hidden="true"
                       className="dynamic-frame-video"
                       style={{ objectPosition: frame.position || 'center' }}
+                      onEnded={() => {
+                        if (frameVideos.length < 2) return
+                        setVideoIndices((currentIndices) => ({
+                          ...currentIndices,
+                          [frameIndex]: ((currentIndices[frameIndex] ?? 0) + 1) % frameVideos.length,
+                        }))
+                      }}
                     />
                   )}
                   <div className="dynamic-frame-vignette" />
