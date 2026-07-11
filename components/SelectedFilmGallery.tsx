@@ -22,6 +22,7 @@ type SelectedFilmGalleryProps = {
 
 export default function SelectedFilmGallery({ films }: SelectedFilmGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
   const activeFilm = films[activeIndex]
 
   if (!activeFilm) return null
@@ -34,16 +35,47 @@ export default function SelectedFilmGallery({ films }: SelectedFilmGalleryProps)
         aria-labelledby={`selected-film-tab-${activeFilm.slug}`}
         className="relative aspect-video bg-black"
       >
-        <iframe
-          key={activeFilm.youtubeId}
-          src={`https://www.youtube-nocookie.com/embed/${activeFilm.youtubeId}?rel=0`}
-          title={`${activeFilm.title} by ${activeFilm.client}`}
-          className="absolute inset-0 h-full w-full"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
+        {isPlaying ? (
+          <iframe
+            key={activeFilm.youtubeId}
+            src={`https://www.youtube-nocookie.com/embed/${activeFilm.youtubeId}?autoplay=1&rel=0`}
+            title={`${activeFilm.title} by ${activeFilm.client}`}
+            className="absolute inset-0 h-full w-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsPlaying(true)}
+            aria-label={`Play ${activeFilm.title}`}
+            className="group absolute inset-0 overflow-hidden text-left"
+          >
+            <Image
+              src={activeFilm.image}
+              alt=""
+              fill
+              aria-hidden="true"
+              priority
+              quality={85}
+              className="selected-film-poster-image object-cover"
+              style={{ objectPosition: activeFilm.objectPosition || 'center' }}
+              sizes="(min-width: 1024px) 70vw, 100vw"
+            />
+            <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.03)_48%,rgba(0,0,0,0.62)_100%)]" />
+            <span className="absolute inset-0 grid place-items-center">
+              <span className="grid h-16 w-16 place-items-center rounded-full bg-brand-red text-white shadow-2xl transition-transform duration-300 group-hover:scale-105 sm:h-20 sm:w-20">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="ml-1 h-6 w-6 fill-current sm:h-7 sm:w-7">
+                  <path d="M8 5.7v12.6L18 12 8 5.7Z" />
+                </svg>
+              </span>
+            </span>
+            <span className="absolute bottom-5 left-5 text-sm font-semibold text-white sm:bottom-7 sm:left-7">
+              Play film
+            </span>
+          </button>
+        )}
       </div>
 
       <div className="flex min-w-0 overflow-x-auto border-t border-white/10 lg:flex lg:flex-col lg:overflow-visible lg:border-l lg:border-t-0" role="tablist" aria-label="Selected films">
@@ -55,7 +87,10 @@ export default function SelectedFilmGallery({ films }: SelectedFilmGalleryProps)
             role="tab"
             aria-selected={index === activeIndex}
             aria-controls="selected-film-player"
-            onClick={() => setActiveIndex(index)}
+            onClick={() => {
+              setActiveIndex(index)
+              setIsPlaying(false)
+            }}
             className="selected-film-tab flex w-[260px] shrink-0 gap-4 border-r border-white/10 p-4 text-left transition-colors last:border-r-0 hover:bg-white/[0.04] lg:w-full lg:flex-1 lg:border-b lg:border-r-0 lg:last:border-b-0"
           >
             <span className="relative aspect-video w-24 shrink-0 overflow-hidden rounded bg-black">

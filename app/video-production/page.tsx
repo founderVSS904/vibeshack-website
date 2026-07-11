@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import SelectedFilmGallery, { type SelectedFilm } from '@/components/SelectedFilmGallery'
+import VideoFormatSelector, { type VideoFormat } from '@/components/VideoFormatSelector'
 import { absoluteUrl } from '@/lib/seo/site'
 import { allWorkProjects } from '@/lib/seo/workProjects'
 import { breadcrumbSchema, faqSchema, studioServiceSchema } from '@/lib/schemas'
@@ -38,40 +39,13 @@ const selectedFilms: SelectedFilm[] = selectedFilmSlugs.flatMap((slug) => {
   return project ? [project] : []
 })
 
-const subServices = [
-  {
-    eyebrow: 'Launch',
-    title: 'Product launch commercials',
-    body: 'Hero launch spots, product beauty shots, landing-page video, paid ads, and launch cutdowns.',
-  },
-  {
-    eyebrow: 'Social',
-    title: 'Social media content',
-    body: 'Reels, TikToks, Shorts, creator-style batches, hooks, thumbnails, stills, and campaign variations.',
-  },
-  {
-    eyebrow: 'Story',
-    title: 'Documentaries and micro docs',
-    body: 'Short 5 to 10 minute pieces for founders, artists, local stories, nonprofits, and brand stories with a human spine.',
-  },
-  {
-    eyebrow: 'Artist',
-    title: 'Music videos',
-    body: 'Performance videos, artist visuals, cover frames, teasers, vertical moments, and rollout content.',
-  },
-  {
-    eyebrow: 'Ad',
-    title: 'Commercials',
-    body: 'Scripted spots, campaign videos, product ads, service explainers, testimonials, and web hero videos.',
-  },
-  {
-    eyebrow: 'Authority',
-    title: 'Talking-head videos',
-    body: 'Founder videos, expert content, executive messages, course modules, training clips, and interview-led brand films.',
-  },
+const videoFacts = [
+  ['$100/hr', 'studio-only from'],
+  ['Scoped', 'crew + production'],
+  ['24/7', 'studio access'],
 ]
 
-const videoFormats = [
+const videoFormats: VideoFormat[] = [
   {
     eyebrow: '01 / Social',
     title: 'Social media content',
@@ -79,7 +53,7 @@ const videoFormats = [
     alt: 'Set prepared for social media content production at VibeShack Studios San Francisco',
     objectPosition: 'center center',
     pressure: 'You need more than one good clip: hooks, vertical cuts, thumbnails, transitions, stills, and enough variation to feed the campaign.',
-    bestRoom: 'We plan the room around the platform: warm sets for talking-head content, white cyc for movement, green screen for edits, and photo/video rooms for fast changes.',
+    bestRoom: 'We plan the set around the platform: warm stages for talking-head content, white cyc for movement, green screen for edits, and a photo/video studio for fast changes.',
   },
   {
     eyebrow: '02 / Commercials',
@@ -97,7 +71,7 @@ const videoFormats = [
     alt: 'Cinematic micro documentary concept image for VibeShack Studios video production',
     objectPosition: 'center 38%',
     pressure: 'A 10-minute story still needs structure: a clear subject, emotional arc, interview spine, supporting visuals, and a reason for the viewer to stay.',
-    bestRoom: 'Use warm rooms for interviews, controlled studio space for portrait moments, and planned B-roll days when the story needs outside context.',
+    bestRoom: 'Use warm sets for interviews, controlled studio space for portrait moments, and planned B-roll days when the story needs outside context.',
   },
   {
     eyebrow: '04 / Music',
@@ -106,7 +80,7 @@ const videoFormats = [
     alt: 'Minimal white cyc music video visual made at VibeShack Studios San Francisco',
     objectPosition: 'center center',
     pressure: 'Artist visuals need atmosphere, negative space, lighting options, and enough visual range to create covers, teasers, performance clips, and full video scenes.',
-    bestRoom: 'Canvas works for clean performance visuals, green screen works for world-building, and warm rooms can carry intimate acoustic or interview-style artist content.',
+    bestRoom: 'Canvas works for clean performance visuals, green screen works for world-building, and warm sets can carry intimate acoustic or interview-style artist content.',
   },
   {
     eyebrow: '05 / Brand',
@@ -129,8 +103,8 @@ const videoFormats = [
 ]
 
 const productionRules = [
-  ['Start with the deliverables', 'A commercial, a reel package, a music video, and a founder film should not be planned the same way. Define format, aspect ratios, length, usage, and must-have shots before choosing the room.'],
-  ['Design the visual language', 'White cyc feels clean and flexible. Green screen creates worlds. Warm sets feel human and premium. Black curtains and controlled light feel cinematic. Pick the room for the story, not just availability.'],
+  ['Start with the deliverables', 'A commercial, a reel package, a music video, and a founder film should not be planned the same way. Define format, aspect ratios, length, usage, and must-have shots before choosing the studio.'],
+  ['Design the visual language', 'White cyc feels clean and flexible. Green screen creates worlds. Warm sets feel human and premium. Black curtains and controlled light feel cinematic. Pick the set for the story, not just availability.'],
   ['Protect sound and pacing', 'If anyone speaks on camera, sound is part of the image. Build the schedule around mics, camera resets, lighting moves, wardrobe changes, props, and social cutaways.'],
   ['Capture more than the hero take', 'A strong production day leaves with the main video plus thumbnails, stills, cutdowns, behind-the-scenes, vertical clips, and extra hooks when the campaign needs them.'],
 ]
@@ -154,7 +128,7 @@ const recommendedRooms = [
   },
   {
     href: '/photography-studio-san-francisco/',
-    title: 'Photo / Video Room',
+    title: 'Photo / Video Studio',
     image: '/studio-images/drive-video-studio.jpg',
     alt: 'Flexible photo and video production room at VibeShack Studios San Francisco',
     fit: 'Product demos, head-and-shoulder video, wardrobe changes, beauty content, creator shoots, and fast social setups.',
@@ -172,7 +146,7 @@ const recommendedRooms = [
 
 const productionPricing = [
   {
-    label: 'Room-only video space',
+    label: 'Studio-only video space',
     price: 'from $100/hr',
     detail:
       'For crews who already have the operator, shot list, lighting plan, talent, and post-production handled.',
@@ -214,7 +188,7 @@ const videoFaqs = [
   },
   {
     question: 'How much does video production cost?',
-    answer: 'Room-only video rentals start at $100 per hour. Scoped in-studio video production is quoted after the brief because concept, crew, camera needs, editing, usage, timeline, and deliverables change the scope.',
+    answer: 'Studio-only video rentals start at $100 per hour. Scoped in-studio video production is quoted after the brief because concept, crew, camera needs, editing, usage, timeline, and deliverables change the scope.',
   },
   {
     question: 'Can we shoot social content, photos, and video in one day?',
@@ -257,48 +231,47 @@ export default function VideoProductionPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
 
-      <section className="relative min-h-screen flex items-end overflow-hidden bg-black">
+      <section className="relative flex min-h-[82svh] items-end overflow-hidden bg-black">
         <div className="absolute inset-0">
           <Image
             src="/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg"
             fill
-            className="object-cover"
+            className="video-hero-image object-cover"
             alt="Behind the scenes video production lighting setup at VibeShack Studios San Francisco"
             priority
+            quality={90}
+            sizes="100vw"
             style={{ objectPosition: 'center 42%' }}
           />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.72) 42%, rgba(0,0,0,0.2) 78%)' }} />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.18) 46%, transparent 78%)' }} />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.54)_44%,rgba(0,0,0,0.12)_78%),linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.08)_48%,rgba(0,0,0,0.9)_100%)]" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-12 pt-32 w-full">
-          <div className="max-w-4xl">
-            <p className="number-label mb-8">Video Production San Francisco</p>
-            <h1 className="font-black text-white leading-[0.95] mb-8" style={{ fontSize: 'clamp(2.45rem, 5.7vw, 5.8rem)', letterSpacing: 0 }}>
-              Product launches, commercials, micro docs.
+        <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-12 pt-32 sm:px-10 sm:pb-16 lg:px-16 lg:pb-20">
+          <div className="video-hero-copy max-w-[830px]">
+            <p className="mb-6 text-sm font-semibold text-white/70">San Francisco / Production studio</p>
+            <h1 className="font-black uppercase leading-[0.88] text-white" style={{ fontSize: 'clamp(4.1rem, 9vw, 8.8rem)', letterSpacing: 0 }}>
+              Video<br />
+              <span className="text-brand-red">Production</span>
             </h1>
-            <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mb-10">
-              Plan video production at VibeShack for product launch videos, social media content, documentaries, music videos, commercials, founder videos, product demos, interviews, green screen, and full brand content days.
+            <p className="mt-7 max-w-[700px] text-lg leading-relaxed text-white/75 sm:text-2xl">
+              Commercials, music videos, social campaigns, and documentaries made in a San Francisco studio built for production days.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 border-y border-white/10 mb-10 max-w-3xl">
-              {[
-                ['Production support', 'Contact us'],
-                ['Room-only video space', 'from $100/hr'],
-                ['Larger shoots', 'Contact us'],
-              ].map(([label, value]) => (
-                <div key={label} className="py-4 sm:border-r sm:border-white/10 sm:px-5 first:sm:pl-0 last:sm:border-r-0">
-                  <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">{label}</p>
-                  <p className="text-white text-base font-black">{value}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-6">
+              <Link href="/contact/?service=video-production" className="inline-flex min-h-[52px] items-center justify-center rounded-md bg-brand-red px-8 text-sm font-bold text-white transition-colors hover:bg-red-700">
+                Start a project
+              </Link>
+              <Link href="#selected-films" className="text-sm font-semibold text-white/70 transition-colors hover:text-white">
+                Watch the work <span className="ml-2" aria-hidden="true">-&gt;</span>
+              </Link>
+            </div>
+
+            <div className="mt-10 grid max-w-3xl grid-cols-3 border-t border-white/15">
+              {videoFacts.map(([value, label], index) => (
+                <div key={label} className={`px-3 py-4 sm:px-5 sm:py-5 ${index > 0 ? 'border-l border-white/10' : ''} first:pl-0`}>
+                  <p className="text-sm font-semibold text-white sm:text-base">{value}</p>
+                  <p className="mt-1 text-xs text-white/45">{label}</p>
                 </div>
               ))}
-            </div>
-            <div className="flex flex-wrap gap-4 items-center">
-              <Link href="/contact/?service=video-production" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
-                Start a video request
-              </Link>
-              <Link href="/book/" prefetch={false} className="text-gray-400 hover:text-white text-sm font-semibold transition-colors">
-                Book room-only
-              </Link>
             </div>
           </div>
         </div>
@@ -325,7 +298,7 @@ export default function VideoProductionPage() {
         </div>
       </section>
 
-      <section className="border-t border-white/5 bg-black py-20 sm:py-28">
+      <section id="selected-films" className="scroll-mt-32 border-t border-white/5 bg-black py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="mb-12 grid gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.55fr)] lg:items-end lg:gap-16">
             <div>
@@ -343,94 +316,58 @@ export default function VideoProductionPage() {
         </div>
       </section>
 
-      <section className="py-20 sm:py-24 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="max-w-4xl mb-12">
-            <span className="number-label mb-6 block">Video services</span>
-            <h2 className="text-white font-black leading-tight mb-6 text-4xl sm:text-5xl lg:text-6xl" style={{ letterSpacing: 0 }}>
-              One production day can carry the whole campaign.
-            </h2>
-            <p className="text-gray-500 text-base sm:text-lg leading-relaxed max-w-2xl">
-              Build the hero film, the social cuts, the interview, and the product moments around one clear visual plan.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {subServices.map(({ eyebrow, title, body }) => (
-              <article key={title} className="rounded-lg border border-white/10 bg-zinc-950 p-6">
-                <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-red">{eyebrow}</p>
-                <h3 className="mb-4 text-2xl font-black leading-tight text-white" style={{ letterSpacing: 0 }}>{title}</h3>
-                <p className="text-sm leading-relaxed text-gray-500">{body}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-28 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="max-w-4xl mb-20">
-            <span className="number-label mb-6 block">What we make</span>
-            <h2 className="text-white font-black leading-[0.98] mb-6" style={{ fontSize: 'clamp(2.45rem, 5vw, 5.4rem)', letterSpacing: 0 }}>
-              Build the video around the job it has to do.
-            </h2>
-            <p className="text-gray-500 text-base sm:text-lg leading-relaxed max-w-2xl">
-              A TikTok batch, a commercial, a music video, and a founder film need different rooms, pacing, lighting, and shot lists. The point is to leave with usable footage, not just a pretty setup.
-            </p>
-          </div>
-
-          <div className="space-y-24">
-            {videoFormats.map(({ eyebrow, title, image, alt, objectPosition, pressure, bestRoom }, index) => (
-              <article key={title} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
-                <div className={`relative overflow-hidden rounded-lg bg-zinc-950 h-[68vh] min-h-[500px] max-h-[740px] lg:col-span-7 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                  <Image
-                    src={image}
-                    alt={alt}
-                    fill
-                    className="object-cover"
-                    style={{ objectPosition }}
-                    sizes="(min-width: 1024px) 58vw, 100vw"
-                  />
-                </div>
-                <div className="lg:col-span-5">
-                  <p className="number-label mb-7">{eyebrow}</p>
-                  <h3 className="text-white font-black leading-[0.98] mb-7" style={{ fontSize: 'clamp(2.25rem, 4.8vw, 4.8rem)', letterSpacing: 0 }}>
-                    {title}
-                  </h3>
-                  <div className="border-y border-white/10 divide-y divide-white/10">
-                    <div className="py-7">
-                      <p className="text-gray-600 text-[10px] tracking-[0.22em] uppercase mb-3">What matters</p>
-                      <p className="text-gray-300 text-base leading-relaxed">{pressure}</p>
-                    </div>
-                    <div className="py-7">
-                      <p className="text-gray-600 text-[10px] tracking-[0.22em] uppercase mb-3">How we shape it</p>
-                      <p className="text-gray-400 text-base leading-relaxed">{bestRoom}</p>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-28 bg-zinc-950 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-16 items-start">
+      <section id="formats" className="scroll-mt-28 border-t border-white/5 bg-black py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.58fr)] lg:items-end lg:gap-16">
             <div>
-              <span className="number-label mb-6 block">Possible outputs</span>
-              <h2 className="text-white font-black leading-[0.98] mb-6" style={{ fontSize: 'clamp(2.25rem, 4vw, 4.5rem)', letterSpacing: 0 }}>
-                Shoot once. Leave with the campaign pieces.
+              <span className="number-label mb-6 block">Production formats</span>
+              <h2 className="brand-sans max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-6xl lg:text-7xl">
+                Choose the format before the set.
               </h2>
-              <p className="text-gray-500 text-base leading-relaxed max-w-md">
-                The best production days protect the main asset and the smaller assets around it: verticals, thumbnails, stills, cutdowns, and behind-the-scenes moments.
+            </div>
+            <p className="max-w-xl text-base leading-relaxed text-gray-500 sm:text-lg">
+              A commercial, social batch, documentary, and founder film ask different things of the studio, schedule, and crew. Start with the job the video needs to do.
+            </p>
+          </div>
+
+          <VideoFormatSelector formats={videoFormats} />
+        </div>
+      </section>
+
+      <section className="border-t border-white/5 bg-zinc-950 py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
+          <div className="grid gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
+            <div>
+              <span className="number-label mb-6 block">Plan the production</span>
+              <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl">
+                Organize the day around every cut.
+              </h2>
+              <p className="mt-6 max-w-md text-base leading-relaxed text-gray-500">
+                The hero video gets priority. The schedule still protects the verticals, thumbnails, stills, and cutdowns that make the campaign useful.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {deliverables.map((deliverable) => (
-                <div key={deliverable} className="rounded-lg border border-white/10 bg-black px-5 py-5">
-                  <p className="text-white text-base font-semibold leading-snug">{deliverable}</p>
+            <div className="divide-y divide-white/10 border-y border-white/10">
+              {productionRules.map(([title, body], index) => (
+                <div key={title} className="grid gap-3 py-6 sm:grid-cols-[48px_0.38fr_0.62fr] sm:gap-6">
+                  <p className="text-xs tabular-nums text-white/25">{String(index + 1).padStart(2, '0')}</p>
+                  <p className="font-semibold text-white">{title}</p>
+                  <p className="text-sm leading-relaxed text-gray-500">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-20 border-t border-white/10 pt-10 sm:mt-24 sm:pt-12">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <h3 className="brand-sans text-3xl font-semibold text-white sm:text-4xl">In the delivery folder</h3>
+              <p className="max-w-lg text-sm leading-relaxed text-gray-500">Final deliverables are scoped to the brief, platform, and campaign plan.</p>
+            </div>
+            <div className="mt-9 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
+              {deliverables.map((deliverable, index) => (
+                <div key={deliverable} className="grid grid-cols-[36px_1fr] gap-3 border-t border-white/10 py-5">
+                  <p className="text-xs tabular-nums text-white/25">{String(index + 1).padStart(2, '0')}</p>
+                  <p className="text-sm font-semibold leading-snug text-white/80">{deliverable}</p>
                 </div>
               ))}
             </div>
@@ -438,16 +375,16 @@ export default function VideoProductionPage() {
         </div>
       </section>
 
-      <section className="py-28 bg-black border-t border-white/5">
+      <section className="border-t border-white/5 bg-black py-24 sm:py-32">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-14">
             <div>
-              <span className="number-label mb-6 block">Room recommendations</span>
-              <h2 className="text-white font-black leading-[0.98]" style={{ fontSize: 'clamp(2.25rem, 4vw, 4.5rem)', letterSpacing: 0 }}>
-                Pick the environment before you pick the camera angle.
+              <span className="number-label mb-6 block">Production environments</span>
+              <h2 className="brand-sans max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-6xl">
+                Pick the environment before the camera angle.
               </h2>
             </div>
-            <Link href="/find-your-studio/" className="text-gray-600 hover:text-white text-sm transition-colors">Use the studio finder</Link>
+            <Link href="/find-your-studio/" className="text-gray-600 hover:text-white text-sm transition-colors">Find your studio</Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -470,82 +407,74 @@ export default function VideoProductionPage() {
         </div>
       </section>
 
-      <section className="py-28 bg-zinc-950 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-16">
-            <div>
-              <span className="number-label mb-6 block">Production logic</span>
-              <h2 className="text-white font-black leading-[0.98] mb-6" style={{ fontSize: 'clamp(2.25rem, 4vw, 4.5rem)', letterSpacing: 0 }}>
-                The best video shoot is organized before the camera turns on.
-              </h2>
-              <p className="text-gray-500 text-sm leading-relaxed max-w-md">
-                Use this checklist when you book. It turns a room rental into a production day with a real shot plan.
-              </p>
-            </div>
-            <div className="divide-y divide-white/10 border-y border-white/10">
-              {productionRules.map(([title, body]) => (
-                <div key={title} className="grid grid-cols-1 md:grid-cols-[0.35fr_0.65fr] gap-4 md:gap-12 py-7">
-                  <p className="text-white font-semibold">{title}</p>
-                  <p className="text-gray-500 text-sm leading-relaxed">{body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-28 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-1 lg:grid-cols-[0.75fr_1.25fr] gap-16 items-start">
+      <section className="border-t border-white/5 bg-zinc-950 py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
+          <div className="grid items-start gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
             <div>
               <span className="number-label mb-6 block">Pricing</span>
-              <div className="font-black text-brand-red leading-none mb-3" style={{ fontSize: 'clamp(2.7rem, 6vw, 4.9rem)', letterSpacing: 0 }}>
-                Contact us
-              </div>
-              <p className="text-white font-semibold mb-2">scoped in-studio video production</p>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                Room-only bookings still start at $100/hr. Production support is quoted for clients who want help making the video, not just renting the room. Final scope depends on concept, crew, camera needs, lighting, set changes, editing, usage, and deliverables.
+              <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl">
+                Scope the shoot, then price it.
+              </h2>
+              <p className="mt-6 max-w-lg text-base leading-relaxed text-gray-500">
+                Studio-only space starts at $100/hr. Production support is quoted after the brief because crew, cameras, set changes, editing, usage, and deliverables change the actual workload.
               </p>
-              <div className="mt-8 grid grid-cols-1 gap-3">
+              <div className="mt-9 divide-y divide-white/10 border-y border-white/10">
                 {productionPricing.map(({ label, price, detail }) => (
-                  <div key={label} className="border border-white/10 bg-zinc-950 p-5">
+                  <div key={label} className="py-6">
                     <div className="flex items-baseline justify-between gap-6">
-                      <p className="text-white font-semibold leading-tight">{label}</p>
-                      <p className="text-brand-red font-black whitespace-nowrap">{price}</p>
+                      <p className="font-semibold leading-tight text-white">{label}</p>
+                      <p className="whitespace-nowrap text-sm font-semibold text-brand-red">{price}</p>
                     </div>
-                    <p className="text-gray-500 text-sm leading-relaxed mt-4">{detail}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-gray-500">{detail}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="divide-y divide-white/10 border-y border-white/10">
-              {videoFaqs.map(({ question, answer }) => (
-                <div key={question} className="grid grid-cols-1 md:grid-cols-[0.42fr_0.58fr] gap-4 md:gap-12 py-7">
-                  <p className="text-white font-semibold">{question}</p>
-                  <p className="text-gray-500 text-sm leading-relaxed">{answer}</p>
-                </div>
-              ))}
+            <div>
+              <span className="number-label mb-6 block">FAQ</span>
+              <h3 className="brand-sans text-3xl font-semibold text-white sm:text-4xl">Before production.</h3>
+              <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
+                {videoFaqs.map(({ question, answer }) => (
+                  <details key={question} className="group py-6">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-semibold text-white marker:hidden [&::-webkit-details-marker]:hidden">
+                      {question}
+                      <span className="text-2xl font-light text-white/35 transition-transform group-open:rotate-45">+</span>
+                    </summary>
+                    <p className="mt-4 max-w-xl text-sm leading-relaxed text-gray-500">{answer}</p>
+                  </details>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-32 bg-black border-t border-white/10">
-        <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
+      <section className="relative isolate overflow-hidden border-t border-white/10 bg-black py-32">
+        <Image
+          src="/studio-images/work-body-is-tea-music-v20260708b.jpg"
+          alt="Body Is Tea music video produced by VibeShack Studios"
+          fill
+          loading="lazy"
+          quality={85}
+          className="object-cover opacity-40"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#000_0%,rgba(0,0,0,0.5)_42%,#000_100%)]" />
+        <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
           <p className="number-label mb-8">Ready</p>
-          <h2 className="font-black text-white leading-[0.98] mb-6" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', letterSpacing: 0 }}>
+          <h2 className="brand-sans mb-6 text-5xl font-semibold leading-tight text-white sm:text-7xl">
             Bring the concept. Build the footage here.
           </h2>
-          <p className="text-gray-500 text-lg mb-10">
-            Video production support is quoted after the brief. Room-only video space starts at $100/hr.
+          <p className="mb-10 text-lg text-white/60">
+            Video production support is quoted after the brief. Studio-only video space starts at $100/hr.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/contact/?service=video-production" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
-              Start a video request
+          <div className="flex flex-wrap justify-center gap-6">
+            <Link href="/contact/?service=video-production" className="inline-flex min-h-[52px] items-center justify-center rounded-md bg-brand-red px-8 text-sm font-bold text-white transition-colors hover:bg-red-700">
+              Start a project
             </Link>
-            <Link href="/book/" prefetch={false} className="text-gray-500 hover:text-white transition-colors text-sm self-center">
-              Book room-only
+            <Link href="/book/" prefetch={false} className="self-center text-sm font-semibold text-white/60 transition-colors hover:text-white">
+              Book studio-only
             </Link>
           </div>
         </div>

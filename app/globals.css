@@ -1414,6 +1414,66 @@ body.podcast-page-active {
   box-shadow: inset 3px 0 0 #ec0000;
 }
 
+.selected-film-poster-image {
+  backface-visibility: hidden;
+  transform: scale(1.005);
+  transition: transform 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:hover > .selected-film-poster-image {
+  transform: scale(1.022);
+}
+
+.video-format-tab {
+  position: relative;
+  transition: background-color 240ms ease;
+}
+
+.video-format-tab::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: #ec0000;
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.video-format-tab:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.video-format-tab[aria-selected='true']::after {
+  transform: scaleX(1);
+}
+
+.video-format-tab[aria-selected='true'] span:last-child {
+  color: #fff;
+}
+
+.video-format-image {
+  opacity: 0;
+  transform: scale(1.015);
+  transition:
+    opacity 620ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1000ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.video-format-image.is-ready {
+  opacity: 1;
+  transform: none;
+}
+
+.video-format-image-previous {
+  transform: scale(1.003);
+}
+
+.video-format-title,
+.video-format-details {
+  animation: podcast-set-copy-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @keyframes podcast-hero-rise {
   from {
     opacity: 0;
@@ -1446,6 +1506,14 @@ body.podcast-page-active {
   .podcast-hero-copy {
     animation: podcast-hero-rise 900ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+
+  .video-hero-image {
+    animation: podcast-hero-image-in 1600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .video-hero-copy {
+    animation: podcast-hero-rise 900ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1453,11 +1521,21 @@ body.podcast-page-active {
   .podcast-set-stage-image,
   .podcast-set-copy-swap,
   .podcast-work-card img,
-  .podcast-production-image {
+  .podcast-production-image,
+  .selected-film-poster-image,
+  .video-format-image,
+  .video-format-title,
+  .video-format-details {
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
     transition: none !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .selected-film-tab[aria-selected='true'] {
+    box-shadow: inset 0 3px 0 #ec0000;
   }
 }
 
