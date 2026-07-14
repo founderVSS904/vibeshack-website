@@ -213,33 +213,6 @@ function DesktopMenuTrigger({
   )
 }
 
-const hubIcons: Record<string, ReactNode> = {
-  '/podcast-studio-san-francisco/': (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="9" y="2" width="6" height="12" rx="3" />
-      <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8" />
-    </svg>
-  ),
-  '/rental-studios/': (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" />
-      <path d="M3 8l9 5 9-5M12 13v8" />
-    </svg>
-  ),
-  '/find-your-studio/': (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" />
-      <circle cx="12" cy="12" r="4.5" />
-      <circle cx="12" cy="12" r="0.5" fill="currentColor" />
-    </svg>
-  ),
-  '/book/': (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <path d="M16 2v4M8 2v4M3 10h18" />
-    </svg>
-  ),
-}
 
 function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
   const featured = podcastStudios[1]
@@ -249,36 +222,9 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
     <DesktopMegaMenu
       className="grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,1fr)_minmax(0,1fr)] gap-x-8 2xl:gap-x-12"
       footer={
-        <div className="flex items-center border-t border-white/10 pt-5">
-          <MenuFooterLink
-            href="/tour/"
-            label="Tour the Studio"
-            detail="Walk every VibeShack Studios space"
-            onNavigate={onNavigate}
-            icon={
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-            }
-          />
-          <div className="mx-10 h-9 w-px bg-white/10" aria-hidden="true" />
-          <MenuFooterLink
-            href="/compare/"
-            label="Compare Studios"
-            detail="Compare features, sizes, and pricing"
-            onNavigate={onNavigate}
-            icon={
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M6 20V10M12 20V4M18 20v-7" />
-              </svg>
-            }
-          />
-          <span className="ml-auto text-brand-red" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </span>
+        <div className="flex items-center gap-10 border-t border-white/[0.08] pt-5">
+          <MenuFooterLink href="/tour/" label="Tour the studio" onNavigate={onNavigate} />
+          <MenuFooterLink href="/compare/" label="Compare studios" onNavigate={onNavigate} />
         </div>
       }
     >
@@ -289,12 +235,11 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
           )}
           <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" aria-hidden="true" />
         </span>
-        <p className="mt-5 font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-brand-red">VibeShack Studios</p>
-        <p className="mt-2 text-[2rem] font-bold leading-none tracking-tight text-white">
+        <p className="mt-6 text-[2rem] font-bold leading-none tracking-tight text-white">
           Choose your room<span className="text-brand-red">.</span>
         </p>
-        <div className="mt-5 space-y-1">
-          {studioHubLinks.map(({ href, label, detail }) => (
+        <div className="mt-6 divide-y divide-white/[0.06]">
+          {studioHubLinks.map(({ href, label }) => (
             <Link
               key={href + label}
               href={href}
@@ -303,16 +248,10 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
                 onNavigate()
                 event.currentTarget.blur()
               }}
-              className="group/hub -mx-3 flex items-center gap-3.5 rounded-xl px-3 py-2.5 transition-colors duration-300 hover:bg-white/[0.05]"
+              className="group/hub flex items-center justify-between py-3.5 text-[15px] font-medium text-zinc-300 transition-colors duration-300 hover:text-white"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-white/[0.06] text-zinc-300 transition-colors duration-300 group-hover/hub:text-white" aria-hidden="true">
-                {hubIcons[href]}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white">{label}</span>
-                <span className="mt-0.5 block text-xs leading-snug text-zinc-500">{detail}</span>
-              </span>
-              <span className="text-zinc-600 transition-all duration-300 group-hover/hub:translate-x-0.5 group-hover/hub:text-brand-red" aria-hidden="true">
+              {label}
+              <span className="text-zinc-600 transition-all duration-300 group-hover/hub:translate-x-0.5 group-hover/hub:text-white" aria-hidden="true">
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                   <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -332,21 +271,15 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
           }}
           className="group/feat block overflow-hidden rounded-2xl bg-white/[0.03] ring-1 ring-white/15 transition-all duration-300 hover:bg-white/[0.05] hover:ring-white/25"
         >
-          <span className="relative block h-32 overflow-hidden">
+          <span className="relative block h-44 overflow-hidden">
             {featured.image && (
               <Image src={featured.image} alt="" fill sizes="512px" quality={85} className="object-cover transition-transform duration-700 group-hover/feat:scale-[1.04]" />
             )}
-            <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" aria-hidden="true" />
-            <span className="absolute left-3 top-3 rounded-full bg-brand-red px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-white">
-              Featured
+            <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" aria-hidden="true" />
+            <span className="absolute inset-x-4 bottom-3.5 flex items-baseline justify-between gap-3">
+              <span className="text-[17px] font-bold leading-tight text-white">{featured.label}</span>
+              <span className="shrink-0 font-mono text-xs text-zinc-300">{featured.price}</span>
             </span>
-          </span>
-          <span className="block px-4 py-3.5">
-            <span className="flex items-baseline justify-between gap-3">
-              <span className="text-[15px] font-bold leading-tight text-white">{featured.label}</span>
-              <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-300 group-hover/feat:text-white">{featured.price}</span>
-            </span>
-            <span className="mt-1 block text-xs leading-snug text-zinc-500">{featured.detail}</span>
           </span>
         </Link>
         <div className="mt-1 flex-1 divide-y divide-white/[0.06]">
@@ -383,10 +316,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
 function MenuColumnHeader({ children }: { children: ReactNode }) {
   return (
     <div className="mb-4">
-      <p className="flex items-center gap-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-zinc-300">
-        <span className="h-[5px] w-[5px] rounded-full bg-brand-red" aria-hidden="true" />
-        {children}
-      </p>
+      <p className="font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-zinc-500">{children}</p>
       <div className="mt-3 h-px bg-white/[0.08]" aria-hidden="true" />
     </div>
   )
@@ -420,37 +350,22 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/room -mx-3 flex items-center gap-4 rounded-xl px-3 py-4 transition-colors duration-300 hover:bg-white/[0.04]"
+      className="group/room -mx-3 flex items-center gap-4 rounded-xl px-3 py-3 transition-colors duration-300 hover:bg-white/[0.04]"
     >
-      <span className="relative h-[88px] w-[112px] shrink-0 overflow-hidden rounded-[10px] bg-white/5 ring-1 ring-white/10">
+      <span className="relative h-[64px] w-[96px] shrink-0 overflow-hidden rounded-lg bg-white/5">
         {room.image && (
           <Image src={room.image} alt="" fill sizes="256px" quality={85} className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
         )}
       </span>
-      <span className="min-w-0 flex-1">
-        <span className="flex items-baseline justify-between gap-3">
-          <span className="text-[15px] font-bold leading-tight text-white">{room.label}</span>
-          {room.price && <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-300 group-hover/room:text-white">{room.price}</span>}
-        </span>
-        <span className="mt-1 block text-xs leading-snug text-zinc-500">{room.detail}</span>
+      <span className="flex min-w-0 flex-1 items-baseline justify-between gap-3">
+        <span className="truncate text-[15px] font-medium leading-tight text-white">{room.label}</span>
+        {room.price && <span className="shrink-0 font-mono text-xs text-zinc-500 transition-colors duration-300 group-hover/room:text-white">{room.price}</span>}
       </span>
     </Link>
   )
 }
 
-function MenuFooterLink({
-  href,
-  label,
-  detail,
-  icon,
-  onNavigate,
-}: {
-  href: string
-  label: string
-  detail: string
-  icon: ReactNode
-  onNavigate: () => void
-}) {
+function MenuFooterLink({ href, label, onNavigate }: { href: string; label: string; onNavigate: () => void }) {
   return (
     <Link
       href={href}
@@ -458,14 +373,13 @@ function MenuFooterLink({
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/foot flex items-center gap-4"
+      className="group/foot flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors duration-300 hover:text-white"
     >
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.04] text-white transition-colors duration-300 group-hover/foot:border-white/30" aria-hidden="true">
-        {icon}
-      </span>
-      <span>
-        <span className="block font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-colors duration-200 group-hover/foot:text-brand-red">{label}</span>
-        <span className="mt-0.5 block text-xs text-zinc-500">{detail}</span>
+      {label}
+      <span className="transition-transform duration-300 group-hover/foot:translate-x-0.5" aria-hidden="true">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+          <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </span>
     </Link>
   )
