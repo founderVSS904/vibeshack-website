@@ -6,8 +6,7 @@ function LogoRow({ hidden }: { hidden?: boolean }) {
   return (
     <div className="flex shrink-0 items-center gap-x-14 pr-14" aria-hidden={hidden || undefined}>
       {trustedLogos.map((logo) => {
-        const src = logo.stripSrc
-          ?? (logo.stripTreatment === 'original' ? logo.src : logo.src.replace('/clean/', '/strip/'))
+        const src = logo.stripSrc ?? logo.src.replace('/clean/', '/strip/')
         const scale = logo.stripScale === 'badge'
           ? 'h-11 w-auto object-contain sm:h-12'
           : logo.stripScale === 'mark'
@@ -22,7 +21,7 @@ function LogoRow({ hidden }: { hidden?: boolean }) {
             width={logo.stripWidth ?? logo.width}
             height={logo.stripHeight ?? logo.height}
             sizes="160px"
-            className={`${scale} max-w-none opacity-80`}
+            className={`${scale} max-w-none opacity-90`}
           />
         )
       })}
