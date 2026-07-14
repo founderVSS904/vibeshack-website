@@ -1215,7 +1215,7 @@ a {
   .desktop-menu-trigger--dismissed .desktop-mega-menu {
     pointer-events: none !important;
     visibility: hidden !important;
-    transform: translate(-50%, -0.5rem) scale(0.985) !important;
+    transform: translateY(-0.375rem) !important;
     opacity: 0 !important;
   }
 
@@ -1227,7 +1227,7 @@ a {
   .desktop-mega-menu .desktop-mega-grid > *,
   .desktop-mega-menu .desktop-mega-footer {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
     transition:
       opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
       transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -1258,7 +1258,7 @@ a {
   .desktop-menu-trigger--dismissed .desktop-mega-grid > *,
   .desktop-menu-trigger--dismissed .desktop-mega-footer {
     opacity: 0 !important;
-    transform: translateY(14px) !important;
+    transform: translateY(10px) !important;
     transition-delay: 0ms !important;
   }
 
