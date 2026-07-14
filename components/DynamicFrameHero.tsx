@@ -53,7 +53,10 @@ const frames: Frame[] = [
     alt: 'Portfolio work and music video production inside a VibeShack Studios rental space',
     position: 'center',
     accent: '#ff2a1f',
-    videos: ['/studio-videos/home-tile-our-work-loop-v20260714b.mp4'],
+    videos: [
+      '/studio-videos/home-tile-our-work-loop-v20260714b.mp4',
+      '/studio-videos/home-tile-restless-moment-loop-v20260714.mp4',
+    ],
   },
   {
     label: 'Photography',
