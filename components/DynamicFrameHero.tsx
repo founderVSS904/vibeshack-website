@@ -27,7 +27,12 @@ const frames: Frame[] = [
     alt: 'Two-host podcast setup inside VibeShack Studios',
     position: 'center 45%',
     accent: '#ff2a1f',
-    videos: ['/studio-videos/home-tile-podcasts-loop-v20260709d.mp4'],
+    videos: [
+      '/studio-videos/home-tile-podcasts-loop-v20260709d.mp4',
+      '/studio-videos/home-tile-podcasts-broll-a-v20260714.mp4',
+      '/studio-videos/home-tile-podcasts-broll-b-v20260714.mp4',
+      '/studio-videos/home-tile-podcasts-broll-c-v20260714.mp4',
+    ],
   },
   {
     label: 'Video Production',
