@@ -2,32 +2,27 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { trustedLogos } from '@/lib/trusted-logos'
 
-const logoTreatments = {
-  mono: 'brightness-0 invert',
-  original: '',
-  invert: 'invert',
-}
-
 function LogoRow({ hidden }: { hidden?: boolean }) {
   return (
     <div className="flex shrink-0 items-center gap-x-14 pr-14" aria-hidden={hidden || undefined}>
       {trustedLogos.map((logo) => {
-        const treatment = logo.stripTreatment ?? 'mono'
-        const scale = logo.stripCrop === 'wide'
-          ? 'h-8 w-14 object-cover sm:h-9 sm:w-16'
+        const src = logo.stripSrc
+          ?? (logo.stripTreatment === 'original' ? logo.src : logo.src.replace('/clean/', '/strip/'))
+        const scale = logo.stripScale === 'badge'
+          ? 'h-11 w-auto object-contain sm:h-12'
           : logo.stripScale === 'mark'
-            ? 'h-7 w-auto object-contain sm:h-8'
-            : 'h-5 w-auto object-contain sm:h-6'
+            ? 'h-9 w-auto object-contain sm:h-10'
+            : 'h-6 w-auto object-contain sm:h-7'
 
         return (
           <Image
             key={logo.name}
-            src={logo.src}
+            src={src}
             alt={hidden ? '' : logo.name}
-            width={logo.width}
-            height={logo.height}
+            width={logo.stripWidth ?? logo.width}
+            height={logo.stripHeight ?? logo.height}
             sizes="160px"
-            className={`${scale} max-w-none opacity-60 ${logoTreatments[treatment]}`}
+            className={`${scale} max-w-none opacity-80`}
           />
         )
       })}

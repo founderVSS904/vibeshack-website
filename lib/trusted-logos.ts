@@ -4,9 +4,11 @@ export type TrustedLogo = {
   width: number
   height: number
   card?: 'dark'
-  stripCrop?: 'wide'
-  stripScale?: 'mark'
-  stripTreatment?: 'original' | 'invert'
+  stripSrc?: string
+  stripWidth?: number
+  stripHeight?: number
+  stripScale?: 'mark' | 'badge'
+  stripTreatment?: 'original'
 }
 
 export const trustedLogos = [
@@ -21,16 +23,17 @@ export const trustedLogos = [
     src: '/brand/trusted-by/clean/front-office-sports.png',
     width: 1100,
     height: 1100,
-    stripCrop: 'wide',
+    stripSrc: '/brand/trusted-by/strip/front-office-sports.png',
+    stripWidth: 696,
+    stripHeight: 296,
     stripScale: 'mark',
-    stripTreatment: 'original',
   },
   {
     name: 'Hey AI Podcast',
     src: '/brand/trusted-by/clean/hey-ai-podcast.png',
     width: 1100,
     height: 1100,
-    stripScale: 'mark',
+    stripScale: 'badge',
     stripTreatment: 'original',
   },
   {
@@ -70,7 +73,6 @@ export const trustedLogos = [
     src: '/brand/trusted-by/clean/owner.png',
     width: 1100,
     height: 333,
-    stripTreatment: 'invert',
   },
   {
     name: "Melinda's Hot Sauce",
@@ -85,13 +87,14 @@ export const trustedLogos = [
     width: 1100,
     height: 1100,
     stripScale: 'mark',
-    stripTreatment: 'invert',
   },
   {
     name: 'Silicon Mania',
     src: '/brand/trusted-by/clean/silicon-mania.png',
     width: 1100,
     height: 775,
+    stripScale: 'badge',
+    stripTreatment: 'original',
   },
   {
     name: 'unPAUSED',
