@@ -110,7 +110,8 @@ export default function Header() {
             aria-label="VibeShack Studios home"
             className="flex flex-shrink-0 items-center transition-opacity duration-200 hover:opacity-80"
           >
-            <BrandMark variant="lockup" priority className="h-[30px] w-auto sm:h-[34px]" />
+            <BrandMark variant="monogram" priority className="h-8 w-auto sm:hidden" />
+            <BrandMark variant="lockup" priority className="hidden h-[34px] w-auto sm:block" />
           </Link>
 
           <nav className="hidden items-center justify-center gap-7 xl:flex 2xl:gap-10" aria-label="Primary">
