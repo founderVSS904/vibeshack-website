@@ -205,7 +205,7 @@ function DesktopMenuTrigger({
       </button>
       <div
         aria-hidden="true"
-        className="desktop-menu-scrim pointer-events-none fixed bottom-0 left-0 right-0 top-20 hidden bg-black/35 opacity-0 backdrop-blur-[3px] transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 xl:block"
+        className="desktop-menu-scrim pointer-events-none fixed bottom-0 left-0 right-0 top-20 hidden bg-black/45 opacity-0 backdrop-blur-[10px] transition-opacity duration-[420ms] group-hover:opacity-100 group-focus-within:opacity-100 xl:block"
         onClick={onDismiss}
       />
       {children}
@@ -283,7 +283,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
       }
     >
       <div>
-        <span className="relative block h-56 overflow-hidden rounded-xl border border-white/10 2xl:h-64">
+        <span className="relative block h-56 overflow-hidden rounded-2xl border border-white/[0.08] 2xl:h-64">
           {featured.image && (
             <Image src={featured.image} alt="The Executive podcast set at VibeShack Studios" fill sizes="768px" quality={85} className="object-cover" />
           )}
@@ -303,7 +303,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
                 onNavigate()
                 event.currentTarget.blur()
               }}
-              className="group/hub flex items-center gap-3.5 rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-3 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.06]"
+              className="group/hub flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-3 transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.05]"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white" aria-hidden="true">
                 {hubIcons[href]}
@@ -330,9 +330,9 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
             onNavigate()
             event.currentTarget.blur()
           }}
-          className="group/feat flex items-center gap-4 rounded-xl border border-white/30 bg-gradient-to-br from-white/[0.08] to-white/[0.02] p-3 transition-colors duration-200 hover:border-white/45"
+          className="group/feat flex items-center gap-4 rounded-2xl border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-3 transition-all duration-300 hover:border-white/35 hover:shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
         >
-          <span className="relative h-[104px] w-[128px] shrink-0 overflow-hidden rounded-lg">
+          <span className="relative h-[104px] w-[128px] shrink-0 overflow-hidden rounded-[10px] ring-1 ring-white/10">
             {featured.image && (
               <Image src={featured.image} alt="" fill sizes="256px" quality={85} className="object-cover transition-transform duration-500 group-hover/feat:scale-[1.05]" />
             )}
@@ -347,7 +347,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
           </span>
           <MenuChevron className="group-hover/feat:translate-x-0.5" />
         </Link>
-        <div className="mt-1 divide-y divide-white/10">
+        <div className="mt-1 divide-y divide-white/[0.06]">
           {coreRows.map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
@@ -356,7 +356,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
 
       <div>
         <MenuColumnHeader>Signature &amp; Custom</MenuColumnHeader>
-        <div className="divide-y divide-white/10">
+        <div className="divide-y divide-white/[0.06]">
           {signaturePodcastStudios.map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
@@ -365,7 +365,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
 
       <div>
         <MenuColumnHeader>Rental Studios</MenuColumnHeader>
-        <div className="divide-y divide-white/10">
+        <div className="divide-y divide-white/[0.06]">
           {rentalStudios.map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
@@ -382,14 +382,14 @@ function MenuColumnHeader({ children }: { children: ReactNode }) {
         <span className="h-[5px] w-[5px] rounded-full bg-brand-red" aria-hidden="true" />
         {children}
       </p>
-      <div className="mt-3 h-px bg-white/10" aria-hidden="true" />
+      <div className="mt-3 h-px bg-white/[0.08]" aria-hidden="true" />
     </div>
   )
 }
 
 function MenuChevron({ className = '' }: { className?: string }) {
   return (
-    <span className={`shrink-0 text-brand-red transition-transform duration-200 ${className}`} aria-hidden="true">
+    <span className={`shrink-0 text-brand-red/70 transition-all duration-300 group-hover/room:text-brand-red group-hover/feat:text-brand-red ${className}`} aria-hidden="true">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="m9 6 6 6-6 6" />
       </svg>
@@ -405,9 +405,9 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/room flex items-center gap-4 py-4 transition-colors duration-200 hover:bg-white/[0.03]"
+      className="group/room -mx-3 flex items-center gap-4 rounded-xl px-3 py-4 transition-colors duration-300 hover:bg-white/[0.04]"
     >
-      <span className="relative h-[88px] w-[112px] shrink-0 overflow-hidden rounded-lg bg-white/5">
+      <span className="relative h-[88px] w-[112px] shrink-0 overflow-hidden rounded-[10px] bg-white/5 ring-1 ring-white/10">
         {room.image && (
           <Image src={room.image} alt="" fill sizes="256px" quality={85} className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
         )}
@@ -446,7 +446,7 @@ function MenuFooterLink({
       }}
       className="group/foot flex items-center gap-4"
     >
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white transition-colors duration-200 group-hover/foot:border-white/35" aria-hidden="true">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.04] text-white transition-colors duration-300 group-hover/foot:border-white/30" aria-hidden="true">
         {icon}
       </span>
       <span>
@@ -495,11 +495,11 @@ function DesktopMegaMenu({
   footer?: ReactNode
 }) {
   return (
-    <div className="desktop-mega-menu pointer-events-none invisible fixed left-1/2 top-[calc(5rem-1px)] hidden max-h-0 w-[min(calc(100vw-2rem),1680px)] -translate-x-1/2 -translate-y-3 overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0c] text-white opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.65)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[840px] group-hover:-translate-x-1/2 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[840px] group-focus-within:-translate-x-1/2 group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
-      <div className={`mx-auto grid px-10 pb-7 pt-9 lg:px-14 ${className}`}>
+    <div className="desktop-mega-menu pointer-events-none invisible fixed left-1/2 top-[calc(5rem-1px)] hidden max-h-[calc(100vh-6.5rem)] w-[min(calc(100vw-2rem),1680px)] -translate-x-1/2 translate-y-[-10px] scale-[0.985] overflow-y-auto overscroll-contain rounded-[20px] border border-white/[0.08] bg-[#0c0c0c] text-white opacity-0 shadow-[0_48px_140px_rgba(0,0,0,0.72)] transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-hover:delay-[60ms] group-hover:duration-[420ms] group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100 group-focus-within:delay-[60ms] group-focus-within:duration-[420ms] xl:block">
+      <div className={`desktop-mega-grid mx-auto grid px-10 pb-7 pt-9 lg:px-14 ${className}`}>
         {children}
       </div>
-      {footer && <div className="px-10 pb-7 lg:px-14">{footer}</div>}
+      {footer && <div className="desktop-mega-footer px-10 pb-7 lg:px-14">{footer}</div>}
     </div>
   )
 }
