@@ -285,7 +285,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
       <div>
         <span className="relative block h-56 overflow-hidden rounded-xl border border-white/10 2xl:h-64">
           {featured.image && (
-            <Image src={featured.image} alt="The Executive podcast set at VibeShack Studios" fill sizes="320px" className="object-cover" />
+            <Image src={featured.image} alt="The Executive podcast set at VibeShack Studios" fill sizes="768px" quality={85} className="object-cover" />
           )}
           <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" aria-hidden="true" />
         </span>
@@ -334,7 +334,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
         >
           <span className="relative h-[104px] w-[128px] shrink-0 overflow-hidden rounded-lg">
             {featured.image && (
-              <Image src={featured.image} alt="" fill sizes="124px" className="object-cover transition-transform duration-500 group-hover/feat:scale-[1.05]" />
+              <Image src={featured.image} alt="" fill sizes="256px" quality={85} className="object-cover transition-transform duration-500 group-hover/feat:scale-[1.05]" />
             )}
           </span>
           <span className="min-w-0 flex-1">
@@ -409,7 +409,7 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
     >
       <span className="relative h-[88px] w-[112px] shrink-0 overflow-hidden rounded-lg bg-white/5">
         {room.image && (
-          <Image src={room.image} alt="" fill sizes="92px" className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
+          <Image src={room.image} alt="" fill sizes="256px" quality={85} className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
         )}
       </span>
       <span className="min-w-0 flex-1">
