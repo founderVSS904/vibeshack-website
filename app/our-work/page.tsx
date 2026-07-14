@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+import { OurWorkShowreel } from '@/components/our-work/OurWorkShowreel'
 import { absoluteUrl } from '@/lib/seo/site'
 import { featuredWorkProject, shotAtVibeshack, workCategories, workProjects, type WorkCategorySlug } from '@/lib/seo/workProjects'
 import { breadcrumbSchema } from '@/lib/schemas'
@@ -46,28 +47,24 @@ export default async function OurWorkPage({
 
       <section className="relative h-[540px] overflow-hidden border-b border-white/10 bg-black pt-20 text-white">
         <div className="absolute inset-x-0 bottom-0 top-20 opacity-95">
-          <Image
-            src={featuredWorkProject.image}
-            alt={featuredWorkProject.alt}
-            fill
-            priority
-            className="object-cover"
-            style={{ objectPosition: '70% center' }}
-            sizes="100vw"
+          <OurWorkShowreel
+            src="/studio-videos/our-work-showreel-v20260714.mp4"
+            poster={featuredWorkProject.image}
+            posterAlt={featuredWorkProject.alt}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#000_0%,rgba(0,0,0,0.92)_23%,rgba(0,0,0,0.34)_48%,rgba(0,0,0,0)_72%),linear-gradient(180deg,rgba(0,0,0,0.14)_0%,rgba(0,0,0,0)_60%,rgba(0,0,0,0.42)_100%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#000_0%,rgba(0,0,0,0.92)_23%,rgba(0,0,0,0.34)_48%,rgba(0,0,0,0)_72%),linear-gradient(180deg,rgba(0,0,0,0.14)_0%,rgba(0,0,0,0)_60%,rgba(0,0,0,0.42)_100%)]" />
         </div>
 
         <div className="relative z-10 mx-auto flex h-full max-w-[1536px] items-center px-10 sm:px-12 lg:px-[70px]">
           <div className="max-w-[520px] pb-4">
-            <p className="mb-4 text-sm font-black uppercase tracking-[0.08em] text-brand-red">Featured</p>
+            <p className="mb-4 text-sm font-black uppercase tracking-[0.08em] text-brand-red">Showreel 2026</p>
             <h1 className="font-black uppercase leading-[0.92] text-white" style={{ fontSize: 'clamp(4.5rem, 7.6vw, 7.45rem)', letterSpacing: 0 }}>
               Our<br />Work
             </h1>
-            <Link href={`/our-work/${featuredWorkProject.slug}/`} className="group mt-8 inline-flex flex-col gap-4 text-base text-white">
+            <Link href="#work-projects" className="group mt-8 inline-flex flex-col gap-4 text-base text-white">
               <span className="inline-flex items-center gap-7">
-                View Project
-                <span className="transition-transform group-hover:translate-x-1">→</span>
+                Explore Projects
+                <span className="transition-transform group-hover:translate-y-1">↓</span>
               </span>
               <span className="h-0.5 w-9 bg-brand-red transition-all group-hover:w-full" />
             </Link>
@@ -97,7 +94,7 @@ export default async function OurWorkPage({
             })}
           </nav>
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div id="work-projects" className="grid scroll-mt-24 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {visibleProjects.map(({ slug, title, categoryLabel, client, image, alt, objectPosition }) => (
               <Link key={slug} href={`/our-work/${slug}/`} className="group block">
                 <figure className="relative h-[206px] overflow-hidden rounded-md border border-white/10 bg-zinc-950">
