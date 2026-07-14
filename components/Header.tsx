@@ -70,10 +70,10 @@ const proofLinks: HeaderLink[] = [
 const signaturePodcastStudios = podcastStudios.slice(5)
 
 const navLinkClass =
-  'relative text-sm tracking-wide whitespace-nowrap text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none'
+  'relative font-mono text-[12px] uppercase tracking-[0.18em] whitespace-nowrap text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none'
 
 const menuButtonClass =
-  'flex items-center gap-1.5 text-sm tracking-wide whitespace-nowrap text-gray-400 transition-colors duration-200 group-hover:text-white group-focus-within:text-white'
+  'flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.18em] whitespace-nowrap text-gray-400 transition-colors duration-200 group-hover:text-white group-focus-within:text-white'
 
 export default function Header() {
   const pathname = usePathname()
@@ -145,11 +145,12 @@ export default function Header() {
             <Link
               href="/book/"
               prefetch={false}
-              className="hidden items-center gap-2 rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.03] hover:border-white/50 hover:bg-white/8 active:scale-[0.98] sm:inline-flex"
+              className="hidden items-center gap-2.5 rounded-lg bg-white px-5 py-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.14em] text-black transition-all duration-200 hover:scale-[1.03] hover:bg-white/90 active:scale-[0.98] sm:inline-flex"
             >
-              Book
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              Book a Session
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
               </svg>
             </Link>
 
@@ -212,23 +213,84 @@ function DesktopMenuTrigger({
   )
 }
 
+const hubIcons: Record<string, ReactNode> = {
+  '/podcast-studio-san-francisco/': (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="9" y="2" width="6" height="12" rx="3" />
+      <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8" />
+    </svg>
+  ),
+  '/rental-studios/': (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" />
+      <path d="M3 8l9 5 9-5M12 13v8" />
+    </svg>
+  ),
+  '/find-your-studio/': (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="4.5" />
+      <circle cx="12" cy="12" r="0.5" fill="currentColor" />
+    </svg>
+  ),
+  '/book/': (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
+    </svg>
+  ),
+}
+
 function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
   const featured = podcastStudios[1]
   const coreRows = podcastStudios.slice(2, 5)
-  const allPodcasts = podcastStudios[0]
 
   return (
     <DesktopMegaMenu
-      className="max-w-7xl grid-cols-[1.05fr_1.1fr_1fr_1fr] gap-10"
+      className="max-w-[1600px] grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,1fr)_minmax(0,1fr)] gap-x-8 2xl:gap-x-12"
       footer={
-        <div className="flex items-center gap-10 border-t border-white/10 pt-5">
-          <MenuFooterLink href="/tour/" label="Tour the Studio" detail="Walk the rooms before a bigger shoot" onNavigate={onNavigate} />
-          <MenuFooterLink href="/compare/" label="Compare Studios" detail="Features, sizes, and pricing side by side" onNavigate={onNavigate} />
+        <div className="flex items-center border-t border-white/10 pt-5">
+          <MenuFooterLink
+            href="/tour/"
+            label="Tour the Studio"
+            detail="Walk every VibeShack Studios space"
+            onNavigate={onNavigate}
+            icon={
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            }
+          />
+          <div className="mx-10 h-9 w-px bg-white/10" aria-hidden="true" />
+          <MenuFooterLink
+            href="/compare/"
+            label="Compare Studios"
+            detail="Compare features, sizes, and pricing"
+            onNavigate={onNavigate}
+            icon={
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M6 20V10M12 20V4M18 20v-7" />
+              </svg>
+            }
+          />
+          <span className="ml-auto text-brand-red" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
         </div>
       }
     >
       <div>
-        <p className="text-3xl font-black leading-tight tracking-tight text-white">
+        <span className="relative block h-44 overflow-hidden rounded-xl border border-white/10">
+          {featured.image && (
+            <Image src={featured.image} alt="The Executive podcast set at VibeShack Studios" fill sizes="320px" className="object-cover" />
+          )}
+          <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" aria-hidden="true" />
+        </span>
+        <p className="mt-5 font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-brand-red">VibeShack Studios</p>
+        <p className="mt-2 text-[2rem] font-bold leading-none tracking-tight text-white">
           Choose your room<span className="text-brand-red">.</span>
         </p>
         <div className="mt-5 space-y-2.5">
@@ -241,62 +303,60 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
                 onNavigate()
                 event.currentTarget.blur()
               }}
-              className="group/hub flex items-center justify-between gap-4 rounded-lg border border-white/10 px-4 py-3 transition-colors duration-200 hover:border-white/30 hover:bg-white/5"
+              className="group/hub flex items-center gap-3.5 rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-3 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.06]"
             >
-              <span>
-                <span className="block text-sm font-bold text-white">{label}</span>
-                <span className="mt-0.5 block text-xs text-zinc-500">{detail}</span>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white" aria-hidden="true">
+                {hubIcons[href]}
               </span>
-              <span className="text-sm text-brand-red transition-transform duration-200 group-hover/hub:translate-x-1" aria-hidden="true">-&gt;</span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white">{label}</span>
+                <span className="mt-0.5 block text-xs leading-snug text-zinc-500">{detail}</span>
+              </span>
+              <span className="text-brand-red transition-transform duration-200 group-hover/hub:translate-x-1" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
             </Link>
           ))}
         </div>
       </div>
 
       <div>
-        <MenuEyebrow>Podcast Sets</MenuEyebrow>
+        <MenuColumnHeader>Podcast Sets</MenuColumnHeader>
         <Link
           href={featured.href}
           onClick={(event) => {
             onNavigate()
             event.currentTarget.blur()
           }}
-          className="group/feat block overflow-hidden rounded-xl border border-brand-red/60 bg-white/[0.03] transition-colors duration-200 hover:bg-white/[0.07]"
+          className="group/feat flex items-center gap-4 rounded-xl border border-white/30 bg-gradient-to-br from-white/[0.08] to-white/[0.02] p-3 transition-colors duration-200 hover:border-white/45"
         >
-          <span className="relative block h-28 overflow-hidden">
+          <span className="relative h-[88px] w-[124px] shrink-0 overflow-hidden rounded-lg">
             {featured.image && (
-              <Image src={featured.image} alt="" fill sizes="280px" className="object-cover transition-transform duration-500 group-hover/feat:scale-[1.04]" />
+              <Image src={featured.image} alt="" fill sizes="124px" className="object-cover transition-transform duration-500 group-hover/feat:scale-[1.05]" />
             )}
           </span>
-          <span className="block p-3.5">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-brand-red">Featured</span>
+          <span className="min-w-0 flex-1">
+            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.26em] text-brand-red">Featured</span>
             <span className="mt-1 flex items-baseline justify-between gap-3">
-              <span className="text-base font-black text-white">{featured.label}</span>
-              <span className="text-xs font-semibold text-zinc-400">{featured.price}</span>
+              <span className="text-[15px] font-bold leading-tight text-white">{featured.label}</span>
+              <span className="shrink-0 font-mono text-xs font-bold text-brand-red">{featured.price}</span>
             </span>
-            <span className="mt-0.5 block text-xs text-zinc-500">{featured.detail}</span>
+            <span className="mt-1 block text-xs leading-snug text-zinc-500">{featured.detail}</span>
           </span>
+          <MenuChevron className="group-hover/feat:translate-x-0.5" />
         </Link>
-        <div className="mt-3 space-y-1">
+        <div className="mt-1 divide-y divide-white/10">
           {coreRows.map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
         </div>
-        <Link
-          href={allPodcasts.href}
-          onClick={(event) => {
-            onNavigate()
-            event.currentTarget.blur()
-          }}
-          className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-zinc-400 transition-colors duration-200 hover:text-white"
-        >
-          {allPodcasts.label} <span aria-hidden="true" className="text-brand-red">-&gt;</span>
-        </Link>
       </div>
 
       <div>
-        <MenuEyebrow>Signature &amp; Custom</MenuEyebrow>
-        <div className="space-y-1">
+        <MenuColumnHeader>Signature &amp; Custom</MenuColumnHeader>
+        <div className="divide-y divide-white/10">
           {signaturePodcastStudios.map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
@@ -304,8 +364,8 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
       </div>
 
       <div>
-        <MenuEyebrow>Rental Studios</MenuEyebrow>
-        <div className="space-y-1">
+        <MenuColumnHeader>Rental Studios</MenuColumnHeader>
+        <div className="divide-y divide-white/10">
           {rentalStudios.map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
@@ -315,12 +375,25 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
   )
 }
 
-function MenuEyebrow({ children }: { children: ReactNode }) {
+function MenuColumnHeader({ children }: { children: ReactNode }) {
   return (
-    <p className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
-      <span className="h-1 w-1 rounded-full bg-brand-red" aria-hidden="true" />
-      {children}
-    </p>
+    <div className="mb-4">
+      <p className="flex items-center gap-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-zinc-300">
+        <span className="h-[5px] w-[5px] rounded-full bg-brand-red" aria-hidden="true" />
+        {children}
+      </p>
+      <div className="mt-3 h-px bg-white/10" aria-hidden="true" />
+    </div>
+  )
+}
+
+function MenuChevron({ className = '' }: { className?: string }) {
+  return (
+    <span className={`shrink-0 text-brand-red transition-transform duration-200 ${className}`} aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m9 6 6 6-6 6" />
+      </svg>
+    </span>
   )
 }
 
@@ -332,25 +405,38 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/room -mx-2 flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-white/5"
+      className="group/room flex items-center gap-4 py-3 transition-colors duration-200 hover:bg-white/[0.03]"
     >
-      <span className="relative h-12 w-[68px] shrink-0 overflow-hidden rounded-md bg-white/5">
+      <span className="relative h-[64px] w-[92px] shrink-0 overflow-hidden rounded-lg bg-white/5">
         {room.image && (
-          <Image src={room.image} alt="" fill sizes="68px" className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
+          <Image src={room.image} alt="" fill sizes="92px" className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
         )}
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline justify-between gap-3">
-          <span className="truncate text-sm font-bold text-white">{room.label}</span>
-          {room.price && <span className="shrink-0 text-xs font-semibold text-zinc-500 transition-colors duration-200 group-hover/room:text-zinc-300">{room.price}</span>}
+          <span className="text-[15px] font-bold leading-tight text-white">{room.label}</span>
+          {room.price && <span className="shrink-0 font-mono text-xs font-bold text-brand-red">{room.price}</span>}
         </span>
-        <span className="mt-0.5 block truncate text-xs text-zinc-500">{room.detail}</span>
+        <span className="mt-1 block text-xs leading-snug text-zinc-500">{room.detail}</span>
       </span>
+      <MenuChevron className="group-hover/room:translate-x-0.5" />
     </Link>
   )
 }
 
-function MenuFooterLink({ href, label, detail, onNavigate }: { href: string; label: string; detail: string; onNavigate: () => void }) {
+function MenuFooterLink({
+  href,
+  label,
+  detail,
+  icon,
+  onNavigate,
+}: {
+  href: string
+  label: string
+  detail: string
+  icon: ReactNode
+  onNavigate: () => void
+}) {
   return (
     <Link
       href={href}
@@ -358,11 +444,15 @@ function MenuFooterLink({ href, label, detail, onNavigate }: { href: string; lab
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/foot flex items-baseline gap-3 text-sm"
+      className="group/foot flex items-center gap-4"
     >
-      <span className="font-bold text-white transition-colors duration-200 group-hover/foot:text-brand-red">{label}</span>
-      <span className="hidden text-xs text-zinc-500 lg:inline">{detail}</span>
-      <span className="text-brand-red transition-transform duration-200 group-hover/foot:translate-x-1" aria-hidden="true">-&gt;</span>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white transition-colors duration-200 group-hover/foot:border-white/35" aria-hidden="true">
+        {icon}
+      </span>
+      <span>
+        <span className="block font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-colors duration-200 group-hover/foot:text-brand-red">{label}</span>
+        <span className="mt-0.5 block text-xs text-zinc-500">{detail}</span>
+      </span>
     </Link>
   )
 }
@@ -373,7 +463,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
       <MegaColumn eyebrow="Production Services" links={serviceLinks} large onNavigate={onNavigate} />
       <MegaColumn eyebrow="Planning Tools" links={proofLinks} onNavigate={onNavigate} />
       <div>
-        <MenuEyebrow>Best First Step</MenuEyebrow>
+        <MenuColumnHeader>Best First Step</MenuColumnHeader>
         <Link
           href="/find-your-studio/"
           onClick={(event) => {
@@ -405,11 +495,11 @@ function DesktopMegaMenu({
   footer?: ReactNode
 }) {
   return (
-    <div className="desktop-mega-menu pointer-events-none invisible fixed left-0 right-0 top-[calc(5rem-1px)] hidden max-h-0 -translate-y-3 overflow-hidden border-b border-white/10 bg-[#0b0b0b] text-white opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.65)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[620px] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[620px] group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
-      <div className={`mx-auto grid px-10 pb-6 pt-9 lg:px-16 ${className}`}>
+    <div className="desktop-mega-menu pointer-events-none invisible fixed left-4 right-4 top-[calc(5rem-1px)] hidden max-h-0 -translate-y-3 overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0c] text-white opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.65)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[640px] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[640px] group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
+      <div className={`mx-auto grid px-10 pb-7 pt-9 lg:px-14 ${className}`}>
         {children}
       </div>
-      {footer && <div className="mx-auto max-w-7xl px-10 pb-7 lg:px-16">{footer}</div>}
+      {footer && <div className="mx-auto max-w-[1600px] px-10 pb-7 lg:px-14">{footer}</div>}
     </div>
   )
 }
@@ -427,7 +517,7 @@ function MegaColumn({
 }) {
   return (
     <div>
-      <MenuEyebrow>{eyebrow}</MenuEyebrow>
+      <MenuColumnHeader>{eyebrow}</MenuColumnHeader>
       <div className={large ? 'space-y-2' : 'space-y-2.5'}>
         {links.map(({ href, label, detail, price }, index) => (
           <Link
