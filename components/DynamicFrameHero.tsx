@@ -56,6 +56,7 @@ const frames: Frame[] = [
     videos: [
       '/studio-videos/home-tile-our-work-loop-v20260714b.mp4',
       '/studio-videos/home-tile-restless-moment-loop-v20260714.mp4',
+      '/studio-videos/home-tile-remote-loop-v20260714.mp4',
     ],
   },
   {
