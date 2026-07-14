@@ -96,24 +96,58 @@ const frames: Frame[] = [
 
 export function DynamicFrameHero() {
   const [activeFrame, setActiveFrame] = useState<string | null>(null)
+  const [spotlightFrame, setSpotlightFrame] = useState<string | null>(null)
   const [videoIndices, setVideoIndices] = useState<Record<string, number>>({})
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map())
+  const spotlightIndexRef = useRef(0)
   const activeIndex = activeFrame ? Number(activeFrame) - 1 : null
   const activeColumn = activeIndex !== null ? String((activeIndex % 3) + 1) : undefined
   const activeRow = activeIndex !== null ? String(Math.floor(activeIndex / 3) + 1) : undefined
 
-  // Play the hovered tile's loop; rewind the rest so the next hover starts fresh.
+  // Ambient spotlight: walks the grid one tile at a time so the hero moves
+  // before anyone hovers. A real pointer always takes control; the walk
+  // resumes where it left off after a beat.
+  useEffect(() => {
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!canHover || reducedMotion) return
+    if (activeFrame !== null) {
+      setSpotlightFrame(null)
+      return
+    }
+
+    const advance = () => {
+      if (document.hidden) return
+      spotlightIndexRef.current = (spotlightIndexRef.current % frames.length) + 1
+      setSpotlightFrame(String(spotlightIndexRef.current))
+    }
+
+    const startDelay = setTimeout(() => {
+      advance()
+    }, 1600)
+    const interval = setInterval(advance, 5000)
+
+    return () => {
+      clearTimeout(startDelay)
+      clearInterval(interval)
+      setSpotlightFrame(null)
+    }
+  }, [activeFrame])
+
+  // Play the hovered or spotlighted tile's loop; rewind the rest so the next
+  // pass starts fresh.
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const playingFrame = activeFrame ?? spotlightFrame
     videoRefs.current.forEach((video, frameIndex) => {
-      if (frameIndex === activeFrame && !reducedMotion) {
+      if (frameIndex === playingFrame && !reducedMotion) {
         void video.play().catch(() => undefined)
       } else {
         video.pause()
         video.currentTime = 0
       }
     })
-  }, [activeFrame, videoIndices])
+  }, [activeFrame, spotlightFrame, videoIndices])
 
   const activateFrame = (frameIndex: string) => {
     setActiveFrame((currentFrame) => currentFrame === frameIndex ? currentFrame : frameIndex)
@@ -156,6 +190,7 @@ export function DynamicFrameHero() {
                   data-column={columnIndex + 1}
                   data-frame={frame.label.toLowerCase().replace(/\s+/g, '-')}
                   data-state={activeFrame === frameIndex ? 'active' : undefined}
+                  data-spotlight={activeFrame === null && spotlightFrame === frameIndex ? 'true' : undefined}
                   onPointerEnter={() => activateFrame(frameIndex)}
                   onFocus={() => activateFrame(frameIndex)}
                   onBlur={clearFrame}

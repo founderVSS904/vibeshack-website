@@ -291,12 +291,14 @@ body .placeholder-gray-700::placeholder {
   transition: opacity 420ms var(--dynamic-frame-ease);
 }
 
-.dynamic-frame-tile[data-state="active"] .dynamic-frame-video {
+.dynamic-frame-tile[data-state="active"] .dynamic-frame-video,
+.dynamic-frame-tile[data-spotlight="true"] .dynamic-frame-video {
   opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dynamic-frame-tile[data-state="active"] .dynamic-frame-video {
+  .dynamic-frame-tile[data-state="active"] .dynamic-frame-video,
+  .dynamic-frame-tile[data-spotlight="true"] .dynamic-frame-video {
     opacity: 0;
   }
 }
