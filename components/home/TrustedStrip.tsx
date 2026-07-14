@@ -8,10 +8,10 @@ function LogoRow({ hidden }: { hidden?: boolean }) {
       {trustedLogos.map((logo) => {
         const src = logo.stripSrc ?? logo.src.replace('/clean/', '/strip/')
         const scale = logo.stripScale === 'badge'
-          ? 'h-11 w-auto object-contain sm:h-12'
+          ? 'h-12 w-auto object-contain sm:h-14'
           : logo.stripScale === 'mark'
-            ? 'h-9 w-auto object-contain sm:h-10'
-            : 'h-6 w-auto object-contain sm:h-7'
+            ? 'h-10 w-auto object-contain sm:h-11'
+            : 'h-7 w-auto object-contain sm:h-8'
 
         return (
           <Image

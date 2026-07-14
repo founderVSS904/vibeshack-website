@@ -690,6 +690,11 @@ a.bg-brand-red:hover, button.bg-brand-red:hover {
   animation-duration: 52s;
 }
 
+/* The trusted strip never pauses; it keeps crawling under the cursor. */
+.trusted-strip-marquee:hover .shot-logo-track {
+  animation-play-state: running;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .shot-logo-track {
     animation: none;
