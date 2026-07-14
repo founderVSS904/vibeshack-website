@@ -42,6 +42,7 @@ const frames: Frame[] = [
       '/studio-videos/home-tile-video-production-loop-v20260714b.mp4',
       '/studio-videos/home-tile-damian-stone-loop-v20260710.mp4',
       '/studio-videos/home-tile-the-client-loop-v20260714.mp4',
+      '/studio-videos/home-tile-unforgiven-loop-v20260714.mp4',
     ],
   },
   {
