@@ -62,6 +62,7 @@ const proofLinks: HeaderLink[] = [
   { href: '/studio-guides/', label: 'Studio Guides', detail: 'Prep smarter before the session' },
   { href: '/use-cases/', label: 'Use Cases', detail: 'Choose by outcome and client need' },
   { href: '/compare/', label: 'Compare Studios', detail: 'Understand the tradeoffs before booking' },
+  { href: '/support/', label: 'Support', detail: 'Questions, policies, and help' },
 ]
 
 const corePodcastStudios = podcastStudios.slice(1, 5)
@@ -133,13 +134,9 @@ export default function Header() {
               <DesktopServicesMenu onNavigate={() => dismissMenu('services')} />
             </DesktopMenuTrigger>
 
-            <Link href="/find-your-studio/" className={primaryNavClass('/find-your-studio/')}>Find a Studio</Link>
+            <Link href="/our-work/" className={primaryNavClass('/our-work/')}>Our Work</Link>
             <Link href="/pricing/" className={primaryNavClass('/pricing/')}>Pricing</Link>
             <Link href="/about/" className={primaryNavClass('/about/')}>About</Link>
-            <Link href="/our-work/" className={primaryNavClass('/our-work/')}>Our Work</Link>
-            <Link href="/studio-guides/" className={primaryNavClass('/studio-guides/')}>Guides</Link>
-            <Link href="/use-cases/" className={primaryNavClass('/use-cases/')}>Use Cases</Link>
-            <Link href="/support/" className={primaryNavClass('/support/')}>Support</Link>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -313,7 +310,7 @@ function MobileMenu() {
       <div className="mx-auto max-w-7xl px-6 pb-10 pt-6 sm:px-10">
         <MobileSection title="Studios" links={[...podcastStudios, ...rentalStudios]} />
         <MobileSection title="Services" links={serviceLinks} />
-        <MobileSection title="Plan" links={[...planningLinks, ...proofLinks, { href: '/support/', label: 'Support', detail: 'Questions, policies, and help' }]} />
+        <MobileSection title="Plan" links={[...planningLinks, ...proofLinks]} />
       </div>
     </div>
   )
