@@ -81,7 +81,7 @@ const frames: Frame[] = [
     alt: 'White cyc rental studio inside VibeShack Studios',
     position: 'center 45%',
     accent: '#f6f6f6',
-    videos: ['/studio-videos/home-tile-rentals-loop-v20260714.mp4'],
+    videos: ['/studio-videos/home-tile-rentals-loop-v20260714b.mp4'],
   },
 ]
 
