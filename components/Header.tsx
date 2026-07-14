@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -11,24 +12,25 @@ type HeaderLink = {
   label: string
   detail?: string
   price?: string
+  image?: string
 }
 
 const podcastStudios: HeaderLink[] = [
   { href: '/podcast-studio-san-francisco/', label: 'All Podcast Studios', detail: 'Compare every podcast set' },
-  { href: '/the-executive/', label: 'The Executive', detail: 'Boardroom set, three cameras', price: '$300/hr' },
-  { href: '/the-wing/', label: 'The Wing', detail: 'Warm two-person conversation set', price: '$300/hr' },
-  { href: '/encore/', label: 'Encore', detail: 'Treated set with clean sightlines', price: '$300/hr' },
-  { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast set', price: '$300/hr' },
-  { href: '/parlor/', label: 'Parlor', detail: 'Signature lounge interview set', price: '$400/hr' },
-  { href: '/horizon/', label: 'Horizon', detail: 'Warm curated sunset podcast set', price: '$400/hr' },
-  { href: '/canvas-podcast/', label: 'Canvas Podcast', detail: 'Large-format custom podcast set', price: '$400/hr' },
+  { href: '/the-executive/', label: 'The Executive', detail: 'Boardroom set, three cameras', price: '$300/hr', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
+  { href: '/the-wing/', label: 'The Wing', detail: 'Warm two-person conversation set', price: '$300/hr', image: '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg' },
+  { href: '/encore/', label: 'Encore', detail: 'Treated set with clean sightlines', price: '$300/hr', image: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg' },
+  { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast set', price: '$300/hr', image: '/studio-images/sunset-hero-v20260509.jpg' },
+  { href: '/parlor/', label: 'Parlor', detail: 'Signature lounge interview set', price: '$400/hr', image: '/studio-images/parlor-production-v20260509.jpg' },
+  { href: '/horizon/', label: 'Horizon', detail: 'Warm curated sunset podcast set', price: '$400/hr', image: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg' },
+  { href: '/canvas-podcast/', label: 'Canvas Podcast', detail: 'Large-format custom podcast set', price: '$400/hr', image: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg' },
 ]
 
 const rentalStudios: HeaderLink[] = [
-  { href: '/rental-studios/', label: 'All Rental Studios', detail: 'White cyc, green screen, photo rooms' },
-  { href: '/canvas-rental/', label: 'Canvas Rental', detail: 'White cyc and open production floor', price: '$100/hr' },
-  { href: '/photography-studio-san-francisco/', label: 'Photography Studio', detail: 'Backdrops, glam room, lighting', price: '$100/hr' },
-  { href: '/green-screen-studio-sf/', label: 'Green Screen', detail: 'Full green wall for compositing', price: '$100/hr' },
+  { href: '/rental-studios/', label: 'All Rental Studios', detail: 'White cyc, green screen, photo rooms', image: '/studio-images/canvas-rental-space-v20260509.jpg' },
+  { href: '/canvas-rental/', label: 'Canvas Rental', detail: 'White cyc and open production floor', price: '$100/hr', image: '/studio-images/enhanced-canvas-podcast-white-cyc-duo-v20260510.jpg' },
+  { href: '/photography-studio-san-francisco/', label: 'Photography Studio', detail: 'Backdrops, glam room, lighting', price: '$100/hr', image: '/studio-images/inside-photography-red-v20260509.jpg' },
+  { href: '/green-screen-studio-sf/', label: 'Green Screen', detail: 'Full green wall for compositing', price: '$100/hr', image: '/studio-images/inside-green-screen-v20260509.jpg' },
 ]
 
 const serviceLinks: HeaderLink[] = [
@@ -65,7 +67,6 @@ const proofLinks: HeaderLink[] = [
   { href: '/support/', label: 'Support', detail: 'Questions, policies, and help' },
 ]
 
-const corePodcastStudios = podcastStudios.slice(1, 5)
 const signaturePodcastStudios = podcastStudios.slice(5)
 
 const navLinkClass =
@@ -212,13 +213,157 @@ function DesktopMenuTrigger({
 }
 
 function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
+  const featured = podcastStudios[1]
+  const coreRows = podcastStudios.slice(2, 5)
+  const allPodcasts = podcastStudios[0]
+
   return (
-    <DesktopMegaMenu className="max-w-7xl grid-cols-[1fr_1fr_1fr_1fr] gap-10">
-      <MegaColumn eyebrow="Browse" links={studioHubLinks} large onNavigate={onNavigate} />
-      <MegaColumn eyebrow="Podcast Sets" links={corePodcastStudios} onNavigate={onNavigate} />
-      <MegaColumn eyebrow="Signature & Custom" links={signaturePodcastStudios} onNavigate={onNavigate} />
-      <MegaColumn eyebrow="Rental Studios" links={rentalStudios} onNavigate={onNavigate} />
+    <DesktopMegaMenu
+      className="max-w-7xl grid-cols-[1.05fr_1.1fr_1fr_1fr] gap-10"
+      footer={
+        <div className="flex items-center gap-10 border-t border-white/10 pt-5">
+          <MenuFooterLink href="/tour/" label="Tour the Studio" detail="Walk the rooms before a bigger shoot" onNavigate={onNavigate} />
+          <MenuFooterLink href="/compare/" label="Compare Studios" detail="Features, sizes, and pricing side by side" onNavigate={onNavigate} />
+        </div>
+      }
+    >
+      <div>
+        <p className="text-3xl font-black leading-tight tracking-tight text-white">
+          Choose your room<span className="text-brand-red">.</span>
+        </p>
+        <div className="mt-5 space-y-2.5">
+          {studioHubLinks.map(({ href, label, detail }) => (
+            <Link
+              key={href + label}
+              href={href}
+              prefetch={href === '/book/' ? false : undefined}
+              onClick={(event) => {
+                onNavigate()
+                event.currentTarget.blur()
+              }}
+              className="group/hub flex items-center justify-between gap-4 rounded-lg border border-white/10 px-4 py-3 transition-colors duration-200 hover:border-white/30 hover:bg-white/5"
+            >
+              <span>
+                <span className="block text-sm font-bold text-white">{label}</span>
+                <span className="mt-0.5 block text-xs text-zinc-500">{detail}</span>
+              </span>
+              <span className="text-sm text-brand-red transition-transform duration-200 group-hover/hub:translate-x-1" aria-hidden="true">-&gt;</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <MenuEyebrow>Podcast Sets</MenuEyebrow>
+        <Link
+          href={featured.href}
+          onClick={(event) => {
+            onNavigate()
+            event.currentTarget.blur()
+          }}
+          className="group/feat block overflow-hidden rounded-xl border border-brand-red/60 bg-white/[0.03] transition-colors duration-200 hover:bg-white/[0.07]"
+        >
+          <span className="relative block h-28 overflow-hidden">
+            {featured.image && (
+              <Image src={featured.image} alt="" fill sizes="280px" className="object-cover transition-transform duration-500 group-hover/feat:scale-[1.04]" />
+            )}
+          </span>
+          <span className="block p-3.5">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-brand-red">Featured</span>
+            <span className="mt-1 flex items-baseline justify-between gap-3">
+              <span className="text-base font-black text-white">{featured.label}</span>
+              <span className="text-xs font-semibold text-zinc-400">{featured.price}</span>
+            </span>
+            <span className="mt-0.5 block text-xs text-zinc-500">{featured.detail}</span>
+          </span>
+        </Link>
+        <div className="mt-3 space-y-1">
+          {coreRows.map((room) => (
+            <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
+          ))}
+        </div>
+        <Link
+          href={allPodcasts.href}
+          onClick={(event) => {
+            onNavigate()
+            event.currentTarget.blur()
+          }}
+          className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-zinc-400 transition-colors duration-200 hover:text-white"
+        >
+          {allPodcasts.label} <span aria-hidden="true" className="text-brand-red">-&gt;</span>
+        </Link>
+      </div>
+
+      <div>
+        <MenuEyebrow>Signature &amp; Custom</MenuEyebrow>
+        <div className="space-y-1">
+          {signaturePodcastStudios.map((room) => (
+            <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <MenuEyebrow>Rental Studios</MenuEyebrow>
+        <div className="space-y-1">
+          {rentalStudios.map((room) => (
+            <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
+          ))}
+        </div>
+      </div>
     </DesktopMegaMenu>
+  )
+}
+
+function MenuEyebrow({ children }: { children: ReactNode }) {
+  return (
+    <p className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+      <span className="h-1 w-1 rounded-full bg-brand-red" aria-hidden="true" />
+      {children}
+    </p>
+  )
+}
+
+function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () => void }) {
+  return (
+    <Link
+      href={room.href}
+      onClick={(event) => {
+        onNavigate()
+        event.currentTarget.blur()
+      }}
+      className="group/room -mx-2 flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-white/5"
+    >
+      <span className="relative h-12 w-[68px] shrink-0 overflow-hidden rounded-md bg-white/5">
+        {room.image && (
+          <Image src={room.image} alt="" fill sizes="68px" className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
+        )}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="truncate text-sm font-bold text-white">{room.label}</span>
+          {room.price && <span className="shrink-0 text-xs font-semibold text-zinc-500 transition-colors duration-200 group-hover/room:text-zinc-300">{room.price}</span>}
+        </span>
+        <span className="mt-0.5 block truncate text-xs text-zinc-500">{room.detail}</span>
+      </span>
+    </Link>
+  )
+}
+
+function MenuFooterLink({ href, label, detail, onNavigate }: { href: string; label: string; detail: string; onNavigate: () => void }) {
+  return (
+    <Link
+      href={href}
+      onClick={(event) => {
+        onNavigate()
+        event.currentTarget.blur()
+      }}
+      className="group/foot flex items-baseline gap-3 text-sm"
+    >
+      <span className="font-bold text-white transition-colors duration-200 group-hover/foot:text-brand-red">{label}</span>
+      <span className="hidden text-xs text-zinc-500 lg:inline">{detail}</span>
+      <span className="text-brand-red transition-transform duration-200 group-hover/foot:translate-x-1" aria-hidden="true">-&gt;</span>
+    </Link>
   )
 }
 
@@ -228,17 +373,17 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
       <MegaColumn eyebrow="Production Services" links={serviceLinks} large onNavigate={onNavigate} />
       <MegaColumn eyebrow="Planning Tools" links={proofLinks} onNavigate={onNavigate} />
       <div>
-        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Best First Step</p>
+        <MenuEyebrow>Best First Step</MenuEyebrow>
         <Link
           href="/find-your-studio/"
           onClick={(event) => {
             onNavigate()
             event.currentTarget.blur()
           }}
-          className="group/card block rounded-2xl border border-black/10 bg-white/65 p-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
+          className="group/card block rounded-2xl border border-white/10 bg-white/[0.04] p-5 transition duration-300 hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08]"
         >
-          <span className="block text-2xl font-black tracking-tight text-black">Match the room to the outcome.</span>
-          <span className="mt-3 block text-sm leading-relaxed text-zinc-600">
+          <span className="block text-2xl font-black tracking-tight text-white">Match the room to the outcome.</span>
+          <span className="mt-3 block text-sm leading-relaxed text-zinc-400">
             Start with what you are making: portraits, a brand film, a podcast, social clips, or a clean rental space.
           </span>
           <span className="mt-5 inline-flex text-sm font-bold text-brand-red transition-transform duration-300 group-hover/card:translate-x-1">
@@ -253,15 +398,18 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
 function DesktopMegaMenu({
   className,
   children,
+  footer,
 }: {
   className: string
   children: ReactNode
+  footer?: ReactNode
 }) {
   return (
-    <div className="desktop-mega-menu pointer-events-none invisible fixed left-0 right-0 top-[calc(5rem-1px)] hidden max-h-0 -translate-y-3 overflow-hidden border-b border-white/10 bg-[#f5f5f2] text-black opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.42)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[540px] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[540px] group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
-      <div className={`mx-auto grid px-10 py-9 lg:px-16 ${className}`}>
+    <div className="desktop-mega-menu pointer-events-none invisible fixed left-0 right-0 top-[calc(5rem-1px)] hidden max-h-0 -translate-y-3 overflow-hidden border-b border-white/10 bg-[#0b0b0b] text-white opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.65)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[620px] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[620px] group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
+      <div className={`mx-auto grid px-10 pb-6 pt-9 lg:px-16 ${className}`}>
         {children}
       </div>
+      {footer && <div className="mx-auto max-w-7xl px-10 pb-7 lg:px-16">{footer}</div>}
     </div>
   )
 }
@@ -279,7 +427,7 @@ function MegaColumn({
 }) {
   return (
     <div>
-      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">{eyebrow}</p>
+      <MenuEyebrow>{eyebrow}</MenuEyebrow>
       <div className={large ? 'space-y-2' : 'space-y-2.5'}>
         {links.map(({ href, label, detail, price }, index) => (
           <Link
@@ -290,11 +438,11 @@ function MegaColumn({
               onNavigate?.()
               event.currentTarget.blur()
             }}
-            className="group/link block text-zinc-700 transition-colors duration-200 hover:text-black"
+            className="group/link block text-zinc-300 transition-colors duration-200 hover:text-white"
           >
-            <span className={`flex items-baseline justify-between gap-4 ${large ? 'text-[1.45rem] font-black leading-[1.08] tracking-tight' : 'text-[0.95rem] font-bold'}`}>
+            <span className={`flex items-baseline justify-between gap-4 ${large ? 'text-[1.45rem] font-black leading-[1.08] tracking-tight text-white' : 'text-[0.95rem] font-bold'}`}>
               <span>{label}</span>
-              {price && <span className="text-xs font-semibold text-zinc-400 transition-colors duration-200 group-hover/link:text-zinc-700">{price}</span>}
+              {price && <span className="text-xs font-semibold text-zinc-500 transition-colors duration-200 group-hover/link:text-zinc-300">{price}</span>}
               {!price && index === 0 && <span className="text-xs font-semibold text-brand-red opacity-0 transition duration-200 group-hover/link:translate-x-1 group-hover/link:opacity-100">-&gt;</span>}
             </span>
             {detail && <span className="mt-0.5 block text-xs leading-relaxed text-zinc-500">{detail}</span>}
