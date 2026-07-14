@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { OurWorkShowreel } from '@/components/our-work/OurWorkShowreel'
 import { absoluteUrl } from '@/lib/seo/site'
-import { featuredWorkProject, shotAtVibeshack, workCategories, workProjects, type WorkCategorySlug } from '@/lib/seo/workProjects'
+import { allWorkProjects, featuredWorkProject, shotAtVibeshack, workCategories, type WorkCategorySlug } from '@/lib/seo/workProjects'
 import { breadcrumbSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
@@ -38,8 +38,8 @@ export default async function OurWorkPage({
   const params = await searchParams
   const activeCategory = normalizeCategory(params?.category)
   const visibleProjects = activeCategory === 'all'
-    ? workProjects
-    : workProjects.filter((project) => project.category === activeCategory)
+    ? allWorkProjects
+    : allWorkProjects.filter((project) => project.category === activeCategory)
 
   return (
     <>
