@@ -1,32 +1,36 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { trustedLogos } from '@/lib/trusted-logos'
 
-// Only logos with true alpha transparency belong here; the white-silhouette
-// treatment (brightness-0 invert) turns baked-in backgrounds into solid boxes.
-const stripLogos = [
-  { name: 'Saviynt', src: '/brand/trusted-by/clean/saviynt.png' },
-  { name: 'unPAUSED', src: '/brand/trusted-by/clean/unpaused.png' },
-  { name: 'Silicon Mania', src: '/brand/trusted-by/clean/silicon-mania.png' },
-  { name: "Melinda's Hot Sauce", src: '/brand/trusted-by/clean/melindas-hot-sauce.png' },
-  { name: 'Dollars & Donuts', src: '/brand/trusted-by/clean/dollars-donuts.png' },
-  { name: '141 Studios', src: '/brand/trusted-by/clean/141-studios.png' },
-  { name: 'Alex Fitness', src: '/brand/trusted-by/clean/alex-fitness.png' },
-  { name: 'Vegas Veteran Voices', src: '/brand/trusted-by/clean/vegas-veteran-voices.png' },
-]
+const logoTreatments = {
+  mono: 'brightness-0 invert',
+  original: '',
+  invert: 'invert',
+}
 
 function LogoRow({ hidden }: { hidden?: boolean }) {
   return (
     <div className="flex shrink-0 items-center gap-x-14 pr-14" aria-hidden={hidden || undefined}>
-      {stripLogos.map((logo) => (
-        <Image
-          key={logo.name}
-          src={logo.src}
-          alt={hidden ? '' : logo.name}
-          width={220}
-          height={80}
-          className="h-5 w-auto max-w-none object-contain opacity-60 brightness-0 invert sm:h-6"
-        />
-      ))}
+      {trustedLogos.map((logo) => {
+        const treatment = logo.stripTreatment ?? 'mono'
+        const scale = logo.stripCrop === 'wide'
+          ? 'h-8 w-14 object-cover sm:h-9 sm:w-16'
+          : logo.stripScale === 'mark'
+            ? 'h-7 w-auto object-contain sm:h-8'
+            : 'h-5 w-auto object-contain sm:h-6'
+
+        return (
+          <Image
+            key={logo.name}
+            src={logo.src}
+            alt={hidden ? '' : logo.name}
+            width={logo.width}
+            height={logo.height}
+            sizes="160px"
+            className={`${scale} max-w-none opacity-60 ${logoTreatments[treatment]}`}
+          />
+        )
+      })}
     </div>
   )
 }
@@ -44,7 +48,7 @@ export function TrustedStrip() {
             <LogoRow hidden />
           </div>
           <span className="sr-only">
-            {stripLogos.map((logo) => logo.name).join(', ')}
+            {trustedLogos.map((logo) => logo.name).join(', ')}
           </span>
         </div>
         <Link

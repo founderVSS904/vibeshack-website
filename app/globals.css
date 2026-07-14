@@ -685,9 +685,9 @@ a.bg-brand-red:hover, button.bg-brand-red:hover {
   animation-play-state: paused;
 }
 
-/* Slim trusted-by strip variant: shorter track, quicker crawl. */
+/* Slim trusted-by strip variant: steady crawl across the full logo roster. */
 .trusted-strip-marquee .shot-logo-track {
-  animation-duration: 30s;
+  animation-duration: 52s;
 }
 
 @media (prefers-reduced-motion: reduce) {
