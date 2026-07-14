@@ -293,7 +293,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
         <p className="mt-2 text-[2rem] font-bold leading-none tracking-tight text-white">
           Choose your room<span className="text-brand-red">.</span>
         </p>
-        <div className="mt-5 space-y-2.5">
+        <div className="mt-5 space-y-1">
           {studioHubLinks.map(({ href, label, detail }) => (
             <Link
               key={href + label}
@@ -303,16 +303,16 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
                 onNavigate()
                 event.currentTarget.blur()
               }}
-              className="group/hub flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-3 transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.05]"
+              className="group/hub -mx-3 flex items-center gap-3.5 rounded-xl px-3 py-2.5 transition-colors duration-300 hover:bg-white/[0.05]"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white" aria-hidden="true">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-white/[0.06] text-zinc-300 transition-colors duration-300 group-hover/hub:text-white" aria-hidden="true">
                 {hubIcons[href]}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white">{label}</span>
                 <span className="mt-0.5 block text-xs leading-snug text-zinc-500">{detail}</span>
               </span>
-              <span className="text-brand-red transition-transform duration-200 group-hover/hub:translate-x-1" aria-hidden="true">
+              <span className="text-zinc-600 transition-all duration-300 group-hover/hub:translate-x-0.5 group-hover/hub:text-brand-red" aria-hidden="true">
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                   <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -322,7 +322,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
         </div>
       </div>
 
-      <div>
+      <div className="flex flex-col">
         <MenuColumnHeader>Podcast Sets</MenuColumnHeader>
         <Link
           href={featured.href}
@@ -330,46 +330,51 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
             onNavigate()
             event.currentTarget.blur()
           }}
-          className="group/feat flex items-center gap-4 rounded-2xl border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-3 transition-all duration-300 hover:border-white/35 hover:shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+          className="group/feat block overflow-hidden rounded-2xl bg-white/[0.03] ring-1 ring-white/15 transition-all duration-300 hover:bg-white/[0.05] hover:ring-white/25"
         >
-          <span className="relative h-[104px] w-[128px] shrink-0 overflow-hidden rounded-[10px] ring-1 ring-white/10">
+          <span className="relative block h-32 overflow-hidden">
             {featured.image && (
-              <Image src={featured.image} alt="" fill sizes="256px" quality={85} className="object-cover transition-transform duration-500 group-hover/feat:scale-[1.05]" />
+              <Image src={featured.image} alt="" fill sizes="512px" quality={85} className="object-cover transition-transform duration-700 group-hover/feat:scale-[1.04]" />
             )}
+            <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" aria-hidden="true" />
+            <span className="absolute left-3 top-3 rounded-full bg-brand-red px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-white">
+              Featured
+            </span>
           </span>
-          <span className="min-w-0 flex-1">
-            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.26em] text-brand-red">Featured</span>
-            <span className="mt-1 flex items-baseline justify-between gap-3">
+          <span className="block px-4 py-3.5">
+            <span className="flex items-baseline justify-between gap-3">
               <span className="text-[15px] font-bold leading-tight text-white">{featured.label}</span>
-              <span className="shrink-0 font-mono text-xs font-bold text-brand-red">{featured.price}</span>
+              <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-300 group-hover/feat:text-white">{featured.price}</span>
             </span>
             <span className="mt-1 block text-xs leading-snug text-zinc-500">{featured.detail}</span>
           </span>
-          <MenuChevron className="group-hover/feat:translate-x-0.5" />
         </Link>
-        <div className="mt-1 divide-y divide-white/[0.06]">
+        <div className="mt-1 flex-1 divide-y divide-white/[0.06]">
           {coreRows.map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
         </div>
+        <MenuViewAll href="/podcast-studio-san-francisco/" label="All podcast sets" onNavigate={onNavigate} />
       </div>
 
-      <div>
+      <div className="flex flex-col">
         <MenuColumnHeader>Signature &amp; Custom</MenuColumnHeader>
-        <div className="divide-y divide-white/[0.06]">
+        <div className="flex-1 divide-y divide-white/[0.06]">
           {signaturePodcastStudios.map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
         </div>
+        <MenuViewAll href="/compare/" label="Compare all rooms" onNavigate={onNavigate} />
       </div>
 
-      <div>
+      <div className="flex flex-col">
         <MenuColumnHeader>Rental Studios</MenuColumnHeader>
-        <div className="divide-y divide-white/[0.06]">
-          {rentalStudios.map((room) => (
+        <div className="flex-1 divide-y divide-white/[0.06]">
+          {rentalStudios.slice(1).map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
         </div>
+        <MenuViewAll href="/rental-studios/" label="All rental studios" onNavigate={onNavigate} />
       </div>
     </DesktopMegaMenu>
   )
@@ -387,13 +392,23 @@ function MenuColumnHeader({ children }: { children: ReactNode }) {
   )
 }
 
-function MenuChevron({ className = '' }: { className?: string }) {
+function MenuViewAll({ href, label, onNavigate }: { href: string; label: string; onNavigate: () => void }) {
   return (
-    <span className={`shrink-0 text-brand-red/70 transition-all duration-300 group-hover/room:text-brand-red group-hover/feat:text-brand-red ${className}`} aria-hidden="true">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="m9 6 6 6-6 6" />
-      </svg>
-    </span>
+    <Link
+      href={href}
+      onClick={(event) => {
+        onNavigate()
+        event.currentTarget.blur()
+      }}
+      className="group/all mt-auto flex items-center gap-2 border-t border-white/[0.06] pt-4 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 transition-colors duration-300 hover:text-white"
+    >
+      {label}
+      <span className="transition-transform duration-300 group-hover/all:translate-x-0.5" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+          <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+    </Link>
   )
 }
 
@@ -415,11 +430,10 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline justify-between gap-3">
           <span className="text-[15px] font-bold leading-tight text-white">{room.label}</span>
-          {room.price && <span className="shrink-0 font-mono text-xs font-bold text-brand-red">{room.price}</span>}
+          {room.price && <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-300 group-hover/room:text-white">{room.price}</span>}
         </span>
         <span className="mt-1 block text-xs leading-snug text-zinc-500">{room.detail}</span>
       </span>
-      <MenuChevron className="group-hover/room:translate-x-0.5" />
     </Link>
   )
 }
