@@ -47,8 +47,8 @@ booking business in San Francisco (podcast, video, photo, rental studios).
 ## Where things live
 
 - Homepage: `app/page.tsx` renders `components/DynamicFrameHero.tsx` (six-tile
-  grid; 5 of 6 tiles play a muted loop on hover, files in
-  `public/studio-videos/home-tile-*`; Rentals is the one still on a still),
+  grid; all 6 tiles play a muted loop on hover, files in
+  `public/studio-videos/home-tile-*`),
   then `components/home/`: `FeaturedOriginals` (auto-advancing carousel with
   video slides), `TrustedStrip` (client-logo marquee), `StudioSpaces` (grid of
   the 10 real studios), `WhatWeDo`, then the shared `Footer`.

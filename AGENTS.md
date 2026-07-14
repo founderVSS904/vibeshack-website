@@ -48,8 +48,8 @@ https://www.vibeshackstudios.com. A San Francisco studio-booking business
 ## Where things live
 
 - Homepage: `app/page.tsx` -> `components/DynamicFrameHero.tsx` (six-tile hero
-  grid; 5 of 6 tiles play a muted loop on hover, files in
-  `public/studio-videos/home-tile-*`; the Rentals tile is still a still image),
+  grid; all 6 tiles play a muted loop on hover, files in
+  `public/studio-videos/home-tile-*`),
   then `components/home/` (`FeaturedOriginals` carousel, `TrustedStrip` logo
   marquee, `StudioSpaces` studio grid, `WhatWeDo`), then the shared `Footer`.
 - Our Work: `app/our-work/page.tsx`, `app/our-work/[slug]/page.tsx`,
