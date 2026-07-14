@@ -54,10 +54,9 @@ const slides: FeaturedSlide[] = [
     body: "Melinda's Wing Battle event film.",
     primaryCta: { label: 'Watch the film', href: 'https://www.youtube.com/watch?v=tX5nk9EEBHs', play: true, external: true },
     secondaryCta: { label: 'All work', href: '/our-work/' },
-    image: '/studio-images/work-wing-battle-melindas-v20260708b.jpg',
-    imageAlt: "Melinda's Hot Sauce Wing Battle title card over grilled wings",
-    imagePosition: 'center 78%',
-    video: '/studio-videos/home-feat-wing-battle-loop-v20260709.mp4',
+    image: '/studio-images/work-wing-battle-grill-v20260714.jpg',
+    imageAlt: 'Hot wings tossed on a kettle grill at the Wing Battle event',
+    video: '/studio-videos/home-feat-wing-battle-loop-v20260714.mp4',
     poster: true,
   },
 ]
