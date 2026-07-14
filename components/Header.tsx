@@ -247,7 +247,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
 
   return (
     <DesktopMegaMenu
-      className="max-w-[1600px] grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,1fr)_minmax(0,1fr)] gap-x-8 2xl:gap-x-12"
+      className="grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,1fr)_minmax(0,1fr)] gap-x-8 2xl:gap-x-12"
       footer={
         <div className="flex items-center border-t border-white/10 pt-5">
           <MenuFooterLink
@@ -283,7 +283,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
       }
     >
       <div>
-        <span className="relative block h-44 overflow-hidden rounded-xl border border-white/10">
+        <span className="relative block h-56 overflow-hidden rounded-xl border border-white/10 2xl:h-64">
           {featured.image && (
             <Image src={featured.image} alt="The Executive podcast set at VibeShack Studios" fill sizes="320px" className="object-cover" />
           )}
@@ -332,7 +332,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
           }}
           className="group/feat flex items-center gap-4 rounded-xl border border-white/30 bg-gradient-to-br from-white/[0.08] to-white/[0.02] p-3 transition-colors duration-200 hover:border-white/45"
         >
-          <span className="relative h-[88px] w-[124px] shrink-0 overflow-hidden rounded-lg">
+          <span className="relative h-[104px] w-[128px] shrink-0 overflow-hidden rounded-lg">
             {featured.image && (
               <Image src={featured.image} alt="" fill sizes="124px" className="object-cover transition-transform duration-500 group-hover/feat:scale-[1.05]" />
             )}
@@ -405,9 +405,9 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/room flex items-center gap-4 py-3 transition-colors duration-200 hover:bg-white/[0.03]"
+      className="group/room flex items-center gap-4 py-4 transition-colors duration-200 hover:bg-white/[0.03]"
     >
-      <span className="relative h-[64px] w-[92px] shrink-0 overflow-hidden rounded-lg bg-white/5">
+      <span className="relative h-[88px] w-[112px] shrink-0 overflow-hidden rounded-lg bg-white/5">
         {room.image && (
           <Image src={room.image} alt="" fill sizes="92px" className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
         )}
@@ -495,11 +495,11 @@ function DesktopMegaMenu({
   footer?: ReactNode
 }) {
   return (
-    <div className="desktop-mega-menu pointer-events-none invisible fixed left-4 right-4 top-[calc(5rem-1px)] hidden max-h-0 -translate-y-3 overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0c] text-white opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.65)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[640px] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[640px] group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
+    <div className="desktop-mega-menu pointer-events-none invisible fixed left-1/2 top-[calc(5rem-1px)] hidden max-h-0 w-[min(calc(100vw-2rem),1680px)] -translate-x-1/2 -translate-y-3 overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0c] text-white opacity-0 shadow-[0_34px_90px_rgba(0,0,0,0.65)] transition-[max-height,opacity,transform,visibility] duration-300 group-hover:pointer-events-auto group-hover:visible group-hover:max-h-[840px] group-hover:-translate-x-1/2 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:max-h-[840px] group-focus-within:-translate-x-1/2 group-focus-within:translate-y-0 group-focus-within:opacity-100 xl:block">
       <div className={`mx-auto grid px-10 pb-7 pt-9 lg:px-14 ${className}`}>
         {children}
       </div>
-      {footer && <div className="mx-auto max-w-[1600px] px-10 pb-7 lg:px-14">{footer}</div>}
+      {footer && <div className="px-10 pb-7 lg:px-14">{footer}</div>}
     </div>
   )
 }
