@@ -488,7 +488,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                 />
               )}
               <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" aria-hidden="true" />
-              <span className="absolute left-4 top-3.5 font-mono text-xs font-bold text-brand-red">{String(index + 1).padStart(2, '0')}</span>
+              <span className="absolute left-4 top-4 font-mono text-[15px] font-medium tracking-[0.08em] text-brand-red">{String(index + 1).padStart(2, '0')}</span>
               <span className="absolute inset-x-4 bottom-4">
                 <span className="block text-[21px] font-black leading-[0.95] text-white">
                   {card.label}
@@ -511,15 +511,15 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
           )
         })}
       </div>
-      <div className="relative mt-5 flex gap-1.5" aria-hidden="true">
+      <div className="relative mx-auto mt-5 flex w-[420px] max-w-full gap-1" aria-hidden="true">
         {serviceCards.map((card, index) => (
-          <span key={card.href + index} className="h-[3px] flex-1 rounded-full bg-white/[0.08]" />
+          <span key={card.href + index} className="h-[2px] flex-1 bg-white/[0.12]" />
         ))}
         <span
-          className="absolute top-0 h-[3px] rounded-full bg-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          className="absolute top-0 h-[2px] bg-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{
-            width: 'calc((100% - 30px) / 6)',
-            left: `calc(${activeCard} * ((100% - 30px) / 6 + 6px))`,
+            width: 'calc((100% - 20px) / 6)',
+            left: `calc(${activeCard} * ((100% - 20px) / 6 + 4px))`,
           }}
         />
       </div>
