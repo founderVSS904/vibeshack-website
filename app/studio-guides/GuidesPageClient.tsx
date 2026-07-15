@@ -43,7 +43,7 @@ const STATIONS = [
     cta: 'Open the guide',
     dot: { left: '13.3%', top: '25.9%' },
     label: '-translate-x-full -translate-y-full pr-4 pb-1 text-right',
-    card: { left: '2%', top: '34%' },
+    card: { left: '1%', top: '38%' },
   },
   {
     n: '02',
@@ -54,7 +54,7 @@ const STATIONS = [
     cta: 'Open the checklist',
     dot: { left: '95.3%', top: '43.1%' },
     label: '-translate-y-full pl-4 pb-1 text-left',
-    card: { right: '1%', top: '56%' },
+    card: { right: '0%', top: '52%' },
   },
   {
     n: '03',
@@ -65,7 +65,7 @@ const STATIONS = [
     cta: 'Open the guide',
     dot: { left: '86.2%', top: '74.6%' },
     label: 'pl-4 pt-2 text-left',
-    card: { right: '4%', bottom: '34%' },
+    card: { right: '2%', bottom: '22%' },
   },
   {
     n: '04',
@@ -76,29 +76,29 @@ const STATIONS = [
     cta: 'Book the session',
     dot: { left: '13.3%', top: '74.1%' },
     label: '-translate-x-full pr-4 pt-2 text-right',
-    card: { left: '2%', bottom: '34%' },
+    card: { left: '2%', bottom: '24%' },
   },
 ]
 
 // Individual gear cutouts, placed on the compass. left/top/w are percent of the
 // container; px is the PNG's natural size; z stacks the cluster.
 const GEAR = [
-  { src: '/studio-images/guides-gear/gear-camera-v20260715.webp', label: 'Cinema camera', px: [349, 331], w: 26, left: 42, top: 15, z: 3 },
-  { src: '/studio-images/guides-gear/gear-mic-v20260715.webp', label: 'Shotgun mic', px: [250, 159], w: 19, left: 25, top: 16, z: 2 },
-  { src: '/studio-images/guides-gear/gear-headphones-v20260715.webp', label: 'Headphones', px: [195, 216], w: 13, left: 68, top: 25, z: 2 },
-  { src: '/studio-images/guides-gear/gear-cable-v20260715.webp', label: 'XLR cable', px: [180, 202], w: 12, left: 26, top: 41, z: 1 },
-  { src: '/studio-images/guides-gear/gear-ssd-v20260715.webp', label: 'Portable SSD', px: [149, 120], w: 10, left: 37, top: 62, z: 1 },
-  { src: '/studio-images/guides-gear/gear-led-v20260715.webp', label: 'LED panel', px: [130, 147], w: 9, left: 49, top: 66, z: 2 },
-  { src: '/studio-images/guides-gear/gear-clapper-v20260715.webp', label: 'Clapperboard', px: [229, 199], w: 15, left: 59, top: 44, z: 2 },
+  { src: '/studio-images/guides-gear/gear-camera-v20260715.webp', label: 'Cinema camera', px: [349, 331], w: 24, left: 41, top: 16, z: 3 },
+  { src: '/studio-images/guides-gear/gear-mic-v20260715.webp', label: 'Shotgun mic', px: [250, 159], w: 17, left: 27, top: 17, z: 2 },
+  { src: '/studio-images/guides-gear/gear-headphones-v20260715.webp', label: 'Headphones', px: [195, 216], w: 12, left: 64, top: 23, z: 2 },
+  { src: '/studio-images/guides-gear/gear-cable-v20260715.webp', label: 'XLR cable', px: [180, 202], w: 11, left: 29, top: 40, z: 1 },
+  { src: '/studio-images/guides-gear/gear-ssd-v20260715.webp', label: 'Portable SSD', px: [149, 120], w: 9, left: 39, top: 60, z: 1 },
+  { src: '/studio-images/guides-gear/gear-led-v20260715.webp', label: 'LED panel', px: [130, 147], w: 8, left: 48, top: 62, z: 2 },
+  { src: '/studio-images/guides-gear/gear-clapper-v20260715.webp', label: 'Clapperboard', px: [229, 199], w: 13, left: 56, top: 45, z: 2 },
 ]
 
 // Dotted red connectors between gear pieces, in the same percent space.
 const CONNECTORS: [number, number, number, number][] = [
-  [36, 25, 44, 28],
-  [62, 32, 69, 33],
-  [33, 53, 40, 64],
-  [58, 38, 63, 46],
-  [45, 68, 49, 71],
+  [37, 25, 44, 28],
+  [60, 30, 65, 31],
+  [35, 52, 41, 62],
+  [57, 37, 60, 46],
+  [46, 66, 49, 66],
 ]
 
 function readMinutes(guide: StudioGuide) {
@@ -347,7 +347,7 @@ export default function GuidesPageClient() {
 
             <div
               key={station.n}
-              className="booking-media-enter absolute z-20 w-[290px] rounded-xl border border-white/15 bg-black/75 p-5 shadow-[0_0_50px_rgba(236,0,0,0.14)] backdrop-blur"
+              className="booking-media-enter absolute z-20 w-[290px] rounded-xl border border-white/15 bg-[#0b0b0b] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.75),0_0_44px_rgba(236,0,0,0.12)]"
               style={station.card}
             >
               <p className="font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-white">{station.title}</p>
