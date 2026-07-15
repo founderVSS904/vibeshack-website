@@ -412,15 +412,12 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
       const data = await res.json()
       if (reqId !== availabilityReqRef.current) return
       setSlots(data.slots || [])
+      // Any failure shows the availability banner; no separate error text needed here.
       setAvailabilityVerified(res.ok && data.verified !== false)
-      if (!res.ok) {
-        setError(data.error || 'Availability could not be verified. Please try again.')
-      }
     } catch {
       if (reqId !== availabilityReqRef.current) return
       setSlots([])
       setAvailabilityVerified(false)
-      setError('Availability could not be verified. Please try again.')
     }
     setSlotsLoading(false)
   }
@@ -777,7 +774,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-10 md:grid-cols-[4fr_3fr] 2xl:gap-14">
                   {/* Calendar */}
                   <div>
                     <p className="mb-5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Select a date</p>
@@ -785,9 +782,15 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                       const months = Object.entries(daysByMonth)
                       const currentIdx = Math.max(0, Math.min(monthOffset, months.length - 1))
                       const [month, monthDays] = months[currentIdx] || ['', []]
+                      const anchor = monthDays[0]
+                      const bookable = new Set(monthDays.map(formatDate))
+                      const year = anchor?.getFullYear() ?? 0
+                      const monthIndex = anchor?.getMonth() ?? 0
+                      const daysInMonth = anchor ? new Date(year, monthIndex + 1, 0).getDate() : 0
+                      const leadingBlanks = anchor ? new Date(year, monthIndex, 1).getDay() : 0
                       return (
                         <div>
-                          <div className="mb-4 flex items-center justify-between">
+                          <div className="mb-6 flex items-center justify-between">
                             <button
                               type="button"
                               onClick={() => setMonthOffset((m) => Math.max(0, m - 1))}
@@ -796,7 +799,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                             >
                               ← Prev
                             </button>
-                            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-400">{month}</p>
+                            <p className="font-mono text-[13px] font-bold uppercase tracking-[0.26em] text-white">{month}</p>
                             <button
                               type="button"
                               onClick={() => setMonthOffset((m) => Math.min(months.length - 1, m + 1))}
@@ -806,24 +809,39 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                               Next →
                             </button>
                           </div>
-                          <div className="grid grid-cols-5 gap-1.5">
-                            {monthDays.map((d) => {
-                              const ds = formatDate(d); const sel = date === ds
+                          <div className="mb-2 grid grid-cols-7 gap-1.5">
+                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((wd) => (
+                              <span key={wd} className="py-1 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">
+                                {wd}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="grid grid-cols-7 gap-1.5">
+                            {Array.from({ length: leadingBlanks }, (_, i) => (
+                              <span key={`blank-${i}`} aria-hidden="true" />
+                            ))}
+                            {Array.from({ length: daysInMonth }, (_, i) => {
+                              const d = new Date(year, monthIndex, i + 1)
+                              const ds = formatDate(d)
+                              const inWindow = bookable.has(ds)
+                              const sel = date === ds
                               return (
                                 <button
                                   key={ds}
                                   type="button"
+                                  disabled={!inWindow}
                                   aria-pressed={sel}
                                   aria-label={d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                                   onClick={() => selectDate(ds)}
-                                  className={`flex flex-col items-center rounded-lg border py-2.5 transition-colors ${
+                                  className={`flex h-11 items-center justify-center rounded-lg text-[15px] transition-colors sm:h-12 2xl:h-14 ${
                                     sel
-                                      ? 'border-brand-red bg-brand-red text-white'
-                                      : 'border-transparent text-zinc-500 hover:border-white/15 hover:text-white'
+                                      ? 'bg-brand-red font-bold text-white'
+                                      : inWindow
+                                        ? 'font-medium text-zinc-300 hover:bg-white/[0.07] hover:text-white'
+                                        : 'cursor-default font-medium text-zinc-700'
                                   }`}
                                 >
-                                  <span className="mb-1 font-mono text-[9px] uppercase leading-none opacity-70">{d.toLocaleDateString('en-US', { weekday: 'short' })}</span>
-                                  <span className="text-sm font-bold leading-none">{d.getDate()}</span>
+                                  {i + 1}
                                 </button>
                               )
                             })}
@@ -871,13 +889,12 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                     {date && !slotsLoading && (
                       <>
                         {!availabilityVerified && (
-                          <div className="mb-4 rounded-xl border border-white/15 bg-white/[0.03] px-4 py-3">
+                          <div className="mb-4 rounded-xl border border-white/15 bg-white/[0.03] px-4 py-3" role="alert">
                             <p className="text-xs font-semibold leading-relaxed text-zinc-300">
                               Live availability is temporarily unavailable. Refresh, or contact us and we will book you in.
                             </p>
                           </div>
                         )}
-                        {error && <p className="mb-4 text-sm text-brand-red" role="alert">{error}</p>}
                         {availabilityVerified && slots.length > 0 && !anyAvailable && (
                           <p className="mb-4 text-xs text-zinc-400" role="status">This day is fully booked. Try another date.</p>
                         )}
