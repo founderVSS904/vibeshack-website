@@ -54,7 +54,7 @@ const STATIONS = [
     cta: 'Open the checklist',
     dot: { left: '95.3%', top: '43.1%' },
     label: '-translate-y-full pl-4 pb-1 text-left',
-    card: { right: '1%', top: '50%' },
+    card: { right: '1%', top: '56%' },
   },
   {
     n: '03',
@@ -78,6 +78,27 @@ const STATIONS = [
     label: '-translate-x-full pr-4 pt-2 text-right',
     card: { left: '2%', bottom: '34%' },
   },
+]
+
+// Individual gear cutouts, placed on the compass. left/top/w are percent of the
+// container; px is the PNG's natural size; z stacks the cluster.
+const GEAR = [
+  { src: '/studio-images/guides-gear/gear-camera-v20260715.webp', label: 'Cinema camera', px: [349, 331], w: 26, left: 42, top: 15, z: 3 },
+  { src: '/studio-images/guides-gear/gear-mic-v20260715.webp', label: 'Shotgun mic', px: [250, 159], w: 19, left: 25, top: 16, z: 2 },
+  { src: '/studio-images/guides-gear/gear-headphones-v20260715.webp', label: 'Headphones', px: [195, 216], w: 13, left: 68, top: 25, z: 2 },
+  { src: '/studio-images/guides-gear/gear-cable-v20260715.webp', label: 'XLR cable', px: [180, 202], w: 12, left: 26, top: 41, z: 1 },
+  { src: '/studio-images/guides-gear/gear-ssd-v20260715.webp', label: 'Portable SSD', px: [149, 120], w: 10, left: 37, top: 62, z: 1 },
+  { src: '/studio-images/guides-gear/gear-led-v20260715.webp', label: 'LED panel', px: [130, 147], w: 9, left: 49, top: 66, z: 2 },
+  { src: '/studio-images/guides-gear/gear-clapper-v20260715.webp', label: 'Clapperboard', px: [229, 199], w: 15, left: 59, top: 44, z: 2 },
+]
+
+// Dotted red connectors between gear pieces, in the same percent space.
+const CONNECTORS: [number, number, number, number][] = [
+  [36, 25, 44, 28],
+  [62, 32, 69, 33],
+  [33, 53, 40, 64],
+  [58, 38, 63, 46],
+  [45, 68, 49, 71],
 ]
 
 function readMinutes(guide: StudioGuide) {
@@ -204,7 +225,7 @@ export default function GuidesPageClient() {
             <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-zinc-400">
               VibeShack Field Guide
             </p>
-            <h1 className="guide-display mt-6 text-white" style={{ fontSize: 'clamp(2.5rem, 3.6vw, 3.9rem)' }}>
+            <h1 className="mt-6 text-white" style={{ fontSize: 'clamp(2.75rem, 4vw, 4rem)' }}>
               Make the shoot feel easy<span className="text-brand-red">.</span>
             </h1>
             <p className="mt-5 max-w-md text-base leading-relaxed text-zinc-300">
@@ -262,26 +283,37 @@ export default function GuidesPageClient() {
           <div className="relative hidden aspect-[13/10] select-none lg:block" aria-label="The VibeShack process: plan, prepare, produce, deliver">
             <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
               <ellipse cx="50" cy="50" rx="46" ry="40" fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="0.18" strokeDasharray="0.9 1.6" />
+              {CONNECTORS.map(([x1, y1, x2, y2]) => (
+                <line
+                  key={`${x1}-${y1}-${x2}-${y2}`}
+                  x1={x1} y1={y1} x2={x2} y2={y2}
+                  stroke="rgba(236,0,0,0.35)"
+                  strokeWidth="0.16"
+                  strokeDasharray="0.7 1.5"
+                />
+              ))}
             </svg>
 
-            <div
-              className="absolute left-1/2 top-1/2 w-[58%] -translate-x-1/2 -translate-y-1/2"
-              style={{
-                WebkitMaskImage: 'radial-gradient(ellipse at center, black 52%, transparent 76%)',
-                maskImage: 'radial-gradient(ellipse at center, black 52%, transparent 76%)',
-              }}
-            >
-              <Image
-                src="/studio-images/guides-gear-cluster-v20260715.jpg"
-                alt="Film production gear: cinema camera, microphone, headphones, clapperboard, light, and drive"
-                width={1280}
-                height={960}
-                priority
-                quality={85}
-                sizes="(min-width: 1024px) 44vw, 90vw"
-                className="h-auto w-full"
-              />
-            </div>
+            {GEAR.map((item) => (
+              <div
+                key={item.label}
+                className="group absolute"
+                style={{ left: `${item.left}%`, top: `${item.top}%`, width: `${item.w}%`, zIndex: item.z }}
+              >
+                <Image
+                  src={item.src}
+                  alt={item.label}
+                  width={item.px[0]}
+                  height={item.px[1]}
+                  unoptimized
+                  className="h-auto w-full transition-transform duration-300 ease-out group-hover:scale-110"
+                  draggable={false}
+                />
+                <span className="pointer-events-none absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/15 bg-black/85 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
+                  {item.label}
+                </span>
+              </div>
+            ))}
 
             {STATIONS.map((s, i) => {
               const active = i === activeStation
@@ -424,7 +456,7 @@ export default function GuidesPageClient() {
                   <span className="flex h-12 w-12 items-center justify-center rounded-full border border-brand-red/60">
                     <GuideIcon slug={featured.slug} className="h-5 w-5 text-brand-red" />
                   </span>
-                  <p className="guide-display mt-7 text-white" style={{ fontSize: 'clamp(1.9rem, 2.4vw, 2.7rem)' }}>
+                  <p className="font-black mt-7 leading-[0.94] text-white" style={{ fontSize: 'clamp(2.1rem, 2.6vw, 3rem)' }}>
                     {featured.shortTitle}
                   </p>
                   <p className="mt-4 max-w-sm text-sm leading-relaxed text-zinc-400">{featured.description}</p>
@@ -461,7 +493,7 @@ export default function GuidesPageClient() {
                         <span className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-red/60">
                           <GuideIcon slug={guide.slug} className="h-4 w-4 text-brand-red" />
                         </span>
-                        <p className="guide-display text-white" style={{ fontSize: 'clamp(1.25rem, 1.5vw, 1.6rem)' }}>
+                        <p className="font-black leading-[0.94] text-white" style={{ fontSize: 'clamp(1.4rem, 1.7vw, 1.85rem)' }}>
                           {guide.shortTitle}
                         </p>
                         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-brand-red">
@@ -498,7 +530,7 @@ export default function GuidesPageClient() {
                   className="group flex items-center justify-between gap-6 py-6"
                 >
                   <div className="min-w-0">
-                    <p className="guide-display text-xl text-white">{guide.shortTitle}</p>
+                    <p className="font-black text-2xl leading-[0.94] text-white">{guide.shortTitle}</p>
                     <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
                       {readMinutes(guide)} min guide
                     </p>

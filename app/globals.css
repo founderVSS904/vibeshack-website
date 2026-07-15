@@ -1391,17 +1391,6 @@ html.booking-flow body {
   overflow-x: clip;
 }
 
-/* Field-guide editorial display face (guides page); overrides the Druk heading mapping */
-.guide-display {
-  font-family: 'Didot', 'Playfair Display', Georgia, 'Times New Roman', serif !important;
-  font-stretch: normal !important;
-  font-weight: 400 !important;
-  letter-spacing: 0.015em !important;
-  line-height: 1.05 !important;
-  text-transform: uppercase;
-  text-rendering: optimizeLegibility;
-}
-
 /* Booking flow motion: opacity and translate only, never scale on text */
 .booking-step-enter {
   animation: booking-step-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
