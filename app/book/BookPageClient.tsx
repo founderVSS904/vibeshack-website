@@ -212,7 +212,7 @@ function Stepper({ step, onJump }: { step: Step; onJump: (s: Exclude<Step, 'paym
               <div className="relative mx-4 h-px flex-1 bg-white/[0.12] sm:mx-6">
                 <span
                   className="absolute inset-y-0 left-0 bg-brand-red transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                  style={{ width: i <= activeIndex ? (i === activeIndex ? '45%' : '100%') : '0%' }}
+                  style={{ width: i <= activeIndex ? '100%' : i === activeIndex + 1 ? '45%' : '0%' }}
                 />
               </div>
             )}
@@ -363,6 +363,8 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
   }
 
   const blockValid = startIndex >= 0 && blockSlots.length === duration && blockFits(startIndex, duration)
+  const anyAvailable = slots.some((s) => s.available)
+  const anyStartable = slots.some((_, i) => blockFits(i, duration))
 
   const continueReady =
     step === 'room' ? Boolean(selectedId)
@@ -607,7 +609,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
         <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-10 2xl:grid-cols-[minmax(0,1fr)_400px] 2xl:gap-14">
 
           {/* ══════════════════ MAIN ══════════════════ */}
-          <div className="min-w-0">
+          <div key={step} className="booking-step-enter min-w-0">
 
             {/* ── STEP 1: ROOM ── */}
             {step === 'room' && previewStudio && (
@@ -623,7 +625,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                       priority
                       quality={85}
                       sizes="(min-width: 1280px) 60vw, 100vw"
-                      className="object-cover"
+                      className="booking-media-enter object-cover"
                     />
                     <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 35%)' }} />
                     {previewStudio.photos.length > 1 && (
@@ -692,7 +694,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                           type="button"
                           aria-pressed={isPreview}
                           onClick={() => previewRoom(s.id)}
-                          className={`w-[220px] shrink-0 snap-start overflow-hidden rounded-xl border text-left transition-colors ${
+                          className={`group w-[220px] shrink-0 snap-start overflow-hidden rounded-xl border text-left transition-colors ${
                             isSelected
                               ? 'border-brand-red ring-1 ring-brand-red'
                               : isPreview
@@ -700,8 +702,8 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                                 : 'border-white/10 hover:border-white/30'
                           }`}
                         >
-                          <div className="relative h-[124px]">
-                            <Image src={s.heroImage} alt={s.name} fill quality={75} sizes="240px" className="object-cover" />
+                          <div className="relative h-[124px] overflow-hidden">
+                            <Image src={s.heroImage} alt={s.name} fill quality={75} sizes="440px" className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]" />
                             {isSelected && (
                               <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-brand-red">
                                 <svg className="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
@@ -876,9 +878,19 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                           </div>
                         )}
                         {error && <p className="mb-4 text-sm text-brand-red" role="alert">{error}</p>}
-                        <p className="mb-4 text-xs text-zinc-500">
-                          Pick when you want to start. Your {duration}-hour block is held from there.
-                        </p>
+                        {availabilityVerified && slots.length > 0 && !anyAvailable && (
+                          <p className="mb-4 text-xs text-zinc-400" role="status">This day is fully booked. Try another date.</p>
+                        )}
+                        {availabilityVerified && anyAvailable && !anyStartable && (
+                          <p className="mb-4 text-xs text-zinc-400" role="status">
+                            No {duration}-hour openings on this day. Shorten the session or try another date.
+                          </p>
+                        )}
+                        {anyStartable && (
+                          <p className="mb-4 text-xs text-zinc-500">
+                            Pick when you want to start. Your {duration}-hour block is held from there.
+                          </p>
+                        )}
                         <div className="max-h-[300px] overflow-y-auto pr-1">
                           <div className="grid grid-cols-3 gap-1.5">
                             {slots.map((slot, i) => {
@@ -1195,7 +1207,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
 
               {selectedStudio ? (
                 <div className="relative mt-5 h-40 overflow-hidden rounded-xl 2xl:h-44">
-                  <Image src={selectedStudio.heroImage} alt={selectedStudio.name} fill quality={80} sizes="400px" className="object-cover" />
+                  <Image src={selectedStudio.heroImage} alt={selectedStudio.name} fill quality={80} sizes="800px" className="object-cover" />
                 </div>
               ) : (
                 <div className="mt-5 flex h-40 items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/[0.02] 2xl:h-44">
@@ -1319,7 +1331,10 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
 
       {/* ══════════════════ MOBILE BAR ══════════════════ */}
       {step !== 'payment' && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/95 px-5 py-3.5 backdrop-blur lg:hidden">
+        <div
+          className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/95 px-5 pt-3.5 backdrop-blur lg:hidden"
+          style={{ paddingBottom: 'calc(0.875rem + env(safe-area-inset-bottom))' }}
+        >
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="font-black text-white" style={{ fontSize: '1.4rem' }}>
@@ -1339,7 +1354,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   : 'cursor-not-allowed bg-white/[0.06] text-zinc-600'
               }`}
             >
-              {continueLabel}
+              {step === 'review' ? (submitting ? 'Processing…' : 'Lock In Session') : continueLabel}
             </button>
           </div>
         </div>
