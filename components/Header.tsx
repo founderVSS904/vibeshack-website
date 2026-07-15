@@ -316,7 +316,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
 function MenuColumnHeader({ children }: { children: ReactNode }) {
   return (
     <div className="mb-4">
-      <p className="font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-zinc-500">{children}</p>
+      <p className="font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-white">{children}</p>
       <div className="mt-3 h-px bg-white/[0.08]" aria-hidden="true" />
     </div>
   )
