@@ -386,14 +386,21 @@ function MenuFooterLink({ href, label, onNavigate }: { href: string; label: stri
 }
 
 const serviceCards = [
-  { ...serviceLinks[0], kicker: 'The full menu', image: '/studio-images/canvas-rental-music-v1775095665.jpg' },
-  { ...serviceLinks[1], kicker: 'Campaign ready', image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg' },
-  { ...serviceLinks[2], kicker: 'Print ready', image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg' },
-  { ...serviceLinks[3], kicker: 'Identity systems', image: '/studio-images/home-branding-pure-magic-v20260625.png' },
-  { ...serviceLinks[4], kicker: 'Broadcast ready', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
-  { ...serviceLinks[5], kicker: 'Room to create', image: '/studio-images/canvas-rental-space-v20260509.jpg' },
-  { ...serviceLinks[6], kicker: 'Concept to screen', image: '/studio-images/drive-video-studio.jpg' },
-  { ...serviceLinks[7], kicker: 'Every frame styled', image: '/studio-images/inside-photography-red-v20260509.jpg' },
+  { href: '/commercials/', label: 'Commercials', detail: 'Launch ads, talking heads, product demos', kicker: 'Campaign ready', image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg' },
+  { href: '/editorials/', label: 'Editorials', detail: 'Fashion, beauty, portraits, campaign stills', kicker: 'Print ready', image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg' },
+  { href: '/branding/', label: 'Branding', detail: 'Creative direction, launches, content systems', kicker: 'Identity systems', image: '/studio-images/home-branding-pure-magic-v20260625.png' },
+  { href: '/podcast-studio-san-francisco/', label: 'Podcasts', detail: 'Sets with cameras, audio, and crew', kicker: 'Broadcast ready', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
+  { href: '/video-production/', label: 'Video Production', detail: 'Social content, music videos, brand video', kicker: 'Concept to screen', image: '/studio-images/drive-video-studio.jpg' },
+  { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, campaigns', kicker: 'Every frame styled', image: '/studio-images/inside-photography-red-v20260509.jpg' },
+]
+
+const proofStripLinks = [
+  { href: '/our-work/', label: 'Our Work' },
+  { href: '/made-at-vibeshack/', label: 'Trusted By' },
+  { href: '/studio-guides/', label: 'Guides' },
+  { href: '/use-cases/', label: 'Use Cases' },
+  { href: '/compare/', label: 'Compare' },
+  { href: '/support/', label: 'Support' },
 ]
 
 const proofIcons: ReactNode[] = [
@@ -406,14 +413,33 @@ const proofIcons: ReactNode[] = [
 ]
 
 function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
-  const [activeCard, setActiveCard] = useState(1)
+  const [activeCard, setActiveCard] = useState(0)
   const active = serviceCards[activeCard]
 
   return (
     <DesktopMegaMenu className="grid-cols-1 gap-y-7">
       <div>
-        <p className="text-[2.6rem] font-black leading-none text-white">What are you making?</p>
-        <p className="mt-3 text-sm text-zinc-400">Start with the outcome. We&apos;ll build the production.</p>
+        <div className="flex items-end justify-between gap-6">
+          <div>
+            <p className="text-[2.8rem] font-black leading-none text-white">What are you making?</p>
+            <p className="mt-3 text-sm text-zinc-400">Start with the outcome. We&apos;ll build the production.</p>
+          </div>
+          <Link
+            href="/services/"
+            onClick={(event) => {
+              onNavigate()
+              event.currentTarget.blur()
+            }}
+            className="group/allsvc mb-1 flex shrink-0 items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-500 transition-colors duration-300 hover:text-white"
+          >
+            All services
+            <span className="transition-transform duration-300 group-hover/allsvc:translate-x-0.5" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </Link>
+        </div>
         <div className="mt-6 flex items-center gap-4" aria-hidden="true">
           <span className="h-px w-16 bg-brand-red/60" />
           <span className="relative flex h-2.5 w-2.5">
@@ -425,7 +451,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
         </div>
       </div>
 
-      <div className="flex h-[320px] gap-2.5 2xl:h-[340px]">
+      <div className="flex h-[300px] gap-2.5 2xl:h-[320px]">
         {serviceCards.map((card, index) => {
           const isActive = index === activeCard
           return (
@@ -455,7 +481,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
               <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" aria-hidden="true" />
               <span className="absolute left-4 top-3.5 font-mono text-xs font-bold text-brand-red">{String(index + 1).padStart(2, '0')}</span>
               <span className="absolute inset-x-4 bottom-4">
-                <span className={`block font-black leading-[0.95] text-white transition-[font-size] duration-300 ${isActive ? 'text-[26px]' : 'text-[17px]'}`}>
+                <span className="block text-[21px] font-black leading-[0.95] text-white">
                   {card.label}
                 </span>
                 <span
@@ -479,7 +505,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
 
       <div className="grid grid-cols-[1.6fr_1fr] gap-5">
         <div className="grid grid-cols-6 divide-x divide-white/[0.06] rounded-2xl border border-white/[0.08] bg-white/[0.02]">
-          {proofLinks.map(({ href, label }, index) => (
+          {proofStripLinks.map(({ href, label }, index) => (
             <Link
               key={href + label}
               href={href}
@@ -490,7 +516,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
               className="group/proof flex flex-col items-center justify-center gap-3.5 px-3 py-7 text-zinc-400 transition-colors duration-300 first:rounded-l-2xl last:rounded-r-2xl hover:bg-white/[0.04] hover:text-white"
             >
               {proofIcons[index]}
-              <span className="text-center font-mono text-[10px] font-bold uppercase leading-relaxed tracking-[0.18em]">{label}</span>
+              <span className="whitespace-nowrap text-center font-mono text-[10px] font-bold uppercase tracking-[0.18em]">{label}</span>
             </Link>
           ))}
         </div>
