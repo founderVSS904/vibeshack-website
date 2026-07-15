@@ -385,27 +385,136 @@ function MenuFooterLink({ href, label, onNavigate }: { href: string; label: stri
   )
 }
 
+const serviceCards = [
+  { ...serviceLinks[0], kicker: 'The full menu', image: '/studio-images/canvas-rental-music-v1775095665.jpg' },
+  { ...serviceLinks[1], kicker: 'Campaign ready', image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg' },
+  { ...serviceLinks[2], kicker: 'Print ready', image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg' },
+  { ...serviceLinks[3], kicker: 'Identity systems', image: '/studio-images/home-branding-pure-magic-v20260625.png' },
+  { ...serviceLinks[4], kicker: 'Broadcast ready', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
+  { ...serviceLinks[5], kicker: 'Room to create', image: '/studio-images/canvas-rental-space-v20260509.jpg' },
+  { ...serviceLinks[6], kicker: 'Concept to screen', image: '/studio-images/drive-video-studio.jpg' },
+  { ...serviceLinks[7], kicker: 'Every frame styled', image: '/studio-images/inside-photography-red-v20260509.jpg' },
+]
+
+const proofIcons: ReactNode[] = [
+  <svg key="work" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="9" width="18" height="11" rx="1.5" /><path d="m3.4 9 17-4.4M7 8l2.4-4.6M12.4 6.6 14.8 2M17.8 5.2 20.2 1.4M7 13h4" /></svg>,
+  <svg key="brands" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 2 20 5v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3Z" /><path d="m12 8 1.2 2.5 2.8.4-2 2 .5 2.7-2.5-1.3-2.5 1.3.5-2.7-2-2 2.8-.4L12 8Z" /></svg>,
+  <svg key="guides" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5c-1.5-1.4-3.6-2-6-2-1 0-2 .12-3 .35V19c1-.23 2-.35 3-.35 2.4 0 4.5.6 6 2 1.5-1.4 3.6-2 6-2 1 0 2 .12 3 .35V3.35C20 3.12 19 3 18 3c-2.4 0-4.5.6-6 2Z" /><path d="M12 5v15.65M6.5 8h2M6.5 12h2M15.5 8h2M15.5 12h2" /></svg>,
+  <svg key="cases" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 2 17 4.8v5L12 12 7 9.8v-5L12 2ZM7 12.2 12 15v5l-5-2.8v-5ZM17 12.2 12 15v5l5-2.8v-5Z" /></svg>,
+  <svg key="compare" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v18M8 21h8M12 6H5L2 13a3.5 3.5 0 0 0 6 0L5 6M12 6h7l3 7a3.5 3.5 0 0 1-6 0l3-7" /></svg>,
+  <svg key="support" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 1 1 16 0" /><rect x="2.5" y="13" width="4" height="6" rx="1.5" /><rect x="17.5" y="13" width="4" height="6" rx="1.5" /><path d="M19.5 19a4 4 0 0 1-4 3h-2" /></svg>,
+]
+
 function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
+  const [activeCard, setActiveCard] = useState(1)
+  const active = serviceCards[activeCard]
+
   return (
-    <DesktopMegaMenu className="max-w-6xl grid-cols-[1.1fr_0.9fr_0.85fr] gap-14">
-      <MegaColumn eyebrow="Production Services" links={serviceLinks} large onNavigate={onNavigate} />
-      <MegaColumn eyebrow="Planning Tools" links={proofLinks} onNavigate={onNavigate} />
+    <DesktopMegaMenu className="grid-cols-1 gap-y-7">
       <div>
-        <MenuColumnHeader>Best First Step</MenuColumnHeader>
+        <p className="text-[2.6rem] font-black leading-none text-white">What are you making?</p>
+        <p className="mt-3 text-sm text-zinc-400">Start with the outcome. We&apos;ll build the production.</p>
+        <div className="mt-6 flex items-center gap-4" aria-hidden="true">
+          <span className="h-px w-16 bg-brand-red/60" />
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inset-0 rounded-full bg-brand-red/40 blur-[3px]" />
+            <span className="relative m-auto h-1.5 w-1.5 rounded-full bg-brand-red" />
+          </span>
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-brand-red">{active.kicker}</span>
+          <span className="h-px flex-1 bg-gradient-to-r from-brand-red/50 to-transparent" />
+        </div>
+      </div>
+
+      <div className="flex h-[320px] gap-2.5 2xl:h-[340px]">
+        {serviceCards.map((card, index) => {
+          const isActive = index === activeCard
+          return (
+            <Link
+              key={card.href + card.label}
+              href={card.href}
+              onMouseEnter={() => setActiveCard(index)}
+              onFocus={() => setActiveCard(index)}
+              onClick={(event) => {
+                onNavigate()
+                event.currentTarget.blur()
+              }}
+              className={`group/svc relative min-w-0 overflow-hidden rounded-xl ring-1 transition-[flex-grow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                isActive ? 'flex-[3_1_0%] ring-brand-red/70' : 'flex-[1_1_0%] ring-white/[0.08] hover:ring-white/20'
+              }`}
+            >
+              {card.image && (
+                <Image
+                  src={card.image}
+                  alt=""
+                  fill
+                  sizes="640px"
+                  quality={85}
+                  className="object-cover transition-transform duration-700 group-hover/svc:scale-[1.03]"
+                />
+              )}
+              <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" aria-hidden="true" />
+              <span className="absolute left-4 top-3.5 font-mono text-xs font-bold text-brand-red">{String(index + 1).padStart(2, '0')}</span>
+              <span className="absolute inset-x-4 bottom-4">
+                <span className={`block font-black leading-[0.95] text-white transition-[font-size] duration-300 ${isActive ? 'text-[26px]' : 'text-[17px]'}`}>
+                  {card.label}
+                </span>
+                <span
+                  className={`block overflow-hidden transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    isActive ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <span className="mt-2 block text-sm text-zinc-300">{card.detail}</span>
+                  <span className="mt-3 flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-brand-red">
+                    Explore service
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                </span>
+              </span>
+            </Link>
+          )
+        })}
+      </div>
+
+      <div className="grid grid-cols-[1.6fr_1fr] gap-5">
+        <div className="grid grid-cols-6 divide-x divide-white/[0.06] rounded-2xl border border-white/[0.08] bg-white/[0.02]">
+          {proofLinks.map(({ href, label }, index) => (
+            <Link
+              key={href + label}
+              href={href}
+              onClick={(event) => {
+                onNavigate()
+                event.currentTarget.blur()
+              }}
+              className="group/proof flex flex-col items-center justify-center gap-3.5 px-3 py-7 text-zinc-400 transition-colors duration-300 first:rounded-l-2xl last:rounded-r-2xl hover:bg-white/[0.04] hover:text-white"
+            >
+              {proofIcons[index]}
+              <span className="text-center font-mono text-[10px] font-bold uppercase leading-relaxed tracking-[0.18em]">{label}</span>
+            </Link>
+          ))}
+        </div>
         <Link
           href="/find-your-studio/"
           onClick={(event) => {
             onNavigate()
             event.currentTarget.blur()
           }}
-          className="group/card block rounded-2xl border border-white/10 bg-white/[0.04] p-5 transition duration-300 hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08]"
+          className="group/find flex overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.04]"
         >
-          <span className="block text-2xl font-black tracking-tight text-white">Match the room to the outcome.</span>
-          <span className="mt-3 block text-sm leading-relaxed text-zinc-400">
-            Start with what you are making: portraits, a brand film, a podcast, social clips, or a clean rental space.
+          <span className="relative w-2/5 shrink-0 overflow-hidden">
+            <Image src="/studio-images/sunset-hero-v20260509.jpg" alt="" fill sizes="384px" quality={85} className="object-cover transition-transform duration-700 group-hover/find:scale-[1.04]" />
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent to-[#101010]/70" aria-hidden="true" />
           </span>
-          <span className="mt-5 inline-flex text-sm font-bold text-brand-red transition-transform duration-300 group-hover/card:translate-x-1">
-            Find a Studio -&gt;
+          <span className="flex min-w-0 flex-1 flex-col justify-center px-6 py-6">
+            <span className="text-xl font-black leading-[0.95] text-white">Match the room to the outcome.</span>
+            <span className="mt-2.5 text-sm leading-relaxed text-zinc-400">Tell us what you&apos;re making. We&apos;ll point you to the right room.</span>
+            <span className="mt-4 flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-brand-red transition-transform duration-300 group-hover/find:translate-x-0.5">
+              Find a Studio
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
           </span>
         </Link>
       </div>
@@ -432,44 +541,6 @@ function DesktopMegaMenu({
   )
 }
 
-function MegaColumn({
-  eyebrow,
-  links,
-  large,
-  onNavigate,
-}: {
-  eyebrow: string
-  links: HeaderLink[]
-  large?: boolean
-  onNavigate?: () => void
-}) {
-  return (
-    <div>
-      <MenuColumnHeader>{eyebrow}</MenuColumnHeader>
-      <div className={large ? 'space-y-2' : 'space-y-2.5'}>
-        {links.map(({ href, label, detail, price }, index) => (
-          <Link
-            key={href + label}
-            href={href}
-            prefetch={href === '/book/' ? false : undefined}
-            onClick={(event) => {
-              onNavigate?.()
-              event.currentTarget.blur()
-            }}
-            className="group/link block text-zinc-300 transition-colors duration-200 hover:text-white"
-          >
-            <span className={`flex items-baseline justify-between gap-4 ${large ? 'text-[1.45rem] font-black leading-[1.08] tracking-tight text-white' : 'text-[0.95rem] font-bold'}`}>
-              <span>{label}</span>
-              {price && <span className="text-xs font-semibold text-zinc-500 transition-colors duration-200 group-hover/link:text-zinc-300">{price}</span>}
-              {!price && index === 0 && <span className="text-xs font-semibold text-brand-red opacity-0 transition duration-200 group-hover/link:translate-x-1 group-hover/link:opacity-100">-&gt;</span>}
-            </span>
-            {detail && <span className="mt-0.5 block text-xs leading-relaxed text-zinc-500">{detail}</span>}
-          </Link>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 function MobileMenu() {
   return (
