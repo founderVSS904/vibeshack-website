@@ -1385,6 +1385,12 @@ a {
   will-change: auto !important;
 }
 
+/* Booking flow: the global overflow-x hidden breaks position:sticky, clip does not */
+html.booking-flow,
+html.booking-flow body {
+  overflow-x: clip;
+}
+
 /* Podcast page editorial motion */
 html.podcast-motion-ready,
 body.podcast-page-active {

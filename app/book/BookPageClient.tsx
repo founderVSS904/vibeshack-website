@@ -1,13 +1,13 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import {
   ADDONS as DEFAULT_ADDONS,
   RECURRING_OPTIONS,
   STUDIOS as DEFAULT_STUDIOS,
   calculateRecurringDiscountCents,
-  getStudioById,
   type AddOn,
   type Studio,
 } from '@/lib/booking/catalog'
@@ -23,20 +23,49 @@ const StripeEmbeddedCheckout = dynamic(() => import('@/components/StripeEmbedded
   ssr: false,
   loading: () => (
     <div className="py-16 text-center">
-      <p className="text-gray-600 text-sm animate-pulse">Preparing secure checkout...</p>
+      <p className="text-sm text-zinc-500 animate-pulse">Preparing secure checkout…</p>
     </div>
   ),
 })
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CartItem { cartId: string; studioId: string; date: string; slots: string[] }
+type Step = 'room' | 'datetime' | 'extras' | 'review' | 'payment'
+type Filter = 'podcast' | 'photo' | 'rental' | 'all'
 
-type CheckoutStep = 'builder' | 'info' | 'extras' | 'review' | 'payment'
+interface Slot { time: string; label: string; available: boolean }
+
+const STEP_ORDER: Exclude<Step, 'payment'>[] = ['room', 'datetime', 'extras', 'review']
+const STEP_LABELS: Record<Exclude<Step, 'payment'>, string> = {
+  room: 'Room',
+  datetime: 'Date & Time',
+  extras: 'Extras',
+  review: 'Review',
+}
+const DURATION_OPTIONS = [1, 2, 3, 4, 5, 6, 8]
+const SLOT_MS = 60 * 60 * 1000
+
+const FILTERS: { id: Filter; label: string }[] = [
+  { id: 'podcast', label: 'Podcast' },
+  { id: 'photo', label: 'Photo' },
+  { id: 'rental', label: 'Rental' },
+  { id: 'all', label: 'All Rooms' },
+]
+
+function matchesFilter(studio: Studio, filter: Filter) {
+  if (filter === 'all') return true
+  if (filter === 'podcast') return studio.type === 'podcast'
+  if (filter === 'photo') return studio.id === 'photography' || studio.id === 'canvas-rental'
+  return studio.id === 'green-screen' || studio.id === 'canvas-rental'
+}
+
+function filterForStudio(studio: Studio): Filter {
+  if (studio.type === 'podcast') return 'podcast'
+  if (studio.id === 'photography') return 'photo'
+  return 'rental'
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function uid() { return Math.random().toString(36).slice(2) }
 
 function getNext60Days() {
   return Array.from({ length: 60 }, (_, i) => {
@@ -54,7 +83,7 @@ function fmtTime(iso: string) {
   return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' })
 }
 function fmtEnd(iso: string, hrs: number) {
-  const d = new Date(Date.parse(iso) + hrs * 60 * 60 * 1000)
+  const d = new Date(Date.parse(iso) + hrs * SLOT_MS)
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' })
 }
 function fmtDateFull(ds: string) {
@@ -63,14 +92,9 @@ function fmtDateFull(ds: string) {
 function fmtDateShort(ds: string) {
   return new Date(ds + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 }
-function groupConsecutive(sorted: string[]): string[][] {
-  if (!sorted.length) return []
-  const groups: string[][] = []; let cur = [sorted[0]]
-  for (let i = 1; i < sorted.length; i++) {
-    Date.parse(sorted[i]) - Date.parse(sorted[i - 1]) === 60 * 60 * 1000
-      ? cur.push(sorted[i]) : (groups.push(cur), cur = [sorted[i]])
-  }
-  groups.push(cur); return groups
+
+function metaLine(studio: Studio) {
+  return studio.description.split('. ').map((part) => part.replace(/\.$/, '')).filter(Boolean).join(' · ')
 }
 
 function checkoutErrorMessage(message: unknown) {
@@ -133,8 +157,106 @@ function readReferralSourceFromBrowser() {
   return ''
 }
 
-// Removed studioById and cartItemPrice — they are now defined in BookPageInner
-// to access the studios prop
+function studioFromQuery(studios: Studio[]) {
+  if (typeof window === 'undefined') return null
+  const id = new URLSearchParams(window.location.search).get('studio')
+  return id ? studios.find((s) => s.id === id) ?? null : null
+}
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
+
+const iconProps = {
+  className: 'h-4 w-4 shrink-0',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.6,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  viewBox: '0 0 24 24',
+  'aria-hidden': true,
+}
+
+const RoomIcon = () => (
+  <svg {...iconProps}><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 10h18M10 20v-10" /></svg>
+)
+const RateIcon = () => (
+  <svg {...iconProps}><path d="M12 2v20M17 6.5H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6" /></svg>
+)
+const DateIcon = () => (
+  <svg {...iconProps}><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 11h18" /></svg>
+)
+const TimeIcon = () => (
+  <svg {...iconProps}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+)
+const DurationIcon = () => (
+  <svg {...iconProps}><circle cx="12" cy="13" r="8" /><path d="M12 9v4M10 2h4M12 2v3" /></svg>
+)
+const CheckCircleIcon = () => (
+  <svg {...iconProps}><circle cx="12" cy="12" r="9" /><path d="m8.5 12.5 2.5 2.5 4.5-5.5" /></svg>
+)
+
+// ─── Stepper ──────────────────────────────────────────────────────────────────
+
+function Stepper({ step, onJump }: { step: Step; onJump: (s: Exclude<Step, 'payment'>) => void }) {
+  const activeIndex = step === 'payment' ? 3 : STEP_ORDER.indexOf(step)
+
+  return (
+    <div className="flex items-center">
+      {STEP_ORDER.map((s, i) => {
+        const done = i < activeIndex
+        const active = i === activeIndex
+        const clickable = done && step !== 'payment'
+        return (
+          <div key={s} className={`flex items-center ${i > 0 ? 'flex-1' : ''}`}>
+            {i > 0 && (
+              <div className="relative mx-4 h-px flex-1 bg-white/[0.12] sm:mx-6">
+                <span
+                  className="absolute inset-y-0 left-0 bg-brand-red transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  style={{ width: i <= activeIndex ? (i === activeIndex ? '45%' : '100%') : '0%' }}
+                />
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={clickable ? () => onJump(s) : undefined}
+              disabled={!clickable}
+              aria-current={active ? 'step' : undefined}
+              className={`group flex items-center gap-3 ${clickable ? 'cursor-pointer' : 'cursor-default'}`}
+            >
+              <span className="sr-only">{`Step ${i + 1}: ${STEP_LABELS[s]}${done ? ', completed' : ''}`}</span>
+              <span
+                aria-hidden="true"
+                className={`flex h-9 w-9 items-center justify-center rounded-full border font-mono text-[11px] font-bold transition-colors ${
+                  done
+                    ? 'border-brand-red bg-brand-red text-white'
+                    : active
+                      ? 'border-brand-red text-brand-red'
+                      : 'border-white/20 text-zinc-500'
+                }`}
+              >
+                {done ? (
+                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
+                    <path d="m5 12.5 4.5 4.5L19 7.5" />
+                  </svg>
+                ) : (
+                  `0${i + 1}`
+                )}
+              </span>
+              <span
+                aria-hidden="true"
+                className={`font-mono text-[11px] font-bold uppercase tracking-[0.2em] transition-colors ${
+                  active ? 'text-brand-red' : done ? `text-white ${clickable ? 'group-hover:text-brand-red' : ''}` : 'text-zinc-500'
+                } ${active ? '' : 'hidden md:inline'}`}
+              >
+                {STEP_LABELS[s]}
+              </span>
+            </button>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -144,57 +266,50 @@ interface BookPageInnerProps {
 }
 
 function BookPageInner({ studios, addons }: BookPageInnerProps) {
-  // Helper functions with access to studios prop
-  const studioById = (id: string) => {
-    const studio = studios.find(s => s.id === id) || getStudioById(id)
-    if (!studio) throw new Error(`Unknown studio: ${id}`)
-    return studio
-  }
-  const cartItemPrice = (item: CartItem) => studioById(item.studioId).price * item.slots.length
+  // Room selection
+  const [step, setStep] = useState<Step>(() => (studioFromQuery(studios) ? 'datetime' : 'room'))
+  const [filter, setFilter] = useState<Filter>(() => {
+    const linked = studioFromQuery(studios)
+    return linked ? filterForStudio(linked) : 'podcast'
+  })
+  const [previewId, setPreviewId] = useState(() => {
+    const linked = studioFromQuery(studios)
+    if (linked) return linked.id
+    return studios.find((s) => s.type === 'podcast')?.id ?? studios[0]?.id ?? ''
+  })
+  const [selectedId, setSelectedId] = useState(() => studioFromQuery(studios)?.id ?? '')
+  const [photoIndex, setPhotoIndex] = useState(0)
 
-  // Builder
-  const [builderStudio, setBuilderStudio] = useState(() => {
-    if (typeof window === 'undefined') return ''
-    return new URLSearchParams(window.location.search).get('studio') || ''
-  })
-  const [builderDate, setBuilderDate]     = useState('')
-  const [builderSlots, setBuilderSlots]   = useState<string[]>([])
-  const [builderStep, setBuilderStep]     = useState<'studio' | 'datetime'>(() => {
-    if (typeof window === 'undefined') return 'studio'
-    const studioParam = new URLSearchParams(window.location.search).get('studio')
-    return studioParam ? 'datetime' : 'studio'
-  })
-  const [monthOffset, setMonthOffset]     = useState(0)
-  const [slots, setSlots] = useState<{ time: string; label: string; available: boolean }[]>([])
-  const [slotsLoading, setSlotsLoading]   = useState(false)
+  // Date & time
+  const [duration, setDuration] = useState(1)
+  const [date, setDate] = useState('')
+  const [startSlot, setStartSlot] = useState('')
+  const [slots, setSlots] = useState<Slot[]>([])
+  const [slotsLoading, setSlotsLoading] = useState(false)
   const [availabilityVerified, setAvailabilityVerified] = useState(true)
-
-  // Cart
-  const [cart, setCart] = useState<CartItem[]>([])
-
-  // Checkout
-  const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>('builder')
-  const [referralSource, setReferralSource] = useState(() => readReferralSourceFromBrowser())
-
-  // Info
-  const [name, setName]         = useState('')
-  const [email, setEmail]       = useState('')
-  const [phone, setPhone]       = useState('')
-  const [teamEmails, setTeamEmails] = useState<string[]>([])
-  const [teamInput, setTeamInput]   = useState('')
+  const [monthOffset, setMonthOffset] = useState(0)
 
   // Extras
   const [selectedAddons, setSelectedAddons] = useState<AddOn[]>([])
-  const [recurring, setRecurring]           = useState<string | null>(null)
+  const [recurring, setRecurring] = useState<string | null>(null)
 
-  // Clear cart confirm
-  const [confirmClear, setConfirmClear] = useState(false)
+  // Contact
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [teamEmails, setTeamEmails] = useState<string[]>([])
+  const [teamInput, setTeamInput] = useState('')
+  const [teamError, setTeamError] = useState('')
 
-  // Submit
+  // Checkout
+  const [referralSource, setReferralSource] = useState(() => readReferralSourceFromBrowser())
   const [submitting, setSubmitting] = useState(false)
-  const [error, setError]           = useState('')
+  const [error, setError] = useState('')
   const [checkoutPublishableKey, setCheckoutPublishableKey] = useState('')
   const [checkoutClientSecret, setCheckoutClientSecret] = useState('')
+
+  const railRef = useRef<HTMLDivElement>(null)
+  const availabilityReqRef = useRef(0)
 
   useEffect(() => {
     const source = readReferralSourceFromBrowser()
@@ -203,51 +318,104 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
     persistReferralSource(source)
   }, [])
 
+  // The global html/body overflow-x:hidden kills position:sticky; clip keeps
+  // the same clipping without breaking the session sidebar.
+  useEffect(() => {
+    document.documentElement.classList.add('booking-flow')
+    return () => document.documentElement.classList.remove('booking-flow')
+  }, [])
+
   // ── Derived ──
+  const previewStudio = studios.find((s) => s.id === previewId) ?? studios[0]
+  const selectedStudio = selectedId ? studios.find((s) => s.id === selectedId) ?? null : null
+  const filteredStudios = studios.filter((s) => matchesFilter(s, filter))
+
   const days = getNext60Days()
   const daysByMonth: Record<string, Date[]> = {}
-  days.forEach(d => {
+  days.forEach((d) => {
     const key = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     if (!daysByMonth[key]) daysByMonth[key] = []
     daysByMonth[key].push(d)
   })
 
-  const cartSubtotal   = cart.reduce((s, i) => s + cartItemPrice(i), 0)
-  const addonTotal     = selectedAddons.reduce((s, a) => s + a.price, 0)
-  const recurringDiscount = recurring ? RECURRING_OPTIONS.find(r => r.id === recurring)?.discount || 0 : 0
-  const discountAmount = calculateRecurringDiscountCents(cartSubtotal * 100, recurring) / 100
-  const grandTotal     = cartSubtotal + addonTotal - discountAmount
+  const startIndex = startSlot ? slots.findIndex((s) => s.time === startSlot) : -1
+  const blockSlots = startIndex >= 0 ? slots.slice(startIndex, startIndex + duration).map((s) => s.time) : []
+  const timeRange = blockSlots.length === duration && duration > 0
+    ? `${fmtTime(blockSlots[0])} – ${fmtEnd(blockSlots[blockSlots.length - 1], 1)}`
+    : ''
 
-  const avail      = slots.filter(s => s.available).length
-  const bBlocks    = groupConsecutive([...builderSlots].sort())
-  const curStudio  = builderStudio ? (studios.find(s => s.id === builderStudio) || null) : null
+  const sessionSubtotal = selectedStudio ? selectedStudio.price * duration : 0
+  const addonTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0)
+  const discountAmount = calculateRecurringDiscountCents(sessionSubtotal * 100, recurring) / 100
+  const recurringDiscount = recurring ? RECURRING_OPTIONS.find((r) => r.id === recurring)?.discount || 0 : 0
+  const grandTotal = sessionSubtotal + addonTotal - discountAmount
 
-  // Primary studios in cart (for prep tips — use first one)
-  const primaryStudio = cart.length > 0 ? studioById(cart[0].studioId) : null
+  const durationLocked = step === 'extras' || step === 'review' || step === 'payment'
 
-  useEffect(() => {
-    if (builderStudio && !studios.some((studio) => studio.id === builderStudio)) {
-      setBuilderStudio('')
-      setBuilderStep('studio')
-      setBuilderDate('')
-      setBuilderSlots([])
-      setSlots([])
+  // A start slot works when every hour in the block is open and consecutive.
+  const blockFits = (fromIndex: number, hours: number) => {
+    for (let k = 0; k < hours; k++) {
+      const slot = slots[fromIndex + k]
+      if (!slot || !slot.available) return false
+      if (k > 0 && Date.parse(slot.time) - Date.parse(slots[fromIndex + k - 1].time) !== SLOT_MS) return false
     }
-  }, [builderStudio, studios])
+    return true
+  }
+
+  const blockValid = startIndex >= 0 && blockSlots.length === duration && blockFits(startIndex, duration)
+
+  const continueReady =
+    step === 'room' ? Boolean(selectedId)
+      : step === 'datetime' ? Boolean(date && startSlot && blockValid)
+        : step === 'extras' ? true
+          : !submitting
+
+  const continueLabel =
+    step === 'room' ? 'Continue to Date & Time'
+      : step === 'datetime' ? 'Continue to Extras'
+        : step === 'extras' ? 'Continue to Review'
+          : submitting ? 'Processing…' : `Lock In Session · $${grandTotal}`
 
   // ── Actions ──
+  function previewRoom(id: string) {
+    if (id === previewId) return
+    setPreviewId(id)
+    setPhotoIndex(0)
+  }
+
+  function changeFilter(next: Filter) {
+    setFilter(next)
+    const visible = studios.filter((s) => matchesFilter(s, next))
+    if (visible.length && !visible.some((s) => s.id === previewId)) previewRoom(visible[0].id)
+  }
+
+  function selectRoom() {
+    if (!previewStudio) return
+    if (selectedId !== previewStudio.id) {
+      availabilityReqRef.current++
+      setSelectedId(previewStudio.id)
+      setDate(''); setStartSlot(''); setSlots([]); setSlotsLoading(false); setError('')
+      trackBookingStep('studio_select', { studio_id: previewStudio.id, studio_name: previewStudio.name, value: previewStudio.price, currency: 'USD' })
+    }
+  }
+
   async function selectDate(ds: string) {
-    setBuilderDate(ds); setBuilderSlots([]); setSlotsLoading(true); setSlots([]); setAvailabilityVerified(true)
-    trackBookingStep('date_select', { studio_id: builderStudio, booking_date: ds })
+    if (!selectedId) return
+    // Only the latest request may write state; stale responses are dropped.
+    const reqId = ++availabilityReqRef.current
+    setDate(ds); setStartSlot(''); setSlotsLoading(true); setSlots([]); setAvailabilityVerified(true); setError('')
+    trackBookingStep('date_select', { studio_id: selectedId, booking_date: ds })
     try {
-      const res = await fetch(`/api/availability/?date=${ds}&studio=${builderStudio}`)
+      const res = await fetch(`/api/availability/?date=${ds}&studio=${selectedId}`)
       const data = await res.json()
+      if (reqId !== availabilityReqRef.current) return
       setSlots(data.slots || [])
-      setAvailabilityVerified(data.verified !== false)
+      setAvailabilityVerified(res.ok && data.verified !== false)
       if (!res.ok) {
         setError(data.error || 'Availability could not be verified. Please try again.')
       }
     } catch {
+      if (reqId !== availabilityReqRef.current) return
       setSlots([])
       setAvailabilityVerified(false)
       setError('Availability could not be verified. Please try again.')
@@ -255,64 +423,105 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
     setSlotsLoading(false)
   }
 
-  function toggleSlot(t: string) {
-    setBuilderSlots(p => p.includes(t) ? p.filter(x => x !== t) : [...p, t])
-    sendGAEvent(GAEventType.SELECT_TIME_SLOT, {
-      studio_id: builderStudio,
-      booking_date: builderDate,
-      slot_time: t,
-      selected: !builderSlots.includes(t),
-    })
+  function pickStart(index: number) {
+    const slot = slots[index]
+    if (!slot || !blockFits(index, duration)) return
+    setStartSlot(slot.time)
+    trackBookingStep('time_select', { studio_id: selectedId, booking_date: date, slot_time: slot.time, hours: duration })
   }
 
-  function addToCart() {
-    if (!builderStudio || !builderDate || !builderSlots.length) return
-    const studio = studioById(builderStudio)
-    sendGAEvent(GAEventType.ADD_TO_CART, {
-      studio_id: builderStudio,
-      studio_name: studio.name,
-      booking_date: builderDate,
-      hours: builderSlots.length,
-      value: studio.price * builderSlots.length,
-      currency: 'USD',
-    })
-    setCart(p => [...p, { cartId: uid(), studioId: builderStudio, date: builderDate, slots: [...builderSlots].sort() }])
-    setBuilderStudio(''); setBuilderDate(''); setBuilderSlots([]); setSlots([]); setBuilderStep('studio')
+  function changeDuration(next: number) {
+    setDuration(next)
+    if (startSlot) {
+      const idx = slots.findIndex((s) => s.time === startSlot)
+      if (idx < 0 || !blockFits(idx, next)) setStartSlot('')
+    }
   }
 
-  function removeFromCart(id: string) { setCart(p => p.filter(i => i.cartId !== id)) }
+  function goToStep(next: Exclude<Step, 'payment'>) {
+    setError('')
+    setStep(next)
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      requestAnimationFrame(() => {
+        document.getElementById('booking-step-headline')?.focus({ preventScroll: true })
+      })
+    }
+  }
 
-  function editCartItem(item: CartItem) {
-    removeFromCart(item.cartId)
-    setBuilderStudio(item.studioId); setBuilderDate(item.date); setBuilderSlots(item.slots)
-    setCheckoutStep('builder'); setBuilderStep('datetime'); selectDate(item.date)
+  function continueFlow() {
+    if (!continueReady) return
+    if (step === 'room') {
+      goToStep('datetime')
+    } else if (step === 'datetime' && selectedStudio) {
+      sendGAEvent(GAEventType.ADD_TO_CART, {
+        studio_id: selectedStudio.id,
+        studio_name: selectedStudio.name,
+        booking_date: date,
+        hours: duration,
+        value: sessionSubtotal,
+        currency: 'USD',
+      })
+      goToStep('extras')
+    } else if (step === 'extras') {
+      trackBookingStep('cart_view', { studio_id: selectedId, value: grandTotal, currency: 'USD' })
+      goToStep('review')
+    } else if (step === 'review') {
+      const form = document.getElementById('review-form') as HTMLFormElement | null
+      form?.requestSubmit()
+    }
+  }
+
+  // Mirrors the server's parseEmailList rules: valid format, lowercase, max 10.
+  function addTeamEmail(raw: string) {
+    const val = raw.trim().replace(/,$/, '').toLowerCase()
+    if (!val) return true
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+      setTeamError('That does not look like an email address.')
+      return false
+    }
+    if (teamEmails.length >= 10 && !teamEmails.includes(val)) {
+      setTeamError('Up to 10 people can be copied on the confirmation.')
+      return false
+    }
+    if (!teamEmails.includes(val)) setTeamEmails((prev) => [...prev, val])
+    setTeamError('')
+    return true
   }
 
   function toggleAddon(addon: AddOn) {
-    setSelectedAddons(p =>
-      p.find(a => a.id === addon.id) ? p.filter(a => a.id !== addon.id) : [...p, addon]
-    )
+    const active = selectedAddons.some((a) => a.id === addon.id)
+    sendGAEvent(active ? GAEventType.DESELECT_ADDON : GAEventType.SELECT_ADDON, { addon_id: addon.id, value: addon.price, currency: 'USD' })
+    setSelectedAddons((prev) => active ? prev.filter((a) => a.id !== addon.id) : [...prev, addon])
   }
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault()
+    if (!selectedStudio || !blockValid) {
+      setError('Pick a room, date, and start time first.')
+      return
+    }
     if (!name || !email) { setError('Name and email are required.'); return }
     setError(''); setSubmitting(true); setCheckoutClientSecret(''); setCheckoutPublishableKey('')
     trackBookingStep('checkout_start', {
-      sessions: cart.length,
+      sessions: 1,
       value: grandTotal,
       currency: 'USD',
-      studios: cart.map((item) => item.studioId).join(','),
+      studios: selectedStudio.id,
       referral_source: referralSource,
     })
     try {
       const res = await fetch('/api/create-checkout-session/', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          cart: cart.map(item => ({
-            studioId: item.studioId, studioName: studioById(item.studioId).name,
-            date: item.date, slots: item.slots, hours: item.slots.length, price: cartItemPrice(item),
-          })),
+          cart: [{
+            studioId: selectedStudio.id,
+            studioName: selectedStudio.name,
+            date,
+            slots: blockSlots,
+            hours: duration,
+            price: sessionSubtotal,
+          }],
           addons: selectedAddons,
           recurring,
           recurringDiscount: discountAmount,
@@ -332,531 +541,628 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
         setCheckoutPublishableKey(data.publishableKey)
         setCheckoutClientSecret(data.clientSecret)
         trackBookingStep('payment_attempt', {
-          sessions: cart.length,
+          sessions: 1,
           value: grandTotal,
           currency: 'USD',
           referral_source: referralSource,
         })
-        setCheckoutStep('payment')
+        setStep('payment')
         setSubmitting(false)
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
       }
       else { setError('Payment could not be started. Please try again.'); setSubmitting(false) }
     } catch { setError('Connection error. Try again.'); setSubmitting(false) }
   }
 
+  const headline =
+    step === 'room' ? 'Build your session'
+      : step === 'datetime' ? 'Pick your time'
+        : step === 'extras' ? 'Make it yours'
+          : step === 'review' ? 'Lock it in'
+            : 'Secure payment'
+
+  const subline =
+    step === 'room' ? 'Start with the room. We handle the rest.'
+      : step === 'datetime' ? 'All times Pacific. Availability is checked live.'
+        : step === 'extras' ? 'Add what the session needs. Skip what it does not.'
+          : step === 'review' ? 'Check the details, add your info, and lock it in.'
+            : 'Card details are handled by Stripe. We never see them.'
+
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-black pt-24 pb-28">
-      <div className="max-w-6xl mx-auto px-6 sm:px-10">
+    <div className="min-h-screen bg-black pb-32 pt-24 lg:pb-24">
+      <div className="mx-auto max-w-[1680px] px-6 sm:px-10 lg:px-16">
 
-        {/* Header */}
-        <div className="mb-14">
-          <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-3">VibeShack Studios · SF</p>
-          <h1 className="text-white font-black leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.05em'}}>
-            {checkoutStep === 'builder' ? 'Book a Session'
-              : checkoutStep === 'info' ? 'Your Info'
-              : checkoutStep === 'extras' ? 'Prepare & Customize'
-              : checkoutStep === 'review' ? 'Review Order'
-              : 'Secure Payment'}
-          </h1>
+        <Stepper step={step} onJump={goToStep} />
+
+        {/* Headline + filters */}
+        <div className="mt-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 id="booking-step-headline" tabIndex={-1} className="text-white outline-none" style={{ fontSize: 'clamp(2.75rem, 4vw, 4rem)' }}>
+              {headline}<span className="text-brand-red">.</span>
+            </h2>
+            <p className="mt-3 text-sm text-zinc-400">{subline}</p>
+          </div>
+          {step === 'room' && (
+            <div className="flex flex-wrap gap-2">
+              {FILTERS.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  aria-pressed={filter === f.id}
+                  onClick={() => changeFilter(f.id)}
+                  className={`rounded-full border px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition-colors ${
+                    filter === f.id
+                      ? 'border-brand-red text-brand-red'
+                      : 'border-white/15 text-zinc-400 hover:border-white/35 hover:text-white'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-12">
+        <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-10 2xl:grid-cols-[minmax(0,1fr)_400px] 2xl:gap-14">
 
           {/* ══════════════════ MAIN ══════════════════ */}
-          <div>
+          <div className="min-w-0">
 
-            {/* ── BUILDER ── */}
-            {checkoutStep === 'builder' && (
-              <>
-                {builderStep === 'studio' && (
-                  <div>
-                    {cart.length > 0 && (
-                      <div className="flex items-center justify-between mb-8">
-                        <p className="text-gray-500 text-sm">Add another studio</p>
-                        <button onClick={() => setCheckoutStep('info')} className="text-white text-sm font-semibold hover:opacity-70 transition-opacity">
-                          Done — Checkout →
-                        </button>
+            {/* ── STEP 1: ROOM ── */}
+            {step === 'room' && previewStudio && (
+              <div>
+                <div className="flex flex-col gap-8 xl:flex-row 2xl:gap-12">
+                  {/* Hero */}
+                  <div className="relative h-[320px] min-w-0 overflow-hidden rounded-[20px] border border-white/[0.08] sm:h-[420px] xl:flex-1 2xl:h-[520px]">
+                    <Image
+                      key={previewStudio.photos[photoIndex] ?? previewStudio.heroImage}
+                      src={previewStudio.photos[photoIndex] ?? previewStudio.heroImage}
+                      alt={previewStudio.name}
+                      fill
+                      priority
+                      quality={85}
+                      sizes="(min-width: 1280px) 60vw, 100vw"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 35%)' }} />
+                    {previewStudio.photos.length > 1 && (
+                      <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                        <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-white/70">
+                          {photoIndex + 1}/{previewStudio.photos.length}
+                        </span>
+                        {[-1, 1].map((dir) => (
+                          <button
+                            key={dir}
+                            type="button"
+                            aria-label={dir < 0 ? 'Previous photo' : 'Next photo'}
+                            onClick={() => setPhotoIndex((p) => (p + dir + previewStudio.photos.length) % previewStudio.photos.length)}
+                            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur transition-colors hover:border-white/50"
+                          >
+                            <svg className={`h-4 w-4 ${dir < 0 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
+                              <path d="m9 6 6 6-6 6" />
+                            </svg>
+                          </button>
+                        ))}
                       </div>
                     )}
-                    <div className="mb-7 flex flex-col gap-3 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
-                      <div>
-                        <p className="text-gray-600 text-xs tracking-[0.22em] uppercase mb-2">01 · Choose studio</p>
-                        <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.25rem)', letterSpacing: '-0.05em'}}>Select the room.</h2>
-                      </div>
-                      <p className="text-gray-500 text-sm leading-relaxed max-w-sm sm:text-right">
-                        Pick the room that matches the look. Availability is checked live before payment.
-                      </p>
-                    </div>
+                  </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {studios.map(s => (
-                        <button key={s.id} onClick={() => { setBuilderStudio(s.id); setBuilderStep('datetime'); trackBookingStep('studio_select', { studio_id: s.id, studio_name: s.name, value: s.price, currency: 'USD' }) }}
-                          className={`min-w-0 w-full text-left rounded-[1.35rem] overflow-hidden group border bg-white/[0.025] transition-all duration-300 studio-card cursor-pointer ${
-                            builderStudio === s.id
-                              ? 'border-brand-red shadow-[0_0_0_1px_#E50000,0_20px_40px_rgba(229,0,0,0.12)] scale-[1.01]'
-                              : 'border-white/10 hover:border-white/25 hover:bg-white/[0.04] hover:shadow-2xl hover:shadow-black/50 hover:scale-[1.01]'
-                          }`} data-tilt>
-                          <div className="relative overflow-hidden" style={{height: '236px'}}>
-                            <Image
-                              src={s.heroImage}
-                              alt={s.name}
-                              fill
-                              className="object-cover group-hover:scale-[1.035] transition-transform duration-[900ms] ease-out"
-                              sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
-                            />
-                            <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.56) 34%, rgba(0,0,0,0.12) 72%, transparent 100%)'}} />
-                            <div className="absolute top-5 right-5 text-right" style={{textShadow: '0 2px 16px rgba(0,0,0,0.9)'}}>
-                              <span className="text-white font-black text-xl" style={{letterSpacing: '-0.04em'}}>${s.price}</span>
-                              <span className="text-gray-300 text-xs">/hr</span>
-                            </div>
-                            <div className="absolute bottom-0 left-0 right-0 p-5">
-                              <div className="flex items-end justify-between gap-5">
-                                <div className="min-w-0">
-                                  <p className="text-white font-black text-2xl leading-none" style={{letterSpacing: '-0.04em'}}>{s.name}</p>
-                                  <p
-                                    className="text-gray-400 text-xs leading-snug mt-2 max-w-[16rem]"
-                                    style={{
-                                      display: '-webkit-box',
-                                      WebkitLineClamp: 2,
-                                      WebkitBoxOrient: 'vertical',
-                                      overflow: 'hidden',
-                                    }}
-                                  >
-                                    {s.description}
-                                  </p>
-                                </div>
-                                <div className="hidden sm:flex items-center gap-2 text-white/80 flex-shrink-0 text-xs font-semibold tracking-wide opacity-0 translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
-                                  Select
-                                  <span aria-hidden>→</span>
-                                </div>
-                              </div>
-                            </div>
+                  {/* Room details */}
+                  <div className="flex w-full shrink-0 flex-col justify-center xl:w-[300px] 2xl:w-[340px]">
+                    <h3 className="text-white" style={{ fontSize: 'clamp(2.25rem, 2.6vw, 3rem)' }}>{previewStudio.name}</h3>
+                    <p className="mt-4 text-sm leading-relaxed text-zinc-400">{metaLine(previewStudio)}</p>
+                    <p className="mt-6 flex items-baseline gap-2">
+                      <span className="font-black text-white" style={{ fontSize: '2.25rem' }}>${previewStudio.price}</span>
+                      <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-500">/ Hour</span>
+                    </p>
+                    {selectedId === previewStudio.id ? (
+                      <button
+                        type="button"
+                        onClick={() => goToStep('datetime')}
+                        className="mt-7 inline-flex w-fit items-center gap-2.5 rounded-lg border border-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors hover:bg-brand-red hover:text-white"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
+                          <path d="m5 12.5 4.5 4.5L19 7.5" />
+                        </svg>
+                        Room selected
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={selectRoom}
+                        className="mt-7 inline-flex w-fit items-center gap-2.5 rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
+                      >
+                        Select this room <span aria-hidden>→</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Room rail */}
+                <div className="relative mt-8">
+                  <div ref={railRef} className="scrollbar-hide flex snap-x gap-4 overflow-x-auto pb-1">
+                    {filteredStudios.map((s) => {
+                      const isSelected = selectedId === s.id
+                      const isPreview = previewId === s.id
+                      return (
+                        <button
+                          key={s.id}
+                          id={`room-card-${s.id}`}
+                          type="button"
+                          aria-pressed={isPreview}
+                          onClick={() => previewRoom(s.id)}
+                          className={`w-[220px] shrink-0 snap-start overflow-hidden rounded-xl border text-left transition-colors ${
+                            isSelected
+                              ? 'border-brand-red ring-1 ring-brand-red'
+                              : isPreview
+                                ? 'border-white/40'
+                                : 'border-white/10 hover:border-white/30'
+                          }`}
+                        >
+                          <div className="relative h-[124px]">
+                            <Image src={s.heroImage} alt={s.name} fill quality={75} sizes="240px" className="object-cover" />
+                            {isSelected && (
+                              <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-brand-red">
+                                <svg className="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
+                                  <path d="m5 12.5 4.5 4.5L19 7.5" />
+                                </svg>
+                              </span>
+                            )}
                           </div>
+                          <div className="flex items-center justify-between gap-3 bg-[#0d0d0d] px-4 py-3">
+                            <span className="truncate font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-white">{s.name}</span>
+                            <span className="shrink-0 font-mono text-[11px] text-zinc-500">${s.price}<span className="text-[9px]">/hr</span></span>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {filteredStudios.length > 5 && (
+                    <button
+                      type="button"
+                      aria-label="Scroll rooms"
+                      onClick={() => railRef.current?.scrollBy({ left: 480, behavior: 'smooth' })}
+                      className="absolute -right-3 top-[62px] hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/80 text-white backdrop-blur transition-colors hover:border-white/40 lg:flex"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
+                        <path d="m9 6 6 6-6 6" />
+                      </svg>
+                    </button>
+                  )}
+                  {filteredStudios.length > 1 && (
+                    <div className="mt-2 flex justify-center">
+                      {filteredStudios.map((s) => (
+                        <button
+                          key={s.id}
+                          type="button"
+                          aria-label={`Show ${s.name}`}
+                          aria-pressed={previewId === s.id}
+                          onClick={() => {
+                            previewRoom(s.id)
+                            document.getElementById(`room-card-${s.id}`)?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+                          }}
+                          className="group/dot flex h-6 w-6 items-center justify-center"
+                        >
+                          <span className={`h-1.5 w-1.5 rounded-full transition-colors ${previewId === s.id ? 'bg-brand-red' : 'bg-white/20 group-hover/dot:bg-white/40'}`} />
                         </button>
                       ))}
                     </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ── STEP 2: DATE & TIME ── */}
+            {step === 'datetime' && selectedStudio && (
+              <div>
+                <div className="mb-8 flex items-center justify-between border-b border-white/[0.08] pb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg">
+                      <Image src={selectedStudio.heroImage} alt={selectedStudio.name} fill sizes="128px" className="object-cover" />
+                    </div>
+                    <div>
+                      <p className="text-[15px] font-bold text-white">{selectedStudio.name}</p>
+                      <p className="font-mono text-xs text-zinc-500">${selectedStudio.price}/hr</p>
+                    </div>
                   </div>
-                )}
+                  <button
+                    type="button"
+                    onClick={() => goToStep('room')}
+                    className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500 transition-colors hover:text-white"
+                  >
+                    Change room
+                  </button>
+                </div>
 
-                {builderStep === 'datetime' && curStudio && (
+                <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+                  {/* Calendar */}
                   <div>
-                    <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/8">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 relative">
-                          <Image src={curStudio.heroImage} alt={curStudio.name} fill className="object-cover" sizes="48px" />
-                        </div>
+                    <p className="mb-5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Select a date</p>
+                    {(() => {
+                      const months = Object.entries(daysByMonth)
+                      const currentIdx = Math.max(0, Math.min(monthOffset, months.length - 1))
+                      const [month, monthDays] = months[currentIdx] || ['', []]
+                      return (
                         <div>
-                          <p className="text-white font-bold text-base">{curStudio.name}</p>
-                          <p className="text-gray-500 text-xs">${curStudio.price}/hr</p>
-                        </div>
-                      </div>
-                      <button onClick={() => { setBuilderStep('studio'); setBuilderSlots([]); setBuilderDate('') }}
-                        className="text-gray-600 hover:text-white text-sm transition-colors">Change</button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                      {/* Calendar */}
-                      <div>
-                        <div className="flex items-center justify-between mb-5">
-                          <p className="text-white font-bold text-base">Date</p>
-                        </div>
-                        <div>
-                          {(() => {
-                            const months = Object.entries(daysByMonth);
-                            const currentIdx = Math.max(0, Math.min(monthOffset, months.length - 1));
-                            const [month, monthDays] = months[currentIdx] || ['', []];
-                            return (
-                              <div>
-                                <div className="flex items-center justify-between mb-4">
-                                  <button onClick={() => setMonthOffset(m => Math.max(0, m - 1))} disabled={monthOffset === 0}
-                                    className="text-gray-600 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
-                                    ← Prev
-                                  </button>
-                                  <p className="text-gray-600 text-xs uppercase tracking-widest">{month}</p>
-                                  <button onClick={() => setMonthOffset(m => Math.min(months.length - 1, m + 1))} disabled={monthOffset >= months.length - 1}
-                                    className="text-gray-600 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
-                                    Next →
-                                  </button>
-                                </div>
-                                <div className="grid grid-cols-5 gap-1">
-                                  {monthDays.map(d => {
-                                    const ds = formatDate(d); const sel = builderDate === ds
-                                    return (
-                                      <button key={ds} onClick={() => selectDate(ds)}
-                                        className={`flex flex-col items-center py-2.5 rounded-xl transition-all ${sel ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/8'}`}>
-                                        <span className="text-xs leading-none mb-1 opacity-60">{d.toLocaleDateString('en-US', { weekday: 'short' })}</span>
-                                        <span className="text-sm font-black leading-none">{d.getDate()}</span>
-                                      </button>
-                                    )
-                                  })}
-                                </div>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </div>
-
-                      {/* Times */}
-                      <div>
-                        <div className="flex items-center justify-between mb-5">
-                          <p className="text-white font-bold text-base">{builderDate ? fmtDateFull(builderDate).split(',')[0] : 'Time'}</p>
-                          {!slotsLoading && avail > 0 && avail <= 4 && <p className="text-yellow-500 text-xs font-semibold">{avail} slots left</p>}
-                        </div>
-                        {!builderDate && <div className="flex items-center justify-center h-48"><p className="text-gray-700 text-sm">Select a date</p></div>}
-                        {builderDate && slotsLoading && <div className="flex items-center justify-center h-48"><p className="text-gray-600 text-sm animate-pulse">Checking availability…</p></div>}
-                        {builderDate && !slotsLoading && (
-                          <>
-                            {!availabilityVerified && (
-                              <div className="mb-4 rounded-xl border border-yellow-900/60 bg-yellow-950/30 px-4 py-3">
-                                <p className="text-yellow-300 text-xs font-semibold">Live availability is temporarily unavailable. Please refresh, or contact us and we will help you book.</p>
-                              </div>
-                            )}
-                            <p className="text-gray-600 text-xs mb-4">Tap to select · multiple for longer or split sessions</p>
-                            <div className="overflow-y-auto" style={{maxHeight: '300px'}}>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {slots.map(slot => {
-                                  const sel = builderSlots.includes(slot.time)
-                                  return (
-                                    <button key={slot.time} disabled={!slot.available} onClick={() => slot.available && toggleSlot(slot.time)}
-                                      className={`py-3 rounded-xl text-sm font-semibold transition-all ${
-                                        !slot.available ? 'text-gray-800 cursor-not-allowed line-through'
-                                        : sel ? 'bg-brand-red text-white' : 'text-gray-400 hover:text-white hover:bg-white/8'}`}>
-                                      {slot.label}
-                                    </button>
-                                  )
-                                })}
-                              </div>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {builderSlots.length > 0 && (
-                      <div className="border-t border-white/8 pt-6">
-                        <div className="flex items-start justify-between mb-5">
-                          <div>
-                            {bBlocks.map((block, i) => (
-                              <p key={i} className="text-white font-bold text-lg leading-tight" style={{letterSpacing: '-0.02em'}}>
-                                {fmtTime(block[0])} → {fmtEnd(block[block.length - 1], 1)}
-                                <span className="text-gray-500 font-normal text-sm ml-2">{block.length}hr</span>
-                              </p>
-                            ))}
-                            <p className="text-gray-500 text-sm mt-1">{fmtDateShort(builderDate)}</p>
+                          <div className="mb-4 flex items-center justify-between">
+                            <button
+                              type="button"
+                              onClick={() => setMonthOffset((m) => Math.max(0, m - 1))}
+                              disabled={monthOffset === 0}
+                              className="font-mono text-[11px] uppercase tracking-[0.12em] text-zinc-500 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                            >
+                              ← Prev
+                            </button>
+                            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-400">{month}</p>
+                            <button
+                              type="button"
+                              onClick={() => setMonthOffset((m) => Math.min(months.length - 1, m + 1))}
+                              disabled={monthOffset >= months.length - 1}
+                              className="font-mono text-[11px] uppercase tracking-[0.12em] text-zinc-500 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                            >
+                              Next →
+                            </button>
                           </div>
-                          <div className="text-right">
-                            <p className="text-white font-black text-2xl" style={{letterSpacing: '-0.03em'}}>${curStudio.price * builderSlots.length}</p>
-                            {confirmClear ? (
-                            <span className="flex flex-col items-end gap-1 mt-1">
-                              <span className="text-gray-400 text-xs">Clear slots?</span>
-                              <span className="flex gap-2">
-                                <button onClick={() => setConfirmClear(false)} className="text-gray-600 hover:text-white text-xs transition-colors">Cancel</button>
-                                <button onClick={() => { setBuilderSlots([]); setConfirmClear(false) }} className="text-brand-red hover:text-red-400 text-xs font-semibold transition-colors">Confirm</button>
-                              </span>
-                            </span>
-                          ) : (
-                            <button onClick={() => setConfirmClear(true)} className="text-gray-600 hover:text-white text-xs transition-colors mt-1">Clear</button>
-                          )}
+                          <div className="grid grid-cols-5 gap-1.5">
+                            {monthDays.map((d) => {
+                              const ds = formatDate(d); const sel = date === ds
+                              return (
+                                <button
+                                  key={ds}
+                                  type="button"
+                                  aria-pressed={sel}
+                                  aria-label={d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                                  onClick={() => selectDate(ds)}
+                                  className={`flex flex-col items-center rounded-lg border py-2.5 transition-colors ${
+                                    sel
+                                      ? 'border-brand-red bg-brand-red text-white'
+                                      : 'border-transparent text-zinc-500 hover:border-white/15 hover:text-white'
+                                  }`}
+                                >
+                                  <span className="mb-1 font-mono text-[9px] uppercase leading-none opacity-70">{d.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                                  <span className="text-sm font-bold leading-none">{d.getDate()}</span>
+                                </button>
+                              )
+                            })}
                           </div>
                         </div>
-                        <button onClick={addToCart} className="w-full py-4 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 transition-colors">
-                          Add to Booking
-                        </button>
+                      )
+                    })()}
+                  </div>
+
+                  {/* Start times */}
+                  <div>
+                    <div className="mb-5 flex items-baseline justify-between">
+                      <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">
+                        Start time{date ? ` · ${fmtDateShort(date)}` : ''}
+                      </p>
+                      <span className="relative lg:hidden">
+                        <select
+                          value={duration}
+                          onChange={(e) => changeDuration(Number(e.target.value))}
+                          aria-label="Session duration"
+                          className="cursor-pointer appearance-none bg-transparent pr-4 text-right font-mono text-[11px] uppercase tracking-[0.14em] text-white focus:outline-none [&>option]:bg-black"
+                        >
+                          {DURATION_OPTIONS.map((n) => (
+                            <option key={n} value={n}>{n} hour{n > 1 ? 's' : ''}</option>
+                          ))}
+                        </select>
+                        <svg className="pointer-events-none absolute right-0 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </span>
+                      <p className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500 lg:block">
+                        {duration} hour{duration > 1 ? 's' : ''}
+                      </p>
+                    </div>
+                    {!date && (
+                      <div className="flex h-44 items-center justify-center rounded-xl border border-dashed border-white/10">
+                        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Select a date first</p>
                       </div>
                     )}
+                    {date && slotsLoading && (
+                      <div className="flex h-44 items-center justify-center">
+                        <p className="animate-pulse text-sm text-zinc-500">Checking availability…</p>
+                      </div>
+                    )}
+                    {date && !slotsLoading && (
+                      <>
+                        {!availabilityVerified && (
+                          <div className="mb-4 rounded-xl border border-white/15 bg-white/[0.03] px-4 py-3">
+                            <p className="text-xs font-semibold leading-relaxed text-zinc-300">
+                              Live availability is temporarily unavailable. Refresh, or contact us and we will book you in.
+                            </p>
+                          </div>
+                        )}
+                        {error && <p className="mb-4 text-sm text-brand-red" role="alert">{error}</p>}
+                        <p className="mb-4 text-xs text-zinc-500">
+                          Pick when you want to start. Your {duration}-hour block is held from there.
+                        </p>
+                        <div className="max-h-[300px] overflow-y-auto pr-1">
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {slots.map((slot, i) => {
+                              const inBlock = startIndex >= 0 && i >= startIndex && i < startIndex + duration
+                              const isStart = slot.time === startSlot
+                              const fits = slot.available && blockFits(i, duration)
+                              return (
+                                <button
+                                  key={slot.time}
+                                  type="button"
+                                  disabled={!fits}
+                                  aria-pressed={isStart}
+                                  aria-label={`${slot.label}${!slot.available ? ', booked' : !fits ? `, does not fit a ${duration}-hour block` : ''}`}
+                                  onClick={() => pickStart(i)}
+                                  className={`rounded-lg border py-3 font-mono text-xs transition-colors ${
+                                    isStart
+                                      ? 'border-brand-red bg-brand-red font-bold text-white'
+                                      : inBlock
+                                        ? 'border-brand-red/40 bg-brand-red/10 text-white'
+                                        : !slot.available
+                                          ? 'cursor-not-allowed border-white/5 text-zinc-600 line-through'
+                                          : !fits
+                                            ? 'cursor-not-allowed border-transparent text-zinc-600'
+                                            : 'border-white/10 text-zinc-400 hover:border-white/30 hover:text-white'
+                                  }`}
+                                >
+                                  {slot.label}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {timeRange && (
+                  <div className="mt-8 flex items-center justify-between border-t border-white/[0.08] pt-6">
+                    <div>
+                      <p className="text-lg font-bold text-white">{timeRange}</p>
+                      <p className="mt-1 text-sm text-zinc-500">{fmtDateFull(date)} · {duration} hour{duration > 1 ? 's' : ''}</p>
+                    </div>
+                    <p className="font-black text-white" style={{ fontSize: '1.75rem' }}>${sessionSubtotal}</p>
                   </div>
                 )}
+              </div>
+            )}
 
-                {cart.length > 0 && builderStep === 'studio' && (
-                  <div className="mt-6">
-                    <button onClick={() => setCheckoutStep('info')} className="w-full py-4 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 transition-colors">
-                      Checkout ({cart.length} session{cart.length > 1 ? 's' : ''}) — ${cartSubtotal}
+            {/* ── STEP 3: EXTRAS ── */}
+            {step === 'extras' && (
+              <div className="max-w-2xl">
+                <p className="mb-4 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Add-ons</p>
+                <div className="space-y-2">
+                  {addons.map((addon) => {
+                    const active = selectedAddons.some((a) => a.id === addon.id)
+                    return (
+                      <button
+                        key={addon.id}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => toggleAddon(addon)}
+                        className={`flex w-full items-start justify-between gap-6 rounded-xl border px-5 py-5 text-left transition-colors ${
+                          active ? 'border-brand-red bg-brand-red/5' : 'border-white/10 hover:border-white/25'
+                        }`}
+                      >
+                        <div className="flex items-start gap-4">
+                          <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${active ? 'border-brand-red bg-brand-red' : 'border-white/30'}`}>
+                            {active && (
+                              <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
+                                <path d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </span>
+                          <span>
+                            <span className="block text-sm font-bold text-white">{addon.name}</span>
+                            <span className="mt-0.5 block text-xs leading-relaxed text-zinc-500">{addon.description}</span>
+                          </span>
+                        </div>
+                        <span className="shrink-0 font-mono text-sm font-bold text-white">+${addon.price}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <p className="mb-2 mt-12 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Make it a standing booking</p>
+                <p className="mb-5 text-sm text-zinc-500">Lock in this slot on a recurring schedule and save.</p>
+                <div className="space-y-2">
+                  {RECURRING_OPTIONS.map((opt) => {
+                    const active = recurring === opt.id
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => setRecurring(active ? null : opt.id)}
+                        className={`flex w-full items-center justify-between rounded-xl border px-5 py-4 text-left transition-colors ${
+                          active ? 'border-brand-red bg-brand-red/5' : 'border-white/10 hover:border-white/25'
+                        }`}
+                      >
+                        <span className="flex items-center gap-4">
+                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${active ? 'border-brand-red bg-brand-red' : 'border-white/30'}`}>
+                            {active && <span className="h-2 w-2 rounded-full bg-white" />}
+                          </span>
+                          <span className="text-sm font-semibold text-white">{opt.label}</span>
+                        </span>
+                        <span className="font-mono text-xs font-bold text-brand-red">{opt.discount}% off</span>
+                      </button>
+                    )
+                  })}
+                </div>
+                {recurring && (
+                  <p className="mt-4 text-xs text-zinc-500">
+                    You save ${discountAmount} on this order. Our team will reach out to confirm your recurring schedule.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* ── STEP 4: REVIEW ── */}
+            {step === 'review' && selectedStudio && (
+              <div className="max-w-2xl">
+                <p className="mb-4 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Your session</p>
+                <div className="flex items-center gap-5 border-b border-white/[0.08] pb-5">
+                  <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg">
+                    <Image src={selectedStudio.heroImage} alt={selectedStudio.name} fill sizes="192px" className="object-cover" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[15px] font-bold text-white">{selectedStudio.name}</p>
+                    <p className="mt-0.5 text-sm text-zinc-500">{fmtDateFull(date)}</p>
+                    <p className="text-sm text-zinc-400">{timeRange} · {duration} hour{duration > 1 ? 's' : ''}</p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="font-mono text-sm font-bold text-white">${sessionSubtotal}</p>
+                    <button
+                      type="button"
+                      onClick={() => goToStep('datetime')}
+                      className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-white"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+
+                {(selectedAddons.length > 0 || recurring) && (
+                  <div className="border-b border-white/[0.08] py-5">
+                    {selectedAddons.map((a) => (
+                      <div key={a.id} className="flex items-center justify-between py-1">
+                        <p className="text-sm text-zinc-300">{a.name}</p>
+                        <p className="font-mono text-sm text-white">+${a.price}</p>
+                      </div>
+                    ))}
+                    {recurring && (
+                      <div className="flex items-center justify-between py-1">
+                        <p className="text-sm text-zinc-300">Recurring · {RECURRING_OPTIONS.find((r) => r.id === recurring)?.label}</p>
+                        <p className="font-mono text-sm font-semibold text-brand-red">−${discountAmount}</p>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => goToStep('extras')}
+                      className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-white"
+                    >
+                      Edit extras
                     </button>
                   </div>
                 )}
-              </>
-            )}
 
-            {/* ── INFO ── */}
-            {checkoutStep === 'info' && (
-              <div className="max-w-md">
-                <form onSubmit={e => { e.preventDefault(); setCheckoutStep('extras') }} className="space-y-8">
+                <div className="flex items-baseline justify-between py-5">
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">Total</p>
+                  <p className="font-black text-white" style={{ fontSize: '2rem' }}>${grandTotal}</p>
+                </div>
 
-                  {/* Primary contact */}
+                <form id="review-form" onSubmit={handlePay} className="mt-4 space-y-8">
                   <div className="space-y-6">
-                    <p className="text-gray-600 text-xs uppercase tracking-widest">Your Details</p>
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Your details</p>
                     {[
                       { label: 'Full Name', type: 'text', val: name, set: setName, ph: 'Your name', req: true },
                       { label: 'Email', type: 'email', val: email, set: setEmail, ph: 'you@example.com', req: true },
                       { label: 'Phone', type: 'tel', val: phone, set: setPhone, ph: '+1 (415) 000-0000', req: false },
-                    ].map(({ label, type, val, set, ph, req }) => (
-                      <div key={label}>
-                        <label className="block text-gray-500 text-xs uppercase tracking-widest mb-3">
-                          {label}{!req && <span className="text-gray-700 ml-2 normal-case tracking-normal">optional</span>}
-                        </label>
-                        <input type={type} required={req} value={val} onChange={e => set(e.target.value)} placeholder={ph}
-                          className="w-full bg-transparent border-b border-white/20 pb-3 text-white placeholder-gray-700 text-base focus:outline-none focus:border-white/50 transition-colors" />
-                      </div>
-                    ))}
+                    ].map(({ label, type, val, set, ph, req }) => {
+                      const fieldId = `detail-${label.toLowerCase().replace(/\s+/g, '-')}`
+                      return (
+                        <div key={label}>
+                          <label htmlFor={fieldId} className="mb-3 block font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+                            {label}{!req && <span className="ml-2 normal-case tracking-normal text-zinc-500">optional</span>}
+                          </label>
+                          <input
+                            id={fieldId}
+                            type={type}
+                            required={req}
+                            value={val}
+                            onChange={(e) => set(e.target.value)}
+                            placeholder={ph}
+                            className="w-full border-b border-white/20 bg-transparent pb-3 text-base text-white placeholder-zinc-500 transition-colors focus:border-white/50 focus:outline-none"
+                          />
+                        </div>
+                      )
+                    })}
                   </div>
 
-                  {/* Team / guests */}
-                  <div className="pt-4 border-t border-white/8">
-                    <p className="text-gray-600 text-xs uppercase tracking-widest mb-1">Who else needs to know?</p>
-                    <p className="text-gray-700 text-xs mb-5">Guests, co-hosts, crew, clients — add as many as you need. Everyone gets a copy of the confirmation.</p>
-
-                    {/* Tag input */}
-                    <div className="border-b border-white/20 pb-3 flex flex-wrap gap-2 items-center min-h-[44px]">
+                  <div className="border-t border-white/[0.08] pt-6">
+                    <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Who else needs to know?</p>
+                    <p className="mb-5 text-xs text-zinc-500">Guests, co-hosts, crew, clients. Everyone gets a copy of the confirmation.</p>
+                    <div className="flex min-h-[44px] flex-wrap items-center gap-2 border-b border-white/20 pb-3">
                       {teamEmails.map((em, i) => (
-                        <span key={i} className="inline-flex items-center gap-1.5 bg-white/10 text-white text-xs px-3 py-1.5 rounded-full">
+                        <span key={i} className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs text-white">
                           {em}
-                          <button type="button" onClick={() => setTeamEmails(p => p.filter((_, j) => j !== i))}
-                            className="text-gray-400 hover:text-white transition-colors leading-none">×</button>
+                          <button
+                            type="button"
+                            aria-label={`Remove ${em}`}
+                            onClick={() => setTeamEmails((p) => p.filter((_, j) => j !== i))}
+                            className="-m-1 p-1 leading-none text-zinc-400 transition-colors hover:text-white"
+                          >
+                            ×
+                          </button>
                         </span>
                       ))}
                       <input
                         type="email"
                         value={teamInput}
-                        onChange={e => setTeamInput(e.target.value)}
-                        onKeyDown={e => {
-                          if ((e.key === 'Enter' || e.key === ',' || e.key === ' ') && teamInput.trim()) {
+                        aria-label="Add a team email"
+                        onChange={(e) => { setTeamInput(e.target.value); if (teamError) setTeamError('') }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
                             e.preventDefault()
-                            const val = teamInput.trim().replace(/,$/, '')
-                            if (val && !teamEmails.includes(val)) setTeamEmails(p => [...p, val])
-                            setTeamInput('')
+                            if (addTeamEmail(teamInput)) setTeamInput('')
+                            return
+                          }
+                          if ((e.key === ',' || e.key === ' ') && teamInput.trim()) {
+                            e.preventDefault()
+                            if (addTeamEmail(teamInput)) setTeamInput('')
                           }
                           if (e.key === 'Backspace' && !teamInput && teamEmails.length) {
-                            setTeamEmails(p => p.slice(0, -1))
+                            setTeamEmails((p) => p.slice(0, -1))
                           }
                         }}
                         onBlur={() => {
-                          const val = teamInput.trim().replace(/,$/, '')
-                          if (val && !teamEmails.includes(val)) setTeamEmails(p => [...p, val])
-                          setTeamInput('')
+                          if (addTeamEmail(teamInput)) setTeamInput('')
                         }}
-                        placeholder={teamEmails.length === 0 ? 'their@email.com — press Enter or comma to add more' : 'Add another…'}
-                        className="flex-1 min-w-[180px] bg-transparent text-white placeholder-gray-700 text-sm focus:outline-none"
+                        placeholder={teamEmails.length === 0 ? 'their@email.com, press Enter to add more' : 'Add another…'}
+                        className="min-w-[180px] flex-1 bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
                       />
                     </div>
-                    {teamEmails.length > 0 && (
-                      <p className="text-gray-600 text-xs mt-2">{teamEmails.length} person{teamEmails.length > 1 ? 's' : ''} will receive the confirmation</p>
+                    {teamError && <p className="mt-2 text-xs text-brand-red" role="alert">{teamError}</p>}
+                    {!teamError && teamEmails.length > 0 && (
+                      <p className="mt-2 text-xs text-zinc-500">{teamEmails.length} person{teamEmails.length > 1 ? 's' : ''} will receive the confirmation</p>
                     )}
                   </div>
 
-                  <div className="pt-2">
-                    <button type="submit" className="w-full py-4 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 transition-colors">
-                      Continue →
-                    </button>
-                    <button type="button" onClick={() => setCheckoutStep('builder')} className="w-full py-3 text-gray-600 hover:text-white text-sm transition-colors mt-2">
-                      ← Add more sessions
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* ── EXTRAS: Prep tips + Add-ons + Recurring ── */}
-            {checkoutStep === 'extras' && (
-              <div className="max-w-xl">
-
-                {/* Prep tips */}
-                {primaryStudio && (
-                  <div className="mb-12">
-                    <p className="text-gray-600 text-xs uppercase tracking-widest mb-2">Before You Arrive</p>
-                    <p className="text-white font-black text-2xl mb-6" style={{letterSpacing: '-0.03em'}}>Here&apos;s how to prepare.</p>
-                    <div className="space-y-4">
-                      {primaryStudio.prep.map((tip, i) => (
-                        <div key={i} className="flex items-start gap-4 py-4 border-b border-white/8">
-                          <span className="text-gray-700 font-black text-sm w-5 flex-shrink-0 mt-0.5">0{i + 1}</span>
-                          <p className="text-gray-300 text-sm leading-relaxed">{tip}</p>
+                  <div className="border-t border-white/[0.08] pt-6">
+                    <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Before you arrive</p>
+                    <div className="space-y-3">
+                      {selectedStudio.prep.map((tip, i) => (
+                        <div key={i} className="flex items-start gap-4">
+                          <span className="mt-0.5 w-5 shrink-0 font-mono text-[11px] font-bold text-zinc-500">0{i + 1}</span>
+                          <p className="text-sm leading-relaxed text-zinc-400">{tip}</p>
                         </div>
                       ))}
                     </div>
-                    <div className="mt-5 p-4 rounded-xl" style={{background: 'rgba(255,255,255,0.03)'}}>
-                      <p className="text-gray-500 text-xs">📍 950 Battery St, SF 94111 · Northern Waterfront<br />Street parking on Battery St · 10 min walk from Ferry Building</p>
-                    </div>
+                    <p className="mt-5 text-xs text-zinc-500">950 Battery St, SF 94111 · Northern Waterfront · Street parking on Battery St</p>
                   </div>
-                )}
 
-                {/* Add-ons */}
-                <div className="mb-12">
-                  <p className="text-gray-600 text-xs uppercase tracking-widest mb-2">Enhance Your Session</p>
-                  <p className="text-white font-black text-2xl mb-6" style={{letterSpacing: '-0.03em'}}>Want to add anything?</p>
-                  <div className="space-y-2">
-                    {addons.map(addon => {
-                      const selected = !!selectedAddons.find(a => a.id === addon.id)
-                      return (
-                        <button key={addon.id} onClick={() => toggleAddon(addon)}
-                          className={`w-full text-left flex items-start justify-between gap-6 px-5 py-5 rounded-2xl border transition-all ${
-                            selected ? 'border-brand-red bg-brand-red/5' : 'border-white/10 hover:border-white/25'}`}>
-                          <div className="flex items-start gap-4">
-                            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-all ${selected ? 'border-brand-red bg-brand-red' : 'border-white/30'}`}>
-                              {selected && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>}
-                            </div>
-                            <div>
-                              <p className="text-white font-bold text-sm">{addon.name}</p>
-                              <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{addon.description}</p>
-                            </div>
-                          </div>
-                          <div className="flex-shrink-0 text-right">
-                            <p className="text-white font-black">+${addon.price}</p>
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
+                  {error && <p className="text-sm text-brand-red" role="alert">{error}</p>}
 
-                {/* Recurring */}
-                <div className="mb-12">
-                  <p className="text-gray-600 text-xs uppercase tracking-widest mb-2">Make It a Standing Booking</p>
-                  <p className="text-white font-black text-2xl mb-2" style={{letterSpacing: '-0.03em'}}>Book this regularly?</p>
-                  <p className="text-gray-500 text-sm mb-6">Lock in this slot on a recurring schedule and save.</p>
-                  <div className="space-y-2">
-                    {RECURRING_OPTIONS.map(opt => {
-                      const sel = recurring === opt.id
-                      return (
-                        <button key={opt.id} onClick={() => setRecurring(sel ? null : opt.id)}
-                          className={`w-full text-left flex items-center justify-between px-5 py-4 rounded-2xl border transition-all ${sel ? 'border-brand-red bg-brand-red/5' : 'border-white/10 hover:border-white/25'}`}>
-                          <div className="flex items-center gap-4">
-                            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${sel ? 'border-brand-red bg-brand-red' : 'border-white/30'}`}>
-                              {sel && <div className="w-2 h-2 rounded-full bg-white" />}
-                            </div>
-                            <p className="text-white font-semibold text-sm">{opt.label}</p>
-                          </div>
-                          <p className="text-brand-red font-bold text-sm">{opt.discount}% off</p>
-                        </button>
-                      )
-                    })}
-                  </div>
-                  {recurring && (
-                    <p className="text-gray-500 text-xs mt-4">
-                      You save ${discountAmount} on this order. Our team will reach out to confirm your recurring schedule.
-                    </p>
-                  )}
-                </div>
-
-                <button onClick={() => setCheckoutStep('review')} className="w-full py-4 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 transition-colors">
-                  Review Order →
-                </button>
-                <button onClick={() => setCheckoutStep('info')} className="w-full py-3 text-gray-600 hover:text-white text-sm transition-colors mt-2">
-                  ← Back
-                </button>
-              </div>
-            )}
-
-            {/* ── REVIEW ── */}
-            {checkoutStep === 'review' && (
-              <div className="max-w-xl">
-
-                {/* Sessions */}
-                <p className="text-gray-600 text-xs uppercase tracking-widest mb-5">Sessions</p>
-                <div className="space-y-4 mb-8">
-                  {cart.map((item, idx) => {
-                    const s = studioById(item.studioId)
-                    const blocks = groupConsecutive([...item.slots].sort())
-                    return (
-                      <div key={item.cartId} className="flex items-center gap-5 py-5 border-b border-white/8">
-                        <span className="text-gray-700 text-xs font-black w-5 text-center">{idx + 1}</span>
-                        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 relative">
-                          <Image src={s.heroImage} alt={s.name} fill className="object-cover" sizes="56px" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white font-bold text-sm">{s.name}</p>
-                          <p className="text-gray-500 text-xs">{fmtDateFull(item.date)}</p>
-                          {blocks.map((b, i) => (
-                            <p key={i} className="text-gray-400 text-xs">{fmtTime(b[0])} → {fmtEnd(b[b.length - 1], 1)} · {b.length}hr</p>
-                          ))}
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <p className="text-white font-black">${cartItemPrice(item)}</p>
-                          <button onClick={() => editCartItem(item)} className="text-gray-600 hover:text-white text-xs transition-colors block mt-1">Edit</button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-
-                {/* Add-ons */}
-                {selectedAddons.length > 0 && (
-                  <>
-                    <p className="text-gray-600 text-xs uppercase tracking-widest mb-4">Add-Ons</p>
-                    <div className="space-y-2 mb-8">
-                      {selectedAddons.map(a => (
-                        <div key={a.id} className="flex justify-between py-3 border-b border-white/8">
-                          <p className="text-gray-300 text-sm">{a.name}</p>
-                          <p className="text-white font-bold text-sm">+${a.price}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-
-                {/* Price breakdown */}
-                <div className="space-y-2 mb-8 py-5 border-t border-b border-white/8">
-                  <div className="flex justify-between">
-                    <p className="text-gray-500 text-sm">Sessions ({cart.length})</p>
-                    <p className="text-white text-sm">${cartSubtotal}</p>
-                  </div>
-                  {addonTotal > 0 && (
-                    <div className="flex justify-between">
-                      <p className="text-gray-500 text-sm">Add-ons</p>
-                      <p className="text-white text-sm">+${addonTotal}</p>
-                    </div>
-                  )}
-                  {discountAmount > 0 && (
-                    <div className="flex justify-between">
-                      <p className="text-gray-500 text-sm">Recurring discount ({recurringDiscount}%)</p>
-                      <p className="text-brand-red text-sm font-semibold">−${discountAmount}</p>
-                    </div>
-                  )}
-                  <div className="flex justify-between pt-2">
-                    <p className="text-white font-bold">Total</p>
-                    <p className="text-white font-black" style={{fontSize: '1.75rem', letterSpacing: '-0.04em'}}>${grandTotal}</p>
-                  </div>
-                </div>
-
-                {/* Contact summary */}
-                <div className="mb-8">
-                  <p className="text-gray-500 text-sm">{name} · {email}</p>
-                  {teamEmails.length > 0 && <p className="text-gray-600 text-sm">+{teamEmails.length} confirmation{teamEmails.length > 1 ? 's' : ''} will be sent to your team</p>}
-                  {recurring && <p className="text-gray-600 text-sm">Recurring: {RECURRING_OPTIONS.find(r => r.id === recurring)?.label}</p>}
-                </div>
-
-                <p className="text-gray-600 text-xs mb-6 flex items-center gap-2">
-                  <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                  </svg>
-                  Secure payment via Stripe · Free cancellation 48hrs before each session
-                </p>
-
-                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-
-                <form onSubmit={handlePay}>
-                  <button type="submit" disabled={submitting}
-                    className="w-full py-4 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer">
-                    {submitting
-                      ? <><svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>Processing…</>
-                      : `Lock In ${cart.length} Session${cart.length > 1 ? 's' : ''} — $${grandTotal}`}
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full rounded-xl bg-brand-red py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 lg:hidden"
+                  >
+                    {submitting ? 'Processing…' : `Lock In Session · $${grandTotal}`}
                   </button>
-                  <button type="button" onClick={() => setCheckoutStep('extras')} className="w-full py-3 text-gray-600 hover:text-white text-sm transition-colors duration-200 mt-2 cursor-pointer">← Back</button>
                 </form>
               </div>
             )}
 
-            {/* ── EMBEDDED PAYMENT ── */}
-            {checkoutStep === 'payment' && (
-              <div className="max-w-xl">
-                <div className="mb-8">
-                  <p className="text-gray-600 text-xs uppercase tracking-widest mb-2">Stripe Secure Checkout</p>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    Complete payment here on VibeShack. Your booking is only added to the studio calendar after payment succeeds.
-                  </p>
-                </div>
-
+            {/* ── PAYMENT ── */}
+            {step === 'payment' && (
+              <div className="max-w-2xl">
+                <p className="mb-6 text-sm leading-relaxed text-zinc-400">
+                  Complete payment here on VibeShack. Your booking lands on the studio calendar only after payment succeeds.
+                </p>
                 {checkoutPublishableKey && checkoutClientSecret ? (
-                  <div className="rounded-3xl bg-white p-2 sm:p-4">
+                  <div className="rounded-2xl bg-white p-2 sm:p-4">
                     <StripeEmbeddedCheckout
                       publishableKey={checkoutPublishableKey}
                       clientSecret={checkoutClientSecret}
@@ -864,18 +1170,17 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   </div>
                 ) : (
                   <div className="py-16 text-center">
-                    <p className="text-gray-600 text-sm animate-pulse">Preparing secure checkout…</p>
+                    <p className="animate-pulse text-sm text-zinc-500" role="status">Preparing secure checkout…</p>
                   </div>
                 )}
-
                 <button
                   type="button"
                   onClick={() => {
                     setCheckoutClientSecret('')
                     setCheckoutPublishableKey('')
-                    setCheckoutStep('review')
+                    goToStep('review')
                   }}
-                  className="w-full py-3 text-gray-600 hover:text-white text-sm transition-colors duration-200 mt-4 cursor-pointer"
+                  className="mt-5 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500 transition-colors hover:text-white"
                 >
                   ← Back to review
                 </button>
@@ -883,142 +1188,160 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
             )}
           </div>
 
-          {/* ══════════════════ SIDEBAR ══════════════════ */}
+          {/* ══════════════════ YOUR SESSION ══════════════════ */}
           <div className="hidden lg:block">
-            <div className="sticky top-28 space-y-6">
+            <div className="sticky top-24 rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6">
+              <p className="text-[15px] font-bold uppercase tracking-[0.12em] text-white">Your Session</p>
 
-              {/* Cart */}
-              <div>
-                <p className="text-gray-600 text-xs uppercase tracking-widest mb-4">
-                  {cart.length === 0 ? 'Your Booking' : `${cart.length} Session${cart.length > 1 ? 's' : ''}`}
-                </p>
-                {cart.length === 0 && <p className="text-gray-700 text-sm">Nothing added yet.</p>}
-                <div className="space-y-4">
-                  {cart.map(item => {
-                    const s = studioById(item.studioId)
-                    const blocks = groupConsecutive([...item.slots].sort())
-                    return (
-                      <div key={item.cartId} className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 relative">
-                          <Image src={s.heroImage} alt={s.name} fill className="object-cover" sizes="40px" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white text-xs font-bold">{s.name}</p>
-                          <p className="text-gray-600 text-xs">{fmtDateShort(item.date)}</p>
-                          {blocks.map((b, i) => <p key={i} className="text-gray-500 text-xs">{fmtTime(b[0])} → {fmtEnd(b[b.length - 1], 1)}</p>)}
-                        </div>
-                        <div className="flex-shrink-0 text-right">
-                          <p className="text-white text-xs font-bold">${cartItemPrice(item)}</p>
-                          <button onClick={() => removeFromCart(item.cartId)} className="text-gray-700 hover:text-white text-xs transition-colors">✕</button>
-                        </div>
-                      </div>
-                    )
-                  })}
+              {selectedStudio ? (
+                <div className="relative mt-5 h-40 overflow-hidden rounded-xl 2xl:h-44">
+                  <Image src={selectedStudio.heroImage} alt={selectedStudio.name} fill quality={80} sizes="400px" className="object-cover" />
                 </div>
+              ) : (
+                <div className="mt-5 flex h-40 items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/[0.02] 2xl:h-44">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Pick a room to start</p>
+                </div>
+              )}
 
-                {/* Add-ons in sidebar */}
-                {selectedAddons.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-white/8 space-y-1">
-                    {selectedAddons.map(a => (
-                      <div key={a.id} className="flex justify-between">
-                        <p className="text-gray-600 text-xs">{a.name}</p>
-                        <p className="text-gray-500 text-xs">+${a.price}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Total */}
-                {cart.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-white/8 flex justify-between items-baseline">
-                    <p className="text-gray-600 text-xs">
-                      {discountAmount > 0 && <span className="text-brand-red">−${discountAmount} discount · </span>}
-                      Total
-                    </p>
-                    <p className="text-white font-black text-xl" style={{letterSpacing: '-0.03em'}}>${grandTotal}</p>
-                  </div>
-                )}
-
-                {/* Checkout buttons */}
-                {cart.length > 0 && checkoutStep === 'builder' && (
-                  <div className="mt-5 space-y-2">
-                    <button onClick={() => { setBuilderStep('studio'); setBuilderStudio(''); setBuilderDate(''); setBuilderSlots([]) }}
-                      className="w-full py-2.5 border border-white/15 text-white text-xs font-semibold rounded-xl hover:border-white/30 transition-colors">
-                      + Add another session
-                    </button>
-                    <button onClick={() => setCheckoutStep('info')} className="w-full py-3 bg-white text-black font-bold text-sm rounded-xl hover:bg-gray-100 transition-colors">
-                      Checkout →
-                    </button>
-                  </div>
-                )}
+              <div className="mt-2 divide-y divide-white/[0.06]">
+                <div className="flex items-center gap-3 py-3.5 text-zinc-500">
+                  <RoomIcon />
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Room</span>
+                  <span className={`ml-auto text-right text-[13px] ${selectedStudio ? 'text-white' : 'text-zinc-500'}`}>
+                    {selectedStudio ? selectedStudio.name : 'Not selected'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 py-3.5 text-zinc-500">
+                  <RateIcon />
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Rate</span>
+                  <span className={`ml-auto text-right text-[13px] ${selectedStudio ? 'text-white' : 'text-zinc-500'}`}>
+                    {selectedStudio ? `$${selectedStudio.price}/hr` : '—'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 py-3.5 text-zinc-500">
+                  <DateIcon />
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Date</span>
+                  <span className={`ml-auto text-right text-[13px] ${date ? 'text-white' : 'text-zinc-500'}`}>
+                    {date ? fmtDateShort(date) : 'Not selected'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 py-3.5 text-zinc-500">
+                  <TimeIcon />
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Time</span>
+                  <span className={`ml-auto text-right text-[13px] ${timeRange ? 'text-white' : 'text-zinc-500'}`}>
+                    {timeRange || 'Not selected'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 py-3.5 text-zinc-500">
+                  <DurationIcon />
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Duration</span>
+                  {durationLocked ? (
+                    <span className="ml-auto text-right text-[13px] text-white">{duration} hour{duration > 1 ? 's' : ''}</span>
+                  ) : (
+                    <span className="relative ml-auto">
+                      <select
+                        value={duration}
+                        onChange={(e) => changeDuration(Number(e.target.value))}
+                        aria-label="Session duration"
+                        className="cursor-pointer appearance-none bg-transparent pr-5 text-right text-[13px] text-white focus:outline-none [&>option]:bg-black"
+                      >
+                        {DURATION_OPTIONS.map((n) => (
+                          <option key={n} value={n}>{n} hour{n > 1 ? 's' : ''}</option>
+                        ))}
+                      </select>
+                      <svg className="pointer-events-none absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* Studio hero image — during datetime step */}
-              {curStudio && builderStep === 'datetime' && (
-                <div className="border-t border-white/8 pt-6">
-                  <div className="rounded-2xl overflow-hidden mb-4 relative" style={{height: '180px'}}>
-                    <Image src={curStudio.heroImage} alt={curStudio.name} fill className="object-cover" sizes="320px" />
-                    <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%)'}} />
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <p className="text-white font-black text-base leading-tight" style={{letterSpacing: '-0.02em'}}>{curStudio.name}</p>
-                      <p className="text-gray-400 text-xs mt-0.5">${curStudio.price}/hr</p>
-                    </div>
+              {(addonTotal > 0 || discountAmount > 0) && (
+                <div className="space-y-1 border-t border-white/[0.06] py-3">
+                  <div className="flex justify-between text-xs text-zinc-500">
+                    <span>Session</span><span>${sessionSubtotal}</span>
                   </div>
-                  <p className="text-gray-600 text-xs uppercase tracking-widest mb-3">What&apos;s included</p>
-                  <ul className="space-y-2.5">
-                    {curStudio.includes.map(inc => (
-                      <li key={inc} className="flex items-center gap-3 text-xs text-gray-400">
-                        <svg className="w-3 h-3 text-brand-red flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/>
-                        </svg>
-                        {inc}
-                      </li>
-                    ))}
-                  </ul>
+                  {addonTotal > 0 && (
+                    <div className="flex justify-between text-xs text-zinc-500">
+                      <span>Add-ons</span><span>+${addonTotal}</span>
+                    </div>
+                  )}
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-zinc-500">Recurring ({recurringDiscount}%)</span>
+                      <span className="font-semibold text-brand-red">−${discountAmount}</span>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* Studio images during info/extras/review */}
-              {checkoutStep !== 'builder' && cart.length > 0 && (
-                <div className="border-t border-white/8 pt-6 space-y-3">
-                  {cart.map(item => {
-                    const s = studioById(item.studioId)
-                    return (
-                      <div key={item.cartId} className="rounded-2xl overflow-hidden relative" style={{height: '140px'}}>
-                        <Image src={s.heroImage} alt={s.name} fill className="object-cover" sizes="320px" />
-                        <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 55%)'}} />
-                        <div className="absolute bottom-3 left-4 right-4">
-                          <p className="text-white font-bold text-sm leading-tight">{s.name}</p>
-                          <p className="text-gray-400 text-xs">{fmtDateShort(item.date)}</p>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
+              <div className="flex items-baseline justify-between border-t border-white/[0.06] pt-4">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">Estimated total</p>
+                <p className="font-black text-white" style={{ fontSize: '2rem' }}>
+                  ${selectedStudio ? grandTotal : 0}
+                </p>
+              </div>
+
+              {step !== 'payment' && (
+                <button
+                  type="button"
+                  onClick={continueFlow}
+                  disabled={!continueReady}
+                  className={`mt-5 w-full rounded-xl py-4 font-mono text-[12px] font-bold uppercase tracking-[0.14em] transition-colors ${
+                    continueReady
+                      ? 'bg-brand-red text-white hover:bg-red-700'
+                      : 'cursor-not-allowed bg-white/[0.04] text-zinc-600'
+                  }`}
+                >
+                  {continueLabel} {continueReady && step !== 'review' ? <span aria-hidden>→</span> : null}
+                </button>
               )}
 
-              <p className="text-gray-700 text-xs">Free cancellation · 48hrs notice per session</p>
+              <div className="mt-4 flex items-start gap-2.5 text-zinc-500">
+                <CheckCircleIcon />
+                <p className="text-xs leading-relaxed">Free cancellation up to 48 hours before the session.</p>
+              </div>
+
+              <div className="mt-5 border-t border-white/[0.06] pt-5 text-center">
+                <p className="text-xs text-zinc-500">Need help choosing?</p>
+                <Link
+                  href="/find-your-studio/"
+                  className="mt-1 inline-block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors hover:text-red-400"
+                >
+                  Match me to a studio <span aria-hidden>→</span>
+                </Link>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* ══════════════════ MOBILE CART BAR ══════════════════ */}
-      {cart.length > 0 && checkoutStep === 'builder' && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-black border-t border-white/10 px-4 py-3">
-          <div className="flex items-center justify-between mb-2">
+      {/* ══════════════════ MOBILE BAR ══════════════════ */}
+      {step !== 'payment' && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/95 px-5 py-3.5 backdrop-blur lg:hidden">
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-white text-sm font-bold">{cart.length} session{cart.length > 1 ? 's' : ''}</p>
-              <p className="text-gray-400 text-xs">${grandTotal} total</p>
+              <p className="font-black text-white" style={{ fontSize: '1.4rem' }}>
+                ${selectedStudio ? grandTotal : 0}
+              </p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-400">
+                {STEP_LABELS[step as Exclude<Step, 'payment'>]}
+              </p>
             </div>
+            <button
+              type="button"
+              onClick={continueFlow}
+              disabled={!continueReady}
+              className={`rounded-lg px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.12em] transition-colors ${
+                continueReady
+                  ? 'bg-brand-red text-white hover:bg-red-700'
+                  : 'cursor-not-allowed bg-white/[0.06] text-zinc-600'
+              }`}
+            >
+              {continueLabel}
+            </button>
           </div>
-          <button
-            onClick={() => setCheckoutStep('info')}
-            className="w-full py-3.5 bg-brand-red text-white font-bold text-sm rounded-full hover:bg-red-700 transition-colors"
-          >
-            Proceed to Checkout →
-          </button>
         </div>
       )}
     </div>
