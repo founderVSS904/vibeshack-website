@@ -440,17 +440,26 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
             </span>
           </Link>
         </div>
-        <div className="mt-6 flex items-center gap-4" aria-hidden="true">
-          <span className="h-px w-16 bg-brand-red/60" />
-          <span className="relative flex h-2.5 w-2.5">
+        <div className="relative mt-7 h-10" aria-hidden="true">
+          <span className="absolute inset-x-0 top-[5px] h-px bg-brand-red/25" />
+          <span
+            className="absolute top-0 flex h-[11px] w-[11px] transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            style={{ left: `calc(${(((activeCard + 1.5) / 8) * 100).toFixed(3)}% - 6px)` }}
+          >
             <span className="absolute inset-0 rounded-full bg-brand-red/40 blur-[3px]" />
-            <span className="relative m-auto h-1.5 w-1.5 rounded-full bg-brand-red" />
+            <span className="relative m-auto h-[7px] w-[7px] rounded-full border border-brand-red bg-[#0c0c0c]" />
+            <span className="absolute left-1/2 top-[11px] h-7 border-l border-dashed border-brand-red/50" />
           </span>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-brand-red">{active.kicker}</span>
-          <span className="h-px flex-1 bg-gradient-to-r from-brand-red/50 to-transparent" />
+          <span
+            className="absolute top-[1px] whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            style={{ left: `min(calc(${(((activeCard + 1.5) / 8) * 100).toFixed(3)}% + 16px), calc(100% - 190px))` }}
+          >
+            {active.kicker}
+          </span>
         </div>
       </div>
 
+      <div>
       <div className="flex h-[300px] gap-2.5 2xl:h-[320px]">
         {serviceCards.map((card, index) => {
           const isActive = index === activeCard
@@ -501,6 +510,19 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
             </Link>
           )
         })}
+      </div>
+      <div className="relative mt-5 flex gap-1.5" aria-hidden="true">
+        {serviceCards.map((card, index) => (
+          <span key={card.href + index} className="h-[3px] flex-1 rounded-full bg-white/[0.08]" />
+        ))}
+        <span
+          className="absolute top-0 h-[3px] rounded-full bg-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{
+            width: 'calc((100% - 30px) / 6)',
+            left: `calc(${activeCard} * ((100% - 30px) / 6 + 6px))`,
+          }}
+        />
+      </div>
       </div>
 
       <div className="grid grid-cols-[1.6fr_1fr] gap-5">
