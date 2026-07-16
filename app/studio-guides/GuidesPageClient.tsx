@@ -43,7 +43,6 @@ const STATIONS = [
     cta: 'Open the guide',
     dot: { left: '13.3%', top: '25.9%' },
     label: '-translate-x-full -translate-y-full pr-4 pb-1 text-right',
-    card: { left: '1%', top: '38%' },
   },
   {
     n: '02',
@@ -54,7 +53,6 @@ const STATIONS = [
     cta: 'Open the checklist',
     dot: { left: '95.3%', top: '43.1%' },
     label: '-translate-y-full pl-4 pb-1 text-left',
-    card: { right: '0%', top: '52%' },
   },
   {
     n: '03',
@@ -65,7 +63,6 @@ const STATIONS = [
     cta: 'Open the guide',
     dot: { left: '86.2%', top: '74.6%' },
     label: 'pl-4 pt-2 text-left',
-    card: { right: '2%', bottom: '22%' },
   },
   {
     n: '04',
@@ -76,7 +73,6 @@ const STATIONS = [
     cta: 'Book the session',
     dot: { left: '13.3%', top: '74.1%' },
     label: '-translate-x-full pr-4 pt-2 text-right',
-    card: { left: '2%', bottom: '24%' },
   },
 ]
 
@@ -280,7 +276,8 @@ export default function GuidesPageClient() {
           </div>
 
           {/* ── Compass (desktop) ── */}
-          <div className="relative hidden aspect-[13/10] select-none lg:block" aria-label="The VibeShack process: plan, prepare, produce, deliver">
+          <div className="hidden lg:block">
+          <div className="relative aspect-[13/9] select-none" aria-label="The VibeShack process: plan, prepare, produce, deliver">
             <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
               <ellipse cx="50" cy="50" rx="46" ry="40" fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="0.18" strokeDasharray="0.9 1.6" />
               {CONNECTORS.map(([x1, y1, x2, y2]) => (
@@ -345,29 +342,28 @@ export default function GuidesPageClient() {
               )
             })}
 
-            <div
-              key={station.n}
-              className="booking-media-enter absolute z-20 w-[290px] rounded-xl border border-white/15 bg-[#0b0b0b] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.75),0_0_44px_rgba(236,0,0,0.12)]"
-              style={station.card}
-            >
-              <p className="font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-white">{station.title}</p>
-              <p className="mt-2.5 text-[13px] leading-relaxed text-zinc-400">{station.body}</p>
+          </div>
+
+          {/* Active station, docked below the compass so it never covers the gear */}
+          <div className="mt-4 flex items-center gap-6 rounded-xl border border-white/10 bg-[#0b0b0b] px-7 py-5">
+            <div className="flex shrink-0 items-baseline gap-3">
+              <span className="font-mono text-[26px] leading-none text-brand-red">{station.n}</span>
+              <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-white">{station.name}</span>
+            </div>
+            <span className="h-9 w-px shrink-0 bg-white/10" aria-hidden />
+            <div key={station.n} className="booking-media-enter flex min-w-0 flex-1 items-center gap-6">
+              <p className="min-w-0 flex-1 text-[13px] leading-relaxed text-zinc-400">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white">{station.title}. </span>
+                {station.body}
+              </p>
               <Link
                 href={station.href}
-                className="mt-4 inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors hover:text-red-400"
+                className="shrink-0 whitespace-nowrap font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors hover:text-red-400"
               >
                 {station.cta} <span aria-hidden>→</span>
               </Link>
             </div>
-
-            <div className="absolute bottom-[2%] left-1/2 flex h-[86px] w-[86px] -translate-x-1/2 flex-col items-center justify-center gap-1.5 rounded-full border border-white/15 text-center">
-              <svg className="h-5 w-5 text-zinc-400" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
-                <path d="M9 11V6a1.5 1.5 0 0 1 3 0v5m0-2.5a1.5 1.5 0 0 1 3 0V11m0-1a1.5 1.5 0 0 1 3 0v4a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L4.2 14a1.6 1.6 0 0 1 2.6-1.8L9 14.5" />
-              </svg>
-              <span className="px-2 font-mono text-[7.5px] font-bold uppercase leading-[1.5] tracking-[0.22em] text-zinc-400">
-                Tap a station
-              </span>
-            </div>
+          </div>
           </div>
 
           {/* ── Compass (mobile): stations as steps ── */}
