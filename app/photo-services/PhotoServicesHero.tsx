@@ -60,42 +60,86 @@ const CATEGORIES: PhotoCategory[] = [
   },
 ]
 
-// Fanned deck slots by signed distance from the active card.
-const SLOTS: Record<number, { x: number; rot: number; s: number; z: number; b: number; o: number }> = {
-  0: { x: 0, rot: 0, s: 1, z: 30, b: 1, o: 1 },
-  1: { x: 74, rot: -18, s: 0.86, z: 20, b: 0.62, o: 1 },
-  [-1]: { x: -74, rot: 18, s: 0.86, z: 20, b: 0.62, o: 1 },
-  2: { x: 136, rot: -24, s: 0.74, z: 10, b: 0.4, o: 1 },
-  [-2]: { x: -136, rot: 24, s: 0.74, z: 10, b: 0.4, o: 1 },
-  3: { x: 0, rot: 0, s: 0.6, z: 0, b: 0.3, o: 0 },
+// Deck geometry anchors by absolute distance from center (0, 1, 2, 3 slots out).
+// Values between anchors are interpolated so a live drag moves every card
+// through the exact path it would travel between resting slots.
+const ANCHORS = [
+  { x: 0, rot: 0, s: 1, b: 1, o: 1 },
+  { x: 74, rot: 18, s: 0.86, b: 0.62, o: 1 },
+  { x: 136, rot: 24, s: 0.74, b: 0.4, o: 1 },
+  { x: 172, rot: 24, s: 0.62, b: 0.3, o: 0 },
+]
+
+// Pixels of drag that move the deck by one card.
+const DRAG_STEP = 240
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t
 }
 
-function relativeSlot(index: number, active: number) {
-  const rel = (((index - active) % 6) + 6) % 6
+function slotAt(rel: number) {
+  const side = rel < 0 ? -1 : 1
+  const d = Math.min(Math.abs(rel), 3)
+  const lower = Math.floor(d)
+  const upper = Math.min(lower + 1, 3)
+  const t = d - lower
+  const a = ANCHORS[lower]
+  const b = ANCHORS[upper]
+  return {
+    x: side * lerp(a.x, b.x, t),
+    rot: -side * lerp(a.rot, b.rot, t),
+    s: lerp(a.s, b.s, t),
+    b: lerp(a.b, b.b, t),
+    o: lerp(a.o, b.o, t),
+    z: Math.round(30 - d * 10),
+  }
+}
+
+function relativeTo(index: number, position: number) {
+  const rel = (((index - position) % 6) + 6) % 6
   return rel > 3 ? rel - 6 : rel
 }
 
 export default function PhotoServicesHero() {
   const [active, setActive] = useState(0)
+  const [dragX, setDragX] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const [hovered, setHovered] = useState<number | null>(null)
   const pinnedRef = useRef(false)
-  const dragRef = useRef<{ x: number; moved: boolean } | null>(null)
+  const hoverRef = useRef(false)
+  const dragStartRef = useRef<{ x: number; moved: boolean } | null>(null)
 
   const go = (next: number) => {
     pinnedRef.current = true
     setActive(((next % 6) + 6) % 6)
   }
 
-  // Ambient advance until the visitor takes over.
+  // Ambient advance until the visitor takes over; rests while hovered.
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const interval = setInterval(() => {
-      if (document.hidden || pinnedRef.current) return
+      if (document.hidden || pinnedRef.current || hoverRef.current) return
       setActive((a) => (a + 1) % 6)
     }, 5000)
     return () => clearInterval(interval)
   }, [])
 
+  const position = dragging ? active - dragX / DRAG_STEP : active
   const activeCategory = CATEGORIES[active]
+
+  const endDrag = (clientX: number) => {
+    const drag = dragStartRef.current
+    dragStartRef.current = null
+    setDragging(false)
+    setDragX(0)
+    if (!drag) return
+    const delta = clientX - drag.x
+    const snapped = Math.round(active - delta / DRAG_STEP)
+    if (snapped !== active) {
+      pinnedRef.current = true
+      setActive(((snapped % 6) + 6) % 6)
+    }
+  }
 
   return (
     <>
@@ -129,66 +173,93 @@ export default function PhotoServicesHero() {
           </div>
         </div>
 
-        {/* ── Fanned deck ── */}
+        {/* ── Fanned deck on a glass floor ── */}
         <div
-          className="relative mx-auto mt-12 h-[400px] max-w-[1680px] cursor-grab select-none active:cursor-grabbing sm:h-[460px] lg:h-[540px]"
+          className={`relative mx-auto mt-12 h-[480px] max-w-[1680px] select-none sm:h-[560px] lg:h-[660px] ${
+            dragging ? 'cursor-grabbing' : 'cursor-grab'
+          }`}
           style={{ perspective: '1400px' }}
           onPointerDown={(e) => {
-            dragRef.current = { x: e.clientX, moved: false }
+            dragStartRef.current = { x: e.clientX, moved: false }
+            setDragging(true)
+            try {
+              e.currentTarget.setPointerCapture(e.pointerId)
+            } catch {}
           }}
           onPointerMove={(e) => {
-            if (dragRef.current && Math.abs(e.clientX - dragRef.current.x) > 10) dragRef.current.moved = true
-          }}
-          onPointerUp={(e) => {
-            const drag = dragRef.current
-            dragRef.current = null
+            const drag = dragStartRef.current
             if (!drag) return
             const delta = e.clientX - drag.x
-            if (delta < -60) go(active + 1)
-            else if (delta > 60) go(active - 1)
+            if (Math.abs(delta) > 10) drag.moved = true
+            setDragX(delta)
           }}
+          onPointerUp={(e) => endDrag(e.clientX)}
           onPointerCancel={() => {
-            dragRef.current = null
+            dragStartRef.current = null
+            setDragging(false)
+            setDragX(0)
           }}
         >
           {CATEGORIES.map((category, i) => {
-            const rel = relativeSlot(i, active)
-            const slot = SLOTS[rel]
+            const rel = relativeTo(i, position)
+            const slot = slotAt(rel)
+            const isHovered = hovered === i && !dragging
+            const scale = slot.s * (isHovered ? 1.05 : 1)
+            const brightness = isHovered ? Math.min(1, slot.b + 0.25) : slot.b
             return (
               <button
                 key={category.label}
                 type="button"
                 aria-label={`Show ${category.label}`}
-                aria-pressed={rel === 0}
-                tabIndex={slot.o === 0 ? -1 : 0}
-                onClick={() => {
-                  if (dragRef.current?.moved) return
-                  if (rel !== 0) go(i)
+                aria-pressed={Math.round(rel) === 0}
+                tabIndex={slot.o < 0.5 ? -1 : 0}
+                onMouseEnter={() => {
+                  setHovered(i)
+                  hoverRef.current = true
                 }}
-                className="absolute left-1/2 top-1/2 w-[240px] overflow-hidden rounded-xl border border-white/10 bg-zinc-950 transition-[transform,opacity,filter] duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] sm:w-[320px] lg:w-[420px]"
+                onMouseLeave={() => {
+                  setHovered((h) => (h === i ? null : h))
+                  hoverRef.current = false
+                }}
+                onClick={() => {
+                  if (dragStartRef.current?.moved) return
+                  if (Math.round(rel) !== 0) go(i)
+                }}
+                className="absolute left-1/2 top-[38%] w-[240px] overflow-visible rounded-xl sm:w-[320px] lg:w-[420px]"
                 style={{
                   aspectRatio: '5 / 6',
                   zIndex: slot.z,
                   opacity: slot.o,
-                  filter: `brightness(${slot.b})`,
-                  transform: `translate(-50%, -50%) translateX(${slot.x}%) rotateY(${slot.rot}deg) scale(${slot.s})`,
-                  pointerEvents: slot.o === 0 ? 'none' : undefined,
+                  filter: `brightness(${brightness})`,
+                  transform: `translate(-50%, -50%) translateX(${slot.x}%) rotateY(${slot.rot}deg) scale(${scale})`,
+                  transition: dragging
+                    ? 'none'
+                    : 'transform 800ms cubic-bezier(0.32, 0.72, 0, 1), filter 500ms ease, opacity 500ms ease',
+                  willChange: 'transform, filter',
+                  pointerEvents: slot.o < 0.5 ? 'none' : undefined,
                 }}
               >
-                <Image
-                  src={category.image}
-                  alt={category.alt}
-                  fill
-                  quality={80}
-                  sizes="(min-width: 1024px) 840px, 640px"
-                  className="object-cover"
-                  style={{ objectPosition: category.position || 'center' }}
-                  draggable={false}
-                  priority={i < 3}
-                />
-                <span className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" aria-hidden />
-                <span className="absolute bottom-4 left-5 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white">
-                  {category.label}
+                <span
+                  className="relative block h-full w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950"
+                  style={{
+                    WebkitBoxReflect: 'below 18px linear-gradient(transparent 62%, rgba(255,255,255,0.18) 100%)',
+                  }}
+                >
+                  <Image
+                    src={category.image}
+                    alt={category.alt}
+                    fill
+                    quality={80}
+                    sizes="(min-width: 1024px) 840px, 640px"
+                    className="object-cover"
+                    style={{ objectPosition: category.position || 'center' }}
+                    draggable={false}
+                    priority={i < 3}
+                  />
+                  <span className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" aria-hidden />
+                  <span className="absolute bottom-4 left-5 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white">
+                    {category.label}
+                  </span>
                 </span>
               </button>
             )
@@ -196,7 +267,7 @@ export default function PhotoServicesHero() {
         </div>
 
         {/* ── Pager ── */}
-        <div className="mx-auto mt-10 flex max-w-[1680px] items-center gap-6 px-6 sm:px-10 lg:px-16">
+        <div className="mx-auto mt-8 flex max-w-[1680px] items-center gap-6 px-6 sm:px-10 lg:px-16">
           <p className="shrink-0 font-mono text-[12px] font-bold tracking-[0.14em] text-zinc-400">
             <span className="text-brand-red">{String(active + 1).padStart(2, '0')}</span> / 06
           </p>
