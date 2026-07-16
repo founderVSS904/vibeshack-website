@@ -440,22 +440,18 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
             </span>
           </Link>
         </div>
-        <div className="relative mt-7 h-10" aria-hidden="true">
-          <span className="absolute inset-x-0 top-[5px] h-px bg-brand-red/25" />
+        <div className="relative mt-7 h-9" aria-hidden="true">
           <span
-            className="absolute top-0 flex h-[11px] w-[11px] transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{ left: `calc(${(((activeCard + 1.5) / 8) * 100).toFixed(3)}% - 6px)` }}
-          >
-            <span className="absolute inset-0 rounded-full bg-brand-red/40 blur-[3px]" />
-            <span className="relative m-auto h-[7px] w-[7px] rounded-full border border-brand-red bg-[#0c0c0c]" />
-            <span className="absolute left-1/2 top-[11px] h-7 border-l border-dashed border-brand-red/50" />
-          </span>
-          <span
-            className="absolute top-[1px] whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{ left: `min(calc(${(((activeCard + 1.5) / 8) * 100).toFixed(3)}% + 16px), calc(100% - 190px))` }}
+            className="absolute top-0 whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            style={{ left: `min(calc(${(((activeCard + 1.5) / 8) * 100).toFixed(3)}% + 12px), calc(100% - 170px))` }}
           >
             {active.kicker}
           </span>
+          <span className="absolute inset-x-0 top-[27px] h-px bg-brand-red/20" />
+          <span
+            className="absolute top-[27px] h-[7px] w-[7px] -translate-y-1/2 rounded-full bg-brand-red shadow-[0_0_10px_rgba(236,0,0,0.55)] transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            style={{ left: `calc(${(((activeCard + 1.5) / 8) * 100).toFixed(3)}% - 3.5px)` }}
+          />
         </div>
       </div>
 
