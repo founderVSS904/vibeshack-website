@@ -390,7 +390,7 @@ const serviceCards = [
   { href: '/editorials/', label: 'Editorials', detail: 'Fashion, beauty, portraits, campaign stills', kicker: 'Print ready', image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg' },
   { href: '/branding/', label: 'Branding', detail: 'Creative direction, launches, content systems', kicker: 'Identity systems', image: '/studio-images/home-branding-pure-magic-v20260625.png' },
   { href: '/podcast-studio-san-francisco/', label: 'Podcasts', detail: 'Sets with cameras, audio, and crew', kicker: 'Broadcast ready', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
-  { href: '/video-production/', label: 'Video Production', detail: 'Social content, music videos, brand video', kicker: 'Concept to screen', image: '/studio-images/drive-video-studio.jpg' },
+  { href: '/video-production/', label: 'Video Production', detail: 'Social content, music videos, brand video', kicker: 'Concept to screen', image: '/studio-images/encore-production.jpg' },
   { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, campaigns', kicker: 'Every frame styled', image: '/studio-images/inside-photography-red-v20260509.jpg' },
 ]
 

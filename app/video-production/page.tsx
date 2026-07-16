@@ -129,7 +129,7 @@ const recommendedRooms = [
   {
     href: '/photography-studio-san-francisco/',
     title: 'Photo / Video Studio',
-    image: '/studio-images/drive-video-studio.jpg',
+    image: '/studio-images/drive-photo-hero.jpg',
     alt: 'Flexible photo and video production room at VibeShack Studios San Francisco',
     fit: 'Product demos, head-and-shoulder video, wardrobe changes, beauty content, creator shoots, and fast social setups.',
     price: '$100/hr',
