@@ -214,8 +214,14 @@ export default function PhotoServicesHero() {
             const rel = relativeTo(i, position)
             const slot = slotAt(rel)
             const isHovered = hovered === i && !dragging
-            const scale = slot.s * (isHovered ? 1.07 : 1)
+            const scale = slot.s
             const brightness = isHovered ? Math.min(1, slot.b + 0.25) : slot.b
+            // The button box never changes; the frame and its reflection slide
+            // their edges outward so the photo widens without moving neighbors.
+            const edge = isHovered ? '-13%' : '0%'
+            const frameTransition = dragging
+              ? 'none'
+              : 'left 500ms cubic-bezier(0.32, 0.72, 0, 1), right 500ms cubic-bezier(0.32, 0.72, 0, 1)' 
             return (
               <button
                 key={category.label}
@@ -238,7 +244,7 @@ export default function PhotoServicesHero() {
                 className="absolute left-1/2 top-[38%] w-[240px] overflow-visible rounded-xl sm:w-[320px] lg:w-[420px]"
                 style={{
                   aspectRatio: '5 / 6',
-                  zIndex: slot.z,
+                  zIndex: isHovered ? 40 : slot.z,
                   opacity: slot.o,
                   filter: `brightness(${brightness})`,
                   transform: `translate(-50%, -50%) translateX(${slot.x}%) rotateY(${slot.rot}deg) scale(${scale})`,
@@ -249,7 +255,10 @@ export default function PhotoServicesHero() {
                   pointerEvents: slot.o < 0.5 ? 'none' : undefined,
                 }}
               >
-                <span className="relative block h-full w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950">
+                <span
+                  className="absolute inset-y-0 block overflow-hidden rounded-xl border border-white/10 bg-zinc-950"
+                  style={{ left: edge, right: edge, transition: frameTransition }}
+                >
                   <Image
                     src={category.image}
                     alt={category.alt}
@@ -268,8 +277,11 @@ export default function PhotoServicesHero() {
                 </span>
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-full mt-[5px] block h-full overflow-hidden rounded-xl"
+                  className="pointer-events-none absolute top-full mt-[5px] block h-full overflow-hidden rounded-xl"
                   style={{
+                    left: edge,
+                    right: edge,
+                    transition: frameTransition,
                     transform: 'scaleY(-1)',
                     maskImage: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 46%)',
                     WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 46%)',
