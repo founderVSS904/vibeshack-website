@@ -72,7 +72,7 @@ const ANCHORS = [
 const DRAG_STEP = 240 // px of drag per card
 const LEAN = 0.55 // how far the deck leans toward the cursor, in cards
 const EDGE_ZONE = 0.85 // |cursor ratio| beyond which the deck scrolls
-const EDGE_SPEED = 0.0009 // cards per ms while in the edge zone
+const EDGE_SPEED = 0.0018 // max cards per ms at the far edge; scales with depth
 const CHASE = 110 // ms time-constant of the exponential chase
 
 function lerp(a: number, b: number, t: number) {
@@ -111,7 +111,7 @@ export default function PhotoServicesHero() {
   const posRef = useRef(0) // rendered position, continuous
   const baseRef = useRef(0) // anchor the lean is measured from
   const leanRef = useRef(0)
-  const edgeRef = useRef(0) // -1 | 0 | 1 while the cursor rides an edge
+  const edgeRef = useRef(0) // signed 0..1 edge depth while the cursor rides an edge
   const hoveredRef = useRef<number | null>(null)
   const overRef = useRef(false)
   const pinnedRef = useRef(false)
@@ -280,7 +280,9 @@ export default function PhotoServicesHero() {
             const rect = e.currentTarget.getBoundingClientRect()
             const ratio = Math.max(-1, Math.min(1, ((e.clientX - rect.left) / rect.width - 0.5) * 2))
             leanRef.current = ratio * LEAN
-            edgeRef.current = Math.abs(ratio) > EDGE_ZONE ? Math.sign(ratio) : 0
+            edgeRef.current = Math.abs(ratio) > EDGE_ZONE
+              ? Math.sign(ratio) * ((Math.abs(ratio) - EDGE_ZONE) / (1 - EDGE_ZONE))
+              : 0
             if (edgeRef.current) pinnedRef.current = true
             pump()
           }}
