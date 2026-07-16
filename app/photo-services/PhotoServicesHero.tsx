@@ -105,9 +105,11 @@ export default function PhotoServicesHero() {
   const [dragX, setDragX] = useState(0)
   const [dragging, setDragging] = useState(false)
   const [hovered, setHovered] = useState<number | null>(null)
+  const [follow, setFollow] = useState(0)
   const pinnedRef = useRef(false)
   const hoverRef = useRef(false)
   const dragStartRef = useRef<{ x: number; moved: boolean } | null>(null)
+  const lastStepRef = useRef(0)
 
   const go = (next: number) => {
     pinnedRef.current = true
@@ -124,7 +126,7 @@ export default function PhotoServicesHero() {
     return () => clearInterval(interval)
   }, [])
 
-  const position = dragging ? active - dragX / DRAG_STEP : active
+  const position = dragging ? active - dragX / DRAG_STEP : active + follow
   const activeCategory = CATEGORIES[active]
 
   const endDrag = (clientX: number) => {
@@ -186,12 +188,33 @@ export default function PhotoServicesHero() {
               e.currentTarget.setPointerCapture(e.pointerId)
             } catch {}
           }}
+          onPointerEnter={() => {
+            hoverRef.current = true
+          }}
           onPointerMove={(e) => {
             const drag = dragStartRef.current
-            if (!drag) return
-            const delta = e.clientX - drag.x
-            if (Math.abs(delta) > 10) drag.moved = true
-            setDragX(delta)
+            if (drag) {
+              const delta = e.clientX - drag.x
+              if (Math.abs(delta) > 10) drag.moved = true
+              setDragX(delta)
+              return
+            }
+            if (e.pointerType !== 'mouse') return
+            // The deck leans with the cursor; sustained movement near an edge
+            // steps through the cards at a readable cadence.
+            const rect = e.currentTarget.getBoundingClientRect()
+            const ratio = ((e.clientX - rect.left) / rect.width - 0.5) * 2
+            const now = performance.now()
+            if (Math.abs(ratio) > 0.8 && now - lastStepRef.current > 450) {
+              lastStepRef.current = now
+              pinnedRef.current = true
+              setActive((a) => (((a + (ratio > 0 ? 1 : -1)) % 6) + 6) % 6)
+            }
+            setFollow(Math.max(-0.75, Math.min(0.75, ratio * 0.75)))
+          }}
+          onPointerLeave={() => {
+            hoverRef.current = false
+            setFollow(0)
           }}
           onPointerUp={(e) => endDrag(e.clientX)}
           onPointerCancel={() => {
@@ -213,7 +236,7 @@ export default function PhotoServicesHero() {
           {CATEGORIES.map((category, i) => {
             const rel = relativeTo(i, position)
             const slot = slotAt(rel)
-            const isHovered = hovered === i && !dragging
+            const isHovered = hovered === i && !dragging && Math.abs(follow) < 0.2
             const scale = slot.s
             const brightness = isHovered ? Math.min(1, slot.b + 0.25) : slot.b
             // The button box never changes; the frame and its reflection slide
@@ -250,7 +273,7 @@ export default function PhotoServicesHero() {
                   transform: `translate(-50%, -50%) translateX(${slot.x}%) rotateY(${slot.rot}deg) scale(${scale})`,
                   transition: dragging
                     ? 'none'
-                    : 'transform 800ms cubic-bezier(0.32, 0.72, 0, 1), filter 500ms ease, opacity 500ms ease',
+                    : `transform ${follow !== 0 ? '450ms' : '800ms'} cubic-bezier(0.32, 0.72, 0, 1), filter 500ms ease, opacity 500ms ease`,
                   willChange: 'transform, filter',
                   pointerEvents: slot.o < 0.5 ? 'none' : undefined,
                 }}
