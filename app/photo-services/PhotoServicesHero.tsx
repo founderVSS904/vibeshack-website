@@ -17,7 +17,7 @@ const CATEGORIES: PhotoCategory[] = [
     label: 'Product',
     title: 'Product photography',
     body: 'Clean product stills, launch images, ecommerce crops, detail shots, campaign frames, and social assets.',
-    image: '/studio-images/home-branding-pure-magic-v20260716.jpg',
+    image: '/studio-images/photo-product-puremagic-v20260716.jpg',
     alt: 'Product photography of a styled cosmetics jar at VibeShack Studios',
   },
   {
