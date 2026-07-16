@@ -463,16 +463,19 @@ export default function GuidesPageClient() {
                     </span>
                   </p>
                 </div>
-                <div className="relative min-h-[240px] flex-1 lg:min-h-[340px]">
-                  <Image
-                    src={featured.image}
-                    alt={featured.imageAlt}
-                    fill
-                    quality={80}
-                    sizes="(min-width: 1024px) 44vw, 100vw"
-                    className="object-cover transition-transform duration-[700ms] ease-out group-hover:scale-[1.03]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0b] via-transparent to-transparent" />
+                <div className="relative min-h-[240px] flex-1 overflow-hidden lg:min-h-[340px]">
+                  {/* Photo and fade zoom as one layer so the blend never swims */}
+                  <div className="absolute inset-0 transition-transform duration-[700ms] ease-out group-hover:scale-[1.03]">
+                    <Image
+                      src={featured.image}
+                      alt={featured.imageAlt}
+                      fill
+                      quality={80}
+                      sizes="(min-width: 1024px) 44vw, 100vw"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0b] via-transparent to-transparent" />
+                  </div>
                 </div>
               </Link>
 
@@ -499,16 +502,18 @@ export default function GuidesPageClient() {
                           {readMinutes(guide)} min guide
                         </p>
                       </div>
-                      <div className="relative min-h-[170px] flex-1">
-                        <Image
-                          src={guide.image}
-                          alt={guide.imageAlt}
-                          fill
-                          quality={80}
-                          sizes="(min-width: 1024px) 28vw, 45vw"
-                          className="object-cover transition-transform duration-[700ms] ease-out group-hover:scale-[1.03]"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0b] via-transparent to-transparent" />
+                      <div className="relative min-h-[170px] flex-1 overflow-hidden">
+                        <div className="absolute inset-0 transition-transform duration-[700ms] ease-out group-hover:scale-[1.03]">
+                          <Image
+                            src={guide.image}
+                            alt={guide.imageAlt}
+                            fill
+                            quality={80}
+                            sizes="(min-width: 1024px) 28vw, 45vw"
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0b] via-transparent to-transparent" />
+                        </div>
                       </div>
                       <span className="absolute bottom-4 right-4 text-white/70 transition-colors group-hover:text-brand-red" aria-hidden>
                         →
