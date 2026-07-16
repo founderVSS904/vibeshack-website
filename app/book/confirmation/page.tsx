@@ -29,8 +29,8 @@ function ConfirmationContent() {
           </svg>
         </div>
 
-        <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-3">VibeShack Studios · SF</p>
-        <h1 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(3rem, 7vw, 5rem)', letterSpacing: '-0.05em'}}>
+        <p className="mb-3 font-mono text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">VibeShack Studios · SF</p>
+        <h1 className="mb-3 text-white" style={{ fontSize: 'clamp(3rem, 7vw, 5rem)' }}>
           You&apos;re booked.
         </h1>
         <p className="text-gray-500 text-lg mb-14">Your booking confirmation and Stripe receipt are on their way.</p>
@@ -43,8 +43,8 @@ function ConfirmationContent() {
             { n: '03', title: 'Walk in ready to work', body: "Everything is set up before you arrive. Cameras on. Lights calibrated. Mics live. Just show up." },
             { n: '04', title: 'Free cancellation', body: 'Plans change. Cancel up to 48 hours before your session for a full refund. No questions asked.' },
           ].map(({ n, title, body }) => (
-            <div key={n} className="flex gap-6 py-5 border-b border-white/8">
-              <span className="text-gray-700 font-black text-sm w-8 flex-shrink-0 mt-0.5">{n}</span>
+            <div key={n} className="flex gap-6 py-5 border-b border-white/[0.08]">
+              <span className="mt-0.5 w-8 flex-shrink-0 font-mono text-[11px] font-bold text-zinc-500">{n}</span>
               <div>
                 <p className="text-white font-bold text-sm mb-1">{title}</p>
                 <p className="text-gray-500 text-sm leading-relaxed">{body}</p>
@@ -56,10 +56,10 @@ function ConfirmationContent() {
         {/* Actions */}
         <div className="flex flex-wrap gap-4 items-center">
           <Link href="/book/" prefetch={false}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 transition-colors">
-            Book another session
+            className="inline-flex items-center gap-2.5 rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+            Book another session <span aria-hidden>→</span>
           </Link>
-          <Link href="/" className="text-gray-600 hover:text-white transition-colors text-sm">← Back to home</Link>
+          <Link href="/" className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500 transition-colors hover:text-white">← Back to home</Link>
         </div>
 
       </div>

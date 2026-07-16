@@ -111,7 +111,7 @@ export default function MadeAtVibeShackPage() {
                 When you create at VibeShack, you can credit the studio clearly across show notes, YouTube descriptions, press notes, and social posts. It gives your audience a clean signal for where the work was produced.
               </p>
               <p className="text-gray-600 text-xs mb-2 tracking-widest uppercase">How to use it</p>
-              <div className="divide-y divide-white/8">
+              <div className="divide-y divide-white/[0.08]">
                 {[
                   { platform: 'Podcast show notes', text: 'Add "Recorded at VibeShack Studios, San Francisco" to every episode description.' },
                   { platform: 'YouTube', text: 'Add to your video description or as a lower-third in your intro.' },
@@ -128,7 +128,7 @@ export default function MadeAtVibeShackPage() {
           </div>
 
           {/* Copy text section */}
-          <div className="border-t border-white/8 pt-16">
+          <div className="border-t border-white/[0.08] pt-16">
             <h2 data-reveal="up" className="text-white font-black text-xl mb-8" style={{letterSpacing: '-0.02em'}}>Attribution copy.</h2>
             <div className="space-y-6">
               {[
@@ -145,7 +145,7 @@ export default function MadeAtVibeShackPage() {
           </div>
 
           {/* CTA */}
-          <div className="border-t border-white/8 pt-16 text-center">
+          <div className="border-t border-white/[0.08] pt-16 text-center">
             <p className="text-gray-500 text-sm mb-6">Ready to join the wall?</p>
             <Link href="/book/" prefetch={false} className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
               Book Your Session

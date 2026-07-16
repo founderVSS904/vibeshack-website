@@ -194,7 +194,7 @@ export default function SupportPage() {
                     {category}
                   </a>
                 ))}
-                <div className="pt-6 border-t border-white/8 mt-6">
+                <div className="pt-6 border-t border-white/[0.08] mt-6">
                   <p className="text-gray-600 text-xs mb-3">Still need help?</p>
                   <a href="mailto:founder@vibeshackstudios.com" className="text-brand-red text-sm font-semibold hover:text-white transition-colors">
                     Email us →
@@ -210,7 +210,7 @@ export default function SupportPage() {
                   <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">{category}</p>
                   <div className="space-y-0">
                     {questions.map(({ q, a }) => (
-                      <div key={q} className="py-6 border-b border-white/8">
+                      <div key={q} className="py-6 border-b border-white/[0.08]">
                         <p className="text-white font-bold text-base mb-3">{q}</p>
                         <p className="text-gray-500 text-sm leading-relaxed">{a}</p>
                       </div>
@@ -249,7 +249,7 @@ export default function SupportPage() {
             ].map(({ label, value, sub, href }) => (
               <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined}
                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="border-t border-white/8 pt-8 group">
+                className="border-t border-white/[0.08] pt-8 group">
                 <p className="text-gray-600 text-xs uppercase tracking-widest mb-3">{label}</p>
                 <p className="text-white font-bold text-lg group-hover:text-brand-red transition-colors" style={{letterSpacing: '-0.02em'}}>{value}</p>
                 <p className="text-gray-500 text-sm mt-1">{sub}</p>

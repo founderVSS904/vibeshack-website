@@ -143,7 +143,7 @@ export default function TourBookingForm() {
         <h2 className="text-white font-black leading-tight mb-5" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em' }}>
           You&apos;re on the calendar.
         </h2>
-        <div className="space-y-3 border-y border-white/8 py-6 mb-6">
+        <div className="space-y-3 border-y border-white/[0.08] py-6 mb-6">
           <p className="text-white font-bold">{fmtDateFull(confirmed.date)}</p>
           <p className="text-brand-red font-black">{confirmed.time} PT</p>
           <p className="text-gray-500 text-sm">Studio interest: {confirmed.studioName}</p>
@@ -190,7 +190,7 @@ export default function TourBookingForm() {
                   key={ds}
                   type="button"
                   onClick={() => selectDate(ds)}
-                  className={`flex flex-col items-center rounded-xl py-2.5 transition-all ${selected ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/8'}`}
+                  className={`flex flex-col items-center rounded-xl py-2.5 transition-all ${selected ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/[0.08]'}`}
                 >
                   <span className="text-xs leading-none mb-1 opacity-60">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
                   <span className="text-sm font-black leading-none">{date.getDate()}</span>
@@ -200,19 +200,19 @@ export default function TourBookingForm() {
           </div>
 
           {!selectedDate && (
-            <div className="flex h-44 items-center justify-center border-t border-white/8">
+            <div className="flex h-44 items-center justify-center border-t border-white/[0.08]">
               <p className="text-gray-700 text-sm">Select a date to see live tour times.</p>
             </div>
           )}
 
           {selectedDate && slotsLoading && (
-            <div className="flex h-44 items-center justify-center border-t border-white/8">
+            <div className="flex h-44 items-center justify-center border-t border-white/[0.08]">
               <p className="text-gray-600 text-sm animate-pulse">Checking the studio calendar...</p>
             </div>
           )}
 
           {selectedDate && !slotsLoading && (
-            <div className="border-t border-white/8 pt-5">
+            <div className="border-t border-white/[0.08] pt-5">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-white font-bold">{fmtDateFull(selectedDate)}</p>
                 <p className="text-gray-600 text-xs">30 min</p>
@@ -234,7 +234,7 @@ export default function TourBookingForm() {
                       className={`rounded-xl py-3 text-sm font-semibold transition-all ${
                         !slot.available ? 'cursor-not-allowed text-gray-800 line-through'
                           : selected ? 'bg-brand-red text-white'
-                            : 'text-gray-400 hover:bg-white/8 hover:text-white'
+                            : 'text-gray-400 hover:bg-white/[0.08] hover:text-white'
                       }`}
                     >
                       {slot.label}

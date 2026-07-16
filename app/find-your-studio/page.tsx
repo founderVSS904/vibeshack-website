@@ -255,7 +255,7 @@ export default function FindYourStudioPage() {
                   className={`w-full text-left py-5 border-b flex items-center justify-between group transition-all duration-150 ${
                     selecting === opt.id
                       ? 'border-brand-red'
-                      : i === 0 ? 'border-t border-b border-white/8' : 'border-white/8'
+                      : i === 0 ? 'border-t border-b border-white/[0.08]' : 'border-white/[0.08]'
                   }`}>
                   <span className={`font-semibold text-lg transition-colors duration-150 ${
                     selecting === opt.id ? 'text-brand-red' : 'text-gray-300 group-hover:text-white'

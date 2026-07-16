@@ -107,7 +107,7 @@ export default function PricingPage() {
           {/* Podcast Studios — grouped */}
           <div className="mb-1">
             <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-4">Podcast Studios</p>
-            <div className="divide-y divide-white/8 border-t border-white/8">
+            <div className="divide-y divide-white/[0.08] border-t border-white/[0.08]">
               {studios.filter(s => s.category === 'Podcast').map((studio) => (
                 <a
                   key={studio.name}
@@ -131,7 +131,7 @@ export default function PricingPage() {
           {/* Rental Studios — grouped */}
           <div className="mt-10">
             <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-4">Rental Studios</p>
-            <div className="divide-y divide-white/8 border-t border-white/8">
+            <div className="divide-y divide-white/[0.08] border-t border-white/[0.08]">
               {studios.filter(s => s.category === 'Rental').map((studio) => (
                 <a
                   key={studio.name}
@@ -154,7 +154,7 @@ export default function PricingPage() {
           {/* Production Services — scoped */}
           <div className="mt-10">
             <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-4">Production Services</p>
-            <div className="divide-y divide-white/8 border-t border-white/8">
+            <div className="divide-y divide-white/[0.08] border-t border-white/[0.08]">
               {productionServices.map((service) => (
                 <a
                   key={service.name}
@@ -271,7 +271,7 @@ export default function PricingPage() {
             </h2>
             <span className="number-label">FAQ</span>
           </div>
-          <div className="divide-y divide-white/8">
+          <div className="divide-y divide-white/[0.08]">
             {pricingFaqs.map(({ question, answer }) => (
               <div key={question} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-16 py-8">
                 <p className="text-white font-semibold text-base">{question}</p>

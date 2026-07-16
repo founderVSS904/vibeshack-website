@@ -215,7 +215,7 @@ export default function ServicesPage() {
                   </div>
                   <div className="flex items-center justify-between border-t border-white/10 pt-5 mt-8">
                     <span className="text-white text-sm font-semibold">{price}</span>
-                    <span className="text-brand-red text-sm font-semibold group-hover:text-white transition-colors">Explore</span>
+                    <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors group-hover:text-white">Explore <span aria-hidden>→</span></span>
                   </div>
                 </div>
               </Link>
@@ -264,11 +264,11 @@ export default function ServicesPage() {
               </h2>
             </div>
             <div className="flex flex-col sm:flex-row lg:justify-end gap-3">
-              <Link href="/find-your-studio/" className="inline-flex items-center justify-center px-7 py-4 bg-white text-black text-sm font-bold rounded-full hover:bg-gray-200 transition-colors">
-                Find a Studio
+              <Link href="/find-your-studio/" className="inline-flex items-center justify-center rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+                Find a studio
               </Link>
-              <Link href="/tour/" className="inline-flex items-center justify-center px-7 py-4 border border-white/15 text-white text-sm font-bold rounded-full hover:border-white/40 transition-colors">
-                Book a Tour
+              <Link href="/tour/" className="inline-flex items-center justify-center rounded-lg border border-white/15 px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-white/40">
+                Book a tour
               </Link>
             </div>
           </div>

@@ -116,13 +116,13 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-20 pt-16 border-t border-white/8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-20 pt-16 border-t border-white/[0.08]">
             {[
               { n: '01', title: 'Studios', body: 'The physical home. Multiple studios at SF\'s Northern Waterfront. Where the work gets made today.' },
               { n: '02', title: 'Creative Services', body: 'Branding, content strategy, production support. The expertise that surrounds the space.' },
               { n: '03', title: 'Platform', body: 'The future. Tools, education, and creative infrastructure for anyone building something worth sharing.' },
             ].map(({ n, title, body }) => (
-              <div key={n} className="border-t border-white/8 pt-8">
+              <div key={n} className="border-t border-white/[0.08] pt-8">
                 <span className="text-gray-700 font-black text-sm block mb-4">{n}</span>
                 <h3 className="text-white font-bold text-xl mb-3" style={{letterSpacing: '-0.02em'}}>{title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{body}</p>

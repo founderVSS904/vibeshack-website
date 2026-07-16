@@ -312,7 +312,7 @@ export default function GreenScreenPage() {
             </h2>
             <span className="number-label">FAQ</span>
           </div>
-          <div className="divide-y divide-white/8">
+          <div className="divide-y divide-white/[0.08]">
             {faqs.map((faq) => (
               <div key={faq.question} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-16 py-8">
                 <p className="text-white font-semibold text-base">{faq.question}</p>

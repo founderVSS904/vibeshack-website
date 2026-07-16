@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
 type FeaturedSlide = {
-  eyebrow: string
   title: [string] | [string, string]
   kicker: string
   body: string
@@ -23,7 +22,6 @@ type FeaturedSlide = {
 
 const slides: FeaturedSlide[] = [
   {
-    eyebrow: 'Featured Music Video',
     title: ['Body', 'Is Tea'],
     kicker: 'A music video by Varii · Directed by Gill',
     body: 'Presented by VibeShack Studios.',
@@ -31,11 +29,10 @@ const slides: FeaturedSlide[] = [
     secondaryCta: { label: 'All work', href: '/our-work/' },
     image: '/studio-images/work-body-is-tea-music-v20260708b.jpg',
     imageAlt: 'Body Is Tea music video title card with dancers in a sunny driveway',
-    video: '/studio-videos/home-feat-body-is-tea-loop-v20260709.mp4',
+    video: '/studio-videos/home-feat-body-is-tea-loop-v20260715.mp4',
     poster: true,
   },
   {
-    eyebrow: 'Featured Series',
     title: ['The', 'Buzzer'],
     kicker: 'Silicon Mania · Startups pitch billionaires',
     body: 'Founders pitch, investors hold the buzzer.',
@@ -48,7 +45,6 @@ const slides: FeaturedSlide[] = [
     poster: true,
   },
   {
-    eyebrow: 'Featured Event',
     title: ['Wing', 'Battle'],
     kicker: "Melinda's Hot Sauce · Hayward, CA 2025",
     body: "Melinda's Wing Battle event film.",
@@ -247,7 +243,7 @@ export function FeaturedOriginals() {
           >
             <span
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === index ? 'w-6 bg-brand-red' : 'w-1.5 bg-white/30 group-hover/dot:bg-white/60'
+                i === index ? 'w-6 bg-brand-red' : 'w-1.5 bg-white/50 group-hover/dot:bg-white/70'
               }`}
             />
           </button>

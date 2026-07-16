@@ -56,7 +56,7 @@ export default function NotFound() {
         </div>
 
         {/* Bottom divider */}
-        <div className="mt-16 pt-8 border-t border-white/8">
+        <div className="mt-16 pt-8 border-t border-white/[0.08]">
           <p className="text-gray-700 text-xs tracking-wide">950 Battery St · San Francisco · Open 24/7</p>
         </div>
       </div>

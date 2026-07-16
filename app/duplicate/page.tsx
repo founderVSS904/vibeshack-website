@@ -167,7 +167,7 @@ export default function HomePage() {
               VibeShack Studios brings podcast sets, green screen production, photo services, video, and white cyc rental studios together at 950 Battery St in San Francisco's Northern Waterfront.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/8" data-stagger>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/[0.08]" data-stagger>
             {[
               { n: '24/7', label: 'Always Open', sub: 'Every hour. Every day. No exceptions.' },
               { n: '$100', label: 'Rental studios', sub: 'Bring your crew. We provide everything else.' },
@@ -286,7 +286,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-12 border-t border-white/8 pt-10">
+          <div className="mt-10 flex flex-wrap gap-12 border-t border-white/[0.08] pt-10">
             {[
               { label: 'Clean white cyc backdrop', sub: 'Minimal. Timeless. Versatile.' },
               { label: 'Professional mics & cameras', sub: 'Already set up. Walk in and record.' },
@@ -375,7 +375,7 @@ export default function HomePage() {
               { name: 'Canvas Rental', price: '$100/hr', slug: '/canvas-rental/', note: 'Creative Series · Rental · all equipment included' },
             ].map(({ name, price, slug, note }) => (
               <a key={name} href={slug}
-                className="flex items-center justify-between py-4 border-b border-white/8 group hover:opacity-70 transition-opacity">
+                className="flex items-center justify-between py-4 border-b border-white/[0.08] group hover:opacity-70 transition-opacity">
                 <div>
                   <p className="text-white text-sm font-semibold group-hover:text-gray-300 transition-colors">{name}</p>
                   <p className="text-gray-600 text-xs mt-0.5">{note}</p>
@@ -427,7 +427,7 @@ export default function HomePage() {
                   { title: 'The gear is already set up', body: '4K cameras, professional lighting, and studio microphones. Walk in and start shooting.' },
                   { title: "The best rate", body: 'From $100/hr. Most SF studios charge $200 to $350 for the same setup.' },
                 ].map(({ title, body }) => (
-                  <div key={title} className="border-t border-white/8 pt-8">
+                  <div key={title} className="border-t border-white/[0.08] pt-8">
                     <h3 className="text-white font-bold text-lg mb-2 leading-tight">{title}</h3>
                     <p className="text-gray-500 text-sm leading-relaxed">{body}</p>
                   </div>
@@ -447,7 +447,7 @@ export default function HomePage() {
                   { n: '02', title: 'Book a time', body: 'Select your date. Instant confirmation.' },
                   { n: '03', title: 'Show up and shoot', body: "We're on-site. Everything's ready." },
                 ].map(({ n, title, body }) => (
-                  <div key={n} className="flex gap-8 border-t border-white/8 py-8">
+                  <div key={n} className="flex gap-8 border-t border-white/[0.08] py-8">
                     <span className="text-gray-700 font-black text-3xl leading-none flex-shrink-0 w-12" style={{letterSpacing: '-0.04em'}}>{n}</span>
                     <div>
                       <h3 className="text-white font-bold text-lg mb-1">{title}</h3>

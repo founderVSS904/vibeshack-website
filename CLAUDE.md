@@ -39,7 +39,7 @@ booking business in San Francisco (podcast, video, photo, rental studios).
 ## Verify before claiming done
 
 - `npm run lint` and `npx tsc --noEmit` must be clean.
-- `npm run build` must pass (72 static pages at last count).
+- `npm run build` must pass.
 - Load the changed pages on http://localhost:3011 and confirm behavior.
 - SEO check: `scripts/seo-audit.mjs` defaults to auditing PRODUCTION. For local,
   run `SEO_AUDIT_BASE_URL=http://localhost:3011 npm run seo:audit`.
@@ -51,7 +51,7 @@ booking business in San Francisco (podcast, video, photo, rental studios).
   `public/studio-videos/home-tile-*`),
   then `components/home/`: `FeaturedOriginals` (auto-advancing carousel with
   video slides), `TrustedStrip` (client-logo marquee), `StudioSpaces` (grid of
-  the 10 real studios), `WhatWeDo`, then the shared `Footer`.
+  the real studios), `WhatWeDo`, then the shared `Footer`.
 - Our Work: `app/our-work/page.tsx`, `app/our-work/[slug]/page.tsx`,
   `lib/seo/workProjects.ts`. Real client work, YouTube embeds on project pages,
   plus a "Shot at VibeShack" row of external YouTube links.

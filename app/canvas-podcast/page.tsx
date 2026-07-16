@@ -333,7 +333,7 @@ export default function CanvasPodcastPage() {
                 desc: 'Announce, interview, celebrate. Canvas makes it feel like the big moment it is.',
               },
             ].map(({ title, desc }) => (
-              <div key={title} className="border-t border-white/8 pt-8">
+              <div key={title} className="border-t border-white/[0.08] pt-8">
                 <h3 className="text-white font-bold text-lg mb-2">{title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
               </div>

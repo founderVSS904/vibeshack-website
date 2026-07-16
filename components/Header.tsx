@@ -79,7 +79,7 @@ export default function Header() {
   const pathname = usePathname()
   const [dismissedMenu, setDismissedMenu] = useState<string | null>(null)
   const isOurWorkPage = pathname === '/our-work' || pathname === '/our-work/'
-  const headerClassName = 'site-header fixed left-0 right-0 top-0 z-50 border-b border-white/8 bg-black transition-colors duration-200'
+  const headerClassName = 'site-header fixed left-0 right-0 top-0 z-50 border-b border-white/[0.08] bg-black transition-colors duration-200'
   const headerContainerClassName = isOurWorkPage
     ? 'mx-auto w-full px-9'
     : 'mx-auto max-w-7xl px-6 sm:px-10 lg:px-16'
@@ -155,7 +155,7 @@ export default function Header() {
             </Link>
 
             <details className="group xl:hidden">
-              <summary className="list-none p-2 text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+              <summary className="list-none p-3 text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none [&::-webkit-details-marker]:hidden">
                 <span className="sr-only">Toggle menu</span>
                 <svg className="h-5 w-5 group-open:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
@@ -330,7 +330,7 @@ function MenuViewAll({ href, label, onNavigate }: { href: string; label: string;
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/all mt-auto flex items-center gap-2 border-t border-white/[0.06] pt-4 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 transition-colors duration-300 hover:text-white"
+      className="group/all mt-auto flex items-center gap-2 border-t border-white/[0.06] pt-4 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 transition-colors duration-300 hover:text-white"
     >
       {label}
       <span className="transition-transform duration-300 group-hover/all:translate-x-0.5" aria-hidden="true">
@@ -359,7 +359,7 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
       </span>
       <span className="flex min-w-0 flex-1 items-baseline justify-between gap-3">
         <span className="truncate text-[15px] font-medium leading-tight text-white">{room.label}</span>
-        {room.price && <span className="shrink-0 font-mono text-xs text-zinc-500 transition-colors duration-300 group-hover/room:text-white">{room.price}</span>}
+        {room.price && <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-300 group-hover/room:text-white">{room.price}</span>}
       </span>
     </Link>
   )
@@ -430,7 +430,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
               onNavigate()
               event.currentTarget.blur()
             }}
-            className="group/allsvc mb-1 flex shrink-0 items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-500 transition-colors duration-300 hover:text-white"
+            className="group/allsvc mb-1 flex shrink-0 items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400 transition-colors duration-300 hover:text-white"
           >
             All services
             <span className="transition-transform duration-300 group-hover/allsvc:translate-x-0.5" aria-hidden="true">
@@ -588,7 +588,7 @@ function DesktopMegaMenu({
 
 function MobileMenu() {
   return (
-    <div className="mobile-menu-panel absolute left-0 right-0 top-full h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain border-t border-white/8 bg-black">
+    <div className="mobile-menu-panel absolute left-0 right-0 top-full h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain border-t border-white/[0.08] bg-black">
       <div className="mx-auto max-w-7xl px-6 pb-10 pt-6 sm:px-10">
         <MobileSection title="Studios" links={[...podcastStudios, ...rentalStudios]} />
         <MobileSection title="Services" links={serviceLinks} />
@@ -606,7 +606,7 @@ function MobileSection({
   links: HeaderLink[]
 }) {
   return (
-    <div className="border-b border-white/8 py-5 last:border-b-0">
+    <div className="border-b border-white/[0.08] py-5 last:border-b-0">
       <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gray-600">{title}</p>
       <div className="grid gap-1 sm:grid-cols-2 sm:gap-x-8">
         {links.map(({ href, label, detail, price }) => (
