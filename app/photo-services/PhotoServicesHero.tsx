@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 type PhotoCategory = {
   label: string
@@ -60,9 +60,8 @@ const CATEGORIES: PhotoCategory[] = [
   },
 ]
 
-// Deck geometry anchors by absolute distance from center (0, 1, 2, 3 slots out).
-// Values between anchors are interpolated so a live drag moves every card
-// through the exact path it would travel between resting slots.
+// Deck geometry anchors by absolute distance from center; values between
+// anchors are interpolated so the deck can rest at any fractional position.
 const ANCHORS = [
   { x: 0, rot: 0, s: 1, b: 1, o: 1 },
   { x: 74, rot: 18, s: 0.86, b: 0.62, o: 1 },
@@ -70,8 +69,11 @@ const ANCHORS = [
   { x: 172, rot: 24, s: 0.62, b: 0.3, o: 0 },
 ]
 
-// Pixels of drag that move the deck by one card.
-const DRAG_STEP = 240
+const DRAG_STEP = 240 // px of drag per card
+const LEAN = 0.55 // how far the deck leans toward the cursor, in cards
+const EDGE_ZONE = 0.85 // |cursor ratio| beyond which the deck scrolls
+const EDGE_SPEED = 0.0009 // cards per ms while in the edge zone
+const CHASE = 110 // ms time-constant of the exponential chase
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t
@@ -102,46 +104,116 @@ function relativeTo(index: number, position: number) {
 
 export default function PhotoServicesHero() {
   const [active, setActive] = useState(0)
-  const [dragX, setDragX] = useState(0)
   const [dragging, setDragging] = useState(false)
   const [hovered, setHovered] = useState<number | null>(null)
-  const [follow, setFollow] = useState(0)
+
+  const nodesRef = useRef<(HTMLButtonElement | null)[]>([])
+  const posRef = useRef(0) // rendered position, continuous
+  const baseRef = useRef(0) // anchor the lean is measured from
+  const leanRef = useRef(0)
+  const edgeRef = useRef(0) // -1 | 0 | 1 while the cursor rides an edge
+  const hoveredRef = useRef<number | null>(null)
+  const overRef = useRef(false)
   const pinnedRef = useRef(false)
-  const hoverRef = useRef(false)
-  const dragStartRef = useRef<{ x: number; moved: boolean } | null>(null)
-  const lastStepRef = useRef(0)
+  const dragRef = useRef<{ startX: number; startPos: number; moved: boolean } | null>(null)
+  const rafRef = useRef(0)
+  const lastTsRef = useRef(0)
+  const activeRef = useRef(0)
 
-  const go = (next: number) => {
-    pinnedRef.current = true
-    setActive(((next % 6) + 6) % 6)
-  }
+  const applyStyles = useCallback((pos: number) => {
+    nodesRef.current.forEach((node, i) => {
+      if (!node) return
+      const rel = relativeTo(i, pos)
+      const slot = slotAt(rel)
+      const isHovered = hoveredRef.current === i
+      const brightness = isHovered ? Math.min(1, slot.b + 0.25) : slot.b
+      node.style.transform = `translate(-50%, -50%) translateX(${slot.x}%) rotateY(${slot.rot}deg) scale(${slot.s})`
+      node.style.opacity = String(slot.o)
+      node.style.filter = `brightness(${brightness})`
+      node.style.zIndex = String(isHovered ? 40 : slot.z)
+      node.style.pointerEvents = slot.o < 0.5 ? 'none' : ''
+    })
+  }, [])
 
-  // Ambient advance until the visitor takes over; rests while hovered.
+  const tick = useCallback(
+    (now: number) => {
+      const dt = Math.min(Math.max(now - lastTsRef.current, 0), 50)
+      lastTsRef.current = now
+
+      if (edgeRef.current && !dragRef.current) {
+        baseRef.current += edgeRef.current * EDGE_SPEED * dt
+      }
+
+      const goal = baseRef.current + leanRef.current
+      if (!dragRef.current) {
+        posRef.current += (goal - posRef.current) * (1 - Math.exp(-dt / CHASE))
+        if (Math.abs(goal - posRef.current) < 0.0005) posRef.current = goal
+      }
+
+      applyStyles(posRef.current)
+
+      const snapped = ((Math.round(posRef.current) % 6) + 6) % 6
+      if (snapped !== activeRef.current) {
+        activeRef.current = snapped
+        setActive(snapped)
+      }
+
+      const settled = !dragRef.current && !overRef.current && Math.abs(goal - posRef.current) < 0.001
+      if (settled) {
+        rafRef.current = 0
+        return
+      }
+      rafRef.current = requestAnimationFrame(tick)
+    },
+    [applyStyles],
+  )
+
+  const ensureLoop = useCallback(() => {
+    if (rafRef.current) return
+    lastTsRef.current = performance.now()
+    rafRef.current = requestAnimationFrame(tick)
+  }, [tick])
+
+  // Pointer events tick the loop directly so motion stays glued to input
+  // even where rAF is throttled.
+  const pump = useCallback(() => {
+    ensureLoop()
+    tick(performance.now())
+  }, [ensureLoop, tick])
+
+  const go = useCallback(
+    (index: number) => {
+      pinnedRef.current = true
+      const from = Math.round(baseRef.current)
+      let delta = (((index - from) % 6) + 6) % 6
+      if (delta > 3) delta -= 6
+      baseRef.current = from + delta
+      leanRef.current = 0
+      edgeRef.current = 0
+      ensureLoop()
+    },
+    [ensureLoop],
+  )
+
+  useEffect(() => {
+    applyStyles(0)
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [applyStyles])
+
+  // Ambient advance until the visitor takes over.
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const interval = setInterval(() => {
-      if (document.hidden || pinnedRef.current || hoverRef.current) return
-      setActive((a) => (a + 1) % 6)
+      if (document.hidden || pinnedRef.current || overRef.current) return
+      baseRef.current = Math.round(baseRef.current) + 1
+      ensureLoop()
     }, 5000)
     return () => clearInterval(interval)
-  }, [])
+  }, [ensureLoop])
 
-  const position = dragging ? active - dragX / DRAG_STEP : active + follow
   const activeCategory = CATEGORIES[active]
-
-  const endDrag = (clientX: number) => {
-    const drag = dragStartRef.current
-    dragStartRef.current = null
-    setDragging(false)
-    setDragX(0)
-    if (!drag) return
-    const delta = clientX - drag.x
-    const snapped = Math.round(active - delta / DRAG_STEP)
-    if (snapped !== active) {
-      pinnedRef.current = true
-      setActive(((snapped % 6) + 6) % 6)
-    }
-  }
 
   return (
     <>
@@ -181,46 +253,61 @@ export default function PhotoServicesHero() {
             dragging ? 'cursor-grabbing' : 'cursor-grab'
           }`}
           style={{ perspective: '1400px' }}
+          onPointerEnter={() => {
+            overRef.current = true
+          }}
           onPointerDown={(e) => {
-            dragStartRef.current = { x: e.clientX, moved: false }
+            dragRef.current = { startX: e.clientX, startPos: posRef.current, moved: false }
+            leanRef.current = 0
+            edgeRef.current = 0
             setDragging(true)
             try {
               e.currentTarget.setPointerCapture(e.pointerId)
             } catch {}
-          }}
-          onPointerEnter={() => {
-            hoverRef.current = true
+            ensureLoop()
           }}
           onPointerMove={(e) => {
-            const drag = dragStartRef.current
+            const drag = dragRef.current
             if (drag) {
-              const delta = e.clientX - drag.x
+              const delta = e.clientX - drag.startX
               if (Math.abs(delta) > 10) drag.moved = true
-              setDragX(delta)
+              posRef.current = drag.startPos - delta / DRAG_STEP
+              baseRef.current = posRef.current
+              pump()
               return
             }
             if (e.pointerType !== 'mouse') return
-            // The deck leans with the cursor; sustained movement near an edge
-            // steps through the cards at a readable cadence.
             const rect = e.currentTarget.getBoundingClientRect()
-            const ratio = ((e.clientX - rect.left) / rect.width - 0.5) * 2
-            const now = performance.now()
-            if (Math.abs(ratio) > 0.8 && now - lastStepRef.current > 450) {
-              lastStepRef.current = now
+            const ratio = Math.max(-1, Math.min(1, ((e.clientX - rect.left) / rect.width - 0.5) * 2))
+            leanRef.current = ratio * LEAN
+            edgeRef.current = Math.abs(ratio) > EDGE_ZONE ? Math.sign(ratio) : 0
+            if (edgeRef.current) pinnedRef.current = true
+            pump()
+          }}
+          onPointerUp={() => {
+            const drag = dragRef.current
+            dragRef.current = null
+            setDragging(false)
+            if (drag) {
               pinnedRef.current = true
-              setActive((a) => (((a + (ratio > 0 ? 1 : -1)) % 6) + 6) % 6)
+              baseRef.current = Math.round(posRef.current)
+              leanRef.current = 0
             }
-            setFollow(Math.max(-0.75, Math.min(0.75, ratio * 0.75)))
+            ensureLoop()
+          }}
+          onPointerCancel={() => {
+            dragRef.current = null
+            setDragging(false)
+            baseRef.current = Math.round(posRef.current)
+            leanRef.current = 0
+            ensureLoop()
           }}
           onPointerLeave={() => {
-            hoverRef.current = false
-            setFollow(0)
-          }}
-          onPointerUp={(e) => endDrag(e.clientX)}
-          onPointerCancel={() => {
-            dragStartRef.current = null
-            setDragging(false)
-            setDragX(0)
+            overRef.current = false
+            edgeRef.current = 0
+            leanRef.current = 0
+            baseRef.current = Math.round(baseRef.current)
+            ensureLoop()
           }}
         >
           {/* The glass sea: a horizon sheen at the contact line and a soft
@@ -234,49 +321,35 @@ export default function PhotoServicesHero() {
             />
           </div>
           {CATEGORIES.map((category, i) => {
-            const rel = relativeTo(i, position)
-            const slot = slotAt(rel)
-            const isHovered = hovered === i && !dragging && Math.abs(follow) < 0.2
-            const scale = slot.s
-            const brightness = isHovered ? Math.min(1, slot.b + 0.25) : slot.b
-            // The button box never changes; the frame and its reflection slide
-            // their edges outward so the photo widens without moving neighbors.
+            const isHovered = hovered === i && !dragging
             const edge = isHovered ? '-13%' : '0%'
-            const frameTransition = dragging
-              ? 'none'
-              : 'left 500ms cubic-bezier(0.32, 0.72, 0, 1), right 500ms cubic-bezier(0.32, 0.72, 0, 1)' 
+            const frameTransition = 'left 500ms cubic-bezier(0.32, 0.72, 0, 1), right 500ms cubic-bezier(0.32, 0.72, 0, 1)'
             return (
               <button
                 key={category.label}
+                ref={(el) => {
+                  nodesRef.current[i] = el
+                }}
                 type="button"
                 aria-label={`Show ${category.label}`}
-                aria-pressed={Math.round(rel) === 0}
-                tabIndex={slot.o < 0.5 ? -1 : 0}
+                aria-pressed={i === active}
+                tabIndex={relativeTo(i, active) === 3 ? -1 : 0}
                 onMouseEnter={() => {
-                  setHovered(i)
-                  hoverRef.current = true
+                  if (edgeRef.current === 0 && Math.abs(baseRef.current + leanRef.current - posRef.current) < 0.3) {
+                    hoveredRef.current = i
+                    setHovered(i)
+                  }
                 }}
                 onMouseLeave={() => {
+                  if (hoveredRef.current === i) hoveredRef.current = null
                   setHovered((h) => (h === i ? null : h))
-                  hoverRef.current = false
                 }}
                 onClick={() => {
-                  if (dragStartRef.current?.moved) return
-                  if (Math.round(rel) !== 0) go(i)
+                  if (dragRef.current?.moved) return
+                  if (i !== activeRef.current) go(i)
                 }}
-                className="absolute left-1/2 top-[38%] w-[240px] overflow-visible rounded-xl sm:w-[320px] lg:w-[420px]"
-                style={{
-                  aspectRatio: '5 / 6',
-                  zIndex: isHovered ? 40 : slot.z,
-                  opacity: slot.o,
-                  filter: `brightness(${brightness})`,
-                  transform: `translate(-50%, -50%) translateX(${slot.x}%) rotateY(${slot.rot}deg) scale(${scale})`,
-                  transition: dragging
-                    ? 'none'
-                    : `transform ${follow !== 0 ? '450ms' : '800ms'} cubic-bezier(0.32, 0.72, 0, 1), filter 500ms ease, opacity 500ms ease`,
-                  willChange: 'transform, filter',
-                  pointerEvents: slot.o < 0.5 ? 'none' : undefined,
-                }}
+                className="absolute left-1/2 top-[38%] w-[240px] sm:w-[320px] lg:w-[420px]"
+                style={{ aspectRatio: '5 / 6' }}
               >
                 <span
                   className="absolute inset-y-0 block overflow-hidden rounded-xl border border-white/10 bg-zinc-950"
@@ -345,7 +418,7 @@ export default function PhotoServicesHero() {
             <button
               type="button"
               aria-label="Previous category"
-              onClick={() => go(active - 1)}
+              onClick={() => go((active + 5) % 6)}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white"
             >
               <svg className="h-3.5 w-3.5 rotate-180" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
@@ -358,7 +431,7 @@ export default function PhotoServicesHero() {
             <button
               type="button"
               aria-label="Next category"
-              onClick={() => go(active + 1)}
+              onClick={() => go((active + 1) % 6)}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white"
             >
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
