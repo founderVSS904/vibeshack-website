@@ -163,9 +163,6 @@ export function FeaturedOriginals() {
               }`}
             >
               <div className="lg:max-w-[52%]">
-                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red sm:text-xs">
-                  {slide.eyebrow}
-                </p>
                 {slide.poster ? (
                   <h2 className="sr-only">
                     {slide.title[0]} {slide.title[1]}
@@ -181,9 +178,6 @@ export function FeaturedOriginals() {
                     )}
                   </h2>
                 )}
-                <p className="mt-5 font-mono text-xs font-bold uppercase tracking-[0.26em] text-amber-300 sm:text-sm">
-                  {slide.kicker}
-                </p>
                 {!slide.poster && (
                   <p className="mt-4 max-w-md text-sm leading-relaxed text-white/70 sm:text-base">
                     {slide.body}
