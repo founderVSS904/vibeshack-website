@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { comparisons } from '@/lib/seo/comparisons'
 import { studioGuides } from '@/lib/seo/studioGuides'
@@ -170,7 +171,14 @@ export default function Footer() {
         {/* Bottom row */}
         <div className="border-t border-white/5 pt-12 text-center">
           <div className="mb-5 flex justify-center" style={{ perspective: '600px' }}>
-            <BrandMark variant="monogram" className="footer-monogram-spin h-9 w-auto" />
+            <Image
+              src="/brand/vibeshack/monogram-3d-red-transparent-v20260715.png"
+              alt="VS"
+              width={800}
+              height={450}
+              sizes="160px"
+              className="footer-monogram-spin h-9 w-auto"
+            />
           </div>
           <p className="text-white text-xs tracking-[0.15em] uppercase font-bold mb-6">The Dream Factory</p>
           <p className="text-gray-700 text-xs mt-2">© 2026 VibeShack Studios · San Francisco</p>
