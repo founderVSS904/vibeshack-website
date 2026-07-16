@@ -489,9 +489,12 @@ export default function GuidesPageClient() {
                         <span className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-red/60">
                           <GuideIcon slug={guide.slug} className="h-4 w-4 text-brand-red" />
                         </span>
-                        <p className="font-black leading-[0.94] text-white" style={{ fontSize: 'clamp(1.4rem, 1.7vw, 1.85rem)' }}>
-                          {guide.shortTitle}
-                        </p>
+                        <div>
+                          <p className="font-black leading-[0.94] text-white" style={{ fontSize: 'clamp(1.4rem, 1.7vw, 1.85rem)' }}>
+                            {guide.shortTitle}
+                          </p>
+                          <p className="mt-2.5 line-clamp-2 text-xs leading-relaxed text-zinc-400">{guide.description}</p>
+                        </div>
                         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-brand-red">
                           {readMinutes(guide)} min guide
                         </p>
@@ -527,7 +530,8 @@ export default function GuidesPageClient() {
                 >
                   <div className="min-w-0">
                     <p className="font-black text-2xl leading-[0.94] text-white">{guide.shortTitle}</p>
-                    <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                    <p className="mt-2 line-clamp-1 max-w-2xl text-xs leading-relaxed text-zinc-400">{guide.description}</p>
+                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
                       {readMinutes(guide)} min guide
                     </p>
                   </div>
