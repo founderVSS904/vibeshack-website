@@ -15,8 +15,6 @@ export const useCases = [
     bookHref: '/book/?studio=the-executive',
     serviceType: 'Podcast Studio Rental',
     audience: ['Podcast hosts', 'Founders', 'Brand teams', 'Agencies', 'YouTube creators'],
-    fastAnswer:
-      'Choose a podcast set when the conversation itself is the product: a founder interview, guest episode, expert panel, or thought-leadership recording that needs clean sound, flattering angles, and clips that can travel.',
     clientNeed:
       'Most interview shoots fail in the invisible details: echo, awkward eyelines, lighting that makes guests look tired, and no plan for clips. The room should make the guest comfortable, the host confident, and the footage useful after the full episode is done.',
     decisionPoints: [
@@ -141,14 +139,12 @@ export const useCases = [
     keyword: 'brand content day studio san francisco',
     description:
       'For teams that want one organized production day to create the founder videos, social clips, portraits, product visuals, and sales assets they keep postponing.',
-    image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
+    image: '/studio-images/usecase-brand-content-v20260509.jpg',
     imageAlt: 'Horizon studio set for a brand content production day at VibeShack Studios San Francisco',
     primaryPage: '/find-your-studio/',
     bookHref: '/book/',
     serviceType: 'Production Studio Rental',
     audience: ['Startups', 'Marketing teams', 'Founders', 'Agencies', 'Creators'],
-    fastAnswer:
-      'Use a content day when your team needs a usable asset library, not one isolated video. The win is getting founder clips, sales answers, portraits, product visuals, and social cutdowns in one coordinated session.',
     clientNeed:
       'A content day should not feel like random filming. It should feel like a production plan: one location, clear shot priorities, efficient room changes, and enough variety that the final assets can support weeks of launch, sales, recruiting, and social content.',
     decisionPoints: [
@@ -279,8 +275,6 @@ export const useCases = [
     bookHref: '/book/?studio=green-screen',
     serviceType: 'Green Screen Studio Rental',
     audience: ['Video teams', 'Course creators', 'Corporate trainers', 'Agencies', 'Commercial productions'],
-    fastAnswer:
-      'Choose green screen when the final environment matters more than the physical room: training modules, app walkthroughs, virtual sets, product demos, and commercial composites.',
     clientNeed:
       'Green screen is not just a green wall. It is a post-production decision. The shoot has to protect clean edges, consistent lighting, proper distance from the background, and enough reference material for the editor to build the final world without fighting the footage.',
     decisionPoints: [
@@ -399,14 +393,12 @@ export const useCases = [
     keyword: 'product photography services san francisco',
     description:
       'For brands that need controlled product images, founder portraits, campaign stills, ecommerce assets, and social ad creative from one organized shoot.',
-    image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
-    imageAlt: 'Red backdrop campaign photography created at VibeShack Studios San Francisco',
+    image: '/studio-images/home-branding-pure-magic-v20260625.png',
+    imageAlt: 'Styled product photography of a cosmetics jar created at VibeShack Studios San Francisco',
     primaryPage: '/photo-services/',
     bookHref: '/contact/?service=photo-services',
     serviceType: 'Photography Services',
     audience: ['DTC brands', 'Founders', 'Photographers', 'Agencies', 'Campaign teams'],
-    fastAnswer:
-      'Choose photo services when the final images need to sell something: product detail, founder credibility, clean ecommerce, launch assets, campaign stills, or a consistent visual system.',
     clientNeed:
       'Product and brand shoots need control. The color has to stay accurate, the surfaces need to behave, the crops need to work across placements, and the team needs enough room to move from product details to people without rebuilding the entire day.',
     decisionPoints: [
@@ -537,8 +529,6 @@ export const useCases = [
     bookHref: '/book/?studio=canvas-rental',
     serviceType: 'White Cyc Studio Rental',
     audience: ['Creators', 'DTC brands', 'Music video teams', 'Ad teams', 'Photographers'],
-    fastAnswer:
-      'Choose white cyc when you want the subject, product, outfit, movement, or message to be the entire visual. It is clean, flexible, and extremely reusable when you plan crops before filming.',
     clientNeed:
       'White cyc works when you want focus without clutter. It gives the editor and designer clean negative space, but it still needs planning: shoes, blocking, floor protection, wardrobe contrast, and crop strategy matter.',
     decisionPoints: [

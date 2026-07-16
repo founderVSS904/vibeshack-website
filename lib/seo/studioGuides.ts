@@ -139,7 +139,7 @@ export const studioGuides = [
       'A practical guide for planning a portrait, product, brand, or campaign shoot in a San Francisco photography studio.',
     keyword: 'photography studio prep san francisco',
     image: '/studio-images/enhanced-photography-headshot-black-blazer-v20260510.jpg',
-    imageAlt: 'Photography studio with red backdrop and lighting at VibeShack Studios in San Francisco',
+    imageAlt: 'Clean white-background headshot photographed at VibeShack Studios in San Francisco',
     primaryPage: '/photography-studio-san-francisco/',
     intro:
       'A good photo shoot is decided by the shot list, surfaces, wardrobe, props, and final crop requirements before anyone steps in front of the camera. The goal is not just good photos; it is useful photos that fit the places they need to live.',
@@ -269,7 +269,7 @@ export const studioGuides = [
       'A decision guide for choosing between podcast sets, green screen, photo services, photography studio rental, and white cyc rental studios in San Francisco.',
     keyword: 'best production studio san francisco',
     image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
-    imageAlt: 'Parlor studio room prepared for a premium production at VibeShack Studios in San Francisco',
+    imageAlt: 'Crew rigging cyc lighting ahead of a production at VibeShack Studios in San Francisco',
     primaryPage: '/find-your-studio/',
     intro:
       'The right studio is the one that matches the asset you actually need. Start with the final deliverable, not the prettiest room. A podcast, product campaign, green screen composite, and white cyc social shoot all need different production conditions.',

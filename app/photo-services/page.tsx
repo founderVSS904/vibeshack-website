@@ -21,53 +21,6 @@ export const metadata: Metadata = {
   },
 }
 
-const shootTypes = [
-  {
-    eyebrow: '01 / Headshots',
-    title: 'Headshots and team portraits',
-    image: '/studio-images/enhanced-photography-headshot-black-blazer-v20260510.jpg',
-    alt: 'Professional headshot photographed at VibeShack Studios San Francisco',
-    objectPosition: 'center 38%',
-    clientNeed:
-      'A clean, current image system for LinkedIn, website bios, investor decks, press kits, recruiting pages, and internal profiles.',
-    howWeThink:
-      'We plan lighting, background, crop ratios, and pacing so every person looks consistent without the session feeling stiff.',
-  },
-  {
-    eyebrow: '02 / Portraits',
-    title: 'Founder and brand portraits',
-    image: '/studio-images/enhanced-photography-editorial-male-portrait-v20260510.jpg',
-    alt: 'Editorial brand portrait photographed at VibeShack Studios San Francisco',
-    objectPosition: 'center 34%',
-    clientNeed:
-      'Images that make the person behind the brand feel credible, sharp, and human across the website, press, and social channels.',
-    howWeThink:
-      'We build a small visual range: approachable, authoritative, editorial, and negative-space frames for headlines and overlays.',
-  },
-  {
-    eyebrow: '03 / Campaigns',
-    title: 'Product and campaign photos',
-    image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
-    alt: 'Campaign photography on the white cyc at VibeShack Studios San Francisco',
-    objectPosition: '42% center',
-    clientNeed:
-      'Controlled stills for launches, ecommerce, ads, landing pages, thumbnails, sales collateral, and social content.',
-    howWeThink:
-      'We start with where the images will live, then choose surface, light direction, background, and crop needs before shoot day.',
-  },
-  {
-    eyebrow: '04 / Editorial',
-    title: 'Lookbooks and editorial sessions',
-    image: '/studio-images/photography-spotlight-portrait-v20260509.jpg',
-    alt: 'Creative editorial portrait photographed at VibeShack Studios San Francisco',
-    objectPosition: 'center 42%',
-    clientNeed:
-      'A more produced photo day with wardrobe changes, movement, color, texture, full-body frames, tight portraits, and social crops.',
-    howWeThink:
-      'We protect the schedule around outfits, set changes, makeup, selects, and the hero images that have to carry the campaign.',
-  },
-]
-
 const process = [
   ['Brief', 'We define the audience, final placements, mood, references, must-have shots, and what would make the shoot feel successful.'],
   ['Plan', 'We match the shoot to the right room, lighting direction, backgrounds, wardrobe rhythm, product needs, and day-of flow.'],
@@ -78,22 +31,18 @@ const process = [
 const scopes = [
   {
     title: 'Headshot block',
-    price: 'Contact us',
     detail: 'For individuals or teams that need polished profile images with consistent lighting and fast, organized pacing.',
   },
   {
     title: 'Portrait session',
-    price: 'Contact us',
     detail: 'For founders, artists, executives, creators, and teams that need a wider set of brand images beyond one profile photo.',
   },
   {
     title: 'Product shoot',
-    price: 'Contact us',
     detail: 'For brands that need clean product details, ecommerce crops, launch images, ad creative, and social visuals.',
   },
   {
-    title: 'Campaign day',
-    price: 'Contact us',
+    title: 'Content day',
     detail: 'For teams that want portraits, product stills, behind-the-scenes images, and content variations from one production day.',
   },
 ]
@@ -201,17 +150,17 @@ const faqs = [
   {
     question: 'Is this the same as renting the photography studio?',
     answer:
-      'No. Photo services means VibeShack helps scope a photoshoot such as headshots, portraits, product photos, lookbooks, campaign stills, or press images. Photography studio rental is the room-only option for clients bringing their own photographer and crew.',
-  },
-  {
-    question: 'Can I still bring my own photographer?',
-    answer:
-      'Yes. If you already have a photographer, book the Photography Studio under rentals. If you want VibeShack to help plan or produce the shoot, use this photo services page to start a request.',
+      'No. Photo services means VibeShack plans and produces the shoot: product photography, headshots and portraits, food and beverage, editorials and lookbooks, wedding and event content, and full content days. If you already have a photographer and only need the room, book the Photography Studio under rentals instead.',
   },
   {
     question: 'Do you shoot headshots and portraits?',
     answer:
       'Yes. Headshots, team portraits, founder portraits, artist portraits, press photos, and brand profile images are all strong fits for the studio.',
+  },
+  {
+    question: 'Can you shoot food, products, and event content?',
+    answer:
+      'Yes. Food and beverage images, product stills, ecommerce crops, and wedding and event content are planned shoots here, scoped the same way as portrait work.',
   },
   {
     question: 'How is pricing handled?',
@@ -221,7 +170,7 @@ const faqs = [
   {
     question: 'Can you shoot products and portraits in one session?',
     answer:
-      'Often, yes. The cleanest way is to define the required deliverables first so the day can move through headshots, portraits, product details, and campaign images without missing priority shots.',
+      'Yes, that is what a content day is for. We define the required deliverables first so the day can move through headshots, portraits, product details, and campaign images without missing priority shots.',
   },
 ]
 
@@ -277,63 +226,16 @@ export default function PhotoServicesPage() {
 
       <PhotoServicesHero />
 
-      <section className="py-28 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="max-w-3xl mb-20">
-            <span className="number-label mb-6 block">Photo service types</span>
-            <h2 className="text-white font-black leading-[0.98] mb-6" style={{ fontSize: 'clamp(2.45rem, 5vw, 5.4rem)', letterSpacing: 0 }}>
-              Choose the image system first.
-            </h2>
-            <p className="text-gray-500 text-base sm:text-lg leading-relaxed max-w-2xl">
-              This page is for planned photoshoots: photographer, lighting direction, shot list, and a finished set of images. If you already have a crew and only need the room, use studio rental.
-            </p>
-          </div>
-
-          <div className="space-y-24">
-            {shootTypes.map(({ eyebrow, title, image, alt, objectPosition, clientNeed, howWeThink }, index) => (
-              <article key={title} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
-                <div className={`relative overflow-hidden rounded-lg bg-zinc-950 h-[72vh] min-h-[520px] max-h-[760px] lg:col-span-7 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                  <Image
-                    src={image}
-                    alt={alt}
-                    fill
-                    className="object-cover"
-                    style={{ objectPosition }}
-                    sizes="(min-width: 1024px) 58vw, 100vw"
-                  />
-                </div>
-                <div className="lg:col-span-5">
-                  <p className="number-label mb-7">{eyebrow}</p>
-                  <h3 className="text-white font-black leading-[0.98] mb-7" style={{ fontSize: 'clamp(2.25rem, 4.8vw, 4.8rem)', letterSpacing: 0 }}>
-                    {title}
-                  </h3>
-                  <div className="border-y border-white/10 divide-y divide-white/10">
-                    <div className="py-7">
-                      <p className="text-gray-600 text-[10px] tracking-[0.22em] uppercase mb-3">Best for</p>
-                      <p className="text-gray-300 text-base leading-relaxed">{clientNeed}</p>
-                    </div>
-                    <div className="py-7">
-                      <p className="text-gray-600 text-[10px] tracking-[0.22em] uppercase mb-3">How we shape it</p>
-                      <p className="text-gray-400 text-base leading-relaxed">{howWeThink}</p>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="py-20 sm:py-28 bg-zinc-950 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="mb-8 flex items-center justify-between gap-6">
-            <span className="number-label">Gallery</span>
-            <Link href="/our-work/" className="text-gray-600 hover:text-white text-sm font-semibold transition-colors">
-              See more work
+            <span className="number-label">Portrait gallery</span>
+            <Link href="/our-work/" className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:text-white">
+              Explore the work
             </Link>
           </div>
 
-          <div className="columns-1 gap-3 sm:columns-2 lg:columns-3 xl:columns-4" aria-label="Photo services gallery">
+          <div className="columns-1 gap-3 sm:columns-2 lg:columns-3 xl:columns-4" aria-label="Portrait gallery">
             {gallery.map(({ src, alt, objectPosition, frameClass }) => (
               <figure key={src} className="mb-3 break-inside-avoid overflow-hidden rounded-lg bg-black ring-1 ring-white/5">
                 <div className={`relative w-full ${frameClass}`}>
@@ -386,19 +288,21 @@ export default function PhotoServicesPage() {
               </h2>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed max-w-md">
-              We scope the final plan around people, products, usage, timeline, and post-production needs.
+              We scope the final plan around people, products, usage, timeline, and post-production needs. Food, event, and fashion briefs run through the same process.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            {scopes.map(({ title, price, detail }) => (
-              <div key={title} className="border border-white/10 rounded-2xl bg-black p-6">
-                <p className="mb-5 text-brand-red text-sm font-black uppercase tracking-[0.18em]">{price}</p>
+            {scopes.map(({ title, detail }) => (
+              <div key={title} className="border border-white/10 rounded-lg bg-black p-6">
                 <h3 className="text-white font-black text-2xl leading-none mb-5" style={{ letterSpacing: '-0.03em' }}>{title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{detail}</p>
               </div>
             ))}
           </div>
+          <p className="mt-6 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+            Every scope is quoted after the brief.
+          </p>
         </div>
       </section>
 
@@ -408,10 +312,10 @@ export default function PhotoServicesPage() {
             <div>
               <span className="number-label mb-6 block">FAQ</span>
               <h2 className="text-white font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
-                Room rental and photo services are different.
+                Before you book.
               </h2>
-              <Link href="/contact/?service=photo-services" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
-                Start a photo request
+              <Link href="/contact/?service=photo-services" className="inline-flex rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+                Plan your shoot
               </Link>
             </div>
 

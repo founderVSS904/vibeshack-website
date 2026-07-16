@@ -177,7 +177,7 @@ function GuideIcon({ slug, className }: { slug: string; className: string }) {
 export default function GuidesPageClient() {
   const [tab, setTab] = useState<TabId>('all')
   const [query, setQuery] = useState('')
-  const [activeStation, setActiveStation] = useState(1)
+  const [activeStation, setActiveStation] = useState(0)
   const pinnedRef = useRef(false)
 
   // Ambient walk around the compass until the user takes over.
@@ -267,7 +267,7 @@ export default function GuidesPageClient() {
                     setTab(chip.tab)
                     goToLibrary()
                   }}
-                  className="rounded-full border border-white/15 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:border-white/40 hover:text-white"
+                  className="rounded-full border border-white/15 px-3.5 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:border-white/40 hover:text-white"
                 >
                   {chip.label}
                 </button>
@@ -382,7 +382,7 @@ export default function GuidesPageClient() {
                     }`}
                   >
                     <span className={`block font-mono text-base leading-none ${active ? 'text-brand-red' : 'text-zinc-500'}`}>{s.n}</span>
-                    <span className={`mt-1.5 block font-mono text-[9px] font-bold uppercase tracking-[0.14em] ${active ? 'text-white' : 'text-zinc-400'}`}>
+                    <span className={`mt-1.5 block font-mono text-[10px] font-bold uppercase tracking-[0.14em] ${active ? 'text-white' : 'text-zinc-400'}`}>
                       {s.name}
                     </span>
                   </button>
@@ -414,7 +414,7 @@ export default function GuidesPageClient() {
                   type="button"
                   onClick={() => setTab(t.id)}
                   aria-pressed={tab === t.id}
-                  className={`relative shrink-0 pb-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
+                  className={`relative shrink-0 pt-3 pb-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
                     tab === t.id ? 'text-brand-red' : 'text-zinc-400 hover:text-white'
                   }`}
                 >
