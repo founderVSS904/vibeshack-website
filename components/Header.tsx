@@ -3,9 +3,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { BrandMark } from '@/components/BrandMark'
+
+// True once a mega menu has been opened; menu media mounts on first open so
+// closed menus cost zero image requests on page load.
+const MenuMediaContext = createContext(false)
 
 type HeaderLink = {
   href: string
@@ -78,6 +82,17 @@ const menuButtonClass =
 export default function Header() {
   const pathname = usePathname()
   const [dismissedMenu, setDismissedMenu] = useState<string | null>(null)
+  const mobileMenuRef = useRef<HTMLDetailsElement>(null)
+
+  const closeMobileMenu = useCallback(() => {
+    mobileMenuRef.current?.removeAttribute('open')
+  }, [])
+
+  // The details element is uncontrolled and Header never remounts on client
+  // navigation, so the panel must be closed for it.
+  useEffect(() => {
+    closeMobileMenu()
+  }, [pathname, closeMobileMenu])
   const isOurWorkPage = pathname === '/our-work' || pathname === '/our-work/'
   const headerClassName = 'site-header fixed left-0 right-0 top-0 z-50 border-b border-white/[0.08] bg-black transition-colors duration-200'
   const headerContainerClassName = isOurWorkPage
@@ -145,7 +160,7 @@ export default function Header() {
             <Link
               href="/book/"
               prefetch={false}
-              className="hidden items-center gap-2.5 rounded-lg bg-white px-5 py-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.14em] text-black transition-all duration-200 hover:scale-[1.03] hover:bg-white/90 active:scale-[0.98] sm:inline-flex"
+              className="relative inline-flex items-center gap-2.5 whitespace-nowrap rounded-lg bg-white px-4 py-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.14em] text-black transition-all duration-200 hover:scale-[1.03] hover:bg-white/90 active:scale-[0.98] sm:px-5"
             >
               Book a Session
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -154,7 +169,7 @@ export default function Header() {
               </svg>
             </Link>
 
-            <details className="group xl:hidden">
+            <details ref={mobileMenuRef} className="group xl:hidden">
               <summary className="list-none p-3 text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none [&::-webkit-details-marker]:hidden">
                 <span className="sr-only">Toggle menu</span>
                 <svg className="h-5 w-5 group-open:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -165,7 +180,7 @@ export default function Header() {
                 </svg>
               </summary>
 
-              <MobileMenu />
+              <MobileMenu onNavigate={closeMobileMenu} />
             </details>
           </div>
         </div>
@@ -189,15 +204,42 @@ function DesktopMenuTrigger({
   onReset: () => void
   children: ReactNode
 }) {
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const [hovered, setHovered] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const [everOpened, setEverOpened] = useState(false)
+  const open = (hovered || focused) && !dismissed
+
   return (
     <div
       className={`desktop-menu-trigger group flex h-20 items-center ${dismissed ? 'desktop-menu-trigger--dismissed' : ''}`}
       data-menu-id={menuId}
-      onFocusCapture={onReset}
-      onMouseEnter={onReset}
-      onMouseLeave={onReset}
+      onFocusCapture={() => {
+        onReset()
+        setFocused(true)
+        setEverOpened(true)
+      }}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false)
+      }}
+      onMouseEnter={() => {
+        onReset()
+        setHovered(true)
+        setEverOpened(true)
+      }}
+      onMouseLeave={() => {
+        onReset()
+        setHovered(false)
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape' && open) {
+          // Focus first so the reset it fires cannot undo the dismiss.
+          buttonRef.current?.focus()
+          onDismiss()
+        }
+      }}
     >
-      <button type="button" className={menuButtonClass}>
+      <button ref={buttonRef} type="button" aria-haspopup="true" aria-expanded={open} className={menuButtonClass}>
         {label}
         <svg className="desktop-menu-caret h-3 w-3 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -208,7 +250,7 @@ function DesktopMenuTrigger({
         className="desktop-menu-scrim pointer-events-none fixed bottom-0 left-0 right-0 top-20 hidden bg-black/45 opacity-0 backdrop-blur-[10px] transition-opacity duration-[420ms] group-hover:opacity-100 group-focus-within:opacity-100 xl:block"
         onClick={onDismiss}
       />
-      {children}
+      <MenuMediaContext.Provider value={everOpened}>{children}</MenuMediaContext.Provider>
     </div>
   )
 }
@@ -217,6 +259,7 @@ function DesktopMenuTrigger({
 function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
   const featured = podcastStudios[1]
   const coreRows = podcastStudios.slice(2, 5)
+  const showMedia = useContext(MenuMediaContext)
 
   return (
     <DesktopMegaMenu
@@ -230,7 +273,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
     >
       <div>
         <span className="relative block h-56 overflow-hidden rounded-2xl border border-white/[0.08] 2xl:h-64">
-          {featured.image && (
+          {showMedia && featured.image && (
             <Image src={featured.image} alt="The Executive podcast set at VibeShack Studios" fill sizes="768px" quality={85} className="object-cover" />
           )}
           <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" aria-hidden="true" />
@@ -272,8 +315,8 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
           className="group/feat block overflow-hidden rounded-2xl bg-white/[0.03] ring-1 ring-white/15 transition-all duration-300 hover:bg-white/[0.05] hover:ring-white/25"
         >
           <span className="relative block h-44 overflow-hidden">
-            {featured.image && (
-              <Image src={featured.image} alt="" fill sizes="512px" quality={85} className="object-cover transition-transform duration-700 group-hover/feat:scale-[1.04]" />
+            {showMedia && featured.image && (
+              <Image src={featured.image} alt="" fill sizes="768px" quality={85} className="object-cover transition-transform duration-700 group-hover/feat:scale-[1.04]" />
             )}
             <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" aria-hidden="true" />
             <span className="absolute inset-x-4 bottom-3.5 flex items-baseline justify-between gap-3">
@@ -343,6 +386,7 @@ function MenuViewAll({ href, label, onNavigate }: { href: string; label: string;
 }
 
 function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () => void }) {
+  const showMedia = useContext(MenuMediaContext)
   return (
     <Link
       href={room.href}
@@ -353,8 +397,8 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
       className="group/room -mx-3 flex items-center gap-4 rounded-xl px-3 py-3 transition-colors duration-300 hover:bg-white/[0.04]"
     >
       <span className="relative h-[64px] w-[96px] shrink-0 overflow-hidden rounded-lg bg-white/5">
-        {room.image && (
-          <Image src={room.image} alt="" fill sizes="256px" quality={85} className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
+        {showMedia && room.image && (
+          <Image src={room.image} alt="" fill sizes="192px" quality={85} className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
         )}
       </span>
       <span className="flex min-w-0 flex-1 items-baseline justify-between gap-3">
@@ -415,6 +459,7 @@ const proofIcons: ReactNode[] = [
 function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
   const [activeCard, setActiveCard] = useState(0)
   const active = serviceCards[activeCard]
+  const showMedia = useContext(MenuMediaContext)
 
   return (
     <DesktopMegaMenu className="grid-cols-1 gap-y-7">
@@ -473,7 +518,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                 isActive ? 'flex-[3_1_0%] ring-brand-red/70' : 'flex-[1_1_0%] ring-white/[0.08] hover:ring-white/20'
               }`}
             >
-              {card.image && (
+              {showMedia && card.image && (
                 <Image
                   src={card.image}
                   alt=""
@@ -546,8 +591,10 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
           }}
           className="group/find flex overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.04]"
         >
-          <span className="relative w-2/5 shrink-0 overflow-hidden">
-            <Image src="/studio-images/sunset-hero-v20260509.jpg" alt="" fill sizes="384px" quality={85} className="object-cover transition-transform duration-700 group-hover/find:scale-[1.04]" />
+          <span className="relative w-2/5 shrink-0 overflow-hidden bg-white/5">
+            {showMedia && (
+              <Image src="/studio-images/sunset-hero-v20260509.jpg" alt="" fill sizes="384px" quality={85} className="object-cover transition-transform duration-700 group-hover/find:scale-[1.04]" />
+            )}
             <span className="absolute inset-0 bg-gradient-to-r from-transparent to-[#101010]/70" aria-hidden="true" />
           </span>
           <span className="flex min-w-0 flex-1 flex-col justify-center px-6 py-6">
@@ -586,13 +633,13 @@ function DesktopMegaMenu({
 }
 
 
-function MobileMenu() {
+function MobileMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
     <div className="mobile-menu-panel absolute left-0 right-0 top-full h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain border-t border-white/[0.08] bg-black">
       <div className="mx-auto max-w-7xl px-6 pb-10 pt-6 sm:px-10">
-        <MobileSection title="Studios" links={[...podcastStudios, ...rentalStudios]} />
-        <MobileSection title="Services" links={serviceLinks} />
-        <MobileSection title="Plan" links={[...planningLinks, ...proofLinks]} />
+        <MobileSection title="Studios" links={[...podcastStudios, ...rentalStudios]} onNavigate={onNavigate} />
+        <MobileSection title="Services" links={serviceLinks} onNavigate={onNavigate} />
+        <MobileSection title="Plan" links={[...planningLinks, ...proofLinks]} onNavigate={onNavigate} />
       </div>
     </div>
   )
@@ -601,9 +648,11 @@ function MobileMenu() {
 function MobileSection({
   title,
   links,
+  onNavigate,
 }: {
   title: string
   links: HeaderLink[]
+  onNavigate: () => void
 }) {
   return (
     <div className="border-b border-white/[0.08] py-5 last:border-b-0">
@@ -614,6 +663,7 @@ function MobileSection({
             key={href + label}
             href={href}
             prefetch={href === '/book/' ? false : undefined}
+            onClick={onNavigate}
             className="flex items-start justify-between gap-4 py-2.5 text-gray-400 transition-colors duration-150 hover:text-white"
           >
             <span>
