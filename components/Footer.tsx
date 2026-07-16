@@ -169,7 +169,7 @@ export default function Footer() {
 
         {/* Bottom row */}
         <div className="border-t border-white/5 pt-12 text-center">
-          <BrandMark variant="wordmark" className="mx-auto mb-5 h-[18px] w-auto" />
+          <BrandMark variant="monogram" className="mx-auto mb-5 h-9 w-auto" />
           <p className="text-white text-xs tracking-[0.15em] uppercase font-bold mb-6">The Dream Factory</p>
           <p className="text-gray-700 text-xs mt-2">© 2026 VibeShack Studios · San Francisco</p>
 
