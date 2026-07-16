@@ -169,7 +169,9 @@ export default function Footer() {
 
         {/* Bottom row */}
         <div className="border-t border-white/5 pt-12 text-center">
-          <BrandMark variant="monogram" className="mx-auto mb-5 h-9 w-auto" />
+          <div className="mb-5 flex justify-center" style={{ perspective: '600px' }}>
+            <BrandMark variant="monogram" className="footer-monogram-spin h-9 w-auto" />
+          </div>
           <p className="text-white text-xs tracking-[0.15em] uppercase font-bold mb-6">The Dream Factory</p>
           <p className="text-gray-700 text-xs mt-2">© 2026 VibeShack Studios · San Francisco</p>
 

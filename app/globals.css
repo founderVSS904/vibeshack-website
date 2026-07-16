@@ -1391,6 +1391,28 @@ html.booking-flow body {
   overflow-x: clip;
 }
 
+/* Footer monogram: slow coin spin */
+.footer-monogram-spin {
+  animation: monogram-spin 7s linear infinite;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+}
+
+@keyframes monogram-spin {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-monogram-spin {
+    animation: none;
+  }
+}
+
 /* Booking flow motion: opacity and translate only, never scale on text */
 .booking-step-enter {
   animation: booking-step-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
