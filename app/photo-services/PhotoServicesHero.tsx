@@ -249,12 +249,7 @@ export default function PhotoServicesHero() {
                   pointerEvents: slot.o < 0.5 ? 'none' : undefined,
                 }}
               >
-                <span
-                  className="relative block h-full w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950"
-                  style={{
-                    WebkitBoxReflect: 'below 5px linear-gradient(transparent 56%, rgba(255,255,255,0.42) 100%)',
-                  }}
-                >
+                <span className="relative block h-full w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950">
                   <Image
                     src={category.image}
                     alt={category.alt}
@@ -267,6 +262,30 @@ export default function PhotoServicesHero() {
                     priority={i < 3}
                   />
                   <span className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" aria-hidden />
+                  <span className="absolute bottom-4 left-5 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white">
+                    {category.label}
+                  </span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-full mt-[5px] block h-full overflow-hidden rounded-xl"
+                  style={{
+                    transform: 'scaleY(-1)',
+                    maskImage: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 46%)',
+                    WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 46%)',
+                  }}
+                >
+                  <Image
+                    src={category.image}
+                    alt=""
+                    fill
+                    quality={80}
+                    sizes="(min-width: 1024px) 840px, 640px"
+                    className="object-cover"
+                    style={{ objectPosition: category.position || 'center' }}
+                    draggable={false}
+                  />
+                  <span className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
                   <span className="absolute bottom-4 left-5 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white">
                     {category.label}
                   </span>
