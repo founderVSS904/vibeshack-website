@@ -61,8 +61,21 @@ export function FeaturedOriginals() {
   const [index, setIndex] = useState(0)
   const [autoAdvance, setAutoAdvance] = useState(true)
   const [isSettled, setIsSettled] = useState(false)
+  const [inView, setInView] = useState(true)
+  const sectionRef = useRef<HTMLElement>(null)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const count = slides.length
+
+  // Offscreen, the carousel neither advances nor plays video.
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting)
+    })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
   const go = (next: number) => setIndex((next + count) % count)
   // Manual navigation hands control to the visitor for good.
   const manualGo = (next: number) => {
@@ -71,20 +84,20 @@ export function FeaturedOriginals() {
   }
 
   useEffect(() => {
-    if (!autoAdvance || isSettled) return
+    if (!autoAdvance || isSettled || !inView) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const timer = window.setInterval(() => {
       setIndex((current) => (current + 1) % count)
     }, 6500)
     return () => window.clearInterval(timer)
-  }, [autoAdvance, isSettled, count])
+  }, [autoAdvance, isSettled, inView, count])
 
   // Only the visible slide's loop plays; the rest sit on their posters.
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     videoRefs.current.forEach((video, i) => {
       if (!video) return
-      if (reducedMotion) {
+      if (reducedMotion || !inView) {
         video.pause()
         return
       }
@@ -94,10 +107,11 @@ export function FeaturedOriginals() {
         video.pause()
       }
     })
-  }, [index])
+  }, [index, inView])
 
   return (
     <section
+      ref={sectionRef}
       className="relative overflow-hidden bg-black"
       aria-roledescription="carousel"
       aria-label="Featured originals and work"
@@ -125,11 +139,10 @@ export function FeaturedOriginals() {
                 poster={slide.image}
                 className="absolute inset-0 h-full w-full object-cover"
                 style={{ objectPosition: slide.imagePosition || 'center' }}
-                autoPlay={i === 0}
                 muted
                 loop
                 playsInline
-                preload={i === 0 ? 'auto' : 'metadata'}
+                preload="metadata"
                 aria-label={slide.imageAlt}
               />
             ) : (

@@ -108,6 +108,8 @@ export default function PhotoServicesHero() {
   const [dragging, setDragging] = useState(false)
   const [hovered, setHovered] = useState<number | null>(null)
 
+  const stageRef = useRef<HTMLDivElement>(null)
+  const inViewRef = useRef(true)
   const nodesRef = useRef<(HTMLButtonElement | null)[]>([])
   const posRef = useRef(0) // rendered position, continuous
   const baseRef = useRef(0) // anchor the lean is measured from
@@ -195,6 +197,15 @@ export default function PhotoServicesHero() {
     if (now - lastTsRef.current >= 16) tick(now)
   }, [ensureLoop, tick])
 
+  // If focus sits on the card that the move will hide, it walks to the new
+  // active card so keyboard users never lose their focus ring.
+  const chaseFocus = useCallback((target: number) => {
+    const focusedAt = nodesRef.current.findIndex((n) => n === document.activeElement)
+    if (focusedAt >= 0 && relativeTo(focusedAt, target) === 3) {
+      nodesRef.current[target]?.focus({ preventScroll: true })
+    }
+  }, [])
+
   const go = useCallback(
     (index: number) => {
       if (dragRef.current) return
@@ -205,9 +216,10 @@ export default function PhotoServicesHero() {
       baseRef.current = from + delta
       leanRef.current = 0
       edgeRef.current = 0
+      chaseFocus(index)
       ensureLoop()
     },
-    [ensureLoop],
+    [chaseFocus, ensureLoop],
   )
 
   // Steps read the motion target, not the lagging snapped index, so rapid
@@ -219,9 +231,10 @@ export default function PhotoServicesHero() {
       baseRef.current = Math.round(baseRef.current) + dir
       leanRef.current = 0
       edgeRef.current = 0
+      chaseFocus(((Math.round(baseRef.current) % 6) + 6) % 6)
       ensureLoop()
     },
-    [ensureLoop],
+    [chaseFocus, ensureLoop],
   )
 
   useEffect(() => {
@@ -231,11 +244,22 @@ export default function PhotoServicesHero() {
     }
   }, [applyStyles])
 
+  // The ambient walk only runs while the deck is actually on screen.
+  useEffect(() => {
+    const el = stageRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([entry]) => {
+      inViewRef.current = entry.isIntersecting
+    })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
   // Ambient advance until the visitor takes over.
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const interval = setInterval(() => {
-      if (document.hidden || pinnedRef.current || overRef.current) return
+      if (document.hidden || !inViewRef.current || pinnedRef.current || overRef.current) return
       baseRef.current = Math.round(baseRef.current) + 1
       ensureLoop()
     }, 5000)
@@ -278,10 +302,19 @@ export default function PhotoServicesHero() {
 
         {/* ── Fanned deck on a glass floor ── */}
         <div
+          ref={stageRef}
+          role="radiogroup"
+          aria-label="Photography categories"
           className={`relative mx-auto mt-12 h-[480px] max-w-[1680px] touch-pan-y select-none sm:h-[560px] lg:h-[660px] ${
             dragging ? 'cursor-grabbing' : 'cursor-grab'
           }`}
           style={{ perspective: '1400px', WebkitTouchCallout: 'none' }}
+          onFocusCapture={() => {
+            overRef.current = true
+          }}
+          onBlurCapture={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node | null)) overRef.current = false
+          }}
           onPointerEnter={() => {
             overRef.current = true
           }}
@@ -401,8 +434,9 @@ export default function PhotoServicesHero() {
                   nodesRef.current[i] = el
                 }}
                 type="button"
+                role="radio"
                 aria-label={`Show ${category.label}`}
-                aria-pressed={i === active}
+                aria-checked={i === active}
                 tabIndex={relativeTo(i, active) === 3 ? -1 : 0}
                 onPointerEnter={(e) => {
                   if (e.pointerType !== 'mouse') return
@@ -494,6 +528,9 @@ export default function PhotoServicesHero() {
         <div className="mx-auto mt-8 flex max-w-[1680px] items-center gap-6 px-6 sm:px-10 lg:px-16">
           <p className="shrink-0 font-mono text-[12px] font-bold tracking-[0.14em] text-zinc-400">
             <span className="text-brand-red">{String(active + 1).padStart(2, '0')}</span> / 06
+            <span className="sr-only" role="status" aria-live="polite">
+              {activeCategory.title}, {active + 1} of 6
+            </span>
           </p>
           <div className="relative h-px min-w-0 flex-1 bg-white/15">
             <span
@@ -512,7 +549,7 @@ export default function PhotoServicesHero() {
                 <path d="m9 6 6 6-6 6" />
               </svg>
             </button>
-            <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 font-mono text-[8px] font-bold uppercase tracking-[0.18em] text-zinc-400" aria-hidden>
+            <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-zinc-400" aria-hidden>
               Drag
             </span>
             <button
@@ -536,14 +573,15 @@ export default function PhotoServicesHero() {
             <h2 className="shrink-0 text-white" style={{ fontSize: 'clamp(2rem, 2.8vw, 3rem)' }}>
               Six ways to shoot<span className="text-brand-red">.</span>
             </h2>
-            <div className="scrollbar-hide flex gap-8 overflow-x-auto">
+            <div role="radiogroup" aria-label="Six ways to shoot" className="scrollbar-hide flex gap-8 overflow-x-auto">
               {CATEGORIES.map((category, i) => (
                 <button
                   key={category.label}
                   type="button"
-                  aria-pressed={i === active}
+                  role="radio"
+                  aria-checked={i === active}
                   onClick={() => go(i)}
-                  className={`relative shrink-0 pb-3 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
+                  className={`relative shrink-0 pb-3 pt-3 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
                     i === active ? 'text-white' : 'text-zinc-400 hover:text-white'
                   }`}
                 >

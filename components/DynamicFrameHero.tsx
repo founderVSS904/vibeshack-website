@@ -100,6 +100,24 @@ export function DynamicFrameHero() {
   const [videoIndices, setVideoIndices] = useState<Record<string, number>>({})
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map())
   const spotlightIndexRef = useRef(0)
+  const sectionRef = useRef<HTMLElement>(null)
+  const inViewRef = useRef(true)
+
+  // The spotlight walk stops downloading and decoding video once the hero
+  // scrolls out of view.
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([entry]) => {
+      inViewRef.current = entry.isIntersecting
+      if (!entry.isIntersecting) {
+        setSpotlightFrame(null)
+        videoRefs.current.forEach((video) => video.pause())
+      }
+    })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
   const activeIndex = activeFrame ? Number(activeFrame) - 1 : null
   const activeColumn = activeIndex !== null ? String((activeIndex % 3) + 1) : undefined
   const activeRow = activeIndex !== null ? String(Math.floor(activeIndex / 3) + 1) : undefined
@@ -117,7 +135,7 @@ export function DynamicFrameHero() {
     }
 
     const advance = () => {
-      if (document.hidden) return
+      if (document.hidden || !inViewRef.current) return
       spotlightIndexRef.current = (spotlightIndexRef.current % frames.length) + 1
       setSpotlightFrame(String(spotlightIndexRef.current))
     }
@@ -158,7 +176,7 @@ export function DynamicFrameHero() {
   }
 
   return (
-    <section className="dynamic-frame-hero bg-black" aria-labelledby="dynamic-frame-title">
+    <section ref={sectionRef} className="dynamic-frame-hero bg-black" aria-labelledby="dynamic-frame-title">
       <h1 id="dynamic-frame-title" className="sr-only">
         VibeShack Studios production studios in San Francisco
       </h1>
