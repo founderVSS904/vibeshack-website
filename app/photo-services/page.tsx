@@ -121,12 +121,6 @@ const gallery = [
     frameClass: 'aspect-[5/6]',
   },
   {
-    src: '/studio-images/photo-gallery-pink-profile-v20260520.jpg',
-    alt: 'Pink profile portrait photographed at VibeShack Studios San Francisco',
-    objectPosition: 'center center',
-    frameClass: 'aspect-[5/6]',
-  },
-  {
     src: '/studio-images/photo-gallery-pink-studio-portrait-v20260520.jpg',
     alt: 'Pink studio portrait photographed at VibeShack Studios San Francisco',
     objectPosition: 'center 34%',
