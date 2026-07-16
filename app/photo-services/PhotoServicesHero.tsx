@@ -120,6 +120,8 @@ export default function PhotoServicesHero() {
   const lastTsRef = useRef(0)
   const activeRef = useRef(0)
 
+  const dimsRef = useRef<(NodeListOf<HTMLElement> | null)[]>([])
+
   const applyStyles = useCallback((pos: number) => {
     nodesRef.current.forEach((node, i) => {
       if (!node) return
@@ -127,11 +129,17 @@ export default function PhotoServicesHero() {
       const slot = slotAt(rel)
       const isHovered = hoveredRef.current === i
       const brightness = isHovered ? Math.min(1, slot.b + 0.25) : slot.b
-      node.style.transform = `translate(-50%, -50%) translateX(${slot.x}%) rotateY(${slot.rot}deg) scale(${slot.s})`
-      node.style.opacity = String(slot.o)
-      node.style.filter = `brightness(${brightness})`
+      node.style.transform = `translate(-50%, -50%) translateX(${slot.x.toFixed(3)}%) rotateY(${slot.rot.toFixed(3)}deg) scale(${slot.s.toFixed(4)})`
+      node.style.opacity = slot.o.toFixed(3)
       node.style.zIndex = String(isHovered ? 40 : slot.z)
       node.style.pointerEvents = slot.o < 0.5 ? 'none' : ''
+      // Dimming rides black overlays at pure compositor opacity; per-frame
+      // filters repaint on the CPU in Safari.
+      const dims = dimsRef.current[i] ?? (dimsRef.current[i] = node.querySelectorAll('[data-dim]'))
+      const dim = Math.min(0.75, Math.max(0, 1 - brightness)).toFixed(3)
+      dims.forEach((d) => {
+        d.style.opacity = dim
+      })
     })
   }, [])
 
@@ -175,10 +183,12 @@ export default function PhotoServicesHero() {
   }, [tick])
 
   // Pointer events tick the loop directly so motion stays glued to input
-  // even where rAF is throttled.
+  // even where rAF is throttled, capped at one render per 16ms so high-rate
+  // mice never double-pump a frame.
   const pump = useCallback(() => {
     ensureLoop()
-    tick(performance.now())
+    const now = performance.now()
+    if (now - lastTsRef.current >= 16) tick(now)
   }, [ensureLoop, tick])
 
   const go = useCallback(
@@ -350,7 +360,7 @@ export default function PhotoServicesHero() {
                   if (dragRef.current?.moved) return
                   if (i !== activeRef.current) go(i)
                 }}
-                className="absolute left-1/2 top-[38%] w-[240px] sm:w-[320px] lg:w-[420px]"
+                className="absolute left-1/2 top-[38%] w-[240px] will-change-transform sm:w-[320px] lg:w-[420px]"
                 style={{ aspectRatio: '5 / 6' }}
               >
                 <span
@@ -372,6 +382,7 @@ export default function PhotoServicesHero() {
                   <span className="absolute bottom-4 left-5 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white">
                     {category.label}
                   </span>
+                  <span data-dim aria-hidden="true" className="pointer-events-none absolute inset-0 bg-black" style={{ opacity: 0 }} />
                 </span>
                 <span
                   aria-hidden="true"
@@ -399,6 +410,7 @@ export default function PhotoServicesHero() {
                   <span className="absolute bottom-4 left-5 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white">
                     {category.label}
                   </span>
+                  <span data-dim aria-hidden="true" className="pointer-events-none absolute inset-0 bg-black" style={{ opacity: 0 }} />
                 </span>
               </button>
             )
@@ -469,7 +481,7 @@ export default function PhotoServicesHero() {
             </div>
           </div>
 
-          <div key={activeCategory.label} className="booking-media-enter mt-10 grid grid-cols-1 gap-8 border-t border-white/[0.08] pt-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          <div className="mt-10 grid grid-cols-1 gap-8 border-t border-white/[0.08] pt-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
             <p className="text-2xl font-bold leading-snug text-white">{activeCategory.title}</p>
             <div>
               <p className="max-w-2xl text-base leading-relaxed text-zinc-400">{activeCategory.body}</p>
