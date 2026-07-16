@@ -1391,10 +1391,18 @@ html.booking-flow body {
   overflow-x: clip;
 }
 
-/* Footer monogram: slow coin spin */
+/* Footer monogram: extruded 3D slab on a slow turntable spin */
+.footer-monogram-tilt {
+  transform: rotateX(14deg);
+  transform-style: preserve-3d;
+}
+
 .footer-monogram-spin {
   animation: monogram-spin 7s linear infinite;
   transform-style: preserve-3d;
+}
+
+.footer-monogram-spin img {
   backface-visibility: visible;
 }
 
