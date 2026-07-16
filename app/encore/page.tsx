@@ -32,10 +32,10 @@ export default function EncorePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#a855f7'}}>Vault Series</p>
-          <h1 data-reveal="up" className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
+          <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
             Encore
           </h1>
-          <p className="text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
+          <p className="text-gray-400 text-xl max-w-xl mb-8">
             Full production firepower. Green screen flexibility. Everything you need to make broadcast-quality content.
           </p>
           <a href="/book/?studio=encore" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
@@ -53,7 +53,7 @@ export default function EncorePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features */}
             <div>
-              <h2 data-reveal="up" className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+              <h2 className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
                 Go <span style={{color: '#a855f7'}}>big.</span><br/>Go<span style={{color: '#a855f7'}}> professional.</span>
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
@@ -83,7 +83,7 @@ export default function EncorePage() {
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">The Vault</span>
-          <h2 data-reveal="up" className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+          <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
             Scale without the <span style={{color: '#a855f7'}}>overhead.</span>
           </h2>
           <p className="text-gray-500 text-lg mb-20 max-w-2xl">Encore is what production companies use when they need to book space fast. Not because they can't afford studios elsewhere, but because this place works. The crew knows the room. The equipment is maintained like obsessives maintain equipment. You walk in and you're making content immediately.</p>
@@ -121,7 +121,7 @@ export default function EncorePage() {
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
           <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$300</div>
-          <p className="text-gray-500 text-lg mb-1" data-reveal="fade">per hour</p>
+          <p className="text-gray-500 text-lg mb-1">per hour</p>
           <p className="text-white font-semibold mb-12">Cameraman and audio tech included. 2 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[

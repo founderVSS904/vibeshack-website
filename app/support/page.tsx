@@ -171,10 +171,10 @@ export default function SupportPage() {
       <section className="bg-black pt-32 sm:pt-48 pb-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Support</span>
-          <h1 data-reveal="up" className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: '-0.05em' }}>
+          <h1 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: '-0.05em' }}>
             How can we<br /><span className="text-brand-red">help?</span>
           </h1>
-          <p className="text-gray-400 text-xl max-w-xl leading-relaxed" data-reveal="fade">
+          <p className="text-gray-400 text-xl max-w-xl leading-relaxed">
             Find answers below. If you don&apos;t see what you need, email us directly and we&apos;ll get back to you fast.
           </p>
         </div>

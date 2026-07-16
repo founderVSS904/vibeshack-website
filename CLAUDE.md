@@ -47,16 +47,26 @@ booking business in San Francisco (podcast, video, photo, rental studios).
 ## Where things live
 
 - Homepage: `app/page.tsx` renders `components/DynamicFrameHero.tsx` (six-tile
-  grid; all 6 tiles play a muted loop on hover, files in
-  `public/studio-videos/home-tile-*`),
+  grid; an ambient spotlight walks the tiles when idle, hover or keyboard focus
+  plays a tile's muted clip, and three tiles (Podcasts, Video Production, Our
+  Work) rotate multi-clip playlists; files in `public/studio-videos/home-tile-*`),
   then `components/home/`: `FeaturedOriginals` (auto-advancing carousel with
   video slides), `TrustedStrip` (client-logo marquee), `StudioSpaces` (grid of
-  the real studios), `WhatWeDo`, then the shared `Footer`.
+  the real studios), `WhatWeDo`. `Header` and `Footer` come from
+  `app/layout.tsx` on every page.
 - Our Work: `app/our-work/page.tsx`, `app/our-work/[slug]/page.tsx`,
   `lib/seo/workProjects.ts`. Real client work, YouTube embeds on project pages,
   plus a "Shot at VibeShack" row of external YouTube links.
-- Booking: `lib/booking/`, `app/api/create-checkout-session/`, `app/api/webhook/`.
+- Booking UI: `app/book/` (`BookPageClient.tsx`, a 4-step flow: room, date and
+  time with a month-grid calendar, extras, review and payment). Booking server
+  side: `lib/booking/` (`calendar.ts` is the Google Calendar integration),
+  `app/api/create-checkout-session/`, `app/api/webhook/`, `app/api/availability/`,
+  `app/api/book-tour/`, `app/api/tour-availability/`.
   Prices are looked up server-side; never trust client price input.
+- Photo services deck hero: `app/photo-services/PhotoServicesHero.tsx`
+  (cursor-driven fanned card deck).
+- Header nav and both mega menus: `components/Header.tsx`.
+- Footer with the 3D VS monogram: `components/Footer.tsx`.
 - SEO surfaces: `app/sitemap.ts`, `app/image-sitemap.xml/route.ts`, `lib/seo/`.
 
 ## Two tools share this repo now

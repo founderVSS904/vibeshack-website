@@ -277,7 +277,7 @@ export default function GreenScreenPage() {
           >
             $100
           </div>
-          <p className="text-gray-500 text-lg mb-1" data-reveal="fade">per hour</p>
+          <p className="text-gray-500 text-lg mb-1">per hour</p>
           <p className="text-white font-semibold mb-12">No minimums. No hidden fees.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
@@ -307,7 +307,7 @@ export default function GreenScreenPage() {
       <section className="py-32 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex items-end justify-between mb-20">
-            <h2 data-reveal="up" className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
+            <h2 className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
               Questions.
             </h2>
             <span className="number-label">FAQ</span>
@@ -357,7 +357,7 @@ export default function GreenScreenPage() {
           >
             Book the <span className="text-brand-red">Green Screen.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">750 sq ft. Professional lighting. $100/hr. Open 24/7.</p>
+          <p className="text-gray-500 text-lg mb-10">750 sq ft. Professional lighting. $100/hr. Open 24/7.</p>
           <a
             href="/book/?studio=green-screen"
             className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded-lg hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer"

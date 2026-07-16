@@ -967,63 +967,6 @@ p {
   opacity: 0.9;
 }
 
-/* ═══ SIMPLE REVEAL ALIASES (for .reveal / .reveal-fade class usage) ═══ */
-.reveal {
-  opacity: 0;
-  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-play-state: paused;
-}
-.reveal.visible {
-  animation-play-state: running;
-}
-.reveal-fade {
-  opacity: 0;
-  animation: fadeIn 0.6s ease forwards;
-  animation-play-state: paused;
-}
-.reveal-fade.visible {
-  animation-play-state: running;
-}
-
-/* ═══════════════════════════════════════════
-   SCROLL REVEAL SYSTEM
-   Apply .reveal to any element. JS picks it up.
-   Variants via data-reveal="up|fade|left|right|scale"
-   Delay via data-delay="100" (ms)
-═══════════════════════════════════════════ */
-
-[data-reveal] {
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
-}
-
-[data-reveal="up"]    { opacity: 0; transform: translateY(48px); }
-[data-reveal="fade"]  { opacity: 0; }
-[data-reveal="left"]  { opacity: 0; transform: translateX(-48px); }
-[data-reveal="right"] { opacity: 0; transform: translateX(48px); }
-[data-reveal="scale"] { opacity: 0; transform: scale(0.93); }
-[data-reveal="blur"]  { opacity: 0; filter: blur(12px); transform: translateY(16px); }
-
-[data-reveal].revealed {
-  opacity: 1 !important;
-  transform: none !important;
-  filter: none !important;
-}
-
-/* Stagger siblings automatically */
-[data-stagger] > * { opacity: 0; transform: translateY(32px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
-[data-stagger].revealed > *:nth-child(1) { opacity:1; transform:none; transition-delay: 0ms; }
-[data-stagger].revealed > *:nth-child(2) { opacity:1; transform:none; transition-delay: 80ms; }
-[data-stagger].revealed > *:nth-child(3) { opacity:1; transform:none; transition-delay: 160ms; }
-[data-stagger].revealed > *:nth-child(4) { opacity:1; transform:none; transition-delay: 240ms; }
-[data-stagger].revealed > *:nth-child(5) { opacity:1; transform:none; transition-delay: 320ms; }
-[data-stagger].revealed > *:nth-child(6) { opacity:1; transform:none; transition-delay: 400ms; }
-[data-stagger].revealed > *:nth-child(7) { opacity:1; transform:none; transition-delay: 480ms; }
-[data-stagger].revealed > *:nth-child(8) { opacity:1; transform:none; transition-delay: 560ms; }
-[data-stagger].revealed > *:nth-child(9) { opacity:1; transform:none; transition-delay: 640ms; }
-[data-stagger].revealed > *:nth-child(10) { opacity:1; transform:none; transition-delay: 720ms; }
-
 /* Image hover scale — applied to all studio images */
 .img-reveal {
   overflow: hidden;
@@ -1034,51 +977,6 @@ p {
 .img-reveal:hover img {
   transform: scale(1.04);
 }
-
-/* ═══ MOTION ENGINE ADDITIONS ═══ */
-
-/* Split text baseline */
-[data-split] { overflow: hidden; }
-
-/* Parallax containers need overflow hidden on parent */
-[data-parallax-wrap] { overflow: hidden; }
-[data-parallax] { transform-origin: center; }
-
-/* Magnetic buttons */
-[data-magnetic] { display: inline-flex; }
-
-/* Stronger reveal animations */
-[data-reveal="up"]    { opacity:0; transform:translateY(56px); }
-[data-reveal="fade"]  { opacity:0; }
-[data-reveal="scale"] { opacity:0; transform:scale(0.92); }
-[data-reveal="left"]  { opacity:0; transform:translateX(-56px); }
-[data-reveal="right"] { opacity:0; transform:translateX(56px); }
-[data-reveal="blur"]  { opacity:0; filter:blur(16px); transform:translateY(20px); }
-
-[data-reveal] {
-  transition:
-    opacity 0.9s cubic-bezier(0.16,1,0.3,1),
-    transform 0.9s cubic-bezier(0.16,1,0.3,1),
-    filter 0.9s cubic-bezier(0.16,1,0.3,1);
-}
-[data-reveal].revealed { opacity:1; transform:none; filter:none; }
-
-/* Stagger — tighter, more dramatic */
-[data-stagger] > * {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
-}
-[data-stagger].revealed > *:nth-child(1)  { opacity:1; transform:none; transition-delay:0ms; }
-[data-stagger].revealed > *:nth-child(2)  { opacity:1; transform:none; transition-delay:90ms; }
-[data-stagger].revealed > *:nth-child(3)  { opacity:1; transform:none; transition-delay:180ms; }
-[data-stagger].revealed > *:nth-child(4)  { opacity:1; transform:none; transition-delay:270ms; }
-[data-stagger].revealed > *:nth-child(5)  { opacity:1; transform:none; transition-delay:360ms; }
-[data-stagger].revealed > *:nth-child(6)  { opacity:1; transform:none; transition-delay:450ms; }
-[data-stagger].revealed > *:nth-child(7)  { opacity:1; transform:none; transition-delay:540ms; }
-[data-stagger].revealed > *:nth-child(8)  { opacity:1; transform:none; transition-delay:630ms; }
-[data-stagger].revealed > *:nth-child(9)  { opacity:1; transform:none; transition-delay:720ms; }
-[data-stagger].revealed > *:nth-child(10) { opacity:1; transform:none; transition-delay:810ms; }
 
 /* Studio hero cards — elevated on hover */
 .studio-card {
@@ -1210,6 +1108,20 @@ a {
 
   .desktop-menu-trigger--dismissed .desktop-menu-scrim {
     opacity: 0 !important;
+  }
+
+  /* Touch devices open these menus via simulated hover. The scrim must catch
+     the outside tap (and dismiss via its click handler) instead of letting
+     the tap fall through to whatever link sits beneath it. Hover devices keep
+     pointer-events off so the mouse can leave the menu to close it. */
+  @media (hover: none) {
+    .desktop-menu-trigger:hover .desktop-menu-scrim,
+    .desktop-menu-trigger:focus-within .desktop-menu-scrim {
+      pointer-events: auto;
+    }
+    .desktop-menu-trigger--dismissed .desktop-menu-scrim {
+      pointer-events: none !important;
+    }
   }
 
   .desktop-menu-trigger--dismissed .desktop-mega-menu {
@@ -1370,19 +1282,6 @@ a {
 .loading-spinner-white {
   border-color: rgba(255,255,255,0.2);
   border-top-color: #fff;
-}
-
-/* Keep content visible without the old scroll-reveal runtime. */
-.reveal,
-.reveal-fade,
-[data-reveal],
-[data-stagger] > * {
-  opacity: 1 !important;
-  transform: none !important;
-  filter: none !important;
-  animation: none !important;
-  transition-property: color, background-color, border-color, opacity, transform !important;
-  will-change: auto !important;
 }
 
 /* Booking flow: the global overflow-x hidden breaks position:sticky, clip does not */
@@ -1667,8 +1566,3 @@ button:hover > .selected-film-poster-image {
   }
 }
 
-/* ═══ SELECTED STUDIO CARD ═══ */
-.studio-book-card-selected {
-  border-color: var(--vibeshack-red) !important;
-  box-shadow: 0 0 0 1px var(--vibeshack-red), 0 20px 40px rgba(236,0,0,0.12);
-}

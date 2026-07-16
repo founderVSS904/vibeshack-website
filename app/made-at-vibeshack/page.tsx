@@ -106,7 +106,7 @@ export default function MadeAtVibeShackPage() {
               <p className="text-gray-600 text-xs mt-4 text-center tracking-wide">The Creative Standard</p>
             </div>
             <div className="pt-4">
-              <h2 data-reveal="up" className="text-white font-black text-2xl mb-4" style={{letterSpacing: '-0.03em'}}>Attribution that travels.</h2>
+              <h2 className="text-white font-black text-2xl mb-4" style={{letterSpacing: '-0.03em'}}>Attribution that travels.</h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-8">
                 When you create at VibeShack, you can credit the studio clearly across show notes, YouTube descriptions, press notes, and social posts. It gives your audience a clean signal for where the work was produced.
               </p>
@@ -129,7 +129,7 @@ export default function MadeAtVibeShackPage() {
 
           {/* Copy text section */}
           <div className="border-t border-white/[0.08] pt-16">
-            <h2 data-reveal="up" className="text-white font-black text-xl mb-8" style={{letterSpacing: '-0.02em'}}>Attribution copy.</h2>
+            <h2 className="text-white font-black text-xl mb-8" style={{letterSpacing: '-0.02em'}}>Attribution copy.</h2>
             <div className="space-y-6">
               {[
                 { label: 'Short', text: 'Created at VibeShack Studios · San Francisco · vibeshackstudios.com' },

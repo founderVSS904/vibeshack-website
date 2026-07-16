@@ -32,10 +32,10 @@ export default function TheWingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#fcd34d'}}>Walnut Series</p>
-          <h1 data-reveal="up" className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
+          <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
             The Wing
           </h1>
-          <p className="text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
+          <p className="text-gray-400 text-xl max-w-xl mb-8">
             Cozy intimacy. Premium quality. Built for duos and close conversations.
           </p>
           <a href="/book/?studio=the-wing" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
@@ -53,7 +53,7 @@ export default function TheWingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features */}
             <div>
-              <h2 data-reveal="up" className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+              <h2 className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
                 Show up.<br/><span className="text-brand-red">Record.</span>
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
@@ -83,7 +83,7 @@ export default function TheWingPage() {
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">The Room</span>
-          <h2 data-reveal="up" className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+          <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
             Built for two<br/>people to <span className="text-brand-red">actually talk.</span>
           </h2>
           <p className="text-gray-500 text-lg mb-20 max-w-2xl">Walk in and the first thing you notice is the furniture. Cognac leather that's broken in, chairs that fit you. You sit down and you forget you're on camera. That's not accidental.</p>
@@ -133,7 +133,7 @@ export default function TheWingPage() {
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
           <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$300</div>
-          <p className="text-gray-500 text-lg mb-1" data-reveal="fade">per hour</p>
+          <p className="text-gray-500 text-lg mb-1">per hour</p>
           <p className="text-white font-semibold mb-12">Cameraman included. 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
@@ -164,7 +164,7 @@ export default function TheWingPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="mb-16">
             <span className="number-label mb-6 block">Explore the Collection</span>
-            <h2 data-reveal="up" className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+            <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
               Also in the<br/><span style={{color: '#fcd34d'}}>Walnut Series.</span>
             </h2>
           </div>
@@ -184,10 +184,10 @@ export default function TheWingPage() {
       {/* Final CTA */}
       <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <h2 data-reveal="up" className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}>
+          <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}>
             Ready to <span className="text-brand-red">Record?</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">$300/hr. Cameraman included. Instant confirmation.</p>
+          <p className="text-gray-500 text-lg mb-10">$300/hr. Cameraman included. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="/book/?studio=the-wing" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
               Book Your Session

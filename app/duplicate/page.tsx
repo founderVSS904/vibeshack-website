@@ -85,7 +85,7 @@ export default function HomePage() {
       {/* ═══ STUDIO GRID ═══ */}
       <section className="bg-black pb-3 pt-10 sm:py-4">
         <div className="max-w-7xl mx-auto px-3">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4" data-stagger>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {[
               { src: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', label: 'The Executive', href: '/the-executive/', alt: 'The Executive — Podcast table setup in use — VibeShack Studios SF' },
               { src: '/studio-images/sunset-hero-v20260509.jpg', label: 'Sunset', href: '/sunset-studio/', alt: 'Sunset — Warm programmable podcast set in use — VibeShack Studios SF' },
@@ -167,7 +167,7 @@ export default function HomePage() {
               VibeShack Studios brings podcast sets, green screen production, photo services, video, and white cyc rental studios together at 950 Battery St in San Francisco's Northern Waterfront.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/[0.08]" data-stagger>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/[0.08]">
             {[
               { n: '24/7', label: 'Always Open', sub: 'Every hour. Every day. No exceptions.' },
               { n: '$100', label: 'Rental studios', sub: 'Bring your crew. We provide everything else.' },
@@ -308,7 +308,7 @@ export default function HomePage() {
       <section className="py-24 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           {/* Section header */}
-          <div data-reveal="up">
+          <div>
             <div className="flex items-end justify-between mb-16">
               <div>
                 <span className="number-label mb-4 block">Studio Spaces</span>
@@ -349,7 +349,7 @@ export default function HomePage() {
               { slug: '/sunset-studio/', img: '/studio-images/sunset-hero-v20260509.jpg', name: 'Sunset', series: 'Creative Series', seriesColor: '#99f6e4', seriesBg: 'rgba(13,148,136,0.3)', price: '$300', sub: 'Programmable color backdrop · Cameraman included' },
               { slug: '/canvas-rental/', img: '/studio-images/inside-canvas-cyc-v20260509.jpg', name: 'Canvas Rental', series: 'Creative Series', seriesColor: '#99f6e4', seriesBg: 'rgba(13,148,136,0.4)', price: '$100', sub: 'White cyc wall · Overhead lighting grid' },
             ].map(({ slug, img, name, series, seriesColor, seriesBg, price, sub }) => (
-              <a key={name} href={slug} className="img-reveal studio-card block relative group overflow-hidden rounded-2xl" data-reveal="scale" style={{height: '380px'}}>
+              <a key={name} href={slug} className="img-reveal studio-card block relative group overflow-hidden rounded-2xl" style={{height: '380px'}}>
                 <Image src={img} alt={`${name} — VibeShack Studios San Francisco`} fill className="object-cover" />
                 <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)'}} />
                 <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-4 p-6 sm:flex-row sm:items-end sm:justify-between sm:p-8">
@@ -399,7 +399,7 @@ export default function HomePage() {
       {/* ═══ STATEMENT ═══ */}
       <section className="py-32 bg-zinc-950 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div data-reveal="up">
+          <div>
             <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">The Dream Factory · SF Northern Waterfront</p>
             <p className="text-white font-black leading-tight mb-6" style={{fontSize: 'clamp(2.2rem, 4.5vw, 4.5rem)', letterSpacing: '-0.04em', maxWidth: '1000px'}}>
               Our job is <span className="text-brand-red">production.</span><br/>
@@ -497,9 +497,9 @@ export default function HomePage() {
       ═══════════════════════════════════════════ */}
       <section className="py-32 bg-zinc-950 border-t border-white/5">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div data-reveal="up">
+          <div>
             <span className="number-label mb-16 block">What Clients Say</span>
-            <blockquote data-reveal="up" className="text-white font-light leading-relaxed mb-12" style={{fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', letterSpacing: '-0.02em'}}>
+            <blockquote className="text-white font-light leading-relaxed mb-12" style={{fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', letterSpacing: '-0.02em'}}>
               &ldquo;Fantastic space, wonderful hosts. So much room to shoot and plenty of space for guests and talent to hang out comfortably.&rdquo;
             </blockquote>
             <cite className="not-italic text-gray-500 text-xs tracking-[0.2em] uppercase font-semibold">

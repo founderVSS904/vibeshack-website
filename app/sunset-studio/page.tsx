@@ -82,10 +82,10 @@ export default function SunsetPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#99f6e4'}}>Creative Series</p>
-          <h1 data-reveal="up" className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
+          <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
             Sunset
           </h1>
-          <p className="text-gray-400 text-xl max-w-xl mb-8" data-reveal="fade">
+          <p className="text-gray-400 text-xl max-w-xl mb-8">
             Pick your mood. Control the light. 12 colors, infinite possibilities.
           </p>
           <a href="/book/?studio=sunset" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
@@ -100,7 +100,7 @@ export default function SunsetPage() {
       {/* Choose Your Mood - Carousel */}
       <section className="py-32 bg-black border-t border-white/5 overflow-hidden" data-carousel>
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 mb-12">
-          <h2 data-reveal="up" className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+          <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
             Choose your <span style={{color: '#99f6e4'}}>mood.</span>
           </h2>
         </div>
@@ -193,7 +193,7 @@ export default function SunsetPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features */}
             <div>
-              <h2 data-reveal="up" className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+              <h2 className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
                 You control<br/>the <span style={{color: '#99f6e4'}}>mood.</span>
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
@@ -223,7 +223,7 @@ export default function SunsetPage() {
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">The Difference</span>
-          <h2 data-reveal="up" className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+          <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
             Programmable <span style={{color: '#99f6e4'}}>means you decide.</span>
           </h2>
           <p className="text-gray-500 text-lg mb-20 max-w-2xl">Every color is pre-calibrated and one dial away. Don't compromise on the mood your show needs. Paint the room to match your vision, not the other way around.</p>
@@ -380,7 +380,7 @@ export default function SunsetPage() {
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
           <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$300</div>
-          <p className="text-gray-500 text-lg mb-1" data-reveal="fade">per hour</p>
+          <p className="text-gray-500 text-lg mb-1">per hour</p>
           <p className="text-white font-semibold mb-12">Cameraman included. 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
@@ -409,7 +409,7 @@ export default function SunsetPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="mb-16">
             <span className="number-label mb-6 block">More Studios</span>
-            <h2 data-reveal="up" className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+            <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
               Other rooms in the<br/><span style={{color: '#99f6e4'}}>Creative Series.</span>
             </h2>
           </div>
@@ -429,10 +429,10 @@ export default function SunsetPage() {
       {/* Final CTA */}
       <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <h2 data-reveal="up" className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}>
+          <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}>
             Pick your <span style={{color: '#99f6e4'}}>color.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">$300/hr. Cameraman included. Instant confirmation.</p>
+          <p className="text-gray-500 text-lg mb-10">$300/hr. Cameraman included. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="/book/?studio=sunset" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
               Book Your Session

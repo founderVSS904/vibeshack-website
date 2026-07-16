@@ -48,15 +48,25 @@ https://www.vibeshackstudios.com. A San Francisco studio-booking business
 ## Where things live
 
 - Homepage: `app/page.tsx` -> `components/DynamicFrameHero.tsx` (six-tile hero
-  grid; all 6 tiles play a muted loop on hover, files in
-  `public/studio-videos/home-tile-*`),
+  grid; an ambient spotlight walks the tiles when idle, hover or keyboard focus
+  plays a tile's muted clip, and three tiles (Podcasts, Video Production, Our
+  Work) rotate multi-clip playlists; files in `public/studio-videos/home-tile-*`),
   then `components/home/` (`FeaturedOriginals` carousel, `TrustedStrip` logo
-  marquee, `StudioSpaces` studio grid, `WhatWeDo`), then the shared `Footer`.
+  marquee, `StudioSpaces` studio grid, `WhatWeDo`). `Header` and `Footer` come
+  from `app/layout.tsx` on every page.
 - Our Work: `app/our-work/page.tsx`, `app/our-work/[slug]/page.tsx`,
   `lib/seo/workProjects.ts`. Real client work with YouTube embeds, plus a
   "Shot at VibeShack" row of external links.
-- Booking: `lib/booking/`, `app/api/create-checkout-session/`, `app/api/webhook/`.
+- Booking UI: `app/book/` (`BookPageClient.tsx`, a 4-step flow: room, date and
+  time with a month-grid calendar, extras, review and payment). Booking server
+  side: `lib/booking/` (`calendar.ts` is the Google Calendar integration),
+  `app/api/create-checkout-session/`, `app/api/webhook/`, `app/api/availability/`,
+  `app/api/book-tour/`, `app/api/tour-availability/`.
   Prices are validated server-side; never trust a client-supplied price.
+- Photo services deck hero: `app/photo-services/PhotoServicesHero.tsx`
+  (cursor-driven fanned card deck).
+- Header nav and both mega menus: `components/Header.tsx`.
+- Footer with the 3D VS monogram: `components/Footer.tsx`.
 - SEO surfaces: `app/sitemap.ts`, `app/image-sitemap.xml/route.ts`, `lib/seo/`.
 
 ## Two tools share this repo

@@ -91,10 +91,10 @@ export default function RentalStudiosPage() {
         <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, transparent 70%)'}} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-gray-500 text-xs tracking-[0.3em] uppercase mb-4">VibeShack Studios · SF Northern Waterfront</p>
-          <h1 data-reveal="up" className="font-black text-white leading-none mb-4" style={{fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: '-0.05em'}}>
+          <h1 className="font-black text-white leading-none mb-4" style={{fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: '-0.05em'}}>
             Rental<br /><span className="text-brand-red">Studios.</span>
           </h1>
-          <p className="text-gray-400 text-xl max-w-xl" data-reveal="fade">
+          <p className="text-gray-400 text-xl max-w-xl">
             Bring your crew. We provide the space, the gear, and the setup. $100/hr.
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function RentalStudiosPage() {
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 px-8 pb-8 flex items-end justify-between">
                   <div>
-                    <a href={s.href} data-reveal="up" className="text-white font-black mb-1 inline-block hover:text-gray-200 transition-colors" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em'}}>{s.name}</a>
+                    <a href={s.href} className="text-white font-black mb-1 inline-block hover:text-gray-200 transition-colors" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em'}}>{s.name}</a>
                     <p className="text-gray-400 text-sm max-w-md">{s.desc}</p>
                   </div>
                   <div className="flex-shrink-0 ml-8 text-right">
@@ -151,7 +151,7 @@ export default function RentalStudiosPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
               <span className="number-label mb-8 block">Every Rental</span>
-              <h2 data-reveal="up" className="font-black text-white leading-none mb-8" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+              <h2 className="font-black text-white leading-none mb-8" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
                 Your crew.<br /><span className="text-brand-red">Our space.</span>
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
@@ -211,10 +211,10 @@ export default function RentalStudiosPage() {
       {/* CTA */}
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <h2 data-reveal="up" className="font-black text-white leading-tight mb-6" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
+          <h2 className="font-black text-white leading-tight mb-6" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
             Need a cameraman too?<br /><span className="text-brand-red">We&apos;ve got you.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10" data-reveal="fade">Upgrade to a Podcast Studio and we handle the whole production.</p>
+          <p className="text-gray-500 text-lg mb-10">Upgrade to a Podcast Studio and we handle the whole production.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="/book/?studio=canvas-rental" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 transition-colors">
               Book a Rental →

@@ -11,14 +11,12 @@ export type WorkProject = {
   category: Exclude<WorkCategorySlug, 'all'>
   categoryLabel: string
   client: string
-  detail?: string
   image: string
   alt: string
   objectPosition?: string
   year: string
   youtubeId: string
   serviceHref: string
-  serviceLabel: string
   summary: string
   credits: string[]
 }
@@ -52,7 +50,6 @@ export const featuredWorkProject: WorkProject = {
   year: '2026',
   youtubeId: '3Rbir7bu408',
   serviceHref: '/video-production/',
-  serviceLabel: 'Video production',
   summary:
     'A summer-soaked music video for Varii and Josh Sidhu: lowriders, dancers, and golden-hour driveways, presented by VibeShack Studios.',
   credits: ['Presented by VibeShack Studios', 'Directed by Gill'],
@@ -70,8 +67,7 @@ export const workProjects: WorkProject[] = [
     year: '2026',
     youtubeId: '3mLFnCovlF8',
     serviceHref: '/video-production/',
-    serviceLabel: 'Video production',
-    summary:
+      summary:
       'A pitch show where founders pitch real investors, and the investors hold a buzzer that can end the meeting. Shot on a clean white set at VibeShack.',
     credits: ['A Silicon Mania production', 'Shot at VibeShack Studios'],
   },
@@ -86,8 +82,7 @@ export const workProjects: WorkProject[] = [
     year: '2025',
     youtubeId: 'tX5nk9EEBHs',
     serviceHref: '/video-production/',
-    serviceLabel: 'Video production',
-    summary:
+      summary:
       "Event coverage of Melinda's Hot Sauce Wing Battle in Hayward, CA: pit smoke, hot sauce, competitors, and the crown.",
     credits: ["A Melinda's Hot Sauce event", 'Filmed in Hayward, CA'],
   },
@@ -102,8 +97,7 @@ export const workProjects: WorkProject[] = [
     year: '2026',
     youtubeId: 'i-YfBQia7UI',
     serviceHref: '/video-production/',
-    serviceLabel: 'Video production',
-    summary:
+      summary:
       'A locker-room hype film for Oakland Ballers pitcher Damian Stone, built on ritual, texture, and game-day focus.',
     credits: ['For the Oakland Ballers'],
   },
@@ -118,8 +112,7 @@ export const workProjects: WorkProject[] = [
     year: '2026',
     youtubeId: 'WWF3sDSyLJw',
     serviceHref: '/video-production/',
-    serviceLabel: 'Video production',
-    summary:
+      summary:
       'A sit-down player feature with Oakland Ballers pitcher Damian Stone, cut between the interview chair and the ballpark.',
     credits: ['Directed by Akar', 'For the Oakland Ballers'],
   },
@@ -134,8 +127,7 @@ export const workProjects: WorkProject[] = [
     year: '2026',
     youtubeId: 'uNwd86wwgtc',
     serviceHref: '/video-production/',
-    serviceLabel: 'Video production',
-    summary:
+      summary:
       'A night-drenched music video for Varii: city skylines, a white Hummer under hard light, and red typography over San Francisco.',
     credits: ['Presented by VibeShack', 'Night exteriors across San Francisco'],
   },
@@ -150,8 +142,7 @@ export const workProjects: WorkProject[] = [
     year: '2025',
     youtubeId: 'Lmp5XUxPGYY',
     serviceHref: '/video-production/',
-    serviceLabel: 'Video production',
-    summary:
+      summary:
       'A moody motorcycle visualizer for Varii, shot at night on San Francisco streets in teal and sodium light.',
     credits: ['Directed by Gill'],
   },
