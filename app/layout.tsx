@@ -3,6 +3,7 @@ import './globals.css'
 
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import AttributionCapture from '@/components/AttributionCapture'
 import { business, externalProfiles, founders, parentBrand, peerspaceListings, siteUrl, studioOffers } from '@/lib/seo/site'
 
 export const viewport = {
@@ -277,6 +278,7 @@ export default function RootLayout({
         )}
       </head>
       <body className="bg-black text-white antialiased">
+        <AttributionCapture />
         <Header />
         <main>{children}</main>
         <Footer />

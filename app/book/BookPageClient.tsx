@@ -532,6 +532,13 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
       })
       const data = await res.json()
       if (!res.ok) {
+        if (res.status === 409 && date) {
+          // The slot was taken while they reviewed. Send them back to the
+          // calendar and refetch, so the stale opening cannot be re-picked.
+          // selectDate clears error state, so the message is set after it.
+          goToStep('datetime')
+          void selectDate(date)
+        }
         setError(checkoutErrorMessage(data.error))
         setSubmitting(false)
         return
@@ -755,6 +762,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
             {/* ── STEP 2: DATE & TIME ── */}
             {step === 'datetime' && selectedStudio && (
               <div>
+                {error && <p className="mb-6 text-sm text-brand-red" role="alert">{error}</p>}
                 <div className="mb-8 flex items-center justify-between border-b border-white/[0.08] pb-6">
                   <div className="flex items-center gap-4">
                     <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg">
