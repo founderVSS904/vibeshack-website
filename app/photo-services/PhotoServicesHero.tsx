@@ -204,7 +204,7 @@ export default function PhotoServicesHero() {
             const rel = relativeTo(i, position)
             const slot = slotAt(rel)
             const isHovered = hovered === i && !dragging
-            const scale = slot.s * (isHovered ? 1.05 : 1)
+            const scale = slot.s * (isHovered ? 1.07 : 1)
             const brightness = isHovered ? Math.min(1, slot.b + 0.25) : slot.b
             return (
               <button
@@ -242,7 +242,7 @@ export default function PhotoServicesHero() {
                 <span
                   className="relative block h-full w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950"
                   style={{
-                    WebkitBoxReflect: 'below 18px linear-gradient(transparent 62%, rgba(255,255,255,0.18) 100%)',
+                    WebkitBoxReflect: 'below 16px linear-gradient(transparent 45%, rgba(255,255,255,0.32) 100%)',
                   }}
                 >
                   <Image
