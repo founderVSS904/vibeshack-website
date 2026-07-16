@@ -1398,7 +1398,7 @@ html.booking-flow body {
 }
 
 .footer-monogram-spin {
-  animation: monogram-spin 7s linear infinite;
+  animation: monogram-sway 4.5s ease-in-out infinite alternate;
   transform-style: preserve-3d;
 }
 
@@ -1406,12 +1406,14 @@ html.booking-flow body {
   backface-visibility: visible;
 }
 
-@keyframes monogram-spin {
+/* A full 360 passes through an edge-on sliver and a mirrored back; the sway
+   keeps the mark readable while the extrusion stays in view. */
+@keyframes monogram-sway {
   from {
-    transform: rotateY(0deg);
+    transform: rotateY(-28deg);
   }
   to {
-    transform: rotateY(360deg);
+    transform: rotateY(28deg);
   }
 }
 

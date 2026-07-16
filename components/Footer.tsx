@@ -170,23 +170,23 @@ export default function Footer() {
 
         {/* Bottom row */}
         <div className="border-t border-white/5 pt-12 text-center">
-          <div className="mb-5 flex justify-center" style={{ perspective: '500px' }}>
+          <div className="mb-6 flex justify-center" style={{ perspective: '700px' }}>
             <div className="footer-monogram-tilt">
-              {/* Eleven copies stacked along z turn the flat mark into an extruded slab;
+              {/* Copies stacked along z turn the flat mark into an extruded slab;
                   outer faces stay bright, inner layers darken into the side walls. */}
-              <div className="footer-monogram-spin relative h-9 w-16">
-                {Array.from({ length: 11 }, (_, i) => (
+              <div className="footer-monogram-spin relative h-14 w-[100px]">
+                {Array.from({ length: 15 }, (_, i) => (
                   <Image
                     key={i}
                     src="/brand/vibeshack/monogram-3d-red-transparent-v20260715.png"
-                    alt={i === 10 ? 'VS' : ''}
+                    alt={i === 14 ? 'VS' : ''}
                     width={800}
                     height={450}
-                    sizes="160px"
+                    sizes="200px"
                     className="absolute inset-0 h-full w-full"
                     style={{
-                      transform: `translateZ(${i - 5}px)`,
-                      filter: i === 0 || i === 10 ? undefined : 'brightness(0.45) saturate(1.2)',
+                      transform: `translateZ(${i - 7}px)`,
+                      filter: i === 0 || i === 14 ? undefined : 'brightness(0.45) saturate(1.2)',
                     }}
                   />
                 ))}
