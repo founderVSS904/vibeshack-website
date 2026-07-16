@@ -168,7 +168,7 @@ export const STUDIOS: Studio[] = [
     tag: null,
     description: 'Professional lighting. White backdrop. Hair & Makeup room.',
     heroImage: '/studio-images/inside-photography-red-v20260509.jpg',
-    photos: ['/studio-images/inside-photography-red-v20260509.jpg', '/studio-images/enhanced-photography-headshot-black-blazer-v20260510.jpg', '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg'],
+    photos: ['/studio-images/inside-photography-red-v20260509.jpg', '/studio-images/enhanced-photography-headshot-black-blazer-v20260510.jpg', '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg'],
     includes: ['Professional lighting', 'White seamless backdrop', 'Hair & Makeup room', 'Kino Flo + ARRI lighting', 'Full vanity station'],
     type: 'photo',
     prep: [

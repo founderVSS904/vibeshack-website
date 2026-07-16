@@ -142,7 +142,7 @@ STUDIOS['photo-services'] = {
   name: 'Photo Services',
   price: 0,
   priceLabel: 'Contact us',
-  img: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
+  img: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
   href: '/photo-services/',
   desc: 'Photoshoots, headshots, portraits, products, and campaign stills.',
   series: 'Services',

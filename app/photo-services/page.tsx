@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     description:
       'Book a produced photoshoot for product photography, headshots, food, portraits, weddings and events, campaigns, press photos, and content days.',
     url: 'https://www.vibeshackstudios.com/photo-services/',
-    images: ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg'],
+    images: ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg'],
   },
 }
 
@@ -183,7 +183,7 @@ const photoServiceSchema = {
   description:
     'Photoshoot services in San Francisco for product photography, food photography, headshots, portraits, weddings and events, brand campaigns, lookbooks, press photos, and content days.',
   url: 'https://www.vibeshackstudios.com/photo-services/',
-  image: 'https://www.vibeshackstudios.com/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
+  image: 'https://www.vibeshackstudios.com/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
   provider: {
     '@id': 'https://www.vibeshackstudios.com/#business',
   },

@@ -59,7 +59,7 @@ export default function EditorialsPage() {
             eyebrow: 'Fashion',
             title: 'Fashion editorials',
             body: 'Full-body frames, movement, wardrobe changes, strong crops, and controlled backgrounds for campaigns and lookbooks.',
-            image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
+            image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
             alt: 'Fashion editorial photographed at VibeShack Studios',
             objectPosition: '42% center',
           },
@@ -116,7 +116,7 @@ export default function EditorialsPage() {
         proofTitle="Beauty, fashion, portraits, and campaign stills."
         proofBody="The studio can move from clean cyc to color, close-up beauty, black-background portraits, and finished campaign images without leaving the building."
         proofImages={[
-          { src: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg', alt: 'Fashion editorial at VibeShack Studios', label: 'Fashion editorial', className: 'md:col-span-2 md:row-span-2', objectPosition: '42% center' },
+          { src: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg', alt: 'Fashion editorial at VibeShack Studios', label: 'Fashion editorial', className: 'md:col-span-2 md:row-span-2', objectPosition: '42% center' },
           { src: '/studio-images/photo-gallery-beauty-jewelry-closeup-v20260520.jpg', alt: 'Beauty jewelry close-up at VibeShack Studios', label: 'Beauty' },
           { src: '/studio-images/photo-gallery-black-red-afro-portrait-v20260520.jpg', alt: 'Black and red editorial portrait at VibeShack Studios', label: 'Portrait' },
           { src: '/studio-images/photo-gallery-pink-studio-portrait-v20260520.jpg', alt: 'Pink studio editorial portrait at VibeShack Studios', label: 'Color study' },

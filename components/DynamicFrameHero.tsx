@@ -76,7 +76,7 @@ const frames: Frame[] = [
     label: 'Branding',
     eyebrow: 'Identity, content systems',
     href: '/branding/',
-    image: '/studio-images/home-branding-pure-magic-v20260625.png',
+    image: '/studio-images/home-branding-pure-magic-v20260716.jpg',
     alt: 'Pure Magic product branding image for VibeShack Studios',
     position: 'center',
     accent: '#ff2a1f',

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const photographyWall = [
   {
-    src: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
+    src: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
     alt: 'Editorial fashion photography created at VibeShack Studios',
     label: 'Editorial campaign',
     className: 'md:col-span-2 md:row-span-2',

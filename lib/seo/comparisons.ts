@@ -49,7 +49,7 @@ export const comparisons = [
     shortTitle: 'Studio vs Location Shoot',
     keyword: 'photography studio vs location shoot',
     description: 'A decision guide for choosing controlled studio photography or an on-location shoot for San Francisco campaigns.',
-    image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
+    image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
     imageAlt: 'Campaign photography created at VibeShack Studios San Francisco',
     primaryPage: '/photography-studio-san-francisco/',
     secondaryPage: '/canvas-rental/',

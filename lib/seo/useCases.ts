@@ -393,7 +393,7 @@ export const useCases = [
     keyword: 'product photography services san francisco',
     description:
       'For brands that need controlled product images, founder portraits, campaign stills, ecommerce assets, and social ad creative from one organized shoot.',
-    image: '/studio-images/home-branding-pure-magic-v20260625.png',
+    image: '/studio-images/home-branding-pure-magic-v20260716.jpg',
     imageAlt: 'Styled product photography of a cosmetics jar created at VibeShack Studios San Francisco',
     primaryPage: '/photo-services/',
     bookHref: '/contact/?service=photo-services',

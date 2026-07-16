@@ -26,7 +26,7 @@ const photographyFrames = [
     widthClass: 'w-[68vw] sm:w-[320px] lg:w-[360px]',
   },
   {
-    src: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
+    src: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
     alt: 'Editorial fashion photography on the white cyc at VibeShack Studios San Francisco',
     position: 'center 50%',
     widthClass: 'w-[82vw] sm:w-[500px] lg:w-[620px]',

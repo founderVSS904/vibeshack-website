@@ -15,7 +15,7 @@ const pageImages = [
       ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg', 'Video production lighting setup at VibeShack Studios San Francisco'],
       ['/studio-images/canvas-rental-music-v1775095665.jpg', 'Music video production inside a VibeShack Studios rental space'],
       ['/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg', 'Photography services portrait created at VibeShack Studios San Francisco'],
-      ['/studio-images/home-branding-pure-magic-v20260625.png', 'Pure Magic product branding image featured on the VibeShack Studios homepage'],
+      ['/studio-images/home-branding-pure-magic-v20260716.jpg', 'Pure Magic product branding image featured on the VibeShack Studios homepage'],
       ['/studio-images/canvas-rental-space-v20260509.jpg', 'White cyc rental studio at VibeShack Studios San Francisco'],
       ['/studio-images/work-body-is-tea-music-v20260708b.jpg', 'Body Is Tea music video by Varii, presented by VibeShack Studios'],
       ['/studio-images/work-the-buzzer-silicon-mania-v20260708.jpg', 'The Buzzer pitch show by Silicon Mania, shot at VibeShack Studios'],
@@ -35,7 +35,7 @@ const pageImages = [
     loc: '/services/',
     images: [
       ['/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg', 'Blue-lit production services set at VibeShack Studios San Francisco'],
-      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg', 'Photo services and creative photoshoots at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg', 'Photo services and creative photoshoots at VibeShack Studios San Francisco'],
       ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg', 'Video production lighting setup at VibeShack Studios San Francisco'],
       ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', 'Podcast production services at VibeShack Studios San Francisco'],
     ],
@@ -61,7 +61,7 @@ const pageImages = [
     loc: '/editorials/',
     images: [
       ['/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg', 'Editorial beauty portrait photographed at VibeShack Studios San Francisco'],
-      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg', 'Fashion editorial photographed at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg', 'Fashion editorial photographed at VibeShack Studios San Francisco'],
       ['/studio-images/photo-gallery-red-blue-sunglasses-v20260520.jpg', 'Color-driven editorial portrait photographed at VibeShack Studios San Francisco'],
     ],
   },

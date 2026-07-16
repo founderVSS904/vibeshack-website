@@ -82,7 +82,7 @@ export default function BrandingPage() {
             eyebrow: 'Product',
             title: 'Packaging and product visuals',
             body: 'Product presentation, packaging direction, launch imagery, product-photo references, ecommerce hero frames, and social crops.',
-            image: '/studio-images/home-branding-pure-magic-v20260625.png',
+            image: '/studio-images/home-branding-pure-magic-v20260716.jpg',
             alt: 'Pure Magic product image for packaging and product visual direction',
             objectPosition: 'center',
           },
