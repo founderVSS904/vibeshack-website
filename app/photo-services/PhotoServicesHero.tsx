@@ -24,9 +24,9 @@ const CATEGORIES: PhotoCategory[] = [
     label: 'People',
     title: 'Headshots and portraits',
     body: 'Founder portraits, team headshots, press photos, artist portraits, executive profiles, and brand images.',
-    image: '/studio-images/photo-gallery-pink-profile-v20260520.jpg',
-    alt: 'Studio portrait in profile against a coral backdrop at VibeShack Studios San Francisco',
-    position: 'center 30%',
+    image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg',
+    alt: 'Direct beauty portrait photographed at VibeShack Studios San Francisco',
+    position: 'center 35%',
   },
   {
     label: 'Food',
