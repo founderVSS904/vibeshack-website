@@ -200,6 +200,16 @@ export default function PhotoServicesHero() {
             setDragX(0)
           }}
         >
+          {/* The glass sea: a horizon sheen at the contact line and a soft
+              falloff below it. Card bottoms sit ~155px above the stage bottom
+              at every breakpoint, so the plane holds without per-size math. */}
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[155px]">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'radial-gradient(58% 130% at 50% 0%, rgba(255,255,255,0.05), transparent 70%)' }}
+            />
+          </div>
           {CATEGORIES.map((category, i) => {
             const rel = relativeTo(i, position)
             const slot = slotAt(rel)
@@ -242,7 +252,7 @@ export default function PhotoServicesHero() {
                 <span
                   className="relative block h-full w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950"
                   style={{
-                    WebkitBoxReflect: 'below 16px linear-gradient(transparent 45%, rgba(255,255,255,0.32) 100%)',
+                    WebkitBoxReflect: 'below 5px linear-gradient(transparent 56%, rgba(255,255,255,0.42) 100%)',
                   }}
                 >
                   <Image
