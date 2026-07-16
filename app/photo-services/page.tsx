@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { absoluteUrl, business } from '@/lib/seo/site'
+import PhotoServicesHero from './PhotoServicesHero'
 import { breadcrumbSchema, faqSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
@@ -19,49 +20,6 @@ export const metadata: Metadata = {
     images: ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg'],
   },
 }
-
-const serviceTabs = [
-  { href: '/editorials/', label: 'Editorials', active: false },
-  { href: '/photo-services/', label: 'Photo Services', active: true },
-  { href: '/branding/', label: 'Branding', active: false },
-  { href: '/video-production/', label: 'Video Production', active: false },
-  { href: '/podcast-studio-san-francisco/', label: 'Podcast', active: false },
-  { href: '/green-screen-studio-sf/', label: 'Green Screen', active: false },
-  { href: '/canvas-rental/', label: 'White Cyc', active: false },
-]
-
-const subServices = [
-  {
-    eyebrow: 'Product',
-    title: 'Product photography',
-    body: 'Clean product stills, launch images, ecommerce crops, detail shots, campaign frames, and social assets.',
-  },
-  {
-    eyebrow: 'People',
-    title: 'Headshots and portraits',
-    body: 'Founder portraits, team headshots, press photos, artist portraits, executive profiles, and brand images.',
-  },
-  {
-    eyebrow: 'Food',
-    title: 'Food and beverage',
-    body: 'Menu images, packaged goods, drink launches, tabletop scenes, delivery-app crops, and social content.',
-  },
-  {
-    eyebrow: 'Fashion',
-    title: 'Editorials and lookbooks',
-    body: 'Lookbook images, wardrobe stories, model tests, beauty crops, campaign stills, and full-body frames.',
-  },
-  {
-    eyebrow: 'Events',
-    title: 'Wedding and event content',
-    body: 'Engagement portraits, editorial wedding details, announcement images, event portraits, and polished recap stills.',
-  },
-  {
-    eyebrow: 'Brand',
-    title: 'Content days',
-    body: 'A planned photo day for the images a brand needs across website, ads, social, decks, and launch material.',
-  },
-]
 
 const shootTypes = [
   {
@@ -317,98 +275,7 @@ export default function PhotoServicesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
 
-      <section className="relative min-h-screen flex items-end overflow-hidden bg-black">
-        <div className="absolute inset-0">
-          <Image
-            src="/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg"
-            alt="Photo services at VibeShack Studios San Francisco"
-            fill
-            priority
-            className="object-cover"
-            style={{ objectPosition: '42% center' }}
-          />
-          <div className="absolute inset-0 hidden lg:block" style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.18) 38%, rgba(0,0,0,0.86) 74%, rgba(0,0,0,0.96) 100%)' }} />
-          <div className="absolute inset-0 lg:hidden" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.32) 34%, rgba(0,0,0,0.72) 68%, #000 100%)' }} />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.12) 42%, transparent 76%)' }} />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-12 pt-32 w-full">
-          <div className="max-w-2xl lg:ml-auto lg:max-w-xl">
-            <p className="number-label mb-8">Photo Services San Francisco</p>
-            <h1 className="font-black text-white leading-[1] mb-7" style={{ fontSize: 'clamp(2rem, 4vw, 4.05rem)', letterSpacing: 0 }}>
-              Photoshoots planned around the image you actually need.
-            </h1>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-xl mb-9">
-              Headshots, portraits, product photos, press images, lookbooks, campaign stills, and content-day photography inside a production studio built for controlled light, clean backgrounds, and polished delivery.
-            </p>
-            <div className="mb-8 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-2">
-              <div className="bg-black/70 p-5 backdrop-blur-sm">
-                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.22em]">Produced photoshoots</p>
-                <p className="mt-2 text-white text-3xl font-black leading-none">Contact us</p>
-                <p className="mt-3 text-gray-500 text-xs leading-relaxed">Planning, studio direction, and a finished image set scoped around the deliverables.</p>
-              </div>
-              <div className="bg-black/70 p-5 backdrop-blur-sm">
-                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.22em]">Room-only rental</p>
-                <p className="mt-2 text-white text-3xl font-black leading-none">$100/hr</p>
-                <p className="mt-3 text-gray-500 text-xs leading-relaxed">For clients bringing their own photographer, lighting plan, and crew.</p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-4 items-center">
-              <Link href="/contact/?service=photo-services" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
-                Start a photo request
-              </Link>
-              <Link href="/photography-studio-san-francisco/" className="text-gray-400 hover:text-white text-sm font-semibold transition-colors">
-                Need room-only rental?
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-black border-t border-white/5 sticky top-20 z-30" data-carousel>
-        <div className="scrollbar-hide max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 overflow-x-auto">
-          <div className="flex gap-2 min-w-max pr-6" role="list" aria-label="Service pages">
-            {serviceTabs.map(({ href, label, active }) => (
-              <Link
-                key={href}
-                href={href}
-                role="listitem"
-                className={`px-4 py-2 rounded-full border text-sm font-semibold transition-colors ${
-                  active
-                    ? 'border-brand-red bg-brand-red text-white'
-                    : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
-                }`}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 sm:py-24 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="max-w-3xl mb-12">
-            <span className="number-label mb-6 block">Photography services</span>
-            <h2 className="text-white font-black leading-tight mb-6 text-4xl sm:text-5xl lg:text-6xl" style={{ letterSpacing: 0 }}>
-              Pick the photo job first, then we build the shoot.
-            </h2>
-            <p className="text-gray-500 text-base sm:text-lg leading-relaxed max-w-2xl">
-              The homepage tile should not lead to a vague gallery. It should lead to clear, buyable photo paths people already understand.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {subServices.map(({ eyebrow, title, body }) => (
-              <article key={title} className="rounded-lg border border-white/10 bg-zinc-950 p-6">
-                <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-red">{eyebrow}</p>
-                <h3 className="mb-4 text-2xl font-black leading-tight text-white" style={{ letterSpacing: 0 }}>{title}</h3>
-                <p className="text-sm leading-relaxed text-gray-500">{body}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PhotoServicesHero />
 
       <section className="py-28 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
