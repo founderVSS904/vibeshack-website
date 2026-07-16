@@ -97,6 +97,12 @@ const gallery = [
     frameClass: 'aspect-[4/5]',
   },
   {
+    src: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg',
+    alt: 'Direct beauty portrait photographed at VibeShack Studios San Francisco',
+    objectPosition: 'center 34%',
+    frameClass: 'aspect-[4/5]',
+  },
+  {
     src: '/studio-images/photo-gallery-pink-profile-v20260520.jpg',
     alt: 'Pink profile portrait photographed at VibeShack Studios San Francisco',
     objectPosition: 'center center',
@@ -131,12 +137,6 @@ const gallery = [
     alt: 'Gesture portrait photographed at VibeShack Studios San Francisco',
     objectPosition: 'center 38%',
     frameClass: 'aspect-[3/4]',
-  },
-  {
-    src: '/studio-images/photo-gallery-black-white-sunglasses-v20260520.jpg',
-    alt: 'Black and white sunglasses portrait photographed at VibeShack Studios San Francisco',
-    objectPosition: 'center 38%',
-    frameClass: 'aspect-[4/5]',
   },
 ]
 

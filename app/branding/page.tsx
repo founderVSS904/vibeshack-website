@@ -59,7 +59,7 @@ export default function BrandingPage() {
             eyebrow: 'Identity',
             title: 'Visual identity systems',
             body: 'Direction for logos, type, color, image style, layout behavior, and the visual rules that keep content coherent.',
-            image: '/studio-images/photo-gallery-black-white-sunglasses-v20260520.jpg',
+            image: '/studio-images/photo-gallery-black-white-sunglasses-v20260716.jpg',
             alt: 'Graphic black and white portrait for brand identity direction',
             objectPosition: 'center 38%',
           },
