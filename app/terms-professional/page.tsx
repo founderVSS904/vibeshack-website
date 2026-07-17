@@ -100,7 +100,7 @@ export default function TermsProfessionalPage() {
             <p>Only Guests explicitly approved or listed at booking are permitted. Unauthorized persons will be asked to leave. You are liable for the conduct of all Guests and for any damage caused by Guests.</p>
             
             <h3>3.6 Property &amp; Cleanliness</h3>
-            <p>You must leave the Studio in the condition you found it. Excessive cleanup requirements result in cleaning fees ($150–$500+, depending on severity).</p>
+            <p>You must leave the Studio in the condition you found it. Excessive cleanup requirements result in cleaning fees ($150 to $500+, depending on severity).</p>
             
             <h3>3.7 Compliance with Law</h3>
             <p>You shall comply with all applicable federal, state, and local laws, including copyright, privacy, labor, building code, and San Francisco municipal ordinances.</p>
@@ -190,7 +190,7 @@ export default function TermsProfessionalPage() {
             <h3>6.3 CAP ON LIABILITY</h3>
             <p><strong className="text-brand-red">THE STUDIO'S TOTAL LIABILITY SHALL NOT EXCEED THE TOTAL FEES PAID FOR THE SESSION(S), CAPPED AT $1,000.</strong></p>
             
-            <h3>6.4–6.7 Additional Disclaimers</h3>
+            <h3>6.4 to 6.7 Additional Disclaimers</h3>
             <p>Equipment is provided as-is without warranty of performance. The Studio is not responsible for Content quality or loss. Internet, power, and utilities are not guaranteed. Studio facility conditions are as-is.</p>
           </section>
 
@@ -246,12 +246,12 @@ export default function TermsProfessionalPage() {
             
             <h3>9.2 Damage Charges Schedule</h3>
             <ul>
-              <li>Minor scuffs/marks: $25–$75</li>
-              <li>Moderate Equipment damage: $150–$1,000+</li>
-              <li>Major Equipment damage: $1,000–$5,000+</li>
-              <li>Structural damage: $500–$5,000+</li>
+              <li>Minor scuffs/marks: $25 to $75</li>
+              <li>Moderate Equipment damage: $150 to $1,000+</li>
+              <li>Major Equipment damage: $1,000 to $5,000+</li>
+              <li>Structural damage: $500 to $5,000+</li>
               <li>Theft/removal: Full replacement + $500 penalty</li>
-              <li>Deep cleaning: $200–$500+</li>
+              <li>Deep cleaning: $200 to $500+</li>
             </ul>
             
             <h3>9.3 Dispute of Damage Charges</h3>
@@ -321,7 +321,7 @@ export default function TermsProfessionalPage() {
             <h3>14.6 No Third-Party Beneficiaries</h3>
             <p>These Terms are between you and the Studio only. No third party has enforcement rights.</p>
             
-            <h3>14.7–14.12 Additional Provisions</h3>
+            <h3>14.7 to 14.12 Additional Provisions</h3>
             <p>Headings are for convenience. These Terms constitute the entire agreement and supersede prior understandings. The Studio may modify Terms with 30 days' written notice for material changes. Confidentiality and indemnification survive termination.</p>
           </section>
 
