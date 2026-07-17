@@ -1,6 +1,7 @@
 export type WorkCategorySlug =
   | 'all'
   | 'music-videos'
+  | 'films'
   | 'series'
   | 'sports'
   | 'events'
@@ -33,6 +34,7 @@ export type ShotAtVibeshackItem = {
 export const workCategories: { slug: WorkCategorySlug; label: string }[] = [
   { slug: 'all', label: 'All Work' },
   { slug: 'music-videos', label: 'Music Videos' },
+  { slug: 'films', label: 'Films' },
   { slug: 'series', label: 'Series' },
   { slug: 'sports', label: 'Sports' },
   { slug: 'events', label: 'Events' },
@@ -130,6 +132,36 @@ export const workProjects: WorkProject[] = [
       summary:
       'Varii at night: a white Hummer under hard light, with red typography cut over the San Francisco skyline.',
     credits: ['Presented by VibeShack', 'Night exteriors across San Francisco'],
+  },
+  {
+    slug: 'chilled',
+    title: 'Chilled',
+    category: 'music-videos',
+    categoryLabel: 'Music Video',
+    client: 'TeYo',
+    image: '/studio-images/work-chilled-teyo-v20260716.jpg',
+    alt: 'Two friends on rooftop couches over a foggy San Francisco skyline in the Chilled music video',
+    year: '2025',
+    youtubeId: 'Y5GQGx1gbPE',
+    serviceHref: '/video-production/',
+    summary:
+      'A night-drifting music video for TeYo: rooftop couches above a foggy skyline, empty streets, and a city cooling down after dark.',
+    credits: ['A VibeShack Studios production with Opale and Zen Studios', 'Directed by Eden Moshe'],
+  },
+  {
+    slug: 'in-a-restless-moment',
+    title: 'In a Restless Moment',
+    category: 'films',
+    categoryLabel: 'Short Film',
+    client: 'Huey Lee',
+    image: '/studio-images/work-restless-moment-film-v20260716.jpg',
+    alt: 'In a Restless Moment title card over a woman waking in a dark hotel room',
+    year: '2024',
+    youtubeId: 't1dglFWDYKQ',
+    serviceHref: '/video-production/',
+    summary:
+      'A quiet hotel-set short film: hair rollers and a tuxedo, an elevator ride down, and a candlelit dinner shot in warm, low light.',
+    credits: ['Directed by Huey Lee', 'Filmed by Kylan Breton'],
   },
   {
     slug: 'betrayed',

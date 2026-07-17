@@ -533,12 +533,7 @@ img {
 
 /* Slim trusted-by strip variant: steady crawl across the full logo roster. */
 .trusted-strip-marquee .shot-logo-track {
-  animation-duration: 52s;
-}
-
-/* The trusted strip never pauses; it keeps crawling under the cursor. */
-.trusted-strip-marquee:hover .shot-logo-track {
-  animation-play-state: running;
+  animation-duration: 72s;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -612,6 +607,26 @@ img {
 
   .shot-logo-group + .shot-logo-group {
     display: none;
+  }
+
+  .trusted-strip-marquee {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .trusted-strip-marquee::-webkit-scrollbar,
+  .trusted-strip-marquee::before,
+  .trusted-strip-marquee::after,
+  .trusted-strip-logo-row--duplicate {
+    display: none;
+  }
+
+  .trusted-strip-marquee .shot-logo-track {
+    width: max-content;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 0;
   }
 }
 

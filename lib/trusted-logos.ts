@@ -8,6 +8,7 @@ export type TrustedLogo = {
   stripWidth?: number
   stripHeight?: number
   stripScale?: 'mark' | 'badge'
+  stripLabel?: string
 }
 
 export const trustedLogos = [
@@ -64,6 +65,7 @@ export const trustedLogos = [
     width: 1100,
     height: 978,
     stripScale: 'badge',
+    stripLabel: 'Dollars & Donuts',
   },
   {
     name: 'Saviynt',
