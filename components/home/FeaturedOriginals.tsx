@@ -52,7 +52,7 @@ const slides: FeaturedSlide[] = [
     secondaryCta: { label: 'All work', href: '/our-work/' },
     image: '/studio-images/work-wing-battle-grill-v20260714.jpg',
     imageAlt: 'Hot wings tossed on a kettle grill at the Wing Battle event',
-    video: '/studio-videos/home-feat-wing-battle-loop-v20260714.mp4',
+    video: '/studio-videos/home-feat-wing-battle-loop-v20260716.mp4',
     poster: true,
   },
 ]
