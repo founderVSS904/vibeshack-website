@@ -258,22 +258,6 @@ export const workProjects: WorkProject[] = [
     credits: ['A VibeShack Studios production', 'Lyric video for the Note To Self EP'],
   },
   {
-    slug: 'note-to-self-trailer',
-    title: 'Note To Self: EP Trailer',
-    category: 'music-videos',
-    categoryLabel: 'EP Trailer',
-    client: '97Shadd',
-    image: '/studio-images/work-nts-trailer-vhs-v20260716.jpg',
-    alt: 'VHS camcorder frame from the Note To Self EP announcement trailer',
-    year: '2026',
-    youtubeId: 'RBOR-oiGMIQ',
-    hoverClip: '/studio-videos/work-hover-nts-trailer-v20260716.mp4',
-    serviceHref: '/video-production/',
-    summary:
-      'A VHS-textured announcement for the Note To Self EP: camcorder timestamps, a letter half-read, and a drop date.',
-    credits: ['Note To Self EP campaign', 'Edited by Erevnaa'],
-  },
-  {
     slug: 'betrayed',
     title: 'Betrayed',
     category: 'music-videos',
