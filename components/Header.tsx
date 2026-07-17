@@ -547,10 +547,6 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
             {active.kicker}
           </span>
           <span className="absolute inset-x-0 top-[27px] h-px bg-brand-red/20" />
-          <span
-            className="absolute top-[27px] h-[7px] w-[7px] -translate-y-1/2 rounded-full bg-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{ left: `calc(${(((activeCard + 1.5) / 8) * 100).toFixed(3)}% - 3.5px)` }}
-          />
         </div>
       </div>
 
