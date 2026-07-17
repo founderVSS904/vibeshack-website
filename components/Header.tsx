@@ -93,11 +93,8 @@ export default function Header() {
   useEffect(() => {
     closeMobileMenu()
   }, [pathname, closeMobileMenu])
-  const isOurWorkPage = pathname === '/our-work' || pathname === '/our-work/'
   const headerClassName = 'site-header fixed left-0 right-0 top-0 z-50 border-b border-white/[0.08] bg-black transition-colors duration-200'
-  const headerContainerClassName = isOurWorkPage
-    ? 'mx-auto w-full px-9'
-    : 'mx-auto max-w-7xl px-6 sm:px-10 lg:px-16'
+  const headerContainerClassName = 'mx-auto max-w-7xl px-6 sm:px-10 lg:px-16'
 
   const dismissMenu = (menuId: string) => {
     setDismissedMenu(menuId)
