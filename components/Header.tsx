@@ -531,7 +531,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
               key={card.href + card.label}
               onMouseEnter={() => setActiveCard(index)}
               className={`group/svc relative min-w-0 overflow-hidden rounded-lg ring-1 transition-[flex-grow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                isActive ? 'flex-[3_1_0%] ring-brand-red/60' : 'flex-[1_1_0%] ring-white/[0.08] hover:ring-white/20'
+                isActive ? 'flex-[3_1_0%] ring-white/30' : 'flex-[1_1_0%] ring-white/[0.08] hover:ring-white/20'
               }`}
             >
               {showMedia && card.image && (
@@ -545,7 +545,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                 />
               )}
               <span className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" aria-hidden="true" />
-              <span className={`absolute left-4 top-4 z-10 font-mono text-[13px] font-medium tracking-[0.1em] transition-colors duration-500 ${isActive ? 'text-brand-red' : 'text-white/35'}`}>{String(index + 1).padStart(2, '0')}</span>
+              <span className={`absolute left-4 top-4 z-10 font-mono text-[13px] font-medium tracking-[0.1em] transition-colors duration-500 ${isActive ? 'text-white' : 'text-white/35'}`}>{String(index + 1).padStart(2, '0')}</span>
               {/* Stretched primary link: the whole card navigates to the service.
                   Kept as a direct child of the card so its overlay covers the
                   full tile, letting the nested child link sit above it. */}
@@ -570,7 +570,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                 >
                   <span className="mt-2 block text-sm text-zinc-300">{card.detail}</span>
                   <span className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em]">
-                    <span className="flex items-center gap-2 text-brand-red">
+                    <span className="flex items-center gap-2 text-white">
                       Explore
                       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                         <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -585,7 +585,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                           event.currentTarget.blur()
                         }}
                         tabIndex={isActive ? undefined : -1}
-                        className="pointer-events-auto relative z-10 flex items-center gap-2 text-zinc-300 transition-colors duration-200 hover:text-white"
+                        className="pointer-events-auto relative z-10 flex items-center gap-2 text-zinc-400 transition-colors duration-200 hover:text-white"
                       >
                         {card.child.label}
                         <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">

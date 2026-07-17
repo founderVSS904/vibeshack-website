@@ -1301,8 +1301,7 @@ body:has(.cinema-experience-root) > footer {
 
 .cinema-media-layer,
 .cinema-theater-video,
-.cinema-theater-hit-target,
-.cinema-frame-vignette {
+.cinema-theater-hit-target {
   position: absolute;
   inset: 0;
 }
@@ -1334,14 +1333,6 @@ body:has(.cinema-experience-root) > footer {
   outline-offset: -5px;
 }
 
-.cinema-frame-vignette {
-  z-index: 2;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.45), transparent 24%, transparent 76%, rgba(0, 0, 0, 0.45)),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.15), transparent 38%, rgba(0, 0, 0, 0.2));
-}
-
 .cinema-chrome {
   position: absolute;
   inset: 0;
@@ -1367,6 +1358,7 @@ body:has(.cinema-experience-root) > footer {
 
 .cinema-chrome button,
 .cinema-chrome a,
+.cinema-progress,
 .cinema-film-rail {
   pointer-events: auto;
 }
@@ -1778,10 +1770,6 @@ body:has(.cinema-experience-root) > footer {
 }
 
 @media (max-width: 639px) {
-  .cinema-frame-vignette {
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.18), transparent 45%, rgba(0, 0, 0, 0.3));
-  }
-
   .cinema-title-lockup {
     top: 0.9rem;
     left: 1rem;

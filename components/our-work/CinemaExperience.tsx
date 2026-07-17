@@ -54,17 +54,22 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
 
   useEffect(() => {
     const chrome = chromeRef.current
+    const browseReturn = browseReturnRef.current
     if (!chrome) return
     if (chromeHidden) {
+      browseReturn?.removeAttribute('aria-hidden')
       if (document.activeElement instanceof Node && chrome.contains(document.activeElement)) {
-        browseReturnRef.current?.focus({ preventScroll: true })
+        browseReturn?.focus({ preventScroll: true })
       }
+      chrome.setAttribute('aria-hidden', 'true')
       chrome.setAttribute('inert', '')
     } else {
       chrome.removeAttribute('inert')
+      chrome.setAttribute('aria-hidden', 'false')
       if (document.activeElement === browseReturnRef.current) {
         playButtonRef.current?.focus({ preventScroll: true })
       }
+      browseReturn?.setAttribute('aria-hidden', 'true')
     }
   }, [chromeHidden])
 
@@ -118,6 +123,10 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const selectProject = (project: CinemaProject) => {
     const nextIndex = projects.findIndex((candidate) => candidate.slug === project.slug)
     if (nextIndex < 0) return
+    if (nextIndex === selectedIndex) {
+      setError(null)
+      return
+    }
     videoRef.current?.pause()
     setReady(false)
     setPlaying(false)
@@ -161,7 +170,6 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const handleRailWheel = (event: WheelEvent<HTMLUListElement>) => {
     if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return
     event.currentTarget.scrollLeft += event.deltaY
-    event.preventDefault()
   }
 
   const seek = (nextTime: number) => {
@@ -172,8 +180,12 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   }
 
   const toggleFullscreen = async () => {
-    if (document.fullscreenElement) await document.exitFullscreen()
-    else await rootRef.current?.requestFullscreen()
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen()
+      else await rootRef.current?.requestFullscreen()
+    } catch {
+      setError('Fullscreen is not available in this browser.')
+    }
   }
 
   const progress = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0
@@ -224,13 +236,11 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
           onClick={() => (playing ? pauseAndBrowse() : play())}
           aria-label={playing ? 'Pause and show cinema projects' : `Play ${selected.title} in the theater`}
         />
-        <div className="cinema-frame-vignette" aria-hidden="true" />
       </div>
 
       <div
         ref={chromeRef}
         className="cinema-chrome"
-        aria-hidden={chromeHidden}
       >
         <div className="cinema-title-lockup">
           <p>VibeShack Cinema</p>
@@ -328,6 +338,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
               step="0.01"
               value={Math.min(currentTime, duration || 0)}
               onChange={(event) => seek(Number(event.currentTarget.value))}
+              onInput={(event) => seek(Number(event.currentTarget.value))}
               disabled={!ready}
               aria-label={`Seek ${selected.title}`}
               style={{ '--cinema-progress': `${progress}%` } as CSSProperties}
@@ -347,7 +358,6 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
         className="cinema-browse-return"
         onClick={pauseAndBrowse}
         tabIndex={chromeHidden ? 0 : -1}
-        aria-hidden={!chromeHidden}
       >
         Browse projects
       </button>
