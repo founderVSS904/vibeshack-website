@@ -1431,9 +1431,9 @@ body:has(.cinema-experience-root) > footer {
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 1.05rem;
-  background: rgba(3, 3, 3, 0.78);
+  background: rgba(3, 3, 3, 0.14);
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.48);
-  backdrop-filter: blur(16px) saturate(1.08);
+  backdrop-filter: none;
 }
 
 .cinema-selected-project {
@@ -1646,16 +1646,44 @@ body:has(.cinema-experience-root) > footer {
 }
 
 .cinema-progress {
-  position: relative;
-  overflow: hidden;
+  width: 100%;
   height: 2px;
-  background: rgba(255, 255, 255, 0.2);
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    #ec0000 0 var(--cinema-progress, 0%),
+    rgba(255, 255, 255, 0.2) var(--cinema-progress, 0%) 100%
+  );
+  cursor: pointer;
 }
 
-.cinema-progress span {
-  position: absolute;
-  inset: 0 auto 0 0;
+.cinema-progress::-webkit-slider-thumb {
+  width: 8px;
+  height: 8px;
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
   background: #ec0000;
+}
+
+.cinema-progress::-moz-range-thumb {
+  width: 8px;
+  height: 8px;
+  border: 0;
+  border-radius: 999px;
+  background: #ec0000;
+}
+
+.cinema-progress:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.88);
+  outline-offset: 4px;
+}
+
+.cinema-progress:disabled {
+  cursor: wait;
+  opacity: 0.45;
 }
 
 .cinema-transport button {
@@ -1836,7 +1864,7 @@ body:has(.cinema-experience-root) > footer {
   }
 }
 
-@media (max-height: 680px) {
+@media (max-height: 760px) {
   .cinema-title-lockup {
     top: 0.85rem;
   }

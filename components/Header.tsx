@@ -469,13 +469,15 @@ function MenuPlanLink({ href, label, onNavigate, primary = false }: { href: stri
 }
 
 
-const serviceCards = [
-  { href: '/commercials/', label: 'Commercials', detail: 'Launch ads, talking heads, product demos', image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg' },
-  { href: '/editorials/', label: 'Editorials', detail: 'Fashion, beauty, portraits, campaign stills', image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg' },
-  { href: '/branding/', label: 'Branding', detail: 'Creative direction, launches, content systems', image: '/studio-images/home-branding-pure-magic-v20260716.jpg' },
-  { href: '/podcast-studio-san-francisco/', label: 'Podcasts', detail: 'Sets with cameras, audio, and crew', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
-  { href: '/video-production/', label: 'Video Production', detail: 'Social content, music videos, brand video', image: '/studio-images/encore-production.jpg' },
-  { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, campaigns', image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg' },
+// Four headline services. Video Production and Photo Services each carry a
+// nested child (Commercials, Editorials) that shows as a sub-link when the
+// card is active, so the menu reads the hierarchy instead of six peers.
+type ServiceCard = { href: string; label: string; detail: string; image: string; child?: { href: string; label: string } }
+const serviceCards: ServiceCard[] = [
+  { href: '/video-production/', label: 'Video Production', detail: 'Social content, music videos, brand video, and commercials.', image: '/studio-images/encore-production.jpg', child: { href: '/commercials/', label: 'Commercials' } },
+  { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, and editorial campaigns.', image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg', child: { href: '/editorials/', label: 'Editorials' } },
+  { href: '/podcast-studio-san-francisco/', label: 'Podcasts', detail: 'Sets with cameras, audio, and crew.', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
+  { href: '/branding/', label: 'Branding', detail: 'Creative direction, launches, content systems.', image: '/studio-images/home-branding-pure-magic-v20260716.jpg' },
 ]
 
 const proofStripLinks = [
@@ -525,15 +527,9 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
         {serviceCards.map((card, index) => {
           const isActive = index === activeCard
           return (
-            <Link
+            <div
               key={card.href + card.label}
-              href={card.href}
               onMouseEnter={() => setActiveCard(index)}
-              onFocus={() => setActiveCard(index)}
-              onClick={(event) => {
-                onNavigate()
-                event.currentTarget.blur()
-              }}
               className={`group/svc relative min-w-0 overflow-hidden rounded-lg ring-1 transition-[flex-grow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 isActive ? 'flex-[3_1_0%] ring-brand-red/60' : 'flex-[1_1_0%] ring-white/[0.08] hover:ring-white/20'
               }`}
@@ -549,26 +545,58 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                 />
               )}
               <span className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" aria-hidden="true" />
-              <span className={`absolute left-4 top-4 font-mono text-[13px] font-medium tracking-[0.1em] transition-colors duration-500 ${isActive ? 'text-brand-red' : 'text-white/35'}`}>{String(index + 1).padStart(2, '0')}</span>
-              <span className="absolute inset-x-4 bottom-4">
+              <span className={`absolute left-4 top-4 z-10 font-mono text-[13px] font-medium tracking-[0.1em] transition-colors duration-500 ${isActive ? 'text-brand-red' : 'text-white/35'}`}>{String(index + 1).padStart(2, '0')}</span>
+              {/* Stretched primary link: the whole card navigates to the service.
+                  Kept as a direct child of the card so its overlay covers the
+                  full tile, letting the nested child link sit above it. */}
+              <Link
+                href={card.href}
+                aria-label={card.label}
+                onFocus={() => setActiveCard(index)}
+                onClick={(event) => {
+                  onNavigate()
+                  event.currentTarget.blur()
+                }}
+                className="absolute inset-0"
+              />
+              <span className="pointer-events-none absolute inset-x-4 bottom-4">
                 <span className="block text-[21px] font-black leading-[0.95] text-white">
                   {card.label}
                 </span>
                 <span
                   className={`block overflow-hidden transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                    isActive ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
+                    isActive ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'
                   }`}
                 >
                   <span className="mt-2 block text-sm text-zinc-300">{card.detail}</span>
-                  <span className="mt-3 flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-brand-red">
-                    Explore service
-                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                  <span className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em]">
+                    <span className="flex items-center gap-2 text-brand-red">
+                      Explore
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    {card.child && (
+                      <Link
+                        href={card.child.href}
+                        onFocus={() => setActiveCard(index)}
+                        onClick={(event) => {
+                          onNavigate()
+                          event.currentTarget.blur()
+                        }}
+                        tabIndex={isActive ? undefined : -1}
+                        className="pointer-events-auto relative z-10 flex items-center gap-2 text-zinc-300 transition-colors duration-200 hover:text-white"
+                      >
+                        {card.child.label}
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                          <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </Link>
+                    )}
                   </span>
                 </span>
               </span>
-            </Link>
+            </div>
           )
         })}
       </div>
