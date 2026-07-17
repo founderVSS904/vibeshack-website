@@ -36,7 +36,8 @@ const serviceTabs = [
 const selectedFilmSlugs = ['damian-stone', 'body-is-tea', 'the-buzzer']
 const selectedFilms: SelectedFilm[] = selectedFilmSlugs.flatMap((slug) => {
   const project = allWorkProjects.find((item) => item.slug === slug)
-  return project ? [project] : []
+  // The gallery embeds YouTube, so only projects with a YouTube home qualify.
+  return project?.youtubeId ? [{ ...project, youtubeId: project.youtubeId }] : []
 })
 
 const videoFacts = [

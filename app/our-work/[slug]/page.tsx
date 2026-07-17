@@ -48,7 +48,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
   }
 
   const relatedProjects = allWorkProjects.filter((item) => item.slug !== project.slug).slice(0, 3)
-  const watchUrl = `https://www.youtube.com/watch?v=${project.youtubeId}`
+  const watchUrl = project.youtubeId ? `https://www.youtube.com/watch?v=${project.youtubeId}` : null
   const breadcrumbs = breadcrumbSchema([
     { name: 'VibeShack Studios', url: absoluteUrl('/') },
     { name: 'Our Work', url: absoluteUrl('/our-work/') },
@@ -87,17 +87,19 @@ export default async function WorkProjectPage({ params }: PageProps) {
                 ))}
               </ul>
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <a
-                  href={watchUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 rounded bg-brand-red px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
-                >
-                  <svg className="h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                    <path d="M2 1.5v9l8-4.5-8-4.5z" />
-                  </svg>
-                  Watch on YouTube
-                </a>
+                {watchUrl && (
+                  <a
+                    href={watchUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-3 rounded bg-brand-red px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
+                  >
+                    <svg className="h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+                      <path d="M2 1.5v9l8-4.5-8-4.5z" />
+                    </svg>
+                    Watch on YouTube
+                  </a>
+                )}
                 <Link href={project.serviceHref} className="text-sm font-semibold text-white/[0.48] transition-colors hover:text-white">
                   Start a similar project
                 </Link>
@@ -107,15 +109,29 @@ export default async function WorkProjectPage({ params }: PageProps) {
             <div className="order-1 lg:order-2">
               <div className="relative overflow-hidden rounded-lg border border-white/10 bg-zinc-950">
                 <div className="relative aspect-video">
-                  <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${project.youtubeId}`}
-                    title={`${project.title} by ${project.client}`}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full"
-                  />
+                  {project.video ? (
+                    // Films without a YouTube home play straight from the site.
+                    <video
+                      src={project.video}
+                      poster={project.image}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      className="absolute inset-0 h-full w-full bg-black"
+                    >
+                      Your browser cannot play this video.
+                    </video>
+                  ) : (
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${project.youtubeId}`}
+                      title={`${project.title} by ${project.client}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full"
+                    />
+                  )}
                 </div>
               </div>
             </div>

@@ -16,7 +16,10 @@ export type WorkProject = {
   alt: string
   objectPosition?: string
   year: string
-  youtubeId: string
+  // Either a YouTube id for embedded projects or a local video path for
+  // films hosted on the site itself.
+  youtubeId?: string
+  video?: string
   serviceHref: string
   summary: string
   credits: string[]
@@ -147,6 +150,51 @@ export const workProjects: WorkProject[] = [
     summary:
       'A night-drifting music video for TeYo: rooftop couches above a foggy skyline, empty streets, and a city cooling down after dark.',
     credits: ['A VibeShack Studios production with Opale and Zen Studios', 'Directed by Eden Moshe'],
+  },
+  {
+    slug: 'the-client',
+    title: 'The Client',
+    category: 'films',
+    categoryLabel: 'Short Film',
+    client: 'The Babysitters',
+    image: '/studio-images/work-the-client-film-v20260716.jpg',
+    alt: 'The Client title card over a neon-lit bar at VibeShack Studios',
+    year: '2026',
+    video: '/studio-videos/film-the-client-v20260716.mp4',
+    serviceHref: '/video-production/',
+    summary:
+      'An action short made for the SF 48 Hour Film Competition: a client, a fixer, and a card reading in a neon-lit bar. Part of The Babysitters.',
+    credits: ['A VibeShack Studios film', 'Directed by Tay and Victor Li', 'Cinematography by Kylan Philipina and Breton'],
+  },
+  {
+    slug: 'remote',
+    title: 'Remote',
+    category: 'films',
+    categoryLabel: 'Short Film',
+    client: 'Zen Studios',
+    image: '/studio-images/work-remote-film-v20260716.jpg',
+    alt: 'A lone figure on a BART platform as the train stops in the Remote short film',
+    year: '2026',
+    video: '/studio-videos/film-remote-v20260716.mp4',
+    serviceHref: '/video-production/',
+    summary:
+      'A night thriller that starts on a BART platform: a remote viewer, a blindfold, and a drive across the city that goes wrong.',
+    credits: ['Directed by James Merkle', 'Starring Jeremy Tinaco', 'Produced by Tay'],
+  },
+  {
+    slug: 'unforgiven',
+    title: 'Unforgiven',
+    category: 'films',
+    categoryLabel: 'Short Film',
+    client: 'VibeShack Studios',
+    image: '/studio-images/work-unforgiven-film-v20260716.jpg',
+    alt: 'Unforgiven title in red over a dim kitchen scene',
+    year: '2026',
+    video: '/studio-videos/film-unforgiven-v20260716.mp4',
+    serviceHref: '/video-production/',
+    summary:
+      'A quiet domestic thriller in a San Francisco house: a man, a kitchen, and a confrontation that has been waiting a long time.',
+    credits: ['Directed by Tay and Victor Li', 'Starring Elijah J. Roberts and Ashleigh Culiver', 'Produced by Gill'],
   },
   {
     slug: 'in-a-restless-moment',
