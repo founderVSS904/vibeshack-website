@@ -170,6 +170,7 @@ export const workProjects: WorkProject[] = [
     image: '/studio-images/work-the-client-bar-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-the-client-v20260716.mp4',
     alt: 'The client and the fixer across a candlelit reading table in a neon bar',
+    objectPosition: 'center 22%',
     year: '2026',
     video: '/studio-videos/film-the-client-v20260716.mp4',
     serviceHref: '/video-production/',
