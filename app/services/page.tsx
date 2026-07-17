@@ -1,19 +1,19 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { breadcrumbSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
   title: 'Production Services San Francisco',
   description:
     "Choose the right VibeShack service for podcasts, commercials, editorials, branding, portfolio proof, and studio rentals in San Francisco.",
-  alternates: { canonical: 'https://www.vibeshackstudios.com/services/' },
+  alternates: { canonical: `${siteUrl}/services/` },
   openGraph: {
     title: 'Production Services San Francisco | VibeShack Studios',
     description:
       'Choose the right VibeShack path: podcasts, commercials, editorials, branding, portfolio proof, and studio rentals.',
-    url: 'https://www.vibeshackstudios.com/services/',
+    url: `${siteUrl}/services/`,
     images: ['/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg'],
   },
 }

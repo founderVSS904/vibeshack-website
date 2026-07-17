@@ -97,7 +97,7 @@ export default function ContactForm() {
       )}
 
       <div>
-        <label htmlFor="name" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="name" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Your Name
         </label>
         <input
@@ -111,7 +111,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="email" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Email Address
         </label>
         <input
@@ -125,7 +125,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="project_type" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="project_type" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Project Type
         </label>
         <select
@@ -154,7 +154,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="preferred_date" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="preferred_date" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Preferred Date
         </label>
         <input
@@ -167,7 +167,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="message" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Message
         </label>
         <textarea

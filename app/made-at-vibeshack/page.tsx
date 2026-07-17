@@ -2,11 +2,26 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ShotHereLogoCarousel } from '@/components/ShotHereLogoCarousel'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
-  title: 'Brands That Trust Us | VibeShack Studios SF',
+  title: 'Brands That Trust Us',
   description: 'Brands, creators, production teams, and media companies trust VibeShack Studios in San Francisco for podcasts, campaigns, interviews, and content days.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/made-at-vibeshack/' }
+  alternates: { canonical: `${siteUrl}/made-at-vibeshack/` },
+  openGraph: {
+    type: 'website',
+    siteName: 'VibeShack Studios',
+    title: 'Brands That Trust Us | VibeShack Studios SF',
+    description: 'Brands, creators, production teams, and media companies trust VibeShack Studios in San Francisco for podcasts, campaigns, interviews, and content days.',
+    url: `${siteUrl}/made-at-vibeshack/`,
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Work made at VibeShack Studios San Francisco' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Brands That Trust Us | VibeShack Studios SF',
+    description: 'Brands, creators, production teams, and media companies trust VibeShack Studios in San Francisco for podcasts, campaigns, interviews, and content days.',
+    images: ['/og-image.jpg'],
+  },
 }
 
 const photographyWall = [
@@ -50,7 +65,7 @@ export default function MadeAtVibeShackPage() {
           fill sizes="100vw" className="object-cover" style={{opacity: 0.5}} priority />
         <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 50%, transparent 100%)'}} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-40 w-full">
-          <p className="text-gray-500 text-xs tracking-[0.3em] uppercase mb-4">VibeShack Studios · SF</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-4">VibeShack Studios · SF</p>
           <h1 className="font-black text-white leading-none mb-4" style={{fontSize: 'clamp(3rem, 6vw, 6rem)', letterSpacing: 0}}>
             Brands<br/><span className="text-brand-red">Trust Us.</span>
           </h1>
@@ -110,7 +125,7 @@ export default function MadeAtVibeShackPage() {
               <p className="text-gray-500 text-sm leading-relaxed mb-8">
                 When you create at VibeShack, you can credit the studio clearly across show notes, YouTube descriptions, press notes, and social posts. It gives your audience a clean signal for where the work was produced.
               </p>
-              <p className="text-gray-600 text-xs mb-2 tracking-widest uppercase">How to use it</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-2">How to use it</p>
               <div className="divide-y divide-white/[0.08]">
                 {[
                   { platform: 'Podcast show notes', text: 'Add "Recorded at VibeShack Studios, San Francisco" to every episode description.' },
@@ -137,7 +152,7 @@ export default function MadeAtVibeShackPage() {
                 { label: 'Full', text: 'Created at VibeShack Studios, 950 Battery St, San Francisco. Professional podcast, video, and photography studios. Open 24/7. vibeshackstudios.com' },
               ].map(({ label, text }) => (
                 <div key={label} className="bg-zinc-950 rounded-lg p-6">
-                  <p className="text-gray-600 text-xs tracking-widest uppercase mb-3">{label}</p>
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-3">{label}</p>
                   <p className="text-gray-300 text-sm leading-relaxed font-mono">{text}</p>
                 </div>
               ))}

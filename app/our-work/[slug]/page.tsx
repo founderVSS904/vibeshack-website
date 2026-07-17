@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { allWorkProjects, getWorkProject, workProjects } from '@/lib/seo/workProjects'
 import { breadcrumbSchema } from '@/lib/schemas'
 
@@ -28,12 +28,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `${project.title} | Our Work`,
     description: project.summary,
     alternates: {
-      canonical: `https://www.vibeshackstudios.com/our-work/${project.slug}/`,
+      canonical: `${siteUrl}/our-work/${project.slug}/`,
     },
     openGraph: {
       title: `${project.title} | VibeShack Studios`,
       description: project.summary,
-      url: `https://www.vibeshackstudios.com/our-work/${project.slug}/`,
+      url: `${siteUrl}/our-work/${project.slug}/`,
       images: [project.image],
     },
   }
@@ -92,7 +92,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
                     href={watchUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-3 rounded bg-brand-red px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
+                    className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
                   >
                     <svg className="h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
                       <path d="M2 1.5v9l8-4.5-8-4.5z" />
@@ -113,10 +113,11 @@ export default async function WorkProjectPage({ params }: PageProps) {
                     // Films without a YouTube home play straight from the site.
                     <video
                       src={project.video}
-                      poster={project.image}
+                      poster={project.poster ?? project.image}
                       controls
                       playsInline
                       preload="metadata"
+                      aria-label={`${project.title} by ${project.client}`}
                       className="absolute inset-0 h-full w-full bg-black"
                     >
                       Your browser cannot play this video.
@@ -202,7 +203,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/50">
               Tell us what you are launching, documenting, recording, or selling. We will route the project to the right production path.
             </p>
-            <Link href={project.serviceHref} className="mt-9 inline-flex items-center gap-3 rounded bg-brand-red px-8 py-4 text-sm font-bold text-white transition-colors hover:bg-red-700">
+            <Link href={project.serviceHref} className="mt-9 inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Start a similar project
             </Link>
           </div>

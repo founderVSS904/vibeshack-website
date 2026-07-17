@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { studioServiceSchema } from '@/lib/schemas'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Canvas Podcast Studio',
   description: 'Customizable LED backdrop podcast studio in San Francisco. Programmable lighting, cinema-grade equipment, same-day footage delivery. $400/hr with crew included.',
   keywords: 'podcast studio san francisco, professional podcast recording, customizable backgrounds, LED backdrop studio, podcast production sf',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/canvas-podcast/' },
+  alternates: { canonical: `${siteUrl}/canvas-podcast/` },
   openGraph: {
     title: 'Canvas Podcast Studio | VibeShack Studios',
     description: 'Professional podcast production with customizable LED backgrounds and cinema-grade lighting.',
-    url: 'https://www.vibeshackstudios.com/canvas-podcast',
+    url: `${siteUrl}/canvas-podcast`,
     images: ['/studio-images/enhanced-canvas-podcast-red-set-wide-v20260510.jpg'],
   },
 }
@@ -18,8 +19,8 @@ export const metadata: Metadata = {
 const canvasPodcastServiceSchema = studioServiceSchema({
   name: 'Canvas Podcast Studio Rental in San Francisco',
   description: 'Podcast studio in San Francisco with customizable LED backgrounds, cinema-grade lighting, and full crew included.',
-  url: 'https://www.vibeshackstudios.com/canvas-podcast/',
-  image: 'https://www.vibeshackstudios.com/studio-images/enhanced-canvas-podcast-warm-panel-wide-v20260510.jpg',
+  url: `${siteUrl}/canvas-podcast/`,
+  image: `${siteUrl}/studio-images/enhanced-canvas-podcast-warm-panel-wide-v20260510.jpg`,
   price: '400',
   serviceType: 'Podcast Studio Rental',
 })
@@ -51,15 +52,12 @@ export default function CanvasPodcastPage() {
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <p className="text-gray-400 text-xs tracking-[0.3em] uppercase mb-6">Full-Crew Podcast Production</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-6 text-brand-red">Full-Crew Podcast Production</p>
           <h1
-            className="font-black text-white leading-tight mb-6"
-            style={{
-              fontSize: 'clamp(3rem, 8vw, 6rem)',
-              letterSpacing: 0,
-            }}
+            className="text-6xl sm:text-7xl font-black text-white leading-none mb-6"
+            style={{ letterSpacing: 0 }}
           >
-            Canvas <span className="text-brand-red">Podcast</span>
+            Canvas Podcast<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed mb-12">
             Customizable LED backgrounds, cinema lighting, broadcast audio, and crew for large-format shows.
@@ -386,7 +384,7 @@ export default function CanvasPodcastPage() {
           </a>
 
           <p className="text-gray-600 text-sm">
-            Open 24/7. Instant confirmation. Free cancellation 48hrs before.
+            Open 24/7. Instant confirmation. Free cancellation 48 hours before.
           </p>
         </div>
       </section>

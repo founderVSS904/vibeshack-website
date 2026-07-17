@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import SelectedFilmGallery, { type SelectedFilm } from '@/components/SelectedFilmGallery'
 import VideoFormatSelector, { type VideoFormat } from '@/components/VideoFormatSelector'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { allWorkProjects } from '@/lib/seo/workProjects'
 import { breadcrumbSchema, faqSchema, studioServiceSchema } from '@/lib/schemas'
 
@@ -12,13 +12,13 @@ export const metadata: Metadata = {
   description:
     'San Francisco video production for product launch commercials, social content, micro documentaries, music videos, talking-head videos, commercials, and product demos.',
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/video-production/',
+    canonical: `${siteUrl}/video-production/`,
   },
   openGraph: {
     title: 'Video Production San Francisco | VibeShack Studios',
     description:
       'Plan product launch commercials, social content, documentaries, music videos, talking-head videos, product demos, interviews, and campaign video days at VibeShack Studios.',
-    url: 'https://www.vibeshackstudios.com/video-production/',
+    url: `${siteUrl}/video-production/`,
     images: ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg'],
   },
 }
@@ -205,8 +205,8 @@ const videoServiceSchema = studioServiceSchema({
   name: 'Video Production Services in San Francisco',
   description:
     'Video production services and studio spaces in San Francisco for product launch commercials, social media content, micro documentaries, music videos, talking-head videos, commercials, product demos, green screen, video podcasts, and brand content.',
-  url: 'https://www.vibeshackstudios.com/video-production/',
-  image: 'https://www.vibeshackstudios.com/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
+  url: `${siteUrl}/video-production/`,
+  image: `${siteUrl}/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg`,
   serviceType: 'Video Production Services',
 })
 

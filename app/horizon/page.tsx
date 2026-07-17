@@ -1,15 +1,16 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { studioServiceSchema } from '@/lib/schemas'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Horizon Studio',
   description: 'Curated sunset environment. Full 4K production. Cameraman included. Studio with ambient light control in San Francisco. $400/hr. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/horizon/' },
+  alternates: { canonical: `${siteUrl}/horizon/` },
   openGraph: {
     title: 'Horizon | VibeShack Studios SF',
     description: 'Warm sunset backdrop with ambient light control and full 4K production. Cameraman included. $400/hr in San Francisco.',
-    url: 'https://www.vibeshackstudios.com/horizon',
+    url: `${siteUrl}/horizon`,
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg', width: 1200, height: 630, alt: 'Horizon at VibeShack Studios SF' }],
     type: 'website',
@@ -25,8 +26,8 @@ export const metadata: Metadata = {
 const horizonServiceSchema = studioServiceSchema({
   name: 'Horizon Studio Rental in San Francisco',
   description: 'Curated sunset podcast and video studio in San Francisco with full 4K production and crew included.',
-  url: 'https://www.vibeshackstudios.com/horizon/',
-  image: 'https://www.vibeshackstudios.com/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
+  url: `${siteUrl}/horizon/`,
+  image: `${siteUrl}/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg`,
   price: '400',
   serviceType: 'Creative Studio Rental',
 })
@@ -45,7 +46,7 @@ export default function HorizonPage() {
           fill sizes="100vw" className="object-cover opacity-80" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">Creative Series</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-4 text-brand-red">Creative Series</p>
           <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: 0}}>
             Horizon<span className="text-brand-red">.</span>
           </h1>
@@ -149,7 +150,7 @@ export default function HorizonPage() {
             Book Horizon
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
-          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48hrs before.</p>
+          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48 hours before.</p>
         </div>
       </section>
 

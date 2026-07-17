@@ -5,15 +5,16 @@ import PodcastPageMotion from '@/components/PodcastPageMotion'
 import PodcastSetSelector, { type PodcastSet } from '@/components/PodcastSetSelector'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 import { shotAtVibeshack } from '@/lib/seo/workProjects'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Podcast Studios San Francisco',
   description: 'Seven podcast studios in San Francisco with 3-camera 4K, broadcast audio, and crew options. From $300/hr. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/podcast-studio-san-francisco/' },
+  alternates: { canonical: `${siteUrl}/podcast-studio-san-francisco/` },
   openGraph: {
     title: 'Podcast Studios SF | VibeShack Studios',
     description: 'Seven podcast studios in SF with 3-camera 4K, broadcast audio, and crew options. Open 24/7.',
-    url: 'https://www.vibeshackstudios.com/podcast-studio-san-francisco',
+    url: `${siteUrl}/podcast-studio-san-francisco`,
     images: ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg'],
   },
 }
@@ -249,8 +250,8 @@ const podcastFaqs = [
 const podcastServiceSchema = studioServiceSchema({
   name: 'Podcast Studio Rental in San Francisco',
   description: 'Podcast studios in San Francisco with 3-camera 4K production, broadcast audio, lighting, and crew options.',
-  url: 'https://www.vibeshackstudios.com/podcast-studio-san-francisco/',
-  image: 'https://www.vibeshackstudios.com/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
+  url: `${siteUrl}/podcast-studio-san-francisco/`,
+  image: `${siteUrl}/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg`,
   price: '300',
   serviceType: 'Podcast Studio Rental',
 })

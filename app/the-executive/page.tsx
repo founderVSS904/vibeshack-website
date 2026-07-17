@@ -1,14 +1,15 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'The Executive Podcast Studio',
   description: 'Walnut Series. Wood slat walls, leather seating, globe lighting. 3-camera 4K podcast studio in San Francisco. $300/hr. Cameraman included. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/the-executive/' },
+  alternates: { canonical: `${siteUrl}/the-executive/` },
   openGraph: {
     title: 'The Executive | VibeShack Studios SF',
     description: 'Walnut Series 3-camera 4K podcast studio with wood slat walls, leather seating, and globe lighting. Cameraman included. $300/hr in San Francisco.',
-    url: 'https://www.vibeshackstudios.com/the-executive',
+    url: `${siteUrl}/the-executive`,
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', width: 1200, height: 630, alt: 'The Executive at VibeShack Studios SF' }],
     type: 'website',
@@ -31,7 +32,7 @@ export default function TheExecutivePage() {
           fill sizes="100vw" className="object-cover opacity-80" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">Walnut Series</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-4 text-brand-red">Walnut Series</p>
           <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: 0}}>
             The Executive<span className="text-brand-red">.</span>
           </h1>
@@ -149,7 +150,7 @@ export default function TheExecutivePage() {
             Book The Executive
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
-          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48hrs before.</p>
+          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48 hours before.</p>
         </div>
       </section>
 
@@ -200,7 +201,7 @@ export default function TheExecutivePage() {
             <Image src="/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg" alt="The Wing, Walnut Series podcast studio, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
             <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%)'}} />
             <div className="absolute bottom-0 left-0 right-0 p-12">
-              <p className="text-xs font-bold tracking-widest uppercase mb-3 text-brand-red">Walnut Series</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-3 text-brand-red">Walnut Series</p>
               <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: 0}}>The Wing</h3>
               <p className="text-gray-300 text-lg max-w-md mb-6">Cozy, intimate 2-person setup. Same finish, sized for two.</p>
               <p className="text-gray-400 text-sm">$300/hr · Cameraman included</p>

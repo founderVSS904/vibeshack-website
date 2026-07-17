@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import CustomSetupForm from './CustomSetupForm'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Canvas Podcast Custom Setup Request',
   description: 'Request a custom Canvas Podcast setup at VibeShack Studios in San Francisco.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/canvas-podcast/custom-setup/' },
+  alternates: { canonical: `${siteUrl}/canvas-podcast/custom-setup/` },
   robots: { index: false, follow: true },
 }
 

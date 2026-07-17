@@ -11,6 +11,7 @@ type OurWorkShowreelProps = {
 
 export function OurWorkShowreel({ src, poster, posterAlt }: OurWorkShowreelProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const userPausedRef = useRef(false)
   const [motionAllowed, setMotionAllowed] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
 
@@ -23,13 +24,42 @@ export function OurWorkShowreel({ src, poster, posterAlt }: OurWorkShowreelProps
     return () => motionQuery.removeEventListener('change', syncMotionPreference)
   }, [])
 
+  // Only stream the reel while it is on screen. Autoplay stays as the
+  // fallback for browsers without IntersectionObserver.
+  useEffect(() => {
+    if (!motionAllowed) return
+    const video = videoRef.current
+    if (!video) return
+    if (typeof IntersectionObserver === 'undefined') return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (!userPausedRef.current) {
+              void video.play().catch(() => setIsPlaying(false))
+            }
+          } else {
+            video.pause()
+          }
+        })
+      },
+      { threshold: 0.2 },
+    )
+
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [motionAllowed])
+
   const togglePlayback = () => {
     const video = videoRef.current
     if (!video) return
 
     if (video.paused) {
+      userPausedRef.current = false
       void video.play().catch(() => setIsPlaying(false))
     } else {
+      userPausedRef.current = true
       video.pause()
     }
   }
@@ -52,7 +82,6 @@ export function OurWorkShowreel({ src, poster, posterAlt }: OurWorkShowreelProps
           <video
             ref={videoRef}
             src={src}
-            poster={poster}
             className="absolute inset-0 h-full w-full object-cover"
             autoPlay
             muted

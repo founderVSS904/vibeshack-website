@@ -13,6 +13,8 @@ export type WorkProject = {
   categoryLabel: string
   client: string
   image: string
+  // Sized-down variant for the native <video poster> attribute.
+  poster?: string
   alt: string
   objectPosition?: string
   year: string
@@ -168,6 +170,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Short Film',
     client: 'The Babysitters',
     image: '/studio-images/work-the-client-bar-v20260716.jpg',
+    poster: '/studio-images/poster-work-the-client-bar-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-the-client-v20260716.mp4',
     alt: 'The client and the fixer across a candlelit reading table in a neon bar',
     objectPosition: 'center 22%',
@@ -185,6 +188,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Short Film',
     client: 'Zen Studios',
     image: '/studio-images/work-remote-film-v20260716.jpg',
+    poster: '/studio-images/poster-work-remote-film-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-remote-v20260716.mp4',
     alt: 'A lone figure on a BART platform as the train stops in the Remote short film',
     year: '2026',
@@ -201,6 +205,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Short Film',
     client: 'VibeShack Studios',
     image: '/studio-images/work-unforgiven-scene-v20260716.jpg',
+    poster: '/studio-images/poster-work-unforgiven-scene-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-unforgiven-v20260716.mp4',
     alt: 'Isabella confronts Andrew in the bathroom in Unforgiven',
     year: '2026',
@@ -249,9 +254,10 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Lyric Video',
     client: '97Shadd',
     image: '/studio-images/work-the-giver-portrait-v20260716.jpg',
+    poster: '/studio-images/poster-work-the-giver-portrait-v20260716.jpg',
     alt: '97Shadd in a yellow cap mid-verse in The Giver lyric video',
     year: '2026',
-    video: '/studio-videos/film-the-giver-v20260716.mp4',
+    video: '/studio-videos/film-the-giver-v20260717.mp4',
     hoverClip: '/studio-videos/work-hover-the-giver-v20260716.mp4',
     serviceHref: '/video-production/',
     summary:

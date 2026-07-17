@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { breadcrumbSchema } from '@/lib/schemas'
-import { absoluteUrl, business, parentBrand, peerspaceListings } from '@/lib/seo/site'
+import { absoluteUrl, business, parentBrand, peerspaceListings, siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: '24/7 Production Studio in San Francisco',
@@ -32,8 +32,8 @@ export default function PressReleasePage() {
     image: absoluteUrl('/og-image.jpg'),
     datePublished: '2026-05-09',
     dateModified: '2026-05-09',
-    author: { '@id': 'https://www.vibeshackstudios.com/#org' },
-    publisher: { '@id': 'https://www.vibeshackstudios.com/#org' },
+    author: { '@id': `${siteUrl}/#business` },
+    publisher: { '@id': `${siteUrl}/#business` },
     mainEntityOfPage: canonical,
   }
 
@@ -44,7 +44,7 @@ export default function PressReleasePage() {
       <section className="bg-black pt-36 pb-20 px-6 sm:px-10 lg:px-16">
         <div className="max-w-4xl mx-auto">
           <Link href="/press/" className="text-gray-500 hover:text-white text-sm transition-colors">← Press Kit</Link>
-          <p className="text-brand-red text-xs font-bold tracking-[0.25em] uppercase mt-10 mb-6">Press Release</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red mt-10 mb-6">Press Release</p>
           <h1 className="text-white font-black leading-none" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: 0 }}>
             VibeShack Studios builds a 24/7 production studio in San Francisco.
           </h1>
@@ -67,7 +67,7 @@ export default function PressReleasePage() {
           </p>
 
           <div className="rounded-lg border border-white/10 bg-black p-8">
-            <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Visible Peerspace listings</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-6">Visible Peerspace listings</p>
             <ul className="space-y-4">
               {peerspaceListings.slice(0, 4).map((listing) => (
                 <li key={listing.href}>

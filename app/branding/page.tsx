@@ -1,18 +1,18 @@
 import type { Metadata } from 'next'
 import { RevenueCategoryPage } from '@/components/RevenueCategoryPage'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { breadcrumbSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
   title: 'Branding and Creative Direction SF',
   description:
     'Branding and creative direction for founders and launches. Lookbooks, packaging visuals, media kits, pitch decks, and visual identity in San Francisco.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/branding/' },
+  alternates: { canonical: `${siteUrl}/branding/` },
   openGraph: {
     title: 'Branding | VibeShack Studios SF',
     description:
       'Creative direction, lookbooks, campaign systems, launch assets, content systems, visual identity, media kits, and brand decks from VibeShack.',
-    url: 'https://www.vibeshackstudios.com/branding/',
+    url: `${siteUrl}/branding/`,
     images: ['/studio-images/photo-gallery-red-blue-sunglasses-v20260520.jpg'],
   },
 }
@@ -21,8 +21,8 @@ const brandingServiceSchema = studioServiceSchema({
   name: 'Branding and Creative Direction in San Francisco',
   description:
     'Branding, creative direction, visual systems, lookbooks, packaging visuals, launch creative, content systems, media kits, and brand deck services for founders, creators, and companies.',
-  url: 'https://www.vibeshackstudios.com/branding/',
-  image: 'https://www.vibeshackstudios.com/studio-images/photo-gallery-red-blue-sunglasses-v20260520.jpg',
+  url: `${siteUrl}/branding/`,
+  image: `${siteUrl}/studio-images/photo-gallery-red-blue-sunglasses-v20260520.jpg`,
   serviceType: 'Branding and Creative Direction',
 })
 

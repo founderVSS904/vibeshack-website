@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { absoluteUrl, business } from '@/lib/seo/site'
+import { absoluteUrl, business, siteUrl } from '@/lib/seo/site'
 import PhotoServicesHero from './PhotoServicesHero'
 import { breadcrumbSchema, faqSchema } from '@/lib/schemas'
 
@@ -10,13 +10,13 @@ export const metadata: Metadata = {
   description:
     'Photo services in San Francisco for product photography, headshots, food, portraits, weddings and events, campaigns, lookbooks, press photos, and content days.',
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/photo-services/',
+    canonical: `${siteUrl}/photo-services/`,
   },
   openGraph: {
     title: 'Photo Services San Francisco | VibeShack Studios',
     description:
       'Book a produced photoshoot for product photography, headshots, food, portraits, weddings and events, campaigns, press photos, and content days.',
-    url: 'https://www.vibeshackstudios.com/photo-services/',
+    url: `${siteUrl}/photo-services/`,
     images: ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg'],
   },
 }
@@ -171,15 +171,15 @@ const faqs = [
 const photoServiceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
-  '@id': 'https://www.vibeshackstudios.com/photo-services/#service',
+  '@id': `${siteUrl}/photo-services/#service`,
   name: 'Photo Services in San Francisco',
   serviceType: 'Photography Services',
   description:
     'Photoshoot services in San Francisco for product photography, food photography, headshots, portraits, weddings and events, brand campaigns, lookbooks, press photos, and content days.',
-  url: 'https://www.vibeshackstudios.com/photo-services/',
-  image: 'https://www.vibeshackstudios.com/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
+  url: `${siteUrl}/photo-services/`,
+  image: `${siteUrl}/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg`,
   provider: {
-    '@id': 'https://www.vibeshackstudios.com/#business',
+    '@id': `${siteUrl}/#business`,
   },
   areaServed: [
     { '@type': 'City', name: 'San Francisco' },
@@ -190,7 +190,7 @@ const photoServiceSchema = {
     '@type': 'Offer',
     name: 'Photo Services quote request',
     availability: 'https://schema.org/InStock',
-    url: 'https://www.vibeshackstudios.com/photo-services/',
+    url: `${siteUrl}/photo-services/`,
     description:
       'Contact VibeShack to scope photo services based on shot list, crew, deliverables, usage, timeline, and post-production needs.',
   },

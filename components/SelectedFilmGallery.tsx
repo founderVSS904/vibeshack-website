@@ -31,8 +31,6 @@ export default function SelectedFilmGallery({ films }: SelectedFilmGalleryProps)
     <div className="grid overflow-hidden border-y border-white/10 bg-black lg:grid-cols-[minmax(0,1fr)_360px]">
       <div
         id="selected-film-player"
-        role="tabpanel"
-        aria-labelledby={`selected-film-tab-${activeFilm.slug}`}
         className="relative aspect-video bg-black"
       >
         {isPlaying ? (
@@ -78,15 +76,13 @@ export default function SelectedFilmGallery({ films }: SelectedFilmGalleryProps)
         )}
       </div>
 
-      <div className="flex min-w-0 overflow-x-auto border-t border-white/10 lg:flex lg:flex-col lg:overflow-visible lg:border-l lg:border-t-0" role="tablist" aria-label="Selected films">
+      <div className="flex min-w-0 overflow-x-auto border-t border-white/10 lg:flex lg:flex-col lg:overflow-visible lg:border-l lg:border-t-0" aria-label="Selected films">
         {films.map((film, index) => (
           <button
             key={film.slug}
             id={`selected-film-tab-${film.slug}`}
             type="button"
-            role="tab"
-            aria-selected={index === activeIndex}
-            aria-controls="selected-film-player"
+            aria-pressed={index === activeIndex}
             onClick={() => {
               setActiveIndex(index)
               setIsPlaying(false)

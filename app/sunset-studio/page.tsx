@@ -1,101 +1,33 @@
-'use client'
-
-import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import SunsetColorCarousel from './SunsetColorCarousel'
+import SunsetColorWheel, { type WheelSegment } from './SunsetColorWheel'
+
+const colors = [
+  { img: '/studio-images/sunset-red-v1775053057.jpg', name: 'Red' },
+  { img: '/studio-images/sunset-blue-v1775053259.jpg', name: 'Blue' },
+  { img: '/studio-images/sunset-green-v1775050495.jpg', name: 'Green' },
+  { img: '/studio-images/sunset-purple-v1775080889.jpg', name: 'Purple' },
+  { img: '/studio-images/sunset-white-v1775080644.jpg', name: 'White' },
+  { img: '/studio-images/sunset-star-wars-v1775080748.jpg', name: 'Saber Green' },
+  { img: '/studio-images/sunset-sunset-v1775053701.jpg', name: 'Sunset' },
+]
+
+const wheelSegments: WheelSegment[] = [
+  { offset: 0, color: '#FF0000', label: 'Red', mood: 'high-energy, bold, and impossible to miss' },
+  { offset: 30, color: '#FF6600', label: 'Orange', mood: 'warm, inviting, and creator-friendly' },
+  { offset: 60, color: '#FFDD00', label: 'Yellow', mood: 'bright, optimistic, and punchy' },
+  { offset: 90, color: '#00DD00', label: 'Green', mood: 'clean, unusual, and attention-grabbing' },
+  { offset: 120, color: '#00DDDD', label: 'Cyan', mood: 'modern, crisp, and tech-forward' },
+  { offset: 150, color: '#0099FF', label: 'Sky Blue', mood: 'cool, polished, and calm' },
+  { offset: 180, color: '#0033FF', label: 'Blue', mood: 'deep, premium, and focused' },
+  { offset: 210, color: '#7700FF', label: 'Purple', mood: 'cinematic, moody, and stylish' },
+  { offset: 240, color: '#DD00DD', label: 'Magenta', mood: 'expressive, music-video ready, and loud' },
+  { offset: 270, color: '#FF0099', label: 'Pink', mood: 'playful, social-first, and glossy' },
+  { offset: 300, color: '#FFFFFF', label: 'White', mood: 'clean, minimal, and editorial' },
+  { offset: 330, color: '#00FF66', label: 'Saber Green', mood: 'neon, sci-fi, and intentionally weird' },
+]
 
 export default function SunsetPage() {
-  const colors = [
-    { img: '/studio-images/sunset-red-v1775053057.jpg', name: 'Red' },
-    { img: '/studio-images/sunset-blue-v1775053259.jpg', name: 'Blue' },
-    { img: '/studio-images/sunset-green-v1775050495.jpg', name: 'Green' },
-    { img: '/studio-images/sunset-purple-v1775080889.jpg', name: 'Purple' },
-    { img: '/studio-images/sunset-white-v1775080644.jpg', name: 'White' },
-    { img: '/studio-images/sunset-star-wars-v1775080748.jpg', name: 'Saber Green' },
-    { img: '/studio-images/sunset-sunset-v1775053701.jpg', name: 'Sunset' },
-  ]
-  const wheelSegments = [
-    { offset: 0, color: '#FF0000', label: 'Red', mood: 'high-energy, bold, and impossible to miss' },
-    { offset: 30, color: '#FF6600', label: 'Orange', mood: 'warm, inviting, and creator-friendly' },
-    { offset: 60, color: '#FFDD00', label: 'Yellow', mood: 'bright, optimistic, and punchy' },
-    { offset: 90, color: '#00DD00', label: 'Green', mood: 'clean, unusual, and attention-grabbing' },
-    { offset: 120, color: '#00DDDD', label: 'Cyan', mood: 'modern, crisp, and tech-forward' },
-    { offset: 150, color: '#0099FF', label: 'Sky Blue', mood: 'cool, polished, and calm' },
-    { offset: 180, color: '#0033FF', label: 'Blue', mood: 'deep, premium, and focused' },
-    { offset: 210, color: '#7700FF', label: 'Purple', mood: 'cinematic, moody, and stylish' },
-    { offset: 240, color: '#DD00DD', label: 'Magenta', mood: 'expressive, music-video ready, and loud' },
-    { offset: 270, color: '#FF0099', label: 'Pink', mood: 'playful, social-first, and glossy' },
-    { offset: 300, color: '#FFFFFF', label: 'White', mood: 'clean, minimal, and editorial' },
-    { offset: 330, color: '#00FF66', label: 'Saber Green', mood: 'neon, sci-fi, and intentionally weird' },
-  ]
-  const [selectedWheelColor, setSelectedWheelColor] = useState(wheelSegments[0])
-  const [hoveredWheelColor, setHoveredWheelColor] = useState<typeof wheelSegments[number] | null>(null)
-  const activeWheelColor = hoveredWheelColor ?? selectedWheelColor
-
-  const carouselRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const carousel = carouselRef.current
-    if (!carousel) return
-
-    // Respect reduced motion: no auto-scroll, leave the strip scrollable by hand
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const wrapper = carousel.parentElement
-      if (wrapper) wrapper.style.overflowX = 'auto'
-      return
-    }
-
-    // Calculate scroll distance and duration
-    const itemWidth = 280 + 12 // item width + gap
-    const totalItems = colors.length
-    const scrollDistance = itemWidth * totalItems
-    const duration = 18000 // 18 seconds in milliseconds
-
-    let animationStartTime: number | null = null
-    let pausedAt: number | null = null
-    let animationId = 0
-
-    const animate = (currentTime: number) => {
-      if (animationStartTime === null) animationStartTime = currentTime
-
-      if (pausedAt === null) {
-        const elapsedTime = currentTime - animationStartTime
-        const progress = (elapsedTime % duration) / duration
-        const translateDistance = scrollDistance * progress
-
-        carousel.style.transform = `translateX(-${translateDistance}px)`
-        carousel.style.transition = 'none'
-      }
-
-      animationId = requestAnimationFrame(animate)
-    }
-
-    // Pause while hovered or focused so the card links stay clickable
-    const pause = () => {
-      if (pausedAt === null) pausedAt = performance.now()
-    }
-    const resume = () => {
-      if (pausedAt !== null && animationStartTime !== null) {
-        animationStartTime += performance.now() - pausedAt
-      }
-      pausedAt = null
-    }
-
-    carousel.addEventListener('pointerenter', pause)
-    carousel.addEventListener('pointerleave', resume)
-    carousel.addEventListener('focusin', pause)
-    carousel.addEventListener('focusout', resume)
-
-    animationId = requestAnimationFrame(animate)
-
-    return () => {
-      cancelAnimationFrame(animationId)
-      carousel.removeEventListener('pointerenter', pause)
-      carousel.removeEventListener('pointerleave', resume)
-      carousel.removeEventListener('focusin', pause)
-      carousel.removeEventListener('focusout', resume)
-    }
-  }, [colors.length])
-
   return (
     <>
       {/* Hero */}
@@ -105,7 +37,7 @@ export default function SunsetPage() {
           fill sizes="100vw" className="object-cover opacity-85" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">Creative Series</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-4 text-brand-red">Creative Series</p>
           <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: 0}}>
             Sunset<span className="text-brand-red">.</span>
           </h1>
@@ -126,7 +58,7 @@ export default function SunsetPage() {
             Choose your <span className="text-brand-red">mood.</span>
           </h2>
         </div>
-        
+
         <style>{`
           .carousel-wrapper {
             overflow: hidden;
@@ -168,6 +100,7 @@ export default function SunsetPage() {
             line-height: 1.4;
             border-radius: 0 0 0.5rem 0.5rem;
             transition: background 0.3s ease, color 0.3s ease;
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             min-height: 48px;
             display: flex;
@@ -180,33 +113,7 @@ export default function SunsetPage() {
           }
         `}</style>
 
-        <div className="carousel-wrapper" aria-label="Sunset color examples">
-          <div className="carousel-inner" ref={carouselRef}>
-            {colors.map(({ img, name }) => (
-              <div key={name} className="carousel-item">
-                <a
-                  href={`/book/?studio=sunset&color=${encodeURIComponent(name.toLowerCase())}`}
-                  className="carousel-link"
-                >
-                  <Image src={img} alt={`Sunset ${name}`} width={280} height={256} className="w-full h-64 object-cover" />
-                  <p className="carousel-label">{name}</p>
-                </a>
-              </div>
-            ))}
-            {/* Duplicate for seamless loop */}
-            {colors.map(({ img, name }) => (
-              <div key={`${name}-2`} className="carousel-item">
-                <a
-                  href={`/book/?studio=sunset&color=${encodeURIComponent(name.toLowerCase())}`}
-                  className="carousel-link"
-                >
-                  <Image src={img} alt={`Sunset ${name}`} width={280} height={256} className="w-full h-64 object-cover" />
-                  <p className="carousel-label">{name}</p>
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
+        <SunsetColorCarousel colors={colors} />
       </section>
 
       {/* The Studio - Features */}
@@ -249,7 +156,7 @@ export default function SunsetPage() {
             Programmable <span className="text-brand-red">means you decide.</span>
           </h2>
           <p className="text-gray-500 text-lg mb-20 max-w-2xl">Every color is pre-calibrated and one dial away. Don't compromise on the mood your show needs. Paint the room to match your vision, not the other way around.</p>
-          
+
           <div className="space-y-24">
             {/* Detail 1 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
@@ -279,124 +186,7 @@ export default function SunsetPage() {
       </section>
 
       {/* Color Wheel - Call to Action */}
-      <section className="py-32 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Left: Color Wheel */}
-            <div className="flex flex-col items-center justify-center gap-6 lg:items-start">
-              <svg
-                width="300"
-                height="300"
-                viewBox="0 0 300 300"
-                className="max-w-xs drop-shadow-lg"
-                aria-label="Interactive Sunset studio color wheel"
-                onPointerLeave={() => setHoveredWheelColor(null)}
-              >
-                <defs>
-                  <radialGradient id="wheelGradient" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="rgba(0,0,0,0)" />
-                    <stop offset="100%" stopColor="rgba(0,0,0,0.1)" />
-                  </radialGradient>
-                </defs>
-                {wheelSegments.map((segment, idx) => {
-                  const startAngle = (segment.offset * Math.PI) / 180 - Math.PI / 2
-                  const endAngle = ((segment.offset + 30) * Math.PI) / 180 - Math.PI / 2
-                  const radius = 130
-                  const x1 = 150 + radius * Math.cos(startAngle)
-                  const y1 = 150 + radius * Math.sin(startAngle)
-                  const x2 = 150 + radius * Math.cos(endAngle)
-                  const y2 = 150 + radius * Math.sin(endAngle)
-                  const selected = selectedWheelColor.label === segment.label
-                  const hovered = hoveredWheelColor?.label === segment.label
-                  const active = hovered || selected
-                  const midAngle = ((segment.offset + 15) * Math.PI) / 180 - Math.PI / 2
-                  const popDistance = hovered ? 11 : selected ? 5 : 0
-                  const popX = popDistance * Math.cos(midAngle)
-                  const popY = popDistance * Math.sin(midAngle)
-                  const scale = hovered ? 1.035 : selected ? 1.015 : 1
-                  
-                  return (
-                    <path
-                      key={idx}
-                      d={`M 150 150 L ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2} Z`}
-                      fill={segment.color}
-                      stroke="black"
-                      strokeWidth={hovered ? 6 : selected ? 4 : 2}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Select ${segment.label}`}
-                      aria-pressed={selected}
-                      className="cursor-pointer outline-none transition-[transform,opacity] duration-200 ease-out"
-                      style={{
-                        transform: `translate(${popX}px, ${popY}px) scale(${scale})`,
-                        transformBox: 'view-box',
-                        transformOrigin: '150px 150px',
-                        opacity: active ? 1 : 0.88,
-                        filter: hovered
-                          ? `drop-shadow(0 14px 18px ${segment.color}55) brightness(1.14)`
-                          : selected
-                            ? `drop-shadow(0 8px 14px ${segment.color}35)`
-                            : 'none',
-                      }}
-                      onPointerEnter={() => setHoveredWheelColor(segment)}
-                      onPointerMove={() => setHoveredWheelColor(segment)}
-                      onClick={() => setSelectedWheelColor(segment)}
-                      onFocus={() => setHoveredWheelColor(segment)}
-                      onBlur={() => setHoveredWheelColor(null)}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault()
-                          setSelectedWheelColor(segment)
-                        }
-                      }}
-                    />
-                  )
-                })}
-                {/* Outer ring glow effect */}
-                <circle cx="150" cy="150" r="136" fill="none" stroke={activeWheelColor.color} strokeWidth="3" opacity="0.7" />
-                {/* Center circle */}
-                <circle cx="150" cy="150" r="60" fill="black" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-                <circle
-                  cx="150"
-                  cy="150"
-                  r={42}
-                  fill={activeWheelColor.color}
-                  opacity="0.85"
-                  className="transition-transform duration-200 ease-out"
-                  style={{
-                    transform: hoveredWheelColor ? 'scale(1.12)' : 'scale(1)',
-                    transformBox: 'view-box',
-                    transformOrigin: '150px 150px',
-                    filter: hoveredWheelColor ? `drop-shadow(0 0 18px ${activeWheelColor.color}77)` : 'none',
-                  }}
-                />
-              </svg>
-              <div className="rounded-lg border border-white/10 bg-zinc-950/80 p-5 text-center lg:text-left">
-                <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-2">Selected mood</p>
-                <p className="text-white text-2xl font-black" style={{ color: activeWheelColor.color }}>
-                  {activeWheelColor.label}
-                </p>
-                <p className="text-gray-400 text-sm mt-2 max-w-xs">{activeWheelColor.mood}</p>
-              </div>
-            </div>
-            
-            {/* Right: CTA */}
-            <div>
-              <h2 className="text-white font-black leading-none mb-6" style={{fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', letterSpacing: 0}}>
-                Pick your <span style={{color: activeWheelColor.color}}>color.</span>
-              </h2>
-              <h3 className="text-white font-black leading-none mb-8" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: 0, color: activeWheelColor.color}}>
-                {activeWheelColor.label}. We'll handle the rest.
-              </h3>
-              <p className="text-gray-400 text-base mb-12">$300/hr · Cameraman included · Open 24/7</p>
-              <a href="/book/?studio=sunset" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
-                Book Sunset
-                <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <SunsetColorWheel segments={wheelSegments} />
 
       {/* Pricing */}
       <section className="py-32 bg-zinc-950 border-t border-white/5">
@@ -421,7 +211,7 @@ export default function SunsetPage() {
             Book Sunset
             <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>
           </a>
-          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48hrs before.</p>
+          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48 hours before.</p>
         </div>
       </section>
 
@@ -438,7 +228,7 @@ export default function SunsetPage() {
             <Image src="/studio-images/parlor-hero.jpg" alt="Canvas Podcast premium studio" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
             <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%)'}} />
             <div className="absolute bottom-0 left-0 right-0 p-12">
-              <p className="text-xs font-bold tracking-widest uppercase mb-3 text-brand-red">Creative Series</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-3 text-brand-red">Creative Series</p>
               <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: 0}}>Canvas Podcast</h3>
               <p className="text-gray-300 text-lg max-w-md mb-6">Signature podcast spaces. Customizable setups. Premium production crew included.</p>
               <p className="text-gray-400 text-sm">$400/hr · Podcast production</p>

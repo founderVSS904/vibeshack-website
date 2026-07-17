@@ -11,6 +11,8 @@ type FeaturedSlide = {
   primaryCta: { label: string; href: string; play?: boolean; external?: boolean }
   secondaryCta: { label: string; href: string }
   image: string
+  // Sized-down variant served raw via the <video poster> attribute.
+  posterSrc?: string
   imageAlt: string
   imagePosition?: string
   // Muted looping background clip; the image doubles as its poster.
@@ -28,6 +30,7 @@ const slides: FeaturedSlide[] = [
     primaryCta: { label: 'Watch the video', href: 'https://www.youtube.com/watch?v=3Rbir7bu408', play: true, external: true },
     secondaryCta: { label: 'All work', href: '/our-work/' },
     image: '/studio-images/work-body-is-tea-music-v20260708b.jpg',
+    posterSrc: '/studio-images/poster-work-body-is-tea-music-v20260708b.jpg',
     imageAlt: 'Body Is Tea music video title card with dancers in a sunny driveway',
     video: '/studio-videos/home-feat-body-is-tea-loop-v20260715.mp4',
     poster: true,
@@ -39,6 +42,7 @@ const slides: FeaturedSlide[] = [
     primaryCta: { label: 'Watch the episode', href: 'https://www.youtube.com/watch?v=3mLFnCovlF8', play: true, external: true },
     secondaryCta: { label: 'All work', href: '/our-work/' },
     image: '/studio-images/work-the-buzzer-silicon-mania-v20260708.jpg',
+    posterSrc: '/studio-images/poster-work-the-buzzer-silicon-mania-v20260708.jpg',
     imageAlt: 'The Buzzer title card over the Silicon Mania pitch show set',
     imagePosition: 'center 25%',
     video: '/studio-videos/home-feat-the-buzzer-loop-v20260709.mp4',
@@ -51,8 +55,9 @@ const slides: FeaturedSlide[] = [
     primaryCta: { label: 'Watch the film', href: 'https://www.youtube.com/watch?v=tX5nk9EEBHs', play: true, external: true },
     secondaryCta: { label: 'All work', href: '/our-work/' },
     image: '/studio-images/work-wing-battle-grill-v20260717.jpg',
+    posterSrc: '/studio-images/poster-work-wing-battle-grill-v20260717.jpg',
     imageAlt: 'Hot wings tossed on a kettle grill at the Wing Battle event',
-    video: '/studio-videos/home-feat-wing-battle-loop-v20260716b.mp4',
+    video: '/studio-videos/home-feat-wing-battle-loop-v20260717.mp4',
     poster: true,
   },
 ]
@@ -136,7 +141,7 @@ export function FeaturedOriginals() {
                   videoRefs.current[i] = el
                 }}
                 src={slide.video}
-                poster={slide.image}
+                poster={slide.posterSrc ?? slide.image}
                 className="absolute inset-0 h-full w-full object-cover"
                 style={{ objectPosition: slide.imagePosition || 'center' }}
                 muted

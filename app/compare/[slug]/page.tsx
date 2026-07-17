@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { EditorialSeoHero } from '@/components/EditorialSeoHero'
 import { breadcrumbSchema, faqSchema } from '@/lib/schemas'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { comparisonUrl, comparisons, getComparisonBySlug } from '@/lib/seo/comparisons'
 
 const pageLabels: Record<string, string> = {
@@ -57,8 +57,8 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
     headline: comparison.title,
     description: comparison.description,
     image: absoluteUrl(comparison.image),
-    author: { '@id': 'https://www.vibeshackstudios.com/#org' },
-    publisher: { '@id': 'https://www.vibeshackstudios.com/#org' },
+    author: { '@id': `${siteUrl}/#business` },
+    publisher: { '@id': `${siteUrl}/#business` },
     mainEntityOfPage: comparisonUrl(comparison.slug),
     datePublished: '2026-05-09',
     dateModified: '2026-05-09',

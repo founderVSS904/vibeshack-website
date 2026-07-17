@@ -1,15 +1,16 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { studioServiceSchema } from '@/lib/schemas'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Parlor Interview Studio',
   description: 'Chesterfield seating. Full 4K production. Cameraman included. Premium interview studio in San Francisco. $400/hr. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/parlor/' },
+  alternates: { canonical: `${siteUrl}/parlor/` },
   openGraph: {
     title: 'Parlor | VibeShack Studios SF',
     description: 'Premium interview studio with Chesterfield seating and full 4K production. Cameraman included. $400/hr in San Francisco.',
-    url: 'https://www.vibeshackstudios.com/parlor',
+    url: `${siteUrl}/parlor`,
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/parlor-hero.jpg', width: 1200, height: 630, alt: 'Parlor at VibeShack Studios SF' }],
     type: 'website',
@@ -25,8 +26,8 @@ export const metadata: Metadata = {
 const parlorServiceSchema = studioServiceSchema({
   name: 'Parlor Interview Studio Rental in San Francisco',
   description: 'Premium interview studio in San Francisco with Chesterfield seating, 4K production, broadcast audio, and crew included.',
-  url: 'https://www.vibeshackstudios.com/parlor/',
-  image: 'https://www.vibeshackstudios.com/studio-images/parlor-hero.jpg',
+  url: `${siteUrl}/parlor/`,
+  image: `${siteUrl}/studio-images/parlor-hero.jpg`,
   price: '400',
   serviceType: 'Interview Studio Rental',
 })
@@ -45,7 +46,7 @@ export default function ParlorPage() {
           fill sizes="100vw" className="object-cover opacity-80" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">Creative Series</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-4 text-brand-red">Creative Series</p>
           <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: 0}}>
             Parlor<span className="text-brand-red">.</span>
           </h1>
@@ -149,7 +150,7 @@ export default function ParlorPage() {
             Book Parlor
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
-          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48hrs before.</p>
+          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48 hours before.</p>
         </div>
       </section>
 

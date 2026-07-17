@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Green Screen Studio San Francisco',
@@ -15,17 +16,17 @@ export const metadata: Metadata = {
     'content creation studio sf',
   ],
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/green-screen-studio-sf/',
+    canonical: `${siteUrl}/green-screen-studio-sf/`,
   },
   openGraph: {
     title: 'Green Screen Studio SF | 750 sq ft Floor-to-Ceiling | VibeShack Studios',
     description:
       '750 sq ft floor-to-ceiling green screen in SF. Professional lighting, rigging, VFX-ready. $100/hr. Northern Waterfront, open 24/7.',
-    url: 'https://www.vibeshackstudios.com/green-screen-studio-sf',
+    url: `${siteUrl}/green-screen-studio-sf`,
     type: 'website',
     images: [
       {
-        url: 'https://www.vibeshackstudios.com/studio-images/inside-green-screen-v20260509.jpg',
+        url: `${siteUrl}/studio-images/inside-green-screen-v20260509.jpg`,
         width: 1200,
         height: 630,
         alt: 'Green Screen Studio - 750 sq ft floor-to-ceiling - VibeShack Studios SF',
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Green Screen Studio SF | VibeShack Studios',
     description: '750 sq ft floor-to-ceiling green screen. Professional lighting. From $100/hr. Open 24/7.',
-    images: ['https://www.vibeshackstudios.com/studio-images/inside-green-screen-v20260509.jpg'],
+    images: [`${siteUrl}/studio-images/inside-green-screen-v20260509.jpg`],
   },
 }
 
@@ -91,8 +92,8 @@ const faqs = [
 const greenScreenServiceSchema = studioServiceSchema({
   name: 'Green Screen Studio Rental in San Francisco',
   description: '750 sq ft floor-to-ceiling green screen studio in San Francisco with professional lighting and easy load-in.',
-  url: 'https://www.vibeshackstudios.com/green-screen-studio-sf/',
-  image: 'https://www.vibeshackstudios.com/studio-images/inside-green-screen-v20260509.jpg',
+  url: `${siteUrl}/green-screen-studio-sf/`,
+  image: `${siteUrl}/studio-images/inside-green-screen-v20260509.jpg`,
   price: '100',
   serviceType: 'Green Screen Studio Rental',
 })
@@ -324,10 +325,10 @@ export default function GreenScreenPage() {
       {/* Sister Studios */}
       <section className="py-16 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <p className="text-gray-600 text-xs uppercase tracking-widest mb-6">Also in the Creative Series</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-6">Also in the Creative Series</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <a href="/photography-studio-san-francisco/" className="relative overflow-hidden rounded-lg group block" style={{height: '200px'}}>
-              <Image src="/studio-images/inside-photography-red-v20260509.jpg" alt="Photography Studio, Creative Series, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+              <Image src="/studio-images/inside-photography-red-v20260509.jpg" alt="Photography Studio, Creative Series, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
                 <p className="text-white font-black">Photography Studio</p>
@@ -335,7 +336,7 @@ export default function GreenScreenPage() {
               </div>
             </a>
             <a href="/canvas-rental/" className="relative overflow-hidden rounded-lg group block" style={{height: '200px'}}>
-              <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg" alt="Canvas, seamless white cyc wall, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+              <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg" alt="Canvas, seamless white cyc wall, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
                 <p className="text-white font-black">Canvas</p>

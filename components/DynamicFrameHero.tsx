@@ -218,7 +218,7 @@ export function DynamicFrameHero() {
                     src={frame.image}
                     alt={frame.alt}
                     fill
-                    priority
+                    priority={index < 3}
                     quality={72}
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="dynamic-frame-image"

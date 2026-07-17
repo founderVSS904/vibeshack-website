@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+import { siteUrl } from '@/lib/seo/site'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -18,9 +19,9 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: [
-      'https://www.vibeshackstudios.com/sitemap.xml',
-      'https://www.vibeshackstudios.com/image-sitemap.xml',
+      `${siteUrl}/sitemap.xml`,
+      `${siteUrl}/image-sitemap.xml`,
     ],
-    host: 'https://www.vibeshackstudios.com',
+    host: siteUrl,
   }
 }

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import WorkCardMedia from '@/components/WorkCardMedia'
 import { OurWorkShowreel } from '@/components/our-work/OurWorkShowreel'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { allWorkProjects, featuredWorkProject, shotAtVibeshack, workCategories, type WorkCategorySlug } from '@/lib/seo/workProjects'
 import { breadcrumbSchema } from '@/lib/schemas'
 
@@ -10,12 +10,12 @@ export const metadata: Metadata = {
   title: 'Our Work',
   description:
     'Music videos, series, sports films, and event coverage produced with VibeShack Studios in San Francisco, plus client shows shot in our rooms.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/our-work/' },
+  alternates: { canonical: `${siteUrl}/our-work/` },
   openGraph: {
     title: 'Our Work | VibeShack Studios SF',
     description:
       'Music videos, series, sports films, and event coverage produced with VibeShack Studios in San Francisco.',
-    url: 'https://www.vibeshackstudios.com/our-work/',
+    url: `${siteUrl}/our-work/`,
     images: ['/studio-images/work-body-is-tea-music-v20260708b.jpg'],
   },
 }

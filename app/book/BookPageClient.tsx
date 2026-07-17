@@ -341,7 +341,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
   const startIndex = startSlot ? slots.findIndex((s) => s.time === startSlot) : -1
   const blockSlots = startIndex >= 0 ? slots.slice(startIndex, startIndex + duration).map((s) => s.time) : []
   const timeRange = blockSlots.length === duration && duration > 0
-    ? `${fmtTime(blockSlots[0])} – ${fmtEnd(blockSlots[blockSlots.length - 1], 1)}`
+    ? `${fmtTime(blockSlots[0])} to ${fmtEnd(blockSlots[blockSlots.length - 1], 1)}`
     : ''
 
   const sessionSubtotal = selectedStudio ? selectedStudio.price * duration : 0
@@ -707,7 +707,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                           }`}
                         >
                           <div className="relative h-[124px] overflow-hidden">
-                            <Image src={s.heroImage} alt={s.name} fill quality={75} sizes="440px" className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]" />
+                            <Image src={s.heroImage} alt={s.name} fill quality={75} sizes="440px" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
                             {isSelected && (
                               <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-brand-red">
                                 <svg className="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
@@ -1252,7 +1252,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   <RateIcon />
                   <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Rate</span>
                   <span className={`ml-auto text-right text-[13px] ${selectedStudio ? 'text-white' : 'text-zinc-500'}`}>
-                    {selectedStudio ? `$${selectedStudio.price}/hr` : '—'}
+                    {selectedStudio ? `$${selectedStudio.price}/hr` : 'Not selected'}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 py-3.5 text-zinc-500">

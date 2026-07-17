@@ -1,18 +1,18 @@
 import type { Metadata } from 'next'
 import { RevenueCategoryPage } from '@/components/RevenueCategoryPage'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { breadcrumbSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
   title: 'Commercial Video Production SF',
   description:
     'Commercial video production in San Francisco for launch ads, talking-head videos, founder videos, product demos, social ads, and campaign content.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/commercials/' },
+  alternates: { canonical: `${siteUrl}/commercials/` },
   openGraph: {
     title: 'Commercials | VibeShack Studios SF',
     description:
       'Plan commercial video shoots for product launches, talking-head ads, founder videos, demos, and social campaigns at VibeShack Studios.',
-    url: 'https://www.vibeshackstudios.com/commercials/',
+    url: `${siteUrl}/commercials/`,
     images: ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg'],
   },
 }
@@ -21,8 +21,8 @@ const commercialServiceSchema = studioServiceSchema({
   name: 'Commercial Video Production in San Francisco',
   description:
     'Commercial video production services for launch ads, talking-head videos, product demos, founder videos, social ads, and campaign content.',
-  url: 'https://www.vibeshackstudios.com/commercials/',
-  image: 'https://www.vibeshackstudios.com/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
+  url: `${siteUrl}/commercials/`,
+  image: `${siteUrl}/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg`,
   serviceType: 'Commercial Video Production',
 })
 

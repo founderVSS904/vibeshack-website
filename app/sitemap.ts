@@ -3,11 +3,14 @@ import { comparisons } from '@/lib/seo/comparisons'
 import { studioGuides } from '@/lib/seo/studioGuides'
 import { useCases } from '@/lib/seo/useCases'
 import { allWorkProjects } from '@/lib/seo/workProjects'
+import { siteUrl } from '@/lib/seo/site'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.vibeshackstudios.com'
-  const lastModified = new Date('2026-07-16')
-  const absoluteUrl = (path: string) => `${baseUrl}${path === '/' ? '/' : `${path}/`}`
+  // Content date, not a build stamp. Stamping every entry with the deploy
+  // time tells crawlers all 62 pages changed on every deploy, which is false
+  // and teaches them to ignore the signal. Bump this when content changes.
+  const lastModified = new Date('2026-07-17')
+  const absoluteUrl = (path: string) => `${siteUrl}${path === '/' ? '/' : `${path}/`}`
 
   // Main pages. The parked old homepage at /duplicate/ is intentionally
   // excluded here and carries noindex, nofollow in its own metadata.

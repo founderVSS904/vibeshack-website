@@ -238,7 +238,7 @@ export default function FindYourStudioPage() {
           <div className="flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full px-6 sm:px-10 pt-32 pb-20">
 
             {/* Step label */}
-            <p className="text-gray-700 text-xs tracking-[0.2em] uppercase mb-8">
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-700 mb-8">
               {currentQ + 1} of {QUESTIONS.length}
             </p>
 
@@ -288,7 +288,7 @@ export default function FindYourStudioPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
               Find a different studio
             </button>
-            <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-4">Your match</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-4">Your match</p>
             <h1 className="text-white font-black leading-none"
               style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0}}>
               {primary?.name}
@@ -301,7 +301,7 @@ export default function FindYourStudioPage() {
               className="block rounded-lg overflow-hidden mb-4 group relative h-[340px] sm:h-[420px]">
               <Image src={primary.img} alt={primary.name}
                 fill sizes="100vw"
-                className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
+                className="object-cover group-hover:scale-[1.035] transition-transform duration-700 ease-out"
                 priority />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 50%, transparent 80%)'}} />
               <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -346,7 +346,7 @@ export default function FindYourStudioPage() {
 
           {otherStudios.length > 0 && (
             <div className="mb-16">
-              <p className="text-gray-600 text-xs uppercase tracking-widest mb-4">Also consider</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-4">Also consider</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {otherStudios.map((s) => (
                   <a key={s.id} href={s.href}
@@ -354,7 +354,7 @@ export default function FindYourStudioPage() {
                     <div className="relative h-[170px]">
                       <Image src={s.img} alt={s.name}
                         fill sizes="100vw"
-                        className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out" />
+                        className="object-cover group-hover:scale-[1.035] transition-transform duration-700 ease-out" />
                       <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 62%)'}} />
                       <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 flex items-end justify-between gap-4">
                         <div>
@@ -372,7 +372,7 @@ export default function FindYourStudioPage() {
 
           {/* All Studios */}
           <div>
-            <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">All Studios</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">All Studios</p>
             {STUDIO_GROUPS.map((group) => {
               const studios = group.ids
                 .map((id) => STUDIOS[id])
@@ -390,7 +390,7 @@ export default function FindYourStudioPage() {
                         <div className="relative h-[160px]">
                           <Image src={s.img} alt={s.name}
                             fill sizes="100vw"
-                            className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out" />
+                            className="object-cover group-hover:scale-[1.035] transition-transform duration-700 ease-out" />
                           <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 55%)'}} />
                           <div className="absolute bottom-0 left-0 right-0 px-5 pb-3">
                             <p className="text-white font-bold text-sm">{s.name}</p>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { breadcrumbSchema, faqSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
@@ -9,13 +9,13 @@ export const metadata: Metadata = {
   description:
     'Photography studio rental in San Francisco for photographers, creators, and crews bringing their own camera team. Lighting, backdrops, makeup room, from $100/hr.',
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/photography-studio-san-francisco/',
+    canonical: `${siteUrl}/photography-studio-san-francisco/`,
   },
   openGraph: {
     title: 'Photography Studio Rental San Francisco | VibeShack Studios',
     description:
       'Book a room-only photography studio rental in San Francisco with lighting, backdrops, makeup room, and white cyc access. From $100/hr.',
-    url: 'https://www.vibeshackstudios.com/photography-studio-san-francisco/',
+    url: `${siteUrl}/photography-studio-san-francisco/`,
     images: ['/studio-images/photography-hero-service-v20260509.jpg'],
   },
 }
@@ -120,8 +120,8 @@ const photographyServiceSchema = studioServiceSchema({
   name: 'Photography Studio Rental in San Francisco',
   description:
     'Room-only photography studio rental in San Francisco for photographers, creators, and crews shooting headshots, products, portraits, fashion, lookbooks, press photos, and campaign stills with lighting, backdrops, white cyc access, and makeup room.',
-  url: 'https://www.vibeshackstudios.com/photography-studio-san-francisco/',
-  image: 'https://www.vibeshackstudios.com/studio-images/photography-hero-service-v20260509.jpg',
+  url: `${siteUrl}/photography-studio-san-francisco/`,
+  image: `${siteUrl}/studio-images/photography-hero-service-v20260509.jpg`,
   price: '100',
   serviceType: 'Photography Studio Rental',
 })

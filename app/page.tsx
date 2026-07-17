@@ -4,20 +4,21 @@ import { FeaturedOriginals } from '@/components/home/FeaturedOriginals'
 import { TrustedStrip } from '@/components/home/TrustedStrip'
 import { WhatWeDo } from '@/components/home/WhatWeDo'
 import { StudioSpaces } from '@/components/home/StudioSpaces'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: { absolute: 'VibeShack Studios | San Francisco Production Studio' },
   description:
     'Podcast, video, and photo studios at 950 Battery St, San Francisco. Book by the hour, 24/7, from $100/hr.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/' },
+  alternates: { canonical: `${siteUrl}/` },
   openGraph: {
     title: 'VibeShack Studios | San Francisco Production Studio',
     description:
       'Podcast, video, and photo studios at 950 Battery St, San Francisco. Book by the hour, 24/7, from $100/hr.',
-    url: 'https://www.vibeshackstudios.com/',
+    url: `${siteUrl}/`,
     images: [
       {
-        url: 'https://www.vibeshackstudios.com/studio-images/work-body-is-tea-music-v20260708b.jpg',
+        url: `${siteUrl}/studio-images/work-body-is-tea-music-v20260708b.jpg`,
         width: 3840,
         height: 2160,
         alt: 'Body Is Tea music video by Varii, presented by VibeShack Studios',

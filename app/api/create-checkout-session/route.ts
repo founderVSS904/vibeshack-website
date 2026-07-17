@@ -6,6 +6,7 @@ import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
 import { describeSlotRanges, formatDateForDisplay, isValidBookingDate } from '@/lib/booking/time'
 import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
 import { isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
+import { siteUrl } from '@/lib/seo/site'
 
 const ATTRIBUTION_COOKIE = 'vbs_attribution'
 const CHECKOUT_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -198,7 +199,7 @@ export async function POST(req: NextRequest) {
         product_data: {
           name: `${item.studioName} - VibeShack Studios`,
           description: `${formatDateForDisplay(item.date)} - ${describeSlotRanges(item.slots)} - ${item.hours}hr${discountCents ? ' - recurring discount applied' : ''}`,
-          images: ['https://www.vibeshackstudios.com/og-image.jpg'],
+          images: [`${siteUrl}/og-image.jpg`],
         },
         unit_amount: discountedSessionAmounts[index],
       },
@@ -212,7 +213,7 @@ export async function POST(req: NextRequest) {
           product_data: {
             name: `Add-on: ${addon.name}`,
             description: addon.description || 'Optional add-on service',
-            images: ['https://www.vibeshackstudios.com/og-image.jpg'],
+            images: [`${siteUrl}/og-image.jpg`],
           },
           unit_amount: addon.price * 100,
         },

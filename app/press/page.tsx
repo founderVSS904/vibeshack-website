@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { breadcrumbSchema } from '@/lib/schemas'
-import { absoluteUrl, business, externalProfiles, founders, moneyPages, parentBrand, peerspaceListings } from '@/lib/seo/site'
+import { absoluteUrl, business, externalProfiles, founders, moneyPages, parentBrand, peerspaceListings, siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Press & Media Kit',
@@ -28,8 +28,8 @@ export default function PressPage() {
     '@type': 'AboutPage',
     '@id': `${absoluteUrl('/press/')}#press`,
     name: 'VibeShack Studios Press & Media Kit',
-    about: { '@id': 'https://www.vibeshackstudios.com/#business' },
-    mainEntity: { '@id': 'https://www.vibeshackstudios.com/#business' },
+    about: { '@id': `${siteUrl}/#business` },
+    mainEntity: { '@id': `${siteUrl}/#business` },
     mentions: [
       ...founders.map((founder) => ({
         '@type': 'Person',
@@ -50,7 +50,7 @@ export default function PressPage() {
         <Image src="/studio-images/the-executive-hero.jpg" alt="VibeShack Studios podcast set in San Francisco" fill sizes="100vw" priority className="object-cover opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-black/10" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-32 w-full">
-          <p className="text-brand-red text-xs font-bold tracking-[0.25em] uppercase mb-6">Official Media Kit</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red mb-6">Official Media Kit</p>
           <h1 className="text-white font-black leading-none max-w-5xl" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: 0 }}>
             VibeShack Studios.
           </h1>
@@ -64,7 +64,7 @@ export default function PressPage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-16">
           <div className="space-y-16">
             <div>
-              <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Boilerplate</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-6">Boilerplate</p>
               <p className="text-white text-2xl sm:text-3xl font-light leading-relaxed max-w-4xl">
                 VibeShack is a media company and brand studio for creators, founders, and companies that need content, campaigns, and production support. VibeShack Studios is the San Francisco production arm: a 24/7 production studio with podcast sets, green screen, photo services, video production, photography studio rental, and white cyc rental spaces at 950 Battery St in the Northern Waterfront.
               </p>
@@ -74,14 +74,14 @@ export default function PressPage() {
             </div>
 
             <div>
-              <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Brand Architecture</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-6">Brand Architecture</p>
               <div className="grid grid-cols-1 gap-px border border-white/10 bg-white/10 md:grid-cols-2">
                 {[
                   ['VibeShack', parentBrand.descriptor, parentBrand.shortDescription],
                   ['VibeShack Studios', 'Production arm / local studio', business.entityRelationship],
                 ].map(([name, role, copy]) => (
                   <div key={name} className="bg-black p-6">
-                    <p className="text-brand-red text-xs font-bold tracking-[0.18em] uppercase mb-4">{role}</p>
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red mb-4">{role}</p>
                     <h2 className="text-white font-black text-2xl mb-4" style={{ letterSpacing: 0 }}>{name}</h2>
                     <p className="text-gray-400 text-sm leading-relaxed">{copy}</p>
                   </div>
@@ -103,14 +103,14 @@ export default function PressPage() {
                 ['Booking', 'Hourly studio bookings from $100/hr'],
               ].map(([label, value]) => (
                 <div key={label} className="border-t border-white/10 pt-5">
-                  <p className="text-gray-500 text-xs font-bold tracking-[0.18em] uppercase mb-3">{label}</p>
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">{label}</p>
                   <p className="text-white text-lg font-bold">{value}</p>
                 </div>
               ))}
             </div>
 
             <div>
-              <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Founders</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-6">Founders</p>
               <div className="grid grid-cols-1 gap-px border border-white/10 bg-white/10 md:grid-cols-3">
                 {founders.map((founder) => {
                   const card = (
@@ -134,7 +134,7 @@ export default function PressPage() {
             </div>
 
             <div>
-              <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Service Pages</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-6">Service Pages</p>
               <div className="grid grid-cols-1 gap-px border border-white/10 bg-white/10 md:grid-cols-2">
                 {moneyPages.map((page) => (
                   <Link key={page.href} href={page.href} className="block bg-black p-6 transition-colors hover:bg-zinc-950">
@@ -146,7 +146,7 @@ export default function PressPage() {
             </div>
 
             <div>
-              <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Peerspace Footprint</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-6">Peerspace Footprint</p>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {peerspaceListings.map((listing) => (
                   <a key={listing.href} href={listing.href} target="_blank" rel="noopener noreferrer" className="grid grid-cols-1 gap-3 px-1 py-5 transition-colors hover:bg-white/[0.025] md:grid-cols-[1fr_auto]">
@@ -164,7 +164,7 @@ export default function PressPage() {
 
           <aside className="lg:sticky lg:top-28 self-start">
             <div className="rounded-lg border border-white/10 bg-zinc-950 p-8">
-              <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Official Links</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-6">Official Links</p>
               <div className="space-y-4">
                 <a href={business.mapUrl} target="_blank" rel="noopener noreferrer" className="block text-white hover:text-brand-red transition-colors">Google Maps →</a>
                 {externalProfiles.map((profile) => (

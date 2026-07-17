@@ -1,20 +1,28 @@
 import type { Metadata } from 'next'
 import ContactForm from './ContactForm'
 import { StudioLocation } from '@/components/StudioLocation'
-import { business, peerspaceUrl } from '@/lib/seo/site'
+import { business, peerspaceUrl, siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Contact',
   description:
     'Contact VibeShack Studios. Book a studio session or schedule a tour. 950 Battery St, San Francisco, CA 94111. +1 (845) 381-2289. founder@vibeshackstudios.com',
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/contact/',
+    canonical: `${siteUrl}/contact/`,
   },
   openGraph: {
     title: 'Contact VibeShack Studios | San Francisco',
     description:
       'Book a studio or schedule a tour. Northern Waterfront SF. +1 (845) 381-2289. founder@vibeshackstudios.com',
-    url: 'https://www.vibeshackstudios.com/contact',
+    url: `${siteUrl}/contact/`,
+    images: [
+      {
+        url: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Inside VibeShack Studios San Francisco',
+      },
+    ],
   },
 }
 
@@ -60,7 +68,7 @@ export default function ContactPage() {
 
               {/* Book Directly */}
               <div className="py-8">
-                <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Fastest Way to Book</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-4">Fastest Way to Book</p>
                 <p className="text-gray-400 text-sm mb-5">
                   Pick your time and confirm instantly.
                 </p>
@@ -75,7 +83,7 @@ export default function ContactPage() {
 
               {/* Address */}
               <div className="py-8">
-                <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Location</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-4">Location</p>
                 <address className="not-italic">
                   <p className="text-white font-bold text-base">950 Battery St</p>
                   <p className="text-gray-400 text-sm">San Francisco, CA 94111</p>
@@ -93,7 +101,7 @@ export default function ContactPage() {
 
               {/* Phone */}
               <div className="py-8">
-                <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Phone</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-4">Phone</p>
                 <a
                   href={`tel:${business.phone.replace(/[^\d+]/g, '')}`}
                   className="text-white font-semibold hover:text-brand-red transition-colors"
@@ -105,7 +113,7 @@ export default function ContactPage() {
 
               {/* Email */}
               <div className="py-8">
-                <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Email</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-4">Email</p>
                 <a
                   href="mailto:founder@vibeshackstudios.com"
                   className="text-white font-semibold hover:text-brand-red transition-colors"
@@ -117,7 +125,7 @@ export default function ContactPage() {
 
               {/* Instagram */}
               <div className="py-8">
-                <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Instagram</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-4">Instagram</p>
                 <a
                   href="https://instagram.com/vibeshackhq/"
                   target="_blank"
@@ -139,7 +147,7 @@ export default function ContactPage() {
 
               {/* Hours */}
               <div className="py-8">
-                <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Studio Hours</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-4">Studio Hours</p>
                 <p className="text-white font-bold text-lg">24 / 7</p>
                 <p className="text-gray-500 text-sm mt-1">
                   All studios open around the clock. Early morning, late night, weekends.
@@ -148,7 +156,7 @@ export default function ContactPage() {
 
               {/* Peerspace */}
               <div className="py-8">
-                <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4">Also on Peerspace</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-4">Also on Peerspace</p>
                 <a
                   href={peerspaceUrl}
                   target="_blank"

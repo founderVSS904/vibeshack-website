@@ -1,15 +1,24 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Rental Studios San Francisco',
   description: 'Rent green screen, photography, and white cyc studios in San Francisco. Bring your crew or shoot solo. From $100/hr. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/rental-studios/' },
+  alternates: { canonical: `${siteUrl}/rental-studios/` },
   openGraph: {
     title: 'Rental Studios SF | VibeShack Studios',
     description: 'Canvas, Photography, Green Screen. $100/hr. Your crew, our space. Open 24/7.',
-    url: 'https://www.vibeshackstudios.com/rental-studios',
+    url: `${siteUrl}/rental-studios/`,
+    images: [
+      {
+        url: '/studio-images/inside-canvas-cyc-v20260509.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Canvas white cyc rental studio at VibeShack Studios SF',
+      },
+    ],
   },
 }
 
@@ -65,8 +74,8 @@ const rentalFaqs = [
 const rentalServiceSchema = studioServiceSchema({
   name: 'Production Studio Rental in San Francisco',
   description: 'Green screen, photography, white cyc, and creative studio rentals in San Francisco for photo, video, product, and content shoots.',
-  url: 'https://www.vibeshackstudios.com/rental-studios/',
-  image: 'https://www.vibeshackstudios.com/studio-images/inside-canvas-cyc-v20260509.jpg',
+  url: `${siteUrl}/rental-studios/`,
+  image: `${siteUrl}/studio-images/inside-canvas-cyc-v20260509.jpg`,
   price: '100',
   serviceType: 'Production Studio Rental',
 })
@@ -90,7 +99,7 @@ export default function RentalStudiosPage() {
           style={{opacity: 0.7, objectPosition: 'center'}} priority />
         <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, transparent 70%)'}} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-gray-500 text-xs tracking-[0.3em] uppercase mb-4">VibeShack Studios · SF Northern Waterfront</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-4">VibeShack Studios · SF Northern Waterfront</p>
           <h1 className="font-black text-white leading-none mb-4" style={{fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: 0}}>
             Rental<br /><span className="text-brand-red">Studios.</span>
           </h1>
@@ -109,12 +118,12 @@ export default function RentalStudiosPage() {
                 className="relative block overflow-hidden rounded-lg group studio-card"
                 style={{height: '420px'}}>
                 <Image src={s.img} alt={s.name}
-                  fill sizes="100vw" className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out" />
+                  fill sizes="100vw" className="object-cover group-hover:scale-[1.035] transition-transform duration-700 ease-out" />
                 <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)'}} />
 
                 {/* Series label */}
                 <div className="absolute top-5 left-5">
-                  <span className="text-xs font-bold tracking-widest uppercase text-white/70">
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-white/70">
                     {s.series}
                   </span>
                 </div>

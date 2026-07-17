@@ -93,6 +93,38 @@ export default function Header() {
   useEffect(() => {
     closeMobileMenu()
   }, [pathname, closeMobileMenu])
+
+  // While the mobile menu covers the page, keep the content behind it out of
+  // the tab order. The header itself stays interactive: the logo, Book CTA,
+  // and close toggle are visible above the panel.
+  useEffect(() => {
+    const details = mobileMenuRef.current
+    if (!details) return
+    const setBackgroundInert = (value: boolean) => {
+      document.querySelectorAll<HTMLElement>('body > main, body > footer').forEach((el) => {
+        if (value) el.setAttribute('inert', '')
+        else el.removeAttribute('inert')
+      })
+    }
+    const onToggle = () => setBackgroundInert(details.open)
+    details.addEventListener('toggle', onToggle)
+    return () => {
+      details.removeEventListener('toggle', onToggle)
+      setBackgroundInert(false)
+    }
+  }, [])
+
+  // The details element hides at the xl breakpoint but stays open, which
+  // would leave the page inert. Close it when the viewport crosses over.
+  // 1280px must stay in lockstep with the xl:hidden class on the details.
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1280px)')
+    const onChange = () => {
+      if (mediaQuery.matches) closeMobileMenu()
+    }
+    mediaQuery.addEventListener('change', onChange)
+    return () => mediaQuery.removeEventListener('change', onChange)
+  }, [closeMobileMenu])
   const headerClassName = 'site-header fixed left-0 right-0 top-0 z-50 border-b border-white/[0.08] bg-black transition-colors duration-200'
   const headerContainerClassName = 'mx-auto max-w-7xl px-6 sm:px-10 lg:px-16'
 
@@ -203,49 +235,75 @@ function DesktopMenuTrigger({
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   const [hovered, setHovered] = useState(false)
-  const [focused, setFocused] = useState(false)
+  const [toggledOpen, setToggledOpen] = useState(false)
   const [everOpened, setEverOpened] = useState(false)
-  const open = (hovered || focused) && !dismissed
+  const open = (hovered || toggledOpen) && !dismissed
 
   return (
     <div
       className={`desktop-menu-trigger group flex h-20 items-center ${dismissed ? 'desktop-menu-trigger--dismissed' : ''}`}
       data-menu-id={menuId}
+      data-open={toggledOpen && !dismissed ? '' : undefined}
       onFocusCapture={() => {
+        // Reset only. Tabbing onto the trigger must not open the panel;
+        // the button click (Enter, Space, or pointer) toggles it.
         onReset()
-        setFocused(true)
-        setEverOpened(true)
+      }}
+      onClickCapture={(e) => {
+        // A click on a panel link navigates. Drop the pin with it, or the
+        // next reset would spring the panel open over the new page.
+        if ((e.target as HTMLElement).closest('a')) setToggledOpen(false)
       }}
       onBlurCapture={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false)
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setToggledOpen(false)
       }}
       onMouseEnter={() => {
         onReset()
         setHovered(true)
         setEverOpened(true)
       }}
-      onMouseLeave={() => {
+      onMouseLeave={(e) => {
         onReset()
         setHovered(false)
+        // A pointer click can pin the panel open without focusing the button
+        // (Safari does not focus buttons on click), so the blur close never
+        // fires. Let the mouse leaving close the pin, unless keyboard focus
+        // is still inside the menu.
+        if (!e.currentTarget.contains(document.activeElement)) setToggledOpen(false)
       }}
       onKeyDown={(e) => {
         if (e.key === 'Escape' && open) {
           // Focus first so the reset it fires cannot undo the dismiss.
           buttonRef.current?.focus()
           onDismiss()
+          setToggledOpen(false)
         }
       }}
     >
-      <button ref={buttonRef} type="button" aria-haspopup="true" aria-expanded={open} className={menuButtonClass}>
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={() => {
+          onReset()
+          setToggledOpen((current) => !current)
+          setEverOpened(true)
+        }}
+        className={menuButtonClass}
+      >
         {label}
-        <svg className="desktop-menu-caret h-3 w-3 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="desktop-menu-caret h-3 w-3 transition-transform duration-300 group-hover:rotate-180 group-data-[open]:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       <div
         aria-hidden="true"
-        className="desktop-menu-scrim pointer-events-none fixed bottom-0 left-0 right-0 top-20 hidden bg-black/45 opacity-0 backdrop-blur-[10px] transition-opacity duration-[420ms] group-hover:opacity-100 group-focus-within:opacity-100 xl:block"
-        onClick={onDismiss}
+        className="desktop-menu-scrim pointer-events-none fixed bottom-0 left-0 right-0 top-20 hidden bg-black/45 opacity-0 backdrop-blur-[10px] transition-opacity duration-[420ms] group-hover:opacity-100 group-data-[open]:opacity-100 xl:block"
+        onClick={() => {
+          onDismiss()
+          setToggledOpen(false)
+        }}
       />
       <MenuMediaContext.Provider value={everOpened}>{children}</MenuMediaContext.Provider>
     </div>
@@ -620,7 +678,7 @@ function DesktopMegaMenu({
   footer?: ReactNode
 }) {
   return (
-    <div className="desktop-mega-menu pointer-events-none invisible fixed inset-x-0 top-[calc(5rem-1px)] mx-auto hidden max-h-[calc(100vh-6.5rem)] w-[min(calc(100vw-2rem),1680px)] translate-y-[-6px] overflow-y-auto overscroll-contain rounded-lg border border-white/[0.08] bg-[#0c0c0c] text-white opacity-0 shadow-[0_48px_140px_rgba(0,0,0,0.72)] transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-hover:delay-[60ms] group-hover:duration-[420ms] group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-focus-within:delay-[60ms] group-focus-within:duration-[420ms] xl:block">
+    <div className="desktop-mega-menu pointer-events-none invisible fixed inset-x-0 top-[calc(5rem-1px)] mx-auto hidden max-h-[calc(100vh-6.5rem)] w-[min(calc(100vw-2rem),1680px)] translate-y-[-6px] overflow-y-auto overscroll-contain rounded-lg border border-white/[0.08] bg-[#0c0c0c] text-white opacity-0 shadow-[0_48px_140px_rgba(0,0,0,0.72)] transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-hover:delay-[60ms] group-hover:duration-[420ms] group-data-[open]:pointer-events-auto group-data-[open]:visible group-data-[open]:translate-y-0 group-data-[open]:opacity-100 group-data-[open]:delay-[60ms] group-data-[open]:duration-[420ms] xl:block">
       <div className={`desktop-mega-grid mx-auto grid px-10 pb-7 pt-9 lg:px-14 ${className}`}>
         {children}
       </div>

@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description: 'Booking policies, cancellation, studio rules, and terms of use for VibeShack Studios.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/terms/' }
+  alternates: { canonical: `${siteUrl}/terms/` }
 }
 
 export default function TermsPage() {
@@ -12,7 +13,7 @@ export default function TermsPage() {
 
       {/* Hero */}
       <section className="pt-40 pb-24 px-6 sm:px-10 lg:px-16 max-w-4xl mx-auto">
-        <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">Legal</p>
+        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">Legal</p>
         <h1
           className="font-black text-white leading-none mb-6"
           style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: 0 }}

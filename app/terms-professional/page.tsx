@@ -1,10 +1,11 @@
 import { Metadata } from 'next';
+import { siteUrl } from '@/lib/seo/site';
 
 export const metadata: Metadata = {
   title: 'Terms of Service (Full Legal)',
   description: 'Complete Terms of Service for VibeShack Studios. Comprehensive legal agreement covering bookings, cancellations, liability, content rights, and dispute resolution.',
   robots: { index: false, follow: true },
-  alternates: { canonical: 'https://www.vibeshackstudios.com/terms/' },
+  alternates: { canonical: `${siteUrl}/terms/` },
 };
 
 export default function TermsProfessionalPage() {
@@ -153,13 +154,13 @@ export default function TermsProfessionalPage() {
             <h3>5.7 Cancellation Policy</h3>
             <ul>
               <li><strong>Full Refund:</strong> Cancellations 48+ hours before session start = 100% refund</li>
-              <li><strong>Partial Refund:</strong> Cancellations 24–48 hours before = 50% refund; Rescheduling with 48+ hours notice = No charge</li>
+              <li><strong>Rescheduling:</strong> Rescheduling with 48+ hours notice = No charge</li>
               <li><strong>No Refund:</strong> Cancellations less than 48 hours before, no-shows = No refund</li>
               <li><strong>Studio-Initiated Cancellations:</strong> If the Studio must cancel, you receive full refund OR rescheduling to alternative time</li>
             </ul>
             
             <h3>5.8 Rescheduling</h3>
-            <p>Rescheduling requests must be submitted 48+ hours before the session. Rescheduling with 48+ hours notice is free. Rescheduling with less than 48 hours notice incurs a $25 fee.</p>
+            <p>Rescheduling with 48+ hours notice is free. Rescheduling with less than 48 hours notice incurs a $25 fee.</p>
             
             <h3>5.9 No-Shows &amp; Late Cancellations</h3>
             <p>No-shows forfeit 100% of fees. Cancellations within 48 hours forfeit 100% of fees.</p>
@@ -173,10 +174,10 @@ export default function TermsProfessionalPage() {
             
             <h3>6.1.1 Disclaimers of Warranty</h3>
             <ul>
-              <li><strong>No Warranty of Merchantability:</strong> The Studio is not fit for any particular purpose or merchantable quality</li>
-              <li><strong>No Warranty of Fitness:</strong> The Studio does not meet your specific needs or expectations</li>
-              <li><strong>No Warranty of Title:</strong> Equipment is not free from liens or claims</li>
-              <li><strong>No Warranty of Non-Infringement:</strong> Services do not infringe third-party IP rights</li>
+              <li><strong>No Warranty of Merchantability:</strong> The Studio makes no warranty that the facility is of merchantable quality or fit for any particular purpose</li>
+              <li><strong>No Warranty of Fitness:</strong> The Studio makes no warranty that the facility meets your specific needs or expectations</li>
+              <li><strong>No Warranty of Title:</strong> The Studio makes no warranty that Equipment is free from liens or claims</li>
+              <li><strong>No Warranty of Non-Infringement:</strong> The Studio makes no warranty that Services do not infringe third-party IP rights</li>
               <li><strong>No Warranty of Uninterrupted Service:</strong> Equipment or connectivity may fail without notice</li>
             </ul>
             
@@ -345,7 +346,7 @@ export default function TermsProfessionalPage() {
               United States<br />
               <br />
               <strong>Email:</strong> founder@vibeshackstudios.com<br />
-              <strong>Website:</strong> https://www.vibeshackstudios.com/<br />
+              <strong>Website:</strong> {siteUrl}/<br />
               <strong>Hours:</strong> 24/7 (by appointment)
             </p>
           </section>

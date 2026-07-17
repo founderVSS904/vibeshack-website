@@ -5,6 +5,7 @@ import { getStudioById } from '@/lib/booking/catalog'
 import { buildReferralInfo, formatMoneyFromCents, type ReferralInfo } from '@/lib/booking/referrals'
 import { addHours, describeSlotRanges, formatDateForDisplay, isValidBookingDate, slotIsoSetForDate } from '@/lib/booking/time'
 import { escapeHtml, isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
+import { siteUrl } from '@/lib/seo/site'
 
 function getStripe() {
   const secret = process.env.STRIPE_SECRET_KEY
@@ -212,7 +213,7 @@ async function markSessionFulfillmentStep(sessionId: string, key: string) {
 
 function emailLogoHtml() {
   return `
-    <a href="https://www.vibeshackstudios.com" style="display:inline-block;color:#ef1100;text-decoration:none;font-size:20px;font-weight:950;letter-spacing:-0.055em;line-height:1;">
+    <a href="${siteUrl}" style="display:inline-block;color:#ef1100;text-decoration:none;font-size:20px;font-weight:950;letter-spacing:-0.055em;line-height:1;">
       VibeShack Studios
     </a>`
 }

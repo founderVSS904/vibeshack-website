@@ -465,7 +465,7 @@ export default function GuidesPageClient() {
                 </div>
                 <div className="relative min-h-[240px] flex-1 overflow-hidden lg:min-h-[340px]">
                   {/* Photo and fade zoom as one layer so the blend never swims */}
-                  <div className="absolute inset-0 transition-transform duration-[700ms] ease-out group-hover:scale-[1.03]">
+                  <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.035]">
                     <Image
                       src={featured.image}
                       alt={featured.imageAlt}
@@ -503,7 +503,7 @@ export default function GuidesPageClient() {
                         </p>
                       </div>
                       <div className="relative min-h-[170px] flex-1 overflow-hidden">
-                        <div className="absolute inset-0 transition-transform duration-[700ms] ease-out group-hover:scale-[1.03]">
+                        <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.035]">
                           <Image
                             src={guide.image}
                             alt={guide.imageAlt}

@@ -483,9 +483,19 @@ body .placeholder-gray-700::placeholder {
   }
 }
 
-/* Better image rendering */
-img {
-  image-rendering: -webkit-optimize-contrast;
+/* The old img { image-rendering: -webkit-optimize-contrast } rule lived here.
+   It sharpened downscaled photos into aliasing in Safari, so it is gone.
+
+   Safari 15-17 blur fallback. There is no browserslist config, so autoprefixer
+   targets the defaults (Safari 18.5 and up) and strips the -webkit-backdrop-filter
+   that Tailwind emits. Older Safari only supports the prefixed property. These
+   rules mirror the backdrop-blur utilities in use across the site, and the
+   control comment stops autoprefixer from removing them at build time. */
+.backdrop-blur,
+.backdrop-blur-sm,
+.backdrop-blur-\[10px\] {
+  /* autoprefixer: off */
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 
 /* Seamless trusted-by logo wall */
@@ -731,7 +741,9 @@ a, button {
 
 /* ═══ NAV TRANSITION ═══ */
 header {
+  /* autoprefixer: off */
   transition: background 0.4s cubic-bezier(0.16,1,0.3,1),
+              -webkit-backdrop-filter 0.4s cubic-bezier(0.16,1,0.3,1),
               backdrop-filter 0.4s cubic-bezier(0.16,1,0.3,1),
               border-color 0.4s cubic-bezier(0.16,1,0.3,1) !important;
 }
@@ -792,7 +804,7 @@ a {
   }
 
   .desktop-menu-trigger:hover::after,
-  .desktop-menu-trigger:focus-within::after {
+  .desktop-menu-trigger[data-open]::after {
     display: block;
   }
 
@@ -810,7 +822,7 @@ a {
      pointer-events off so the mouse can leave the menu to close it. */
   @media (hover: none) {
     .desktop-menu-trigger:hover .desktop-menu-scrim,
-    .desktop-menu-trigger:focus-within .desktop-menu-scrim {
+    .desktop-menu-trigger[data-open] .desktop-menu-scrim {
       pointer-events: auto;
     }
     .desktop-menu-trigger--dismissed .desktop-menu-scrim {
@@ -840,22 +852,22 @@ a {
   }
 
   .desktop-menu-trigger:hover .desktop-mega-grid > *,
-  .desktop-menu-trigger:focus-within .desktop-mega-grid > * {
+  .desktop-menu-trigger[data-open] .desktop-mega-grid > * {
     opacity: 1;
     transform: none;
   }
 
   .desktop-menu-trigger:hover .desktop-mega-grid > *:nth-child(1),
-  .desktop-menu-trigger:focus-within .desktop-mega-grid > *:nth-child(1) { transition-delay: 60ms; }
+  .desktop-menu-trigger[data-open] .desktop-mega-grid > *:nth-child(1) { transition-delay: 60ms; }
   .desktop-menu-trigger:hover .desktop-mega-grid > *:nth-child(2),
-  .desktop-menu-trigger:focus-within .desktop-mega-grid > *:nth-child(2) { transition-delay: 120ms; }
+  .desktop-menu-trigger[data-open] .desktop-mega-grid > *:nth-child(2) { transition-delay: 120ms; }
   .desktop-menu-trigger:hover .desktop-mega-grid > *:nth-child(3),
-  .desktop-menu-trigger:focus-within .desktop-mega-grid > *:nth-child(3) { transition-delay: 180ms; }
+  .desktop-menu-trigger[data-open] .desktop-mega-grid > *:nth-child(3) { transition-delay: 180ms; }
   .desktop-menu-trigger:hover .desktop-mega-grid > *:nth-child(4),
-  .desktop-menu-trigger:focus-within .desktop-mega-grid > *:nth-child(4) { transition-delay: 240ms; }
+  .desktop-menu-trigger[data-open] .desktop-mega-grid > *:nth-child(4) { transition-delay: 240ms; }
 
   .desktop-menu-trigger:hover .desktop-mega-footer,
-  .desktop-menu-trigger:focus-within .desktop-mega-footer {
+  .desktop-menu-trigger[data-open] .desktop-mega-footer {
     opacity: 1;
     transform: none;
     transition-delay: 300ms;
@@ -878,7 +890,7 @@ a {
   }
 
   .site-header:has(.desktop-menu-trigger:hover),
-  .site-header:has(.desktop-menu-trigger:focus-within) {
+  .site-header:has(.desktop-menu-trigger[data-open]) {
     border-bottom-color: transparent;
   }
 }

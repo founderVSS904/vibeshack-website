@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { EditorialSeoHero } from '@/components/EditorialSeoHero'
 import { breadcrumbSchema, faqSchema } from '@/lib/schemas'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { getGuideBySlug, guideUrl, studioGuides } from '@/lib/seo/studioGuides'
 
 export function generateStaticParams() {
@@ -48,8 +48,8 @@ export default async function StudioGuidePage({ params }: { params: Promise<{ sl
     headline: guide.title,
     description: guide.description,
     image: absoluteUrl(guide.image),
-    author: { '@id': 'https://www.vibeshackstudios.com/#org' },
-    publisher: { '@id': 'https://www.vibeshackstudios.com/#org' },
+    author: { '@id': `${siteUrl}/#business` },
+    publisher: { '@id': `${siteUrl}/#business` },
     mainEntityOfPage: guideUrl(guide.slug),
     datePublished: '2026-05-09',
     dateModified: '2026-05-09',

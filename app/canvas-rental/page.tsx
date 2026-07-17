@@ -1,18 +1,19 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { studioServiceSchema } from '@/lib/schemas'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Canvas White Cyc Studio',
   description: 'Creative Series. Flexible white cyc backdrop studio. Perfect for photography, video, and creative projects. $100/hr. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/canvas-rental/' }
+  alternates: { canonical: `${siteUrl}/canvas-rental/` }
 }
 
 const canvasRentalServiceSchema = studioServiceSchema({
   name: 'White Cyc Studio Rental in San Francisco',
   description: 'Canvas Rental is a flexible white cyc studio in San Francisco with overhead lighting grid for photography, video, product, and content shoots.',
-  url: 'https://www.vibeshackstudios.com/canvas-rental/',
-  image: 'https://www.vibeshackstudios.com/studio-images/canvas-rental-hero-v1775094073.jpg',
+  url: `${siteUrl}/canvas-rental/`,
+  image: `${siteUrl}/studio-images/canvas-rental-hero-v1775094073.jpg`,
   price: '100',
   serviceType: 'White Cyc Studio Rental',
 })
@@ -67,7 +68,7 @@ export default function CanvasRentalPage() {
           priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">White Cyc Studio</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-4 text-brand-red">White Cyc Studio</p>
           <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: 0}}>Canvas<span className="text-brand-red">.</span></h1>
           <p className="text-lg sm:text-xl text-gray-300 max-w-2xl leading-relaxed mb-8">
             White cyc backdrop. Overhead lighting grid. Total creative control. Rent by the hour for any production.
@@ -82,14 +83,14 @@ export default function CanvasRentalPage() {
       <div className="h-px w-full bg-white/10" />
 
       {/* Features */}
-      <section className="bg-black py-20 sm:py-28 px-6 sm:px-10 lg:px-16">
+      <section className="bg-black py-32 px-6 sm:px-10 lg:px-16">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
             <div className="order-1">
               <Image src="/studio-images/canvas-rental-blackfloor-v1775094171.jpg" alt="Canvas rental with black floor options" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
             <div className="order-2 flex flex-col justify-center">
-              <h2 className="text-white font-black text-4xl mb-6" style={{letterSpacing: 0}}>Flexible Space</h2>
+              <h2 className="text-white font-black text-4xl mb-6" style={{letterSpacing: 0}}>Flexible space</h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 <div className="py-4 text-gray-400 text-base">Seamless white cyc wall</div>
                 <div className="py-4 text-gray-400 text-base">Black floor mats available</div>
@@ -176,15 +177,15 @@ export default function CanvasRentalPage() {
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
-          <p className="text-gray-500 text-sm mt-4">Open 24/7. Instant confirmation. Free cancellation 48hrs before.</p>
+          <p className="text-gray-500 text-sm mt-4">Open 24/7. Instant confirmation. Free cancellation 48 hours before.</p>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="bg-black py-20 sm:py-28 px-6 sm:px-10 lg:px-16 border-t border-white/10">
+      <section className="bg-black py-32 px-6 sm:px-10 lg:px-16 border-t border-white/10">
         <div className="max-w-2xl mx-auto text-center">
           <div className="h-1 w-16 rounded-full mx-auto mb-8 bg-white/10" />
-          <h2 className="text-5xl sm:text-6xl font-black text-white mb-6" style={{letterSpacing: 0}}>Ready to Create?</h2>
+          <h2 className="text-5xl sm:text-6xl font-black text-white mb-6" style={{letterSpacing: 0}}>Ready to <span className="text-brand-red">Create?</span></h2>
           <p className="text-gray-400 text-lg mb-8">Book your studio time. No production crew needed. Full control. 24/7 access.</p>
           <a href="/book/?studio=canvas-rental" className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Reserve Canvas

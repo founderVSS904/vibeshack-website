@@ -1,18 +1,18 @@
 import type { Metadata } from 'next'
 import { RevenueCategoryPage } from '@/components/RevenueCategoryPage'
-import { absoluteUrl } from '@/lib/seo/site'
+import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { breadcrumbSchema, studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
   title: 'Editorial Photoshoots SF',
   description:
     'Editorial photoshoots in San Francisco for fashion, beauty, portraits, lookbooks, cover art, campaign stills, and content days at VibeShack Studios.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/editorials/' },
+  alternates: { canonical: `${siteUrl}/editorials/` },
   openGraph: {
     title: 'Editorials | VibeShack Studios SF',
     description:
       'Plan fashion, beauty, portrait, lookbook, cover art, and campaign editorial shoots inside VibeShack Studios.',
-    url: 'https://www.vibeshackstudios.com/editorials/',
+    url: `${siteUrl}/editorials/`,
     images: ['/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg'],
   },
 }
@@ -21,8 +21,8 @@ const editorialServiceSchema = studioServiceSchema({
   name: 'Editorial Photoshoots in San Francisco',
   description:
     'Editorial photoshoot services for fashion, beauty, portraits, cover art, lookbooks, campaign stills, and content days.',
-  url: 'https://www.vibeshackstudios.com/editorials/',
-  image: 'https://www.vibeshackstudios.com/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg',
+  url: `${siteUrl}/editorials/`,
+  image: `${siteUrl}/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg`,
   serviceType: 'Editorial Photography Services',
 })
 

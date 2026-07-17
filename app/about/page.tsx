@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { StudioLocation } from '@/components/StudioLocation'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'About',
   description: 'VibeShack Studios is San Francisco creative production infrastructure: podcast, green screen, photo, and rental studios at the Northern Waterfront.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/about/' }
+  alternates: { canonical: `${siteUrl}/about/` }
 }
 
 export default function AboutPage() {
@@ -22,7 +23,7 @@ export default function AboutPage() {
           <p className="text-gray-400 text-xl leading-relaxed max-w-2xl mb-6">
             Podcast sets, photo rooms, a green screen, a white cyc, and production support at 950 Battery St in San Francisco.
           </p>
-          <p className="text-gray-600 text-sm tracking-[0.15em] uppercase">Studios and production · SF Northern Waterfront</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600">Studios and production · SF Northern Waterfront</p>
         </div>
       </section>
 
@@ -30,7 +31,7 @@ export default function AboutPage() {
       <section className="py-0 bg-black border-t border-white/10">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           <div className="px-6 sm:px-10 lg:px-20 py-32 flex flex-col justify-center">
-            <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">The Belief</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">The Belief</p>
             <h2 className="font-black text-white leading-none mb-8" style={{ fontSize: 'clamp(2.5rem, 5vw, 5rem)', letterSpacing: 0 }}>
               Production,<br />
               under <span className="text-brand-red">one roof.</span>
@@ -54,7 +55,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
-              <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">The Name</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">The Name</p>
               <h2 className="font-black text-white leading-none mb-8" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
                 Why<br /><span className="text-brand-red">&ldquo;The Dream Factory&rdquo;.</span>
               </h2>
@@ -105,7 +106,7 @@ export default function AboutPage() {
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="max-w-3xl">
-            <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">What We&apos;re Building</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">What We&apos;re Building</p>
             <h2 className="font-black text-white leading-tight mb-10" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
               Studios first.<br /><span className="text-brand-red">Production alongside.</span>
             </h2>
@@ -137,7 +138,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
-              <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">The Promise</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">The Promise</p>
               <h2 className="font-black text-white leading-none mb-8" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
                 The Creative<br /><span className="text-brand-red">Standard.</span>
               </h2>
@@ -191,7 +192,7 @@ export default function AboutPage() {
       {/* Final CTA */}
       <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <p className="text-gray-600 text-xs uppercase tracking-widest mb-6">The Dream Factory</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-6">The Dream Factory</p>
           <h2 className="font-black text-white leading-tight mb-6" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0 }}>
             Come see the space.<br />
             <span className="text-brand-red">Book a free tour.</span>

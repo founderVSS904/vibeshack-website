@@ -1,9 +1,24 @@
 import type { Metadata } from 'next'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
-  title: 'Support | VibeShack Studios',
+  title: 'Support',
   description: 'Questions about booking, pricing, studios, or your session. We\'re here. VibeShack Studios, 950 Battery St, San Francisco.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/support/' },
+  alternates: { canonical: `${siteUrl}/support/` },
+  openGraph: {
+    type: 'website',
+    siteName: 'VibeShack Studios',
+    title: 'Support | VibeShack Studios SF',
+    description: 'Questions about booking, pricing, studios, or your session. We\'re here. VibeShack Studios, 950 Battery St, San Francisco.',
+    url: `${siteUrl}/support/`,
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'VibeShack Studios support' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Support | VibeShack Studios SF',
+    description: 'Questions about booking, pricing, studios, or your session. We\'re here. VibeShack Studios, 950 Battery St, San Francisco.',
+    images: ['/og-image.jpg'],
+  },
 }
 
 const FAQS = [
@@ -207,7 +222,7 @@ export default function SupportPage() {
             <div className="pt-16 space-y-16">
               {FAQS.map(({ category, questions }) => (
                 <div key={category} id={category.toLowerCase().replace(/\s+/g, '-')}>
-                  <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">{category}</p>
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">{category}</p>
                   <div className="space-y-0">
                     {questions.map(({ q, a }) => (
                       <div key={q} className="py-6 border-b border-white/[0.08]">
@@ -250,7 +265,7 @@ export default function SupportPage() {
               <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined}
                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="border-t border-white/[0.08] pt-8 group">
-                <p className="text-gray-600 text-xs uppercase tracking-widest mb-3">{label}</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-3">{label}</p>
                 <p className="text-white font-bold text-lg group-hover:text-brand-red transition-colors" style={{letterSpacing: 0}}>{value}</p>
                 <p className="text-gray-500 text-sm mt-1">{sub}</p>
               </a>

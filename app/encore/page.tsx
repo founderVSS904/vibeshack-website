@@ -1,14 +1,15 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Encore Production Studio',
   description: 'Vault Series. Full-scale production studio with dual green screens, 4K cinema cameras, and professional crew. $300/hr. Cameraman and audio tech included. Open 24/7.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/encore/' },
+  alternates: { canonical: `${siteUrl}/encore/` },
   openGraph: {
     title: 'Encore | VibeShack Studios SF',
     description: 'Vault Series full-scale production studio with dual green screens and 4K cinema cameras. Cameraman and audio tech included. $300/hr in San Francisco.',
-    url: 'https://www.vibeshackstudios.com/encore',
+    url: `${siteUrl}/encore`,
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg', width: 1200, height: 630, alt: 'Encore at VibeShack Studios SF' }],
     type: 'website',
@@ -31,7 +32,7 @@ export default function EncorePage() {
           fill sizes="100vw" className="object-cover opacity-85" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">Vault Series</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-4 text-brand-red">Vault Series</p>
           <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: 0}}>
             Encore<span className="text-brand-red">.</span>
           </h1>
@@ -120,7 +121,7 @@ export default function EncorePage() {
           <span className="number-label mb-12 block">Pricing</span>
           <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>$300</div>
           <p className="text-gray-500 text-lg mb-1">per hour</p>
-          <p className="text-white font-semibold mb-12">Cameraman and audio tech included. 2 hour minimum. Open 24/7.</p>
+          <p className="text-white font-semibold mb-12">Cameraman and audio tech included. 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
               { label: '2 Hours', price: '$600' },
@@ -137,7 +138,7 @@ export default function EncorePage() {
             Book Encore
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
-          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48hrs before.</p>
+          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48 hours before.</p>
         </div>
       </section>
 
@@ -155,7 +156,7 @@ export default function EncorePage() {
             </a>
             <a href="/tour/?studio=encore" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →</a>
           </div>
-          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48hrs before.</p>
+          <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48 hours before.</p>
         </div>
       </section>
     </>

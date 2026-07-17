@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import TourBookingForm from './TourBookingForm'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Book a Free Studio Tour',
   description: 'Book a free VibeShack Studios tour online. Tour availability is checked against the live studio calendar at 950 Battery St, San Francisco.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/tour/' },
+  alternates: { canonical: `${siteUrl}/tour/` },
 }
 
 export default function TourPage() {

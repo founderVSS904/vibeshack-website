@@ -1,21 +1,22 @@
 import type { Metadata } from 'next'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Studio Pricing',
   description:
     'Studio rentals from $100/hr, podcast sets from $300/hr, Canvas Podcast $400/hr. Production services quoted by request in San Francisco.',
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/pricing/',
+    canonical: `${siteUrl}/pricing/`,
   },
   openGraph: {
     title: 'Studio Pricing | VibeShack Studios San Francisco',
     description:
       'Studios from $100-$400/hr, plus commercials, editorials, branding, photo, and video production services quoted by request.',
-    url: 'https://www.vibeshackstudios.com/pricing/',
+    url: `${siteUrl}/pricing/`,
     images: [
       {
-        url: 'https://www.vibeshackstudios.com/og-image.jpg',
+        url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: 'VibeShack Studios Pricing | San Francisco',
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Studio Pricing | VibeShack Studios San Francisco',
     description: 'Studios from $100-$400/hr. Commercials, editorials, branding, photo, and video services quoted by request.',
-    images: ['https://www.vibeshackstudios.com/og-image.jpg'],
+    images: [`${siteUrl}/og-image.jpg`],
   },
 }
 
@@ -63,14 +64,48 @@ const pricingFaqs = [
   { question: 'Can I bring my own equipment?', answer: 'Yes. You can bring your own gear and use our studios as your production space.' },
 ]
 
-const pricingServiceSchema = studioServiceSchema({
-  name: 'Studio Rental Pricing in San Francisco',
-  description: 'Hourly pricing for VibeShack Studios podcast sets, green screen, photography studio rental, Canvas Podcast, white cyc rentals, and production service quote requests in San Francisco.',
-  url: 'https://www.vibeshackstudios.com/pricing/',
-  image: 'https://www.vibeshackstudios.com/og-image.jpg',
-  price: '100',
-  serviceType: 'Studio Rental Pricing',
+const hourlyOffer = (name: string, price: string) => ({
+  '@type': 'Offer',
+  name,
+  url: `${siteUrl}/book/`,
+  priceCurrency: 'USD',
+  price,
+  priceSpecification: {
+    '@type': 'UnitPriceSpecification',
+    price,
+    priceCurrency: 'USD',
+    unitCode: 'HUR',
+  },
+  availability: 'https://schema.org/InStock',
+  priceValidUntil: '2027-12-31',
 })
+
+const quotedOffer = (name: string, description: string) => ({
+  '@type': 'Offer',
+  name,
+  url: `${siteUrl}/contact/`,
+  availability: 'https://schema.org/InStock',
+  description,
+})
+
+// Single Service schema for this page. The full offer set lives here so there
+// is exactly one price source for search engines.
+const pricingServiceSchema = {
+  ...studioServiceSchema({
+    name: 'Studio Rental Pricing in San Francisco',
+    description: 'Hourly pricing for VibeShack Studios podcast sets, green screen, photography studio rental, Canvas Podcast, white cyc rentals, and production service quote requests in San Francisco.',
+    url: `${siteUrl}/pricing/`,
+    image: `${siteUrl}/og-image.jpg`,
+    serviceType: 'Studio Rental Pricing',
+  }),
+  offers: [
+    hourlyOffer('Podcast Studios', '300'),
+    hourlyOffer('Canvas Podcast Studio', '400'),
+    hourlyOffer('Rental Studios (Green Screen, Photography Studio, Canvas)', '100'),
+    quotedOffer('Photo Services', 'Contact VibeShack Studios for a scoped photo services quote.'),
+    quotedOffer('Video Production Services', 'Contact VibeShack Studios for a scoped video production quote.'),
+  ],
+}
 
 export default function PricingPage() {
   return (
@@ -105,7 +140,7 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           {/* Podcast Studios, grouped */}
           <div className="mb-1">
-            <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-4">Podcast Studios</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-4">Podcast Studios</p>
             <div className="divide-y divide-white/10 border-t border-white/10">
               {studios.filter(s => s.category === 'Podcast').map((studio) => (
                 <a
@@ -129,7 +164,7 @@ export default function PricingPage() {
 
           {/* Rental Studios, grouped */}
           <div className="mt-10">
-            <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-4">Rental Studios</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-4">Rental Studios</p>
             <div className="divide-y divide-white/10 border-t border-white/10">
               {studios.filter(s => s.category === 'Rental').map((studio) => (
                 <a
@@ -152,7 +187,7 @@ export default function PricingPage() {
 
           {/* Production Services, scoped */}
           <div className="mt-10">
-            <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-4">Production Services</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-4">Production Services</p>
             <div className="divide-y divide-white/10 border-t border-white/10">
               {productionServices.map((service) => (
                 <a
