@@ -470,12 +470,12 @@ function MenuPlanLink({ href, label, onNavigate, primary = false }: { href: stri
 
 
 const serviceCards = [
-  { href: '/commercials/', label: 'Commercials', detail: 'Launch ads, talking heads, product demos', kicker: 'Campaign ready', image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg' },
-  { href: '/editorials/', label: 'Editorials', detail: 'Fashion, beauty, portraits, campaign stills', kicker: 'Print ready', image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg' },
-  { href: '/branding/', label: 'Branding', detail: 'Creative direction, launches, content systems', kicker: 'Identity systems', image: '/studio-images/home-branding-pure-magic-v20260716.jpg' },
-  { href: '/podcast-studio-san-francisco/', label: 'Podcasts', detail: 'Sets with cameras, audio, and crew', kicker: 'Broadcast ready', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
-  { href: '/video-production/', label: 'Video Production', detail: 'Social content, music videos, brand video', kicker: 'Concept to screen', image: '/studio-images/encore-production.jpg' },
-  { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, campaigns', kicker: 'Every frame styled', image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg' },
+  { href: '/commercials/', label: 'Commercials', detail: 'Launch ads, talking heads, product demos', image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg' },
+  { href: '/editorials/', label: 'Editorials', detail: 'Fashion, beauty, portraits, campaign stills', image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg' },
+  { href: '/branding/', label: 'Branding', detail: 'Creative direction, launches, content systems', image: '/studio-images/home-branding-pure-magic-v20260716.jpg' },
+  { href: '/podcast-studio-san-francisco/', label: 'Podcasts', detail: 'Sets with cameras, audio, and crew', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
+  { href: '/video-production/', label: 'Video Production', detail: 'Social content, music videos, brand video', image: '/studio-images/encore-production.jpg' },
+  { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, campaigns', image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg' },
 ]
 
 const proofStripLinks = [
@@ -487,27 +487,20 @@ const proofStripLinks = [
   { href: '/support/', label: 'Support' },
 ]
 
-const proofIcons: ReactNode[] = [
-  <svg key="work" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="9" width="18" height="11" rx="1.5" /><path d="m3.4 9 17-4.4M7 8l2.4-4.6M12.4 6.6 14.8 2M17.8 5.2 20.2 1.4M7 13h4" /></svg>,
-  <svg key="brands" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 2 20 5v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3Z" /><path d="m12 8 1.2 2.5 2.8.4-2 2 .5 2.7-2.5-1.3-2.5 1.3.5-2.7-2-2 2.8-.4L12 8Z" /></svg>,
-  <svg key="guides" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5c-1.5-1.4-3.6-2-6-2-1 0-2 .12-3 .35V19c1-.23 2-.35 3-.35 2.4 0 4.5.6 6 2 1.5-1.4 3.6-2 6-2 1 0 2 .12 3 .35V3.35C20 3.12 19 3 18 3c-2.4 0-4.5.6-6 2Z" /><path d="M12 5v15.65M6.5 8h2M6.5 12h2M15.5 8h2M15.5 12h2" /></svg>,
-  <svg key="cases" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 2 17 4.8v5L12 12 7 9.8v-5L12 2ZM7 12.2 12 15v5l-5-2.8v-5ZM17 12.2 12 15v5l5-2.8v-5Z" /></svg>,
-  <svg key="compare" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v18M8 21h8M12 6H5L2 13a3.5 3.5 0 0 0 6 0L5 6M12 6h7l3 7a3.5 3.5 0 0 1-6 0l3-7" /></svg>,
-  <svg key="support" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 1 1 16 0" /><rect x="2.5" y="13" width="4" height="6" rx="1.5" /><rect x="17.5" y="13" width="4" height="6" rx="1.5" /><path d="M19.5 19a4 4 0 0 1-4 3h-2" /></svg>,
-]
-
 function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
   const [activeCard, setActiveCard] = useState(0)
-  const active = serviceCards[activeCard]
   const showMedia = useContext(MenuMediaContext)
 
   return (
-    <DesktopMegaMenu className="grid-cols-1 gap-y-7">
+    // Exactly THREE direct grid children below: header, the card row, the bottom
+    // pair. The reveal cascade (globals.css) only defines nth-child delays
+    // through 4, so keep this at three or four, never more.
+    <DesktopMegaMenu className="grid-cols-1 gap-y-5">
       <div>
         <div className="flex items-end justify-between gap-6">
           <div>
-            <p className="text-[2.8rem] font-black leading-none text-white">What are you making?</p>
-            <p className="mt-3 text-sm text-zinc-400">Start with the outcome. We&apos;ll build the production.</p>
+            <p className="text-[2.3rem] font-black leading-[1.02] tracking-[-0.01em] text-white 2xl:text-[2.5rem]">What are you making?</p>
+            <p className="mt-2.5 text-sm text-zinc-400">Start with the outcome. We&apos;ll build the production.</p>
           </div>
           <Link
             href="/services/"
@@ -525,19 +518,10 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
             </span>
           </Link>
         </div>
-        <div className="relative mt-7 h-9" aria-hidden="true">
-          <span
-            className="absolute top-0 whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{ left: `min(calc(${(((activeCard + 1.5) / 8) * 100).toFixed(3)}% + 12px), calc(100% - 170px))` }}
-          >
-            {active.kicker}
-          </span>
-          <span className="absolute inset-x-0 top-[27px] h-px bg-brand-red/20" />
-        </div>
+        <div className="mt-6 h-px w-full bg-white/[0.08]" aria-hidden="true" />
       </div>
 
-      <div>
-      <div className="flex h-[300px] gap-2.5 2xl:h-[320px]">
+      <div className="flex h-[280px] gap-2.5 2xl:h-[300px]">
         {serviceCards.map((card, index) => {
           const isActive = index === activeCard
           return (
@@ -551,7 +535,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                 event.currentTarget.blur()
               }}
               className={`group/svc relative min-w-0 overflow-hidden rounded-lg ring-1 transition-[flex-grow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                isActive ? 'flex-[3_1_0%] ring-brand-red/70' : 'flex-[1_1_0%] ring-white/[0.08] hover:ring-white/20'
+                isActive ? 'flex-[3_1_0%] ring-brand-red/60' : 'flex-[1_1_0%] ring-white/[0.08] hover:ring-white/20'
               }`}
             >
               {showMedia && card.image && (
@@ -564,8 +548,8 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                   className="object-cover transition-transform duration-700 group-hover/svc:scale-[1.03]"
                 />
               )}
-              <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" aria-hidden="true" />
-              <span className="absolute left-4 top-4 font-mono text-[15px] font-medium tracking-[0.08em] text-brand-red">{String(index + 1).padStart(2, '0')}</span>
+              <span className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" aria-hidden="true" />
+              <span className={`absolute left-4 top-4 font-mono text-[13px] font-medium tracking-[0.1em] transition-colors duration-500 ${isActive ? 'text-brand-red' : 'text-white/35'}`}>{String(index + 1).padStart(2, '0')}</span>
               <span className="absolute inset-x-4 bottom-4">
                 <span className="block text-[21px] font-black leading-[0.95] text-white">
                   {card.label}
@@ -588,36 +572,30 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
           )
         })}
       </div>
-      <div className="relative mx-auto mt-5 flex w-[420px] max-w-full gap-1" aria-hidden="true">
-        {serviceCards.map((card, index) => (
-          <span key={card.href + index} className="h-[2px] flex-1 bg-white/[0.12]" />
-        ))}
-        <span
-          className="absolute top-0 h-[2px] bg-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-          style={{
-            width: 'calc((100% - 20px) / 6)',
-            left: `calc(${activeCard} * ((100% - 20px) / 6 + 4px))`,
-          }}
-        />
-      </div>
-      </div>
 
-      <div className="grid grid-cols-[1.6fr_1fr] gap-5">
-        <div className="grid grid-cols-6 divide-x divide-white/[0.06] rounded-lg border border-white/[0.08] bg-white/[0.02]">
-          {proofStripLinks.map(({ href, label }, index) => (
-            <Link
-              key={href + label}
-              href={href}
-              onClick={(event) => {
-                onNavigate()
-                event.currentTarget.blur()
-              }}
-              className="group/proof flex flex-col items-center justify-center gap-3.5 px-3 py-7 text-zinc-400 transition-colors duration-300 first:rounded-l-lg last:rounded-r-lg hover:bg-white/[0.04] hover:text-white"
-            >
-              {proofIcons[index]}
-              <span className="whitespace-nowrap text-center font-mono text-[10px] font-bold uppercase tracking-[0.18em]">{label}</span>
-            </Link>
-          ))}
+      <div className="grid grid-cols-2 gap-5">
+        <div className="rounded-lg border border-white/[0.08] bg-white/[0.02] px-6 py-4">
+          <MenuColumnHeader>More from VibeShack</MenuColumnHeader>
+          <div className="grid grid-cols-2 gap-x-8">
+            {proofStripLinks.map(({ href, label }) => (
+              <Link
+                key={href + label}
+                href={href}
+                onClick={(event) => {
+                  onNavigate()
+                  event.currentTarget.blur()
+                }}
+                className="group/proof -mx-2 flex items-center justify-between rounded-md px-2 py-1.5 text-[14px] font-medium text-zinc-300 transition-colors duration-200 hover:bg-white/[0.04] hover:text-white"
+              >
+                {label}
+                <span className="text-zinc-600 transition-[transform,color] duration-300 group-hover/proof:translate-x-0.5 group-hover/proof:text-white" aria-hidden="true">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
         <Link
           href="/find-your-studio/"
