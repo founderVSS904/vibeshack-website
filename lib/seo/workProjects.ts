@@ -245,32 +245,11 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
     objectPosition: '80% center',
   },
   {
-    title: 'unPAUSED',
-    detail: 'Your biological clock and fertility',
-    youtubeId: 'EFNL3qdbuTY',
-    image: '/studio-images/work-unpaused-clock-v20260709.jpg',
-    alt: 'unPAUSED podcast host recording in The Executive at VibeShack Studios',
-  },
-  {
     title: 'Second Nature',
     detail: 'The AI world has a human problem',
     youtubeId: 'QMXrpJteBXA',
     image: '/studio-images/work-second-nature-insider-v20260709.jpg',
     alt: 'Second Nature podcast title frame on a white set at VibeShack Studios',
-  },
-  {
-    title: 'Second Nature',
-    detail: 'Why AI companies will fund conservation',
-    youtubeId: 'wcw1iTPfsBM',
-    image: '/studio-images/work-second-nature-conservation-v20260709.jpg',
-    alt: 'Second Nature podcast two-shot on a white set at VibeShack Studios',
-  },
-  {
-    title: 'Second Nature',
-    detail: '400 carbon accounting companies',
-    youtubeId: 'nkpMFBT1zV4',
-    image: '/studio-images/work-second-nature-carbon-v20260709.jpg',
-    alt: 'Second Nature podcast conversation at VibeShack Studios',
   },
   {
     title: 'Vegas Veteran Voices',

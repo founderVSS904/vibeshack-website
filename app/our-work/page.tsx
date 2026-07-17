@@ -131,7 +131,7 @@ export default async function OurWorkPage({
                   Shot at VibeShack
                 </p>
                 <h2 id="shot-at-vibeshack-title" className="mt-3 text-2xl font-black leading-tight text-white sm:text-3xl">
-                  Client shows filmed in our rooms
+                  Client projects shot here
                 </h2>
               </div>
               <p className="max-w-sm text-sm leading-relaxed text-white/60">

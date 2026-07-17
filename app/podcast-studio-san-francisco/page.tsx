@@ -25,9 +25,10 @@ const studios: PodcastSet[] = [
     fullName: 'The Executive',
     href: '/the-executive/',
     bookHref: '/book/?studio=the-executive',
-    img: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
+    img: '/studio-images/the-executive-hero.jpg',
     thumb: '/studio-images/the-executive-hero.jpg',
     series: 'Walnut Series',
+    category: 'podcast',
     line: 'A walnut boardroom table, balanced sightlines, and a composed frame for founder interviews and branded conversations.',
     bestFor: 'Founder interviews, executive conversations, and branded shows with a composed editorial look.',
     price: '$300/hr',
@@ -40,9 +41,10 @@ const studios: PodcastSet[] = [
     fullName: 'The Wing',
     href: '/the-wing/',
     bookHref: '/book/?studio=the-wing',
-    img: '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg',
+    img: '/studio-images/the-wing-hero.jpg',
     thumb: '/studio-images/the-wing-hero.jpg',
     series: 'Walnut Series',
+    category: 'podcast',
     line: 'Warm leather, close eyelines, and a tighter frame for two-person shows that should feel personal.',
     bestFor: 'Two-person podcasts, close interviews, and conversations that should feel warm and direct.',
     price: '$300/hr',
@@ -55,9 +57,10 @@ const studios: PodcastSet[] = [
     fullName: 'Encore',
     href: '/encore/',
     bookHref: '/book/?studio=encore',
-    img: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg',
+    img: '/studio-images/encore-thumbnail-v1775092451.jpg',
     thumb: '/studio-images/encore-thumbnail-v1775092451.jpg',
     series: 'Vault Series',
+    category: 'podcast',
     line: 'A clean white backdrop inside a fully treated studio, with simple sightlines that keep attention on the conversation.',
     bestFor: 'Clean interviews, direct-to-camera episodes, and shows that need a neutral visual system.',
     price: '$300/hr',
@@ -70,9 +73,10 @@ const studios: PodcastSet[] = [
     fullName: 'Sunset',
     href: '/sunset-studio/',
     bookHref: '/book/?studio=sunset',
-    img: '/studio-images/sunset-hero-v20260509.jpg',
+    img: '/studio-images/sunset-studio-thumbnail.jpg',
     thumb: '/studio-images/sunset-studio-thumbnail.jpg',
     series: 'Creative Series',
+    category: 'podcast',
     line: 'Programmable color turns the backdrop into part of the show, from restrained brand tones to saturated creator looks.',
     bestFor: 'Creator shows, social-first episodes, and formats with a strong color identity.',
     price: '$300/hr',
@@ -85,9 +89,10 @@ const studios: PodcastSet[] = [
     fullName: 'Parlor',
     href: '/parlor/',
     bookHref: '/book/?studio=parlor',
-    img: '/studio-images/parlor-production-v20260509.jpg',
+    img: '/studio-images/parlor-hero.jpg',
     thumb: '/studio-images/parlor-hero.jpg',
     series: 'Signature Series',
+    category: 'signature',
     line: 'Chesterfield seating and a relaxed lounge layout give longer conversations space to breathe.',
     bestFor: 'Long-form guest interviews, relaxed panels, and conversations with a more intimate pace.',
     price: '$400/hr',
@@ -100,9 +105,10 @@ const studios: PodcastSet[] = [
     fullName: 'Horizon',
     href: '/horizon/',
     bookHref: '/book/?studio=horizon',
-    img: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
+    img: '/studio-images/horizon-hero.jpg',
     thumb: '/studio-images/horizon-hero.jpg',
     series: 'Signature Series',
+    category: 'signature',
     line: 'A warm panoramic background and wide seating plan for conversations that need scale without losing intimacy.',
     bestFor: 'Premium guest shows, editorial conversations, and wider multi-person compositions.',
     price: '$400/hr',
@@ -118,19 +124,61 @@ const studios: PodcastSet[] = [
     img: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg',
     thumb: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg',
     series: 'Signature Series',
+    category: 'signature',
     line: 'Our largest podcast set, with a custom LED backdrop, cinema lighting, and space for full art direction.',
     bestFor: 'Custom visual podcasts, larger productions, and shows that need a fully directed environment.',
     price: '$400/hr',
     specs: ['Custom LED backdrop', 'Cinema lighting', 'Large-format set'],
     position: 'center 48%',
   },
-]
-
-const studioFacts = [
-  ['3', 'camera capture'],
-  ['4K', 'recording'],
-  ['Broadcast', 'audio'],
-  ['Crew', 'available'],
+  {
+    id: 'canvas-rental',
+    name: 'Canvas Rental',
+    fullName: 'Canvas Rental',
+    href: '/canvas-rental/',
+    bookHref: '/book/?studio=canvas-rental',
+    img: '/studio-images/canvas-rental-space-v20260509.jpg',
+    thumb: '/studio-images/canvas-rental-space-v20260509.jpg',
+    series: 'Rental Studio',
+    category: 'rental',
+    line: 'A white cyc and open production floor for product work, music videos, interviews, and custom builds.',
+    bestFor: 'White cyc shoots, custom sets, music videos, and production days that need an open floor.',
+    price: '$100/hr',
+    specs: ['White cyc stage', 'Open production floor', 'Lighting available', 'Crew available'],
+    position: 'center 54%',
+  },
+  {
+    id: 'photography-studio',
+    name: 'Photography Studio',
+    fullName: 'Photography Studio',
+    href: '/photography-studio-san-francisco/',
+    bookHref: '/book/?studio=photography',
+    img: '/studio-images/inside-photography-red-v20260509.jpg',
+    thumb: '/studio-images/inside-photography-red-v20260509.jpg',
+    series: 'Rental Studio',
+    category: 'rental',
+    line: 'A treated photo room with multiple backdrop options, lighting access, and a dedicated glam area.',
+    bestFor: 'Portraits, headshots, products, editorials, and compact campaign shoots.',
+    price: '$100/hr',
+    specs: ['Multiple backdrops', 'Treated studio', 'Lighting available', 'Glam room access'],
+    position: 'center 52%',
+  },
+  {
+    id: 'green-screen',
+    name: 'Green Screen',
+    fullName: 'Green Screen',
+    href: '/green-screen-studio-sf/',
+    bookHref: '/book/?studio=green-screen',
+    img: '/studio-images/inside-green-screen-v20260509.jpg',
+    thumb: '/studio-images/inside-green-screen-v20260509.jpg',
+    series: 'Rental Studio',
+    category: 'rental',
+    line: 'A full green wall and floor for clean keying, virtual environments, product demos, and effects work.',
+    bestFor: 'Compositing, virtual backgrounds, explainers, effects plates, and product demonstrations.',
+    price: '$100/hr',
+    specs: ['Full green wall', 'Green floor coverage', 'Lighting available', 'Crew available'],
+    position: 'center 50%',
+  },
 ]
 
 const productionStack = [
@@ -220,72 +268,8 @@ export default function PodcastStudiosPage() {
       />
       <PodcastPageMotion />
 
-      <section className="podcast-hero relative isolate flex min-h-[82svh] items-end overflow-hidden bg-black pt-20 text-white">
-        <Image
-          src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg"
-          alt="Podcast recording in The Executive at VibeShack Studios"
-          fill
-          priority
-          quality={90}
-          className="podcast-hero-image object-cover object-[83%_center] sm:object-center"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.76)_0%,rgba(0,0,0,0.38)_38%,rgba(0,0,0,0.06)_72%),linear-gradient(180deg,rgba(0,0,0,0.12)_0%,rgba(0,0,0,0.08)_48%,rgba(0,0,0,0.88)_100%)]" />
-
-        <div className="relative z-10 mx-auto w-full max-w-[1680px] px-6 pb-12 sm:px-10 sm:pb-16 lg:px-16 lg:pb-20">
-          <div className="podcast-hero-copy max-w-[760px]">
-            <p className="mb-6 text-sm font-semibold text-white/70">San Francisco / Open 24/7</p>
-            <h1 className="font-black uppercase leading-[0.88] text-white" style={{ fontSize: 'clamp(4.1rem, 9vw, 8.8rem)', letterSpacing: 0 }}>
-              Podcast<br />
-              <span className="text-brand-red">Studios</span>
-            </h1>
-            <p className="mt-7 max-w-[660px] text-lg leading-relaxed text-white/80 sm:text-2xl">
-              Seven distinct podcast sets with 3-camera 4K, broadcast audio, and production crew available.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-6">
-              <Link
-                href="/book/?service=podcast"
-                prefetch={false}
-                className="inline-flex items-center justify-center rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
-              >
-                Book a session
-              </Link>
-              <Link href="#sets" className="text-sm font-semibold text-white/70 transition-colors hover:text-white">
-                Explore the sets <span className="ml-2" aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <div className="podcast-page bg-black text-white">
-        <section className="border-y border-white/10">
-          <div className="mx-auto grid max-w-7xl grid-cols-2 sm:grid-cols-4">
-            {studioFacts.map(([value, label], index) => (
-              <div key={label} className={`px-6 py-7 sm:px-7 ${index % 2 === 1 ? 'border-l border-white/10' : ''} ${index > 1 ? 'border-t border-white/10 sm:border-t-0' : ''} ${index > 0 ? 'sm:border-l sm:border-white/10' : ''}`}>
-                <p className="text-2xl font-semibold text-white sm:text-3xl">{value}</p>
-                <p className="mt-1 text-xs text-white/40">{label}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="sets" className="scroll-mt-20 px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
-          <div className="mx-auto max-w-7xl">
-            <div data-podcast-reveal className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.58fr)] lg:items-end lg:gap-16">
-              <div>
-                <p className="number-label mb-6">Seven sets</p>
-                <h2 className="brand-sans max-w-4xl text-4xl font-semibold leading-[1.02] text-white sm:text-6xl lg:text-7xl">
-                  Choose the frame that already feels like your show.
-                </h2>
-              </div>
-              <p className="max-w-xl text-lg leading-relaxed text-white/55">
-                Warm walnut, clean white, saturated color, or a fully directed canvas. Every set is camera-ready, so your production time stays focused on the conversation.
-              </p>
-            </div>
-            <PodcastSetSelector sets={studios} />
-          </div>
-        </section>
+        <PodcastSetSelector sets={studios} />
 
         <section className="border-y border-white/10 bg-zinc-950 px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
           <div className="mx-auto max-w-7xl">
