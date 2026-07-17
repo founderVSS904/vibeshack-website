@@ -61,6 +61,10 @@ https://www.vibeshackstudios.com. A San Francisco studio-booking business
 - Our Work: `app/our-work/page.tsx`, `app/our-work/[slug]/page.tsx`,
   `lib/seo/workProjects.ts`. Real client work with YouTube embeds, plus a
   "Shot at VibeShack" row of external links.
+- Cinema Experience checkpoint: `docs/CINEMA_EXPERIENCE_CHECKPOINT.md`. This is
+  the source of truth for the Blender-integrated Our Work redesign. Build and
+  review it in this repo at `http://localhost:3011/our-work/`; the separate
+  Desktop Sites prototype is historical test material, not the production app.
 - Booking UI: `app/book/` (`BookPageClient.tsx`, a 4-step flow: room, date and
   time with a month-grid calendar, extras, review and payment). Booking server
   side: `lib/booking/` (`calendar.ts` is the Google Calendar integration),
