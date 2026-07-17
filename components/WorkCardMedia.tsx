@@ -27,7 +27,7 @@ export default function WorkCardMedia({
   // Metadata preloads up front (the pattern the homepage tiles use, proven
   // in Safari); the full clip only downloads once play() runs on hover.
   const enter = (e: React.PointerEvent) => {
-    if (e.pointerType !== 'mouse' || !clip) return
+    if (e.pointerType === 'touch' || !clip) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const video = videoRef.current
     if (!video) return

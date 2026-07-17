@@ -106,8 +106,8 @@ export default async function OurWorkPage({
                     imageClassName="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
                     sizes="(min-width: 1280px) 32vw, (min-width: 768px) 50vw, 100vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/82 via-black/12 to-transparent" />
-                  <figcaption className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4">
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/82 via-black/12 to-transparent" />
+                  <figcaption className="pointer-events-none absolute inset-x-4 bottom-4 flex items-end justify-between gap-4">
                     <div>
                       <p className="text-base font-medium leading-tight text-white">{title}</p>
                       <p className="mt-0.5 text-sm text-white/70">
@@ -157,8 +157,8 @@ export default async function OurWorkPage({
                       imageClassName="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
                       sizes="(min-width: 1280px) 19vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
-                    <figcaption className="absolute inset-x-3 bottom-3">
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+                    <figcaption className="pointer-events-none absolute inset-x-3 bottom-3">
                       <p className="text-sm font-semibold leading-tight text-white">{title}</p>
                       <p className="mt-0.5 line-clamp-1 text-xs text-white/60">{detail}</p>
                     </figcaption>
