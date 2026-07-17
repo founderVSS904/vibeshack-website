@@ -521,19 +521,20 @@ No amount of additional CSS blur or glow fully fixes this architectural mismatch
 
 ### Phase A: Curate the launch films
 
-The owner chooses a small featured set. A reasonable first milestone is three to six films.
+The owner approved a three-film launch set on 2026-07-17:
 
-Current website candidates include:
+1. The Client
+2. The Giver
+3. Body Is Tea
 
-- Body Is Tea
-- Chilled
-- Remote
-- The Client
-- Unforgiven
-- The Giver
-- Wing Battle
+The exact local source files and inspected media properties are recorded in:
 
-The final list is an owner decision. Do not assume every current project belongs in the theater launch.
+```text
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/video/launch_films.json
+```
+
+Do not add other current projects to the theater launch without a new owner
+decision.
 
 For each selected project, confirm:
 
@@ -908,18 +909,22 @@ Do not commit large source masters, EXR sequences, or generated render caches to
 
 ## 20. Open owner decisions
 
-The following are intentionally unresolved:
+Resolved on 2026-07-17:
 
-1. How many films are in the curated launch set?
-2. Which exact projects are included?
-3. Does each project play in full or as a curated excerpt?
-4. What is the screen policy for 16:9 work inside the 2.35:1 architectural frame: contain, designed matte, or approved crop?
-5. Should the initial idle screen show the VibeShack logo, a featured poster, or black?
-6. Should switching films keep the room dark or briefly raise practical lighting?
-7. What captions are available?
-8. Where will final web video derivatives be hosted?
-9. Does the short proof justify full Cycles rendering, or does a tuned Eevee result pass the owner comparison?
-10. What is the approved mobile fallback?
+- Launch set size: three films.
+- Launch films: The Client, The Giver, and Body Is Tea.
+
+The following remain intentionally unresolved:
+
+1. Does each project play in full or as a curated excerpt?
+2. What is the screen policy for 16:9 work inside the 2.35:1 architectural frame: contain, designed matte, or approved crop?
+3. Should the initial idle screen show the VibeShack logo, a featured poster, or black?
+4. Should switching films keep the room dark or briefly raise practical lighting?
+5. What captions are available?
+6. Where will final web video derivatives be hosted?
+7. Does the short proof justify full Cycles rendering, or does a tuned Eevee result pass the owner comparison?
+8. What is the approved mobile fallback?
+9. Should the shared theater output use 23.976 fps, 24 fps, 25 fps, or a different conforming strategy for the mixed-frame-rate sources?
 
 Do not guess these answers when they materially change the result.
 
@@ -929,7 +934,7 @@ The next builder should perform these steps in order:
 
 1. Read `AGENTS.md`, `CLAUDE.md`, and this checkpoint.
 2. Verify the real local site is still available at `http://localhost:3011/our-work/`.
-3. Confirm the selected short proof source with the owner.
+3. Review `/Users/emmanueltay/Desktop/VibeShack Cinema Experience/video/launch_films.json` and confirm which selected film supplies the short production proof.
 4. Duplicate the v005/v008 work into a new v010 production-template milestone.
 5. Build a true lights-on to lights-off animation.
 6. Upgrade film transport to more receiver zones with every-frame temporal smoothing.

@@ -45,7 +45,6 @@ const frames: Frame[] = [
       '/studio-videos/home-tile-video-production-loop-v20260714b.mp4',
       '/studio-videos/home-tile-damian-stone-loop-v20260710.mp4',
       '/studio-videos/home-tile-the-client-loop-v20260714.mp4',
-      '/studio-videos/home-tile-unforgiven-loop-v20260714.mp4',
     ],
   },
   {
@@ -58,8 +57,6 @@ const frames: Frame[] = [
     accent: '#ff2a1f',
     videos: [
       '/studio-videos/home-tile-our-work-loop-v20260714b.mp4',
-      '/studio-videos/home-tile-restless-moment-loop-v20260714.mp4',
-      '/studio-videos/home-tile-remote-loop-v20260714.mp4',
     ],
   },
   {

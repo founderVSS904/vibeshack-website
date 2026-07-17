@@ -80,6 +80,38 @@ const nextConfig = {
         permanent: true,
       },
       {
+        // Retired portfolio pieces. Send old links to the portfolio index
+        // rather than a dead end.
+        source: '/our-work/remote',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/remote/',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/unforgiven',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/unforgiven/',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/in-a-restless-moment',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/in-a-restless-moment/',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
         // The Photography Studio rental is retired. Canvas is the cyc room
         // photo work happens in now, so inbound links land somewhere real.
         source: '/photography-studio-san-francisco',
