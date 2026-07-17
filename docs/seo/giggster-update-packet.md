@@ -17,6 +17,7 @@ No listing should use phone numbers, external URLs, or direct contact info becau
 ## Account-Level Audit
 
 - Four active listings found: white cyc, green screen, photography studio, premium podcast.
+- The photography studio listing is retired and needs taking down. See its section below.
 - All four listings show `Calendar sync: not connected`.
 - Instant book appears off.
 - White cyc is aligned to `$100/hr` starting price.
@@ -120,46 +121,17 @@ Remove or demote:
 - Setup photos with clutter as cover images.
 - Duplicate monitor/control angles.
 
-### Photography Studio
+### Photography Studio (RETIRED - take the listing down)
 
-Current listing:
-`Photography Studio – Vanity, Backdrops & Lighting Grid`
+We no longer rent the Photography Studio. Do not optimize this listing. Remove
+it from Giggster.
 
-Recommended title:
-`Photography Studio with Backdrops, HMU & Lighting Grid`
+If a listing has to stay live while the takedown processes, point it at Canvas
+Rental instead: seamless white cyc wall, overhead lighting grid, $100/hr. Do not
+advertise the hair and makeup room or the backdrop wall, because that room is
+gone.
 
-Recommended price:
-Change starting rate to `$100/hr` to match the website room-only photography rental rate.
-
-Recommended description:
-
-Photography studio for portraits, headshots, fashion tests, product photos, ecommerce images, lookbooks, press photos, campaign stills, and creator content.
-
-The room includes a shooting area with backdrop options, a hair and makeup / wardrobe zone, lighting grid support, restroom access, and production-friendly staging space. It is built for photographers and small crews who want a controlled studio environment without renting a larger soundstage.
-
-Use this room when your shoot needs clean background control, quick wardrobe or makeup changes, and lighting flexibility. Bring your own photographer and crew, or ask about VibeShack photo services if you want help producing the shoot.
-
-Best for:
-- Headshots and portraits
-- Product photography
-- Fashion tests and lookbooks
-- Press photos
-- Beauty and editorial images
-- Social campaign stills
-
-Photo order from `/Users/emmanueltay/Desktop/VibeShack Giggster Uploads/photography/`:
-
-1. `01-photography-red-backdrop-room.jpg`
-2. `02-photography-paper-backdrop.jpg`
-3. `03-photography-cyc-creative-example.jpg`
-4. `04-photography-fashion-cyc-example.jpg`
-5. `05-photography-beauty-portrait-example.jpg`
-
-Remove or demote:
-
-- Low-res room photos.
-- Any photo that looks like a casual phone snapshot.
-- Repetitive backdrop-only shots after the best room photo.
+Photo Services is unaffected. VibeShack still plans and produces shoots.
 
 ### Premium Podcast
 

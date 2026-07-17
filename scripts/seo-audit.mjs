@@ -8,7 +8,6 @@ const requiredPaths = [
   '/',
   '/podcast-studio-san-francisco/',
   '/green-screen-studio-sf/',
-  '/photography-studio-san-francisco/',
   '/video-production/',
   '/services/',
   '/canvas-rental/',

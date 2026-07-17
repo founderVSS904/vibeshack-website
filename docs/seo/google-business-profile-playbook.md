@@ -102,7 +102,7 @@ Q: Can I tour the space before booking?
 A: Yes. Studio tours can be booked at `https://www.vibeshackstudios.com/tour/`.
 
 Q: What services does VibeShack Studios offer?
-A: Podcast studios, green screen, photo services, video production, photography studio rental, white cyc rental, and room-only production studio rental.
+A: Podcast studios, green screen, photo services, video production, white cyc rental, and room-only production studio rental.
 
 Q: Is VibeShack Studios open 24/7?
 A: Yes, the studio is open 24/7 for bookings.

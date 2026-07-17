@@ -26,6 +26,10 @@ https://www.vibeshackstudios.com. A San Francisco studio-booking business
   caches. The `.gitignore` covers these; do not weaken it.
 - Premier is removed from the business. Do not reintroduce Premier anywhere in
   frontend or backend (booking catalog, pages, images, sitemaps, schemas).
+- The Photography Studio rental is removed from the business. Do not
+  reintroduce it anywhere in frontend or backend (booking catalog, pages,
+  images, sitemaps, schemas, llms.txt). Canvas Rental is the photo room.
+  Photo Services, which sells the shoot rather than the room, stays.
 
 ## Running it
 

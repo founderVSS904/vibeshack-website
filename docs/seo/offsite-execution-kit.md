@@ -24,13 +24,13 @@ Use this distinction when a platform asks what the company is. VibeShack can be 
 - Booking URL: https://www.vibeshackstudios.com/book/
 - Email: founder@vibeshackstudios.com
 - Hours: Open 24/7
-- Primary services: podcast studio rental, green screen studio rental, photography studio rental, white cyc studio rental, photo services, video production, production studio rental
+- Primary services: podcast studio rental, green screen studio rental, white cyc studio rental, photo services, video production, production studio rental
 - Price range: $100-$400/hr
 - Public leadership signals to keep consistent when appropriate: Emmanuel Tay, CEO; Prabhnoor Gill, co-founder / producer
 
 ## Business Description
 
-VibeShack is a media company and brand studio for creators, founders, and companies that need content, campaigns, and production support. VibeShack Studios is the San Francisco production arm: a 24/7 production studio in the Northern Waterfront offering podcast rooms, green screen, photo services, video production, photography studio rental, and white cyc rental spaces at 950 Battery St, with hourly bookings, professional lighting, broadcast audio, 4K camera setups, and crew options available.
+VibeShack is a media company and brand studio for creators, founders, and companies that need content, campaigns, and production support. VibeShack Studios is the San Francisco production arm: a 24/7 production studio in the Northern Waterfront offering podcast rooms, green screen, photo services, video production, and white cyc rental spaces at 950 Battery St, with hourly bookings, professional lighting, broadcast audio, 4K camera setups, and crew options available.
 
 ## Short Profile Bios
 
@@ -38,7 +38,7 @@ Use these where character limits are tight.
 
 - 80 characters: VibeShack Studios: SF production arm for podcast, photo, video, and green screen.
 - 160 characters: VibeShack Studios is the SF production arm of VibeShack, built for podcast, photo, video, green screen, white cyc, and creator content.
-- 300 characters: VibeShack is a media company and brand studio. VibeShack Studios is its 24/7 San Francisco production arm at 950 Battery St, with podcast rooms, green screen, photo services, video production, photography studio rental, white cyc, professional lighting, broadcast audio, and crew options.
+- 300 characters: VibeShack is a media company and brand studio. VibeShack Studios is its 24/7 San Francisco production arm at 950 Battery St, with podcast rooms, green screen, photo services, video production, white cyc, professional lighting, broadcast audio, and crew options.
 
 ## Citation Targets
 

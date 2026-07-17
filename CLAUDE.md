@@ -25,6 +25,10 @@ booking business in San Francisco (podcast, video, photo, rental studios).
   caches. The `.gitignore` already covers these; keep it that way.
 - Premier is gone from the business. Do not reintroduce Premier anywhere in
   frontend or backend (booking catalog, pages, images, sitemaps, schemas).
+- The Photography Studio rental is gone from the business. Do not reintroduce
+  it anywhere in frontend or backend (booking catalog, pages, images, sitemaps,
+  schemas, llms.txt). Canvas Rental is the photo room. Photo Services, which
+  sells the shoot rather than the room, stays.
 
 ## Running it
 
