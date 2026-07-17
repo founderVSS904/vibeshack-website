@@ -2,7 +2,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import { studioGuides, type StudioGuide } from '@/lib/seo/studioGuides'
+import { studioGuides } from '@/lib/seo/studioGuides'
 import { rankGuides } from '@/lib/seo/guideSearch'
 
 // ─── Data shaping ─────────────────────────────────────────────────────────────
@@ -68,70 +68,6 @@ const STATIONS = [
     cta: 'Book the session',
   },
 ]
-
-function readMinutes(guide: StudioGuide) {
-  const text = [
-    guide.intro,
-    ...guide.sections.map((s) => `${s.heading} ${s.body}`),
-    ...guide.producerNotes,
-    ...guide.mistakes,
-    ...guide.checklist,
-    ...guide.faqs.map((f) => `${f.question} ${f.answer}`),
-  ].join(' ')
-  const words = text.split(/\s+/).length
-  return Math.min(9, Math.max(4, Math.round(words / 180)))
-}
-
-const guideIconProps = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.5,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-  viewBox: '0 0 24 24',
-  'aria-hidden': true,
-}
-
-function GuideIcon({ slug, className }: { slug: string; className: string }) {
-  if (slug === 'podcast-studio-prep') {
-    return (
-      <svg {...guideIconProps} className={className}>
-        <rect x="9" y="3" width="6" height="11" rx="3" />
-        <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-      </svg>
-    )
-  }
-  if (slug === 'photography-studio-prep') {
-    return (
-      <svg {...guideIconProps} className={className}>
-        <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
-        <circle cx="12" cy="13" r="3.5" />
-      </svg>
-    )
-  }
-  if (slug === 'green-screen-studio-prep') {
-    return (
-      <svg {...guideIconProps} className={className}>
-        <rect x="3" y="5" width="18" height="12" rx="1.5" />
-        <path d="M8 21h8M12 17v4" />
-      </svg>
-    )
-  }
-  if (slug === 'white-cyc-studio-prep') {
-    return (
-      <svg {...guideIconProps} className={className}>
-        <path d="M4 4v9a7 7 0 0 0 7 7h9" />
-        <path d="M4 20h4M20 4v4" />
-      </svg>
-    )
-  }
-  return (
-    <svg {...guideIconProps} className={className}>
-      <path d="M12 5c-2-1.5-4.5-2-8-2v16c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2V3c-3.5 0-6 .5-8 2z" />
-      <path d="M12 5v16" />
-    </svg>
-  )
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -295,15 +231,12 @@ export default function GuidesPageClient() {
                 className="group flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0b0b0b] transition-colors hover:border-white/25 lg:flex-row"
               >
                 <div className="flex flex-col p-8 lg:w-[54%] lg:p-10">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full border border-brand-red/60">
-                    <GuideIcon slug={featured.slug} className="h-5 w-5 text-brand-red" />
-                  </span>
-                  <p className="font-black mt-7 leading-[0.94] text-white" style={{ fontSize: 'clamp(2.1rem, 2.6vw, 3rem)' }}>
+                  <p className="font-black leading-[0.94] text-white" style={{ fontSize: 'clamp(2.1rem, 2.6vw, 3rem)' }}>
                     {featured.shortTitle}
                   </p>
                   <p className="mt-4 max-w-sm text-sm leading-relaxed text-zinc-400">{featured.description}</p>
                   <p className="mt-auto flex items-center gap-4 pt-9 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-brand-red">
-                    {readMinutes(featured)} min guide
+                    Read the guide
                     <span className="relative h-px w-24 bg-brand-red/70 origin-left transition-transform duration-300 ease-out group-hover:scale-x-125">
                       <span className="absolute -right-px -top-[3.5px] block h-[7px] w-[7px] rotate-45 border-r border-t border-brand-red/70" />
                     </span>
@@ -334,19 +267,11 @@ export default function GuidesPageClient() {
                       href={`/studio-guides/${guide.slug}/`}
                       className="group relative flex flex-1 overflow-hidden rounded-lg border border-white/10 bg-[#0b0b0b] transition-colors hover:border-white/25"
                     >
-                      <div className="flex w-[58%] flex-col justify-center gap-4 p-7">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-red/60">
-                          <GuideIcon slug={guide.slug} className="h-4 w-4 text-brand-red" />
-                        </span>
-                        <div>
-                          <p className="font-black leading-[0.94] text-white" style={{ fontSize: 'clamp(1.4rem, 1.7vw, 1.85rem)' }}>
-                            {guide.shortTitle}
-                          </p>
-                          <p className="mt-2.5 line-clamp-2 text-xs leading-relaxed text-zinc-400">{guide.description}</p>
-                        </div>
-                        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-brand-red">
-                          {readMinutes(guide)} min guide
+                      <div className="flex w-[58%] flex-col justify-center gap-3 p-7">
+                        <p className="font-black leading-[0.94] text-white" style={{ fontSize: 'clamp(1.4rem, 1.7vw, 1.85rem)' }}>
+                          {guide.shortTitle}
                         </p>
+                        <p className="line-clamp-2 text-xs leading-relaxed text-zinc-400">{guide.description}</p>
                       </div>
                       <div className="relative min-h-[170px] flex-1 overflow-hidden">
                         <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.035]">
@@ -382,9 +307,6 @@ export default function GuidesPageClient() {
                   <div className="min-w-0">
                     <p className="font-black text-2xl leading-[0.94] text-white">{guide.shortTitle}</p>
                     <p className="mt-2 line-clamp-1 max-w-2xl text-xs leading-relaxed text-zinc-400">{guide.description}</p>
-                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                      {readMinutes(guide)} min guide
-                    </p>
                   </div>
                   <span className="shrink-0 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors group-hover:text-brand-red">
                     Read guide <span aria-hidden>→</span>

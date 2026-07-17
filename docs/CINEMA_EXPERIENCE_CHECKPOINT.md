@@ -2,7 +2,7 @@
 
 Checkpoint date: 2026-07-17  
 Owner: Tay / Emmanuel  
-Status: v010 Blender production proof complete; owner approval and real-website integration pending
+Status: v012 Blender composition/lighting preview complete; owner approval, full-motion render, and real-website integration pending
 Primary local review URL: `http://localhost:3011/our-work/`
 
 ## 1. Purpose of this document
@@ -531,6 +531,75 @@ Validation completed on 2026-07-17: every PNG decodes at 3840×2160
 This proof is ready for owner review. It does not authorize full-film batch
 rendering, the final screen-fit policy, or production website deployment.
 
+### v011: shadow-atlas correction
+
+Owner screenshots exposed visible breakup in the first and last two seconds of
+v010. The files were valid, but the rendered pixels were not: the v010 scene
+had 82 shadow-casting lights and repeatedly requested approximately 6196 tiles
+from Eevee's 2048-tile shadow buffer.
+
+The versioned v011 scene keeps shadows on 12 structural lights and leaves the
+decorative practicals and film-transport lights shadowless. A 4K stress render
+now reports zero `Shadow buffer full` warnings. Frames 1–48 and 241–288 were
+re-rendered; the unaffected integrated-film frames 49–240 were preserved.
+
+```text
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/vibeshack_cinema_theater_v011_client_shadow_fixed.blend
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/scripts/fix_theater_shadow_budget_v011.py
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/scripts/master_theater_production_proof_v011.sh
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/video/theater_v011_client_shadow_fixed_prores.mov
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/renders/theater_v011_client_shadow_fixed_4k.mp4
+```
+
+Validation: all 96 corrected PNGs decode at 3840×2160 `rgb48be`; the corrected
+ProRes and H.264 files contain exactly 288 frames at `24000/1001`, 48 kHz stereo
+audio, and a 12.012-second duration; both decode end to end. Use v011—not v010—
+for owner review.
+
+### Current material-realism finding
+
+The theater already loads 4K Poly Haven color, roughness, and normal maps for
+leather, acoustic wool, and carpet. The remaining synthetic look is driven more
+by repeated procedural seat forms, limited upholstery wrinkles and seam
+tension, missing displacement and wear variation, and lighting/material
+calibration than by texture resolution alone. Prioritize one high-quality hero
+recliner model and targeted shader/UV work before buying a broad material
+subscription.
+
+### v012: closer composition and practical-light refinement
+
+The owner requested a viewpoint one row closer to the screen and side lights
+that do not read as glossy orange plastic before they dim. The v012 scene moves
+the camera forward by the exact 4.5-meter seat-row spacing while preserving the
+34.5 mm lens. Its depth-of-field focus plane moves forward by the same amount.
+
+The side-light lenses now use a matte diffuse-plus-emission shader instead of
+the prior glossy Principled response. Their area lights are larger and softer,
+with almost no specular contribution. The wall pools, vertical grazes,
+perimeter wash, and lower red wash were softened, and the leather shaders
+received lower specular/coat values plus a small roughness lift.
+
+```text
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/vibeshack_cinema_theater_v012_composition_lighting.blend
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/scripts/improve_theater_composition_lighting_v012.py
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/scripts/render_v012_speed_preview.py
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/renders/theater_v012_speed_preview_frames/
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/renders/theater_v012_composition_lighting_contact.jpg
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/renders/theater_v011_to_v012_before_after.jpg
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/renders/theater_v012_continuous_quicktime_review.mov
+```
+
+Seven 1920x1080 key frames rendered at 16 samples in approximately 28 seconds.
+Visual review confirms a substantially larger screen without clipping, a clean
+foreground-seat silhouette, and side practicals that read as restrained warm
+lenses rather than shiny plastic. No full v012 animation or 4K master has been
+rendered; the speed-first workflow keeps that work gated on owner approval. The
+first QuickTime attempt incorrectly used crossfades between seven still states
+and was rejected. It was replaced at the same path with a true continuous
+1280x720 Blender render of all 288 frames and correctly timed audio. The
+corrected movie validates as 288 H.264 frames at `24000/1001` plus 48 kHz
+stereo AAC and decodes end to end.
+
 ## 10. Why the current hosted result is wrong
 
 The current hosted page uses:
@@ -662,7 +731,7 @@ Render an Eevee and Cycles comparison at the intended final resolution. Choose t
 
 For maximum quality, Cycles is the reference. If a full-length Cycles render is operationally impractical, Eevee must be tuned against the Cycles reference and approved by the owner. Do not silently substitute a faster renderer.
 
-Current result: the v010 4K Eevee proof is complete and validated. Owner review
+Current result: the v011 shadow-fixed 4K Eevee proof is complete and validated. Owner review
 must decide whether it is sufficient or whether a targeted Cycles comparison is
 required before full-film rendering.
 
@@ -979,14 +1048,18 @@ The next builder should perform these steps in order:
 
 1. Read `AGENTS.md`, `CLAUDE.md`, and this checkpoint.
 2. Verify the real local site is still available at `http://localhost:3011/our-work/`.
-3. Review `renders/theater_v010_client_production_proof_4k.mp4` with the owner.
-4. Confirm the 16:9-to-2.35:1 screen policy and whether the tuned Eevee result
+3. Review `renders/theater_v012_composition_lighting_contact.jpg` and
+   `renders/theater_v011_to_v012_before_after.jpg` with the owner.
+4. If the corrected continuous v012 QuickTime, closer composition, and revised
+   practicals are approved, proceed to a new 4K master.
+5. Confirm the 16:9-to-2.35:1 screen policy and whether the tuned Eevee result
    is sufficient or requires a targeted Cycles comparison.
-5. Preserve the v010 Blender scene, 16-bit frame sequence, and ProRes master.
-6. After proof approval, build the two-player crossfade prototype inside the
+6. Preserve the v011 Blender scene, corrected frames, and ProRes master as the
+   validated motion reference. Keep v010 only as historical failure evidence.
+7. After proof approval, build the two-player crossfade prototype inside the
    real Next.js `/our-work/` route.
-7. Validate seamless switching, playback, accessibility, and mobile fallback locally.
-8. Only after proof and web-transition approval, batch the three curated films.
+8. Validate seamless switching, playback, accessibility, and mobile fallback locally.
+9. Only after proof and web-transition approval, batch the three curated films.
 
 ## 22. Definition of done for the launch experience
 
@@ -1008,14 +1081,17 @@ The launch cinema is not done until:
 
 ## 23. Final checkpoint summary
 
-The project proved the hardest visual idea with v008 and has now completed the
-first production-quality implementation with v010: when the film is inside
-Blender and the room is rendered with it, the theater feels unified.
+The project proved the hardest visual idea with v008, completed the first
+production-quality implementation with v011, and now has a faster, more
+screen-forward v012 composition with restrained practical-light and leather
+response. When the film is inside Blender and the room is rendered with it, the
+theater feels unified.
 
 The mistake was not the v008 architecture. The mistake was treating its preview resolution and incomplete lighting animation as a reason to replace it with a separate browser video layer.
 
-The next decision is owner approval of the v010 *The Client* proof. After that,
-use the approved template for the three-film launch library and integrate the
-experience into the real VibeShack Next.js site at `http://localhost:3011/our-work/`.
+The next decision is owner approval of the v012 look against the validated v011
+motion proof. After that, use the approved template for the three-film launch
+library and integrate the experience into the real VibeShack Next.js site at
+`http://localhost:3011/our-work/`.
 
 The future real-time 3D version should be pursued only as a measured scalability project that must match the approved Blender-integrated reference.
