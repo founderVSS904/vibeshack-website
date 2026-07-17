@@ -162,6 +162,16 @@ function studioFromQuery(studios: Studio[]) {
   return id ? studios.find((s) => s.id === id) ?? null : null
 }
 
+// Pre-selects add-ons from a ?addon=id,id link, so the pricing page can send a
+// visitor straight into booking with the teleprompter already toggled.
+function addonsFromQuery(addons: AddOn[]) {
+  if (typeof window === 'undefined') return []
+  const raw = new URLSearchParams(window.location.search).get('addon')
+  if (!raw) return []
+  const ids = new Set(raw.split(',').map((value) => value.trim()))
+  return addons.filter((addon) => ids.has(addon.id))
+}
+
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 const iconProps = {
@@ -289,7 +299,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
   const [monthOffset, setMonthOffset] = useState(0)
 
   // Extras
-  const [selectedAddons, setSelectedAddons] = useState<AddOn[]>([])
+  const [selectedAddons, setSelectedAddons] = useState<AddOn[]>(() => addonsFromQuery(addons))
   const [recurring, setRecurring] = useState<string | null>(null)
 
   // Contact

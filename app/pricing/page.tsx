@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
 
@@ -234,24 +235,30 @@ export default function PricingPage() {
           </h2>
           <div className="divide-y divide-white/10 border-y border-white/10">
             {[
-              { name: 'Audio Technician', price: 'Contact for rate', desc: 'An engineer runs your audio so levels are right the first time.' },
-              { name: 'Live Switching', price: 'Contact for rate', desc: 'Cut between cameras live and leave with a finished stream.' },
-              { name: 'Teleprompter', price: '$25', desc: 'Teleprompter loaded with your script before you arrive.' },
-            ].map(({ name, price, desc }) => (
-              <div key={name} className="flex items-start justify-between gap-8 py-6">
-                <div>
-                  <p className="text-white font-bold text-base mb-1">{name}</p>
-                  <p className="text-gray-500 text-sm">{desc}</p>
-                </div>
-                <span className="text-brand-red font-bold text-sm flex-shrink-0">{price}</span>
-              </div>
-            ))}
+              { name: 'Audio Technician', price: 'Contact for rate', desc: 'An engineer runs your audio so levels are right the first time.', href: 'mailto:founder@vibeshackstudios.com', cta: 'Request a rate' },
+              { name: 'Live Switching', price: 'Contact for rate', desc: 'Cut between cameras live and leave with a finished stream.', href: 'mailto:founder@vibeshackstudios.com', cta: 'Request a rate' },
+              { name: 'Teleprompter', price: '$25', desc: 'Teleprompter loaded with your script before you arrive.', href: '/book/?addon=teleprompter', cta: 'Add during booking' },
+            ].map(({ name, price, desc, href, cta }) => {
+              const inner = (
+                <>
+                  <span className="min-w-0">
+                    <span className="block text-white font-bold text-base mb-1">{name}</span>
+                    <span className="block text-gray-500 text-sm">{desc}</span>
+                    <span className="mt-2 block font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-gray-600 transition-colors group-hover/addon:text-gray-300">
+                      {cta} <span aria-hidden="true">&rarr;</span>
+                    </span>
+                  </span>
+                  <span className="text-brand-red font-bold text-sm flex-shrink-0">{price}</span>
+                </>
+              )
+              const className = 'group/addon flex items-start justify-between gap-8 py-6 transition-colors hover:bg-white/[0.02]'
+              return href.startsWith('/')
+                ? <Link key={name} href={href} className={className}>{inner}</Link>
+                : <a key={name} href={href} className={className}>{inner}</a>
+            })}
           </div>
           <p className="text-gray-600 text-sm mt-8">
-            Add to your booking:{' '}
-            <a href="mailto:founder@vibeshackstudios.com" className="text-brand-red hover:underline">
-              founder@vibeshackstudios.com
-            </a>
+            The teleprompter is added at checkout when you book. Audio tech and live switching are quoted by request.
           </p>
         </div>
       </section>
