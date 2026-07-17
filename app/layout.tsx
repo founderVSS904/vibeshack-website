@@ -12,6 +12,7 @@ export const viewport = {
 }
 
 export const metadata: Metadata = {
+  manifest: '/manifest.json',
   metadataBase: new URL('https://www.vibeshackstudios.com/'),
   icons: {
     icon: [

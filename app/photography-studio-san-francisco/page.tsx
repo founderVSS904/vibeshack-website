@@ -164,16 +164,17 @@ export default function PhotographyStudioPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-12 pt-32 w-full">
           <div className="max-w-3xl">
-            <p className="number-label mb-8">Photography Studio Rental San Francisco</p>
-            <h1 className="font-black text-white leading-none mb-8" style={{ fontSize: 'clamp(3.2rem, 8vw, 7.5rem)', letterSpacing: '-0.055em' }}>
-              Rent the room. Bring your photographer.
+            <p className="mb-6 text-sm font-semibold text-white/70">Photography Studio Rental San Francisco</p>
+            <h1 className="font-black uppercase leading-[0.88] text-white mb-8" style={{ fontSize: 'clamp(4.1rem, 9vw, 8.8rem)', letterSpacing: 0 }}>
+              Rent the room.<br />
+              <span className="text-brand-red">Bring your photographer.</span>
             </h1>
             <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mb-10">
               A San Francisco photography studio rental for photographers, creators, agencies, and in-house teams who already have the shoot plan and need controlled light, backdrops, makeup space, staging room, and a clean production environment.
             </p>
             <div className="flex flex-wrap gap-4 items-center">
-              <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
-                Book studio rental
+              <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+                Book Studio Rental
               </Link>
               <Link href="/photo-services/" className="text-gray-400 hover:text-white text-sm font-semibold transition-colors">
                 Need VibeShack to shoot it?
@@ -183,7 +184,7 @@ export default function PhotographyStudioPage() {
         </div>
       </section>
 
-      <section className="bg-black border-t border-white/5 sticky top-20 z-30" data-carousel>
+      <section className="bg-black border-t border-white/5 sticky top-20 z-30">
         <div className="scrollbar-hide max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 overflow-x-auto">
           <div className="flex gap-2 min-w-max pr-6" role="list" aria-label="Service pages">
             {serviceTabs.map(({ href, label, active }) => (
@@ -210,7 +211,7 @@ export default function PhotographyStudioPage() {
             <div>
               <span className="number-label mb-6 block">The point</span>
               <h2 className="text-white font-black leading-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
-                Not just a room. A repeatable visual system.
+                More than a room. A repeatable visual system.
               </h2>
               <p className="text-gray-500 text-base leading-relaxed mb-8">
                 Strong photo sessions are planned around the final use: website hero, press bio, product page, ad creative, cover art, social crop, or sales deck. The studio gives you the control to shoot those variations without changing locations.
@@ -336,8 +337,8 @@ export default function PhotographyStudioPage() {
               <h2 className="text-white font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
                 The boring details that save the shoot.
               </h2>
-              <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
-                Book studio rental
+              <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+                Book Studio Rental
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 border border-white/10 rounded-2xl overflow-hidden">
@@ -387,8 +388,8 @@ export default function PhotographyStudioPage() {
             Room-only photography studio rental in San Francisco from $100/hr. Open 24/7 at 950 Battery St, San Francisco, CA 94111.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
-              Book studio rental
+            <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+              Book Studio Rental
             </Link>
             <Link href="/services/" className="text-gray-500 hover:text-white transition-colors text-sm self-center">
               Compare all services

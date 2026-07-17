@@ -33,14 +33,14 @@ export default function NotFound() {
         </h1>
 
         <p className="text-gray-500 text-base leading-relaxed mb-12 max-w-sm mx-auto">
-          This page doesn&apos;t exist — but your next session does. Let&apos;s get you back on track.
+          This page doesn&apos;t exist. Your next session can.
         </p>
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
           >
             Back to Home
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,7 +49,7 @@ export default function NotFound() {
           </Link>
           <Link
             href="/book/"
-            className="inline-flex items-center gap-2 px-8 py-4 text-white text-sm font-semibold border border-white/20 rounded-full hover:border-white/50 hover:bg-white/5 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-4 text-white text-sm font-semibold border border-white/20 rounded-full hover:border-white/50 hover:bg-white/5 transition-colors cursor-pointer"
           >
             Book a Session
           </Link>

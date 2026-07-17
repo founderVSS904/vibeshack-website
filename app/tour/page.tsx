@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import TourBookingForm from './TourBookingForm'
 
 export const metadata: Metadata = {
-  title: 'Book a Free Studio Tour | VibeShack Studios SF',
+  title: 'Book a Free Studio Tour',
   description: 'Book a free VibeShack Studios tour online. Tour availability is checked against the live studio calendar at 950 Battery St, San Francisco.',
   alternates: { canonical: 'https://www.vibeshackstudios.com/tour/' },
 }
@@ -28,7 +28,7 @@ export default function TourPage() {
           {/* What to expect */}
           <div className="border-t border-white/[0.08] pt-10 space-y-5">
           {[
-            { n: '01', title: 'Walk every studio', body: 'See the full space — all the rooms, the gear, the setup. No surprises when you book.' },
+            { n: '01', title: 'Walk every studio', body: 'See the full space: every room, the gear, the setup. No surprises when you book.' },
             { n: '02', title: 'Ask anything', body: 'Camera specs, lighting options, pricing, availability. Our team will be on-site to answer.' },
             { n: '03', title: 'No sales pressure', body: 'If you like what you see, book. If not, no problem. The tour is free either way.' },
           ].map(({ n, title, body }) => (

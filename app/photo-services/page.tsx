@@ -237,7 +237,7 @@ export default function PhotoServicesPage() {
                     src={src}
                     alt={alt}
                     fill
-                    className="object-cover transition-transform duration-700 ease-out hover:scale-[1.035]"
+                    className="object-cover"
                     style={{ objectPosition }}
                     sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   />
@@ -253,7 +253,7 @@ export default function PhotoServicesPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-16">
             <div>
               <span className="number-label mb-6 block">Production logic</span>
-              <h2 className="text-white font-black leading-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+              <h2 className="text-white font-black leading-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
                 A stronger shoot starts before the camera comes out.
               </h2>
               <p className="text-gray-500 text-sm leading-relaxed max-w-md">
@@ -277,7 +277,7 @@ export default function PhotoServicesPage() {
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-14">
             <div>
               <span className="number-label mb-6 block">Common requests</span>
-              <h2 className="text-white font-black leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+              <h2 className="text-white font-black leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
                 Choose a scope that matches the real deliverable.
               </h2>
             </div>
@@ -289,7 +289,7 @@ export default function PhotoServicesPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             {scopes.map(({ title, detail }) => (
               <div key={title} className="border border-white/10 rounded-lg bg-black p-6">
-                <h3 className="text-white font-black text-2xl leading-none mb-5" style={{ letterSpacing: '-0.03em' }}>{title}</h3>
+                <h3 className="text-white font-black text-2xl leading-none mb-5" style={{ letterSpacing: 0 }}>{title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{detail}</p>
               </div>
             ))}
@@ -305,7 +305,7 @@ export default function PhotoServicesPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[0.75fr_1.25fr] gap-16 items-start">
             <div>
               <span className="number-label mb-6 block">FAQ</span>
-              <h2 className="text-white font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+              <h2 className="text-white font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
                 Before you book.
               </h2>
               <Link href="/contact/?service=photo-services" className="inline-flex rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">

@@ -10,7 +10,7 @@ export default function SunsetPage() {
     { img: '/studio-images/sunset-green-v1775050495.jpg', name: 'Green' },
     { img: '/studio-images/sunset-purple-v1775080889.jpg', name: 'Purple' },
     { img: '/studio-images/sunset-white-v1775080644.jpg', name: 'White' },
-    { img: '/studio-images/sunset-star-wars-v1775080748.jpg', name: 'Star Wars' },
+    { img: '/studio-images/sunset-star-wars-v1775080748.jpg', name: 'Saber Green' },
     { img: '/studio-images/sunset-sunset-v1775053701.jpg', name: 'Sunset' },
   ]
   const wheelSegments = [
@@ -25,7 +25,7 @@ export default function SunsetPage() {
     { offset: 240, color: '#DD00DD', label: 'Magenta', mood: 'expressive, music-video ready, and loud' },
     { offset: 270, color: '#FF0099', label: 'Pink', mood: 'playful, social-first, and glossy' },
     { offset: 300, color: '#FFFFFF', label: 'White', mood: 'clean, minimal, and editorial' },
-    { offset: 330, color: '#00FF66', label: 'Star Wars', mood: 'neon, sci-fi, and intentionally weird' },
+    { offset: 330, color: '#00FF66', label: 'Saber Green', mood: 'neon, sci-fi, and intentionally weird' },
   ]
   const [selectedWheelColor, setSelectedWheelColor] = useState(wheelSegments[0])
   const [hoveredWheelColor, setHoveredWheelColor] = useState<typeof wheelSegments[number] | null>(null)
@@ -37,6 +37,13 @@ export default function SunsetPage() {
     const carousel = carouselRef.current
     if (!carousel) return
 
+    // Respect reduced motion: no auto-scroll, leave the strip scrollable by hand
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const wrapper = carousel.parentElement
+      if (wrapper) wrapper.style.overflowX = 'auto'
+      return
+    }
+
     // Calculate scroll distance and duration
     const itemWidth = 280 + 12 // item width + gap
     const totalItems = colors.length
@@ -44,31 +51,48 @@ export default function SunsetPage() {
     const duration = 18000 // 18 seconds in milliseconds
 
     let animationStartTime: number | null = null
-    let isRunning = true
+    let pausedAt: number | null = null
+    let animationId = 0
 
     const animate = (currentTime: number) => {
       if (animationStartTime === null) animationStartTime = currentTime
-      
-      if (!isRunning) {
-        animationStartTime = null
-        return
+
+      if (pausedAt === null) {
+        const elapsedTime = currentTime - animationStartTime
+        const progress = (elapsedTime % duration) / duration
+        const translateDistance = scrollDistance * progress
+
+        carousel.style.transform = `translateX(-${translateDistance}px)`
+        carousel.style.transition = 'none'
       }
 
-      const elapsedTime = currentTime - animationStartTime
-      const progress = (elapsedTime % duration) / duration
-      const translateDistance = scrollDistance * progress
-
-      carousel.style.transform = `translateX(-${translateDistance}px)`
-      carousel.style.transition = 'none'
-
-      requestAnimationFrame(animate)
+      animationId = requestAnimationFrame(animate)
     }
 
-    const animationId = requestAnimationFrame(animate)
+    // Pause while hovered or focused so the card links stay clickable
+    const pause = () => {
+      if (pausedAt === null) pausedAt = performance.now()
+    }
+    const resume = () => {
+      if (pausedAt !== null && animationStartTime !== null) {
+        animationStartTime += performance.now() - pausedAt
+      }
+      pausedAt = null
+    }
+
+    carousel.addEventListener('pointerenter', pause)
+    carousel.addEventListener('pointerleave', resume)
+    carousel.addEventListener('focusin', pause)
+    carousel.addEventListener('focusout', resume)
+
+    animationId = requestAnimationFrame(animate)
 
     return () => {
-      isRunning = false
       cancelAnimationFrame(animationId)
+      carousel.removeEventListener('pointerenter', pause)
+      carousel.removeEventListener('pointerleave', resume)
+      carousel.removeEventListener('focusin', pause)
+      carousel.removeEventListener('focusout', resume)
     }
   }, [colors.length])
 
@@ -81,18 +105,16 @@ export default function SunsetPage() {
           fill className="object-cover opacity-85" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#99f6e4'}}>Creative Series</p>
+          <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">Creative Series</p>
           <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
-            Sunset
+            Sunset<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8">
-            Pick your mood. Control the light. 12 colors, infinite possibilities.
+            Pick your mood. Control the light. 12 colors. One dial. Your call.
           </p>
-          <a href="/book/?studio=sunset" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+          <a href="/book/?studio=sunset" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book Sunset
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>
           </a>
         </div>
       </section>
@@ -101,7 +123,7 @@ export default function SunsetPage() {
       <section className="py-32 bg-black border-t border-white/5 overflow-hidden" data-carousel>
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 mb-12">
           <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
-            Choose your <span style={{color: '#99f6e4'}}>mood.</span>
+            Choose your <span className="text-brand-red">mood.</span>
           </h2>
         </div>
         
@@ -132,10 +154,10 @@ export default function SunsetPage() {
             height: 260px;
             object-fit: cover;
             border-radius: 0.5rem 0.5rem 0 0;
-            transition: transform 0.3s ease;
+            transition: transform 0.7s ease-out;
           }
           .carousel-link:hover img {
-            transform: scale(1.06);
+            transform: scale(1.035);
           }
           .carousel-label {
             background: rgba(0, 0, 0, 0.6);
@@ -145,7 +167,7 @@ export default function SunsetPage() {
             font-size: 14px;
             line-height: 1.4;
             border-radius: 0 0 0.5rem 0.5rem;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease, color 0.3s ease;
             backdrop-filter: blur(8px);
             min-height: 48px;
             display: flex;
@@ -167,7 +189,7 @@ export default function SunsetPage() {
                   className="carousel-link"
                 >
                   <Image src={img} alt={`Sunset ${name}`} width={280} height={256} className="w-full h-64 object-cover" />
-                  <p className="carousel-label text-gray-500 text-sm mt-2 transition-colors">{name}</p>
+                  <p className="carousel-label">{name}</p>
                 </a>
               </div>
             ))}
@@ -179,7 +201,7 @@ export default function SunsetPage() {
                   className="carousel-link"
                 >
                   <Image src={img} alt={`Sunset ${name}`} width={280} height={256} className="w-full h-64 object-cover" />
-                  <p className="carousel-label text-gray-500 text-sm mt-2 transition-colors">{name}</p>
+                  <p className="carousel-label">{name}</p>
                 </a>
               </div>
             ))}
@@ -188,18 +210,18 @@ export default function SunsetPage() {
       </section>
 
       {/* The Studio - Features */}
-      <section className="py-32 bg-zinc-950 border-t" style={{borderColor: '#99f6e4'}}>
+      <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features */}
             <div>
               <h2 className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
-                You control<br/>the <span style={{color: '#99f6e4'}}>mood.</span>
+                You control<br/>the <span className="text-brand-red">mood.</span>
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {[
                   '12 programmable colors',
-                  'Dual-angle camera setup',
+                  '3-camera 4K setup',
                   'Cameraman included',
                   'Wireless mic system',
                   'Broadcast lighting',
@@ -224,7 +246,7 @@ export default function SunsetPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">The Difference</span>
           <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
-            Programmable <span style={{color: '#99f6e4'}}>means you decide.</span>
+            Programmable <span className="text-brand-red">means you decide.</span>
           </h2>
           <p className="text-gray-500 text-lg mb-20 max-w-2xl">Every color is pre-calibrated and one dial away. Don't compromise on the mood your show needs. Paint the room to match your vision, not the other way around.</p>
           
@@ -236,7 +258,7 @@ export default function SunsetPage() {
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Warm Tones Make People Look Human</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">Gold. Orange. Warm reds. These colors do the heavy lifting for you. They make skin look healthy. They feel intimate. They photograph true to what people expect. Most shows live in these vibes because they just work. One dial. Infinite warmth.</p>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">Gold. Orange. Warm reds. These colors do the heavy lifting for you. They make skin look healthy. They feel intimate. They photograph true to what people expect. Most shows live in these tones for a reason. One dial does all of it.</p>
                 <p className="text-gray-500 text-sm">Podcast hosts use this. Creators use this. Brands use this.</p>
               </div>
             </div>
@@ -245,8 +267,8 @@ export default function SunsetPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Bold Colors Stop Scrolls</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">Red. Purple. Magenta. White. Blue. Star Wars green. When you need your show to command attention, paint the room. Your audience's eyes lock in. Your brand pops out of the feed. Energy, edge, unmissable presence—all from the color dial. No gels. No rewiring. Just one turn.</p>
-                <p className="text-gray-500 text-sm">Music videos use this. Comedy specials use this. Brand content uses this.</p>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">Red. Purple. Magenta. White. Blue. Saber Green. When you need your show to command attention, paint the room. Your audience's eyes lock in. Your brand pops out of the feed. Energy, edge, presence you can't ignore. All from the color dial. No gels. No rewiring. One turn.</p>
+                <p className="text-gray-500 text-sm">Music videos and comedy specials book this room for exactly this.</p>
               </div>
               <div className="order-1 md:order-2">
                 <Image src="/studio-images/sunset-detail-01.jpg" alt="Sunset bold red colors" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
@@ -304,7 +326,7 @@ export default function SunsetPage() {
                       tabIndex={0}
                       aria-label={`Select ${segment.label}`}
                       aria-pressed={selected}
-                      className="cursor-pointer outline-none transition-all duration-200 ease-out"
+                      className="cursor-pointer outline-none transition-[transform,opacity] duration-200 ease-out"
                       style={{
                         transform: `translate(${popX}px, ${popY}px) scale(${scale})`,
                         transformBox: 'view-box',
@@ -337,11 +359,14 @@ export default function SunsetPage() {
                 <circle
                   cx="150"
                   cy="150"
-                  r={hoveredWheelColor ? 47 : 42}
+                  r={42}
                   fill={activeWheelColor.color}
                   opacity="0.85"
-                  className="transition-all duration-200 ease-out"
+                  className="transition-transform duration-200 ease-out"
                   style={{
+                    transform: hoveredWheelColor ? 'scale(1.12)' : 'scale(1)',
+                    transformBox: 'view-box',
+                    transformOrigin: '150px 150px',
                     filter: hoveredWheelColor ? `drop-shadow(0 0 18px ${activeWheelColor.color}77)` : 'none',
                   }}
                 />
@@ -364,11 +389,9 @@ export default function SunsetPage() {
                 {activeWheelColor.label}. We'll handle the rest.
               </h3>
               <p className="text-gray-400 text-base mb-12">$300/hr · Cameraman included · Open 24/7</p>
-              <a href="/book/?studio=sunset" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+              <a href="/book/?studio=sunset" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
                 Book Sunset
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>
               </a>
             </div>
           </div>
@@ -394,30 +417,28 @@ export default function SunsetPage() {
               </div>
             ))}
           </div>
-          <a href="/book/?studio=sunset" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+          <a href="/book/?studio=sunset" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book Sunset
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>
           </a>
           <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48hrs before.</p>
         </div>
       </section>
 
       {/* Explore Other Studios */}
-      <section className="py-48 bg-black border-t border-white/5">
+      <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="mb-16">
             <span className="number-label mb-6 block">More Studios</span>
             <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
-              Other rooms in the<br/><span style={{color: '#99f6e4'}}>Creative Series.</span>
+              Other rooms in the<br/><span className="text-brand-red">Creative Series.</span>
             </h2>
           </div>
           <a href="/canvas-podcast/" className="relative overflow-hidden rounded-3xl group block w-full" style={{height: '400px'}}>
-            <Image src="/studio-images/parlor-hero.jpg" alt="Canvas Podcast premium studio" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <Image src="/studio-images/parlor-hero.jpg" alt="Canvas Podcast premium studio" fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
             <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%)'}} />
             <div className="absolute bottom-0 left-0 right-0 p-12">
-              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{color: '#99f6e4'}}>Creative Series</p>
+              <p className="text-xs font-bold tracking-widest uppercase mb-3 text-brand-red">Creative Series</p>
               <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: '-0.04em'}}>Canvas Podcast</h3>
               <p className="text-gray-300 text-lg max-w-md mb-6">Signature podcast spaces. Customizable setups. Premium production crew included.</p>
               <p className="text-gray-400 text-sm">$400/hr · Podcast production</p>
@@ -430,15 +451,13 @@ export default function SunsetPage() {
       <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
           <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}>
-            Pick your <span style={{color: '#99f6e4'}}>color.</span>
+            Pick your <span className="text-brand-red">color.</span>
           </h2>
           <p className="text-gray-500 text-lg mb-10">$300/hr. Cameraman included. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book/?studio=sunset" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+            <a href="/book/?studio=sunset" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>
             </a>
             <a href="/tour/?studio=sunset" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →
             </a>

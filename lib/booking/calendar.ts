@@ -491,7 +491,7 @@ export async function assertTourSlotAvailable(date: string, slot: string) {
 
   const selected = availability.slots.find((candidate) => candidate.time === slot)
   if (!selected?.available) {
-    return { ok: false, status: 409, error: 'Sorry, that tour time was just booked or is no longer available. Please choose another open time.' }
+    return { ok: false, status: 409, error: 'Sorry, that tour time was booked moments ago or is no longer available. Please choose another open time.' }
   }
 
   return { ok: true, status: 200, error: '' }

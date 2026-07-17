@@ -98,7 +98,7 @@ export const workProjects: WorkProject[] = [
     youtubeId: 'i-YfBQia7UI',
     serviceHref: '/video-production/',
       summary:
-      'A locker-room hype film for Oakland Ballers pitcher Damian Stone, built on ritual, texture, and game-day focus.',
+      'A hype film for Oakland Ballers pitcher Damian Stone: pre-game ritual and locker-room texture, shot for game-day focus.',
     credits: ['For the Oakland Ballers'],
   },
   {
@@ -128,7 +128,7 @@ export const workProjects: WorkProject[] = [
     youtubeId: 'uNwd86wwgtc',
     serviceHref: '/video-production/',
       summary:
-      'A night-drenched music video for Varii: city skylines, a white Hummer under hard light, and red typography over San Francisco.',
+      'Varii at night: a white Hummer under hard light, with red typography cut over the San Francisco skyline.',
     credits: ['Presented by VibeShack', 'Night exteriors across San Francisco'],
   },
   {

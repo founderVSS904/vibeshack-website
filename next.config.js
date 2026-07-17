@@ -75,6 +75,11 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/contact-success',
+        destination: '/contact/',
+        permanent: true,
+      },
+      {
         source: '/premier',
         destination: '/find-your-studio/',
         permanent: true,

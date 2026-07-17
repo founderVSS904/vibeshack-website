@@ -1,68 +1,41 @@
 import Link from 'next/link'
-import type { ReactNode } from 'react'
 
 type Offering = {
+  number: string
   title: string
   body: string
   href: string
-  icon: ReactNode
+  cta: string
 }
-
-const iconProps = {
-  className: 'h-9 w-9 text-brand-red',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.5,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-  viewBox: '0 0 24 24',
-  'aria-hidden': true,
-} as const
 
 const offerings: Offering[] = [
   {
+    number: '01',
     title: 'Podcast Production',
-    body: 'Full-service podcast production from concept to distribution.',
+    body: 'Record, cut, and publish from one room.',
     href: '/podcast-studio-san-francisco/',
-    icon: (
-      <svg {...iconProps}>
-        <rect x="9" y="2.5" width="6" height="11" rx="3" />
-        <path d="M5 11a7 7 0 0 0 14 0M12 18v3.5M8.5 21.5h7" />
-      </svg>
-    ),
+    cta: 'See the podcast sets',
   },
   {
+    number: '02',
     title: 'Video Production',
-    body: 'High-end video production for brands and storytellers.',
+    body: 'Brand films, ads, and product video with crew.',
     href: '/video-production/',
-    icon: (
-      <svg {...iconProps}>
-        <rect x="2.5" y="7" width="13" height="10" rx="2" />
-        <path d="M15.5 10.5l6-3v9l-6-3" />
-      </svg>
-    ),
+    cta: 'Watch the work',
   },
   {
+    number: '03',
     title: 'Photography',
-    body: 'Campaigns, portraits, and content that capture attention.',
+    body: 'Campaigns, portraits, and product stills.',
     href: '/photo-services/',
-    icon: (
-      <svg {...iconProps}>
-        <path d="M4 7.5h3l1.5-2.5h7L17 7.5h3a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5z" />
-        <circle cx="12" cy="13.5" r="3.5" />
-      </svg>
-    ),
+    cta: 'Plan a shoot',
   },
   {
+    number: '04',
     title: 'Studio Rentals',
-    body: 'Top-tier studios and gear ready when you are.',
+    body: 'Ten rooms from $100/hr, open 24/7.',
     href: '/rental-studios/',
-    icon: (
-      <svg {...iconProps}>
-        <path d="M12 2.8l8 4.4v9.6l-8 4.4-8-4.4V7.2l8-4.4z" />
-        <path d="M4 7.2l8 4.4 8-4.4M12 11.6V21.2" />
-      </svg>
-    ),
+    cta: 'See rental rates',
   },
 ]
 
@@ -85,7 +58,9 @@ export function WhatWeDo() {
         <div className="mt-20 grid grid-cols-1 gap-14 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-white/10">
           {offerings.map((offering) => (
             <div key={offering.title} className="flex flex-col items-center gap-5 text-center lg:px-12">
-              {offering.icon}
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red" aria-hidden="true">
+                {offering.number}
+              </p>
               <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">
                 {offering.title}
               </h3>
@@ -94,7 +69,7 @@ export function WhatWeDo() {
                 href={offering.href}
                 className="mt-1 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-white/55 transition-colors hover:text-brand-red"
               >
-                Explore <span aria-hidden="true">-&gt;</span>
+                {offering.cta} <span aria-hidden="true">&rarr;</span>
               </Link>
             </div>
           ))}

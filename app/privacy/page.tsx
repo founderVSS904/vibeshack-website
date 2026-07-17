@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | VibeShack Studios',
+  title: 'Privacy Policy',
   description: 'How VibeShack Studios collects, uses, and protects your personal information.',
   alternates: { canonical: 'https://www.vibeshackstudios.com/privacy/' }
 }
@@ -38,13 +38,13 @@ export default function PrivacyPage() {
           </div>
           <div className="lg:col-span-2 space-y-6 text-gray-400 text-lg leading-relaxed">
             <p>
-              When you book a session, we collect your name, email address, phone number, and the details of your booking — studio type, date, and duration. If you contact us through the site, we keep that correspondence.
+              When you book a session, we collect your name, email address, phone number, and the details of your booking: studio type, date, and duration. If you contact us through the site, we keep that correspondence.
             </p>
             <p>
-              Payments go through Stripe. We never see your card number or CVV — only a transaction confirmation and the last four digits of your card. Stripe handles all payment data under their PCI-compliant infrastructure.
+              Payments go through Stripe. We never see your card number or CVV, only a transaction confirmation and the last four digits of your card. Stripe handles all payment data under their PCI-compliant infrastructure.
             </p>
             <p>
-              We use Google Analytics to understand how people use the site. This data is anonymized — no personal identifiers are attached to traffic data. Standard browser cookies support site functionality and analytics. We don&apos;t sell tracking data.
+              We use Google Analytics to understand how people use the site. This data is anonymized. No personal identifiers are attached to traffic data. Standard browser cookies support site functionality and analytics. We don&apos;t sell tracking data.
             </p>
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function PrivacyPage() {
             <div>
               <p className="text-white font-semibold mb-2">Google Calendar</p>
               <p>
-                Internal booking scheduling. Your name and email are added to calendar events we use to manage the studio — nothing more.
+                Internal booking scheduling. Your name and email are added to calendar events we use to manage the studio, nothing more.
               </p>
             </div>
             <div>
@@ -179,7 +179,7 @@ export default function PrivacyPage() {
             </h2>
           </div>
           <div className="lg:col-span-2 space-y-4 text-gray-400 text-lg leading-relaxed">
-            <p>Questions or requests about this policy — reach us directly.</p>
+            <p>For questions or requests about this policy, reach us directly.</p>
             <p>
               <a
                 href="mailto:founder@vibeshackstudios.com"

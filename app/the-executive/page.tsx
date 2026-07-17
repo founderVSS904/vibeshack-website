@@ -27,28 +27,26 @@ export default function TheExecutivePage() {
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg"
-          alt="The Executive podcast studio hero shot — VibeShack Studios San Francisco"
+          alt="The Executive podcast studio hero shot, VibeShack Studios San Francisco"
           fill className="object-cover opacity-80" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#fcd34d'}}>Walnut Series</p>
+          <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">Walnut Series</p>
           <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
-            The Executive
+            The Executive<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8">
             Warm lighting. Intimate setting. 3 cameras. Built for conversations that feel real.
           </p>
-          <a href="/book/?studio=the-executive" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+          <a href="/book/?studio=the-executive" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book This Studio
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
         </div>
       </section>
 
       {/* Show up. Record - 2 Column: Features Left + Photo Right */}
-      <section className="py-32 bg-zinc-950 border-t" style={{borderColor: '#fcd34d'}}>
+      <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features */}
@@ -73,20 +71,20 @@ export default function TheExecutivePage() {
             </div>
             {/* Right: Full Room Photo */}
             <div>
-              <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg" alt="The Executive full room with professional lighting and setup — VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
+              <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg" alt="The Executive full room with professional lighting and setup, VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Studio Details Gallery */}
-      <section className="py-32 bg-black border-t border-white/5">
+      <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">The Room</span>
           <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
-            Where three people<br/>sound <span className="text-brand-red">like legends.</span>
+            Where two people<br/>sound <span className="text-brand-red">like legends.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-20 max-w-2xl">The Executive is the set where your show stops being a podcast and becomes a broadcast. Three cameras, three angles, three voices that cut through the noise.</p>
+          <p className="text-gray-500 text-lg mb-20 max-w-2xl">The Executive is the set where your show stops being a podcast and becomes a broadcast. Three cameras, three angles, two voices that cut through the noise.</p>
           
           <div className="space-y-24">
             {/* Detail 1: Image Left, Text Right */}
@@ -96,8 +94,8 @@ export default function TheExecutivePage() {
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Shure Mics That Cost More Than Your Gear</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">Three Shure broadcast microphones. If you know what that means, you already know they're the standard. If you don't, just know that every word you say comes through clean and true.</p>
-                <p className="text-gray-400 text-lg leading-relaxed">They're positioned right. Tested every morning. You don't think about them. They just work.</p>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">Shure broadcast microphones, one locked on each voice. If you know what that means, you already know they're the standard. If you don't, every word you say still comes through clean and true.</p>
+                <p className="text-gray-400 text-lg leading-relaxed">They're positioned right. Tested every morning. You never think about them. They work.</p>
               </div>
             </div>
 
@@ -129,7 +127,7 @@ export default function TheExecutivePage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-32 bg-zinc-950 border-t border-white/5">
+      <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
           <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$300</div>
@@ -147,18 +145,16 @@ export default function TheExecutivePage() {
               </div>
             ))}
           </div>
-          <a href="/book/?studio=the-executive" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+          <a href="/book/?studio=the-executive" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book The Executive
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
           <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48hrs before.</p>
         </div>
       </section>
 
       {/* Made Here */}
-      <section className="py-32 bg-zinc-950 border-t border-white/5">
+      <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex items-end justify-between mb-12">
             <div>
@@ -169,44 +165,44 @@ export default function TheExecutivePage() {
             </div>
           </div>
           <div className="mb-3">
-            <Image src="/studio-images/executive-made-3.jpg" alt="Portfolio Players Front Office Sports production — The Executive VibeShack Studios San Francisco"
+            <Image src="/studio-images/executive-made-3.jpg" alt="Portfolio Players Front Office Sports production, The Executive, VibeShack Studios San Francisco"
                 width={1200} height={800} className="w-full h-auto rounded-2xl" />
             <p className="text-gray-600 text-xs mt-2">Portfolio Players · <span className="text-gray-500">Front Office Sports</span></p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <Image src="/studio-images/executive-made-1.jpg" alt="Live broadcast production setup — The Executive VibeShack Studios San Francisco"
+              <Image src="/studio-images/executive-made-1.jpg" alt="Live broadcast production setup, The Executive, VibeShack Studios San Francisco"
                   width={600} height={400} className="w-full h-auto rounded-2xl" />
               <p className="text-gray-600 text-xs mt-2">Live broadcast setup · The Executive</p>
             </div>
             <div>
-              <Image src="/studio-images/executive-made-4.jpg" alt="Multi-camera production monitors — The Executive VibeShack Studios San Francisco"
+              <Image src="/studio-images/executive-made-4.jpg" alt="Multi-camera production monitors, The Executive, VibeShack Studios San Francisco"
                   width={600} height={400} className="w-full h-auto rounded-2xl" />
               <p className="text-gray-600 text-xs mt-2">Multi-camera production · The Executive</p>
             </div>
           </div>
           <p className="text-gray-600 text-xs mt-4">
-            Created something here? <a href="mailto:founder@vibeshackstudios.com" className="text-brand-red hover:text-white transition-colors">Send it to us</a> — we&apos;ll feature it.
+            Created something here? <a href="mailto:founder@vibeshackstudios.com" className="text-brand-red hover:text-white transition-colors">Send it to us</a> and we&apos;ll feature it.
           </p>
         </div>
       </section>
 
       {/* Explore the Walnut Series - Expanded */}
-      <section className="py-48 bg-black border-t border-white/5">
+      <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="mb-16">
             <span className="number-label mb-6 block">Explore the Collection</span>
             <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
-              Also in the<br/><span style={{color: '#fcd34d'}}>Walnut Series.</span>
+              Also in the<br/><span className="text-brand-red">Walnut Series.</span>
             </h2>
           </div>
           <a href="/the-wing/" className="relative overflow-hidden rounded-3xl group block w-full" style={{height: '400px'}}>
-            <Image src="/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg" alt="The Wing — Walnut Series podcast studio, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <Image src="/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg" alt="The Wing, Walnut Series podcast studio, VibeShack Studios San Francisco" fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
             <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%)'}} />
             <div className="absolute bottom-0 left-0 right-0 p-12">
-              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{color: '#fcd34d'}}>Walnut Series</p>
+              <p className="text-xs font-bold tracking-widest uppercase mb-3 text-brand-red">Walnut Series</p>
               <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: '-0.04em'}}>The Wing</h3>
-              <p className="text-gray-300 text-lg max-w-md mb-6">Cozy, intimate 2-person setup. Same premium quality. 20% smaller footprint.</p>
+              <p className="text-gray-300 text-lg max-w-md mb-6">Cozy, intimate 2-person setup. Same finish, sized for two.</p>
               <p className="text-gray-400 text-sm">$300/hr · Cameraman included</p>
             </div>
           </a>
@@ -221,11 +217,9 @@ export default function TheExecutivePage() {
           </h2>
           <p className="text-gray-500 text-lg mb-10">$300/hr. Cameraman included. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book/?studio=the-executive" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+            <a href="/book/?studio=the-executive" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </a>
             <a href="/tour/?studio=the-executive" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →
             </a>

@@ -74,7 +74,7 @@ const proofLinks: HeaderLink[] = [
 const signaturePodcastStudios = podcastStudios.slice(5)
 
 const navLinkClass =
-  'relative font-mono text-[12px] uppercase tracking-[0.18em] whitespace-nowrap text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none'
+  'relative font-mono text-[12px] uppercase tracking-[0.18em] whitespace-nowrap text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-red'
 
 const menuButtonClass =
   'flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.18em] whitespace-nowrap text-gray-400 transition-colors duration-200 group-hover:text-white group-focus-within:text-white'
@@ -160,7 +160,7 @@ export default function Header() {
             <Link
               href="/book/"
               prefetch={false}
-              className="relative inline-flex items-center gap-2.5 whitespace-nowrap rounded-lg bg-white px-4 py-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.14em] text-black transition-all duration-200 hover:scale-[1.03] hover:bg-white/90 active:scale-[0.98] sm:px-5"
+              className="relative inline-flex items-center gap-2.5 whitespace-nowrap rounded-lg bg-white px-4 py-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-black transition-colors duration-200 hover:bg-white/90 sm:px-5"
             >
               Book a Session
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -170,7 +170,7 @@ export default function Header() {
             </Link>
 
             <details ref={mobileMenuRef} className="group xl:hidden">
-              <summary className="list-none p-3 text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+              <summary className="list-none p-3 text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-red [&::-webkit-details-marker]:hidden">
                 <span className="sr-only">Toggle menu</span>
                 <svg className="h-5 w-5 group-open:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
@@ -294,7 +294,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
               className="group/hub flex items-center justify-between py-3.5 text-[15px] font-medium text-zinc-300 transition-colors duration-300 hover:text-white"
             >
               {label}
-              <span className="text-zinc-600 transition-all duration-300 group-hover/hub:translate-x-0.5 group-hover/hub:text-white" aria-hidden="true">
+              <span className="text-zinc-600 transition-[transform,color] duration-300 group-hover/hub:translate-x-0.5 group-hover/hub:text-white" aria-hidden="true">
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                   <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -312,7 +312,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
             onNavigate()
             event.currentTarget.blur()
           }}
-          className="group/feat block overflow-hidden rounded-2xl bg-white/[0.03] ring-1 ring-white/15 transition-all duration-300 hover:bg-white/[0.05] hover:ring-white/25"
+          className="group/feat block overflow-hidden rounded-2xl bg-white/[0.03] ring-1 ring-white/15 transition-[background-color,box-shadow] duration-300 hover:bg-white/[0.05] hover:ring-white/25"
         >
           <span className="relative block h-44 overflow-hidden">
             {showMedia && featured.image && (

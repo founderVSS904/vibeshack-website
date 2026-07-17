@@ -55,25 +55,25 @@ export default async function OurWorkPage({
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#000_0%,rgba(0,0,0,0.92)_23%,rgba(0,0,0,0.34)_48%,rgba(0,0,0,0)_72%),linear-gradient(180deg,rgba(0,0,0,0.14)_0%,rgba(0,0,0,0)_60%,rgba(0,0,0,0.42)_100%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto flex h-full max-w-[1536px] items-center px-10 sm:px-12 lg:px-[70px]">
+        <div className="relative z-10 mx-auto flex h-full max-w-[1680px] items-center px-6 sm:px-10 lg:px-16">
           <div className="max-w-[520px] pb-4">
-            <p className="mb-4 text-sm font-black uppercase tracking-[0.08em] text-brand-red">Showreel 2026</p>
+            <p className="mb-4 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Showreel 2026</p>
             <h1 className="font-black uppercase leading-[0.92] text-white" style={{ fontSize: 'clamp(4.5rem, 7.6vw, 7.45rem)', letterSpacing: 0 }}>
               Our<br />Work
             </h1>
             <Link href="#work-projects" className="group mt-8 inline-flex flex-col gap-4 text-base text-white">
               <span className="inline-flex items-center gap-7">
-                Explore Projects
+                Explore projects
                 <span className="transition-transform group-hover:translate-y-1">↓</span>
               </span>
-              <span className="h-0.5 w-9 bg-brand-red transition-all group-hover:w-full" />
+              <span className="h-0.5 w-full origin-left scale-x-[0.08] bg-brand-red transition-transform duration-300 group-hover:scale-x-100" />
             </Link>
           </div>
         </div>
       </section>
 
       <main className="bg-black pb-16 text-white">
-        <div className="mx-auto max-w-[1536px] px-10">
+        <div className="mx-auto max-w-[1680px] px-6 sm:px-10 lg:px-16">
           <nav className="flex justify-center gap-8 overflow-x-auto py-5 sm:gap-12" aria-label="Work categories">
             {workCategories.map(({ slug, label }) => {
               const isActive = slug === activeCategory
@@ -84,7 +84,7 @@ export default async function OurWorkPage({
                   key={slug}
                   href={href}
                   className={`relative shrink-0 py-2 text-base transition-colors ${
-                    isActive ? 'text-brand-red' : 'text-white/86 hover:text-white'
+                    isActive ? 'text-brand-red' : 'text-white/[0.86] hover:text-white'
                   }`}
                 >
                   {label}
@@ -115,7 +115,7 @@ export default async function OurWorkPage({
                       </p>
                     </div>
                     <span className="hidden items-center gap-4 text-sm text-white transition-colors group-hover:text-brand-red sm:inline-flex">
-                      View Project
+                      View project
                       <span aria-hidden="true">→</span>
                     </span>
                   </figcaption>

@@ -50,7 +50,7 @@ const frames: Frame[] = [
   },
   {
     label: 'Our Work',
-    eyebrow: 'Portfolio, proof, taste',
+    eyebrow: 'Portfolio, proof',
     href: '/our-work/',
     image: '/studio-images/canvas-rental-music-v1775095665.jpg',
     alt: 'Portfolio work and music video production inside a VibeShack Studios rental space',
@@ -64,7 +64,7 @@ const frames: Frame[] = [
   },
   {
     label: 'Photography',
-    eyebrow: 'Portraits, products, campaigns',
+    eyebrow: 'Portraits to campaigns',
     href: '/photo-services/',
     image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg',
     alt: 'Photography services portrait created at VibeShack Studios',

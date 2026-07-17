@@ -38,7 +38,7 @@ const studios = [
     bookHref: '/book/?studio=green-screen',
     img: '/studio-images/inside-green-screen-v20260509.jpg',
     series: 'Creative Series',
-    desc: '750 sqft floor-to-ceiling green screen. Full lighting grid.',
+    desc: '750 sq ft floor-to-ceiling green screen. Full lighting grid.',
     price: '$100',
   },
 ]
@@ -54,7 +54,7 @@ const rentalFaqs = [
   },
   {
     question: 'How much do rental studios cost?',
-    answer: 'Rental studios start at $100 per hour with no minimums. Podcast production sets start at $300 per hour.',
+    answer: 'Rental studios start at $100 per hour with a 1 hour minimum. Podcast production sets start at $300 per hour.',
   },
   {
     question: 'Are rental studios available 24/7?',
@@ -106,7 +106,7 @@ export default function RentalStudiosPage() {
           <div className="space-y-3">
             {studios.map((s, i) => (
               <div key={s.name}
-                className="relative block overflow-hidden rounded-2xl group studio-card" data-tilt
+                className="relative block overflow-hidden rounded-2xl group studio-card"
                 style={{height: '420px'}}>
                 <Image src={s.img} alt={s.name}
                   fill className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out" />
@@ -134,8 +134,8 @@ export default function RentalStudiosPage() {
                     <p className="text-white font-black text-2xl">{s.price}</p>
                     <p className="text-gray-500 text-xs">per hour</p>
                     <a href={s.bookHref}
-                      className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 bg-white text-black font-bold text-xs rounded-full hover:bg-gray-100 transition-colors">
-                      Book →
+                      className="mt-3 inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+                      Book <span aria-hidden>→</span>
                     </a>
                   </div>
                 </div>
@@ -156,7 +156,7 @@ export default function RentalStudiosPage() {
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {[
-                  'All equipment included',
+                  'Space, lighting, and setup included. Bring your camera package.',
                   'Space set up and ready on arrival',
                   'You bring your own crew or shoot solo',
                   'Hair & Makeup room on-site',
@@ -174,13 +174,13 @@ export default function RentalStudiosPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                '/studio-images/greenscreen-shoot-1.jpg',
-                '/studio-images/drive-photo-hero.jpg',
-                '/studio-images/podcast-cyc-duo.jpg',
-                '/studio-images/greenscreen-empty.jpg',
-              ].map((src, i) => (
-                <div key={i} className="overflow-hidden rounded-xl">
-                  <Image src={src} alt="VibeShack Rental Studios" width={400} height={180} className="w-full object-cover" style={{height: '180px'}} />
+                { src: '/studio-images/greenscreen-shoot-1.jpg', alt: 'Crew filming on the green screen stage' },
+                { src: '/studio-images/drive-photo-hero.jpg', alt: 'The empty white cyc stage' },
+                { src: '/studio-images/podcast-cyc-duo.jpg', alt: 'Two hosts recording on a podcast set' },
+                { src: '/studio-images/greenscreen-empty.jpg', alt: 'The green screen stage with a camera set up' },
+              ].map(({ src, alt }) => (
+                <div key={src} className="overflow-hidden rounded-xl">
+                  <Image src={src} alt={alt} width={400} height={180} className="w-full object-cover" style={{height: '180px'}} />
                 </div>
               ))}
             </div>
@@ -216,8 +216,8 @@ export default function RentalStudiosPage() {
           </h2>
           <p className="text-gray-500 text-lg mb-10">Upgrade to a Podcast Studio and we handle the whole production.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book/?studio=canvas-rental" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 transition-colors">
-              Book a Rental →
+            <a href="/book/?studio=canvas-rental" className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+              Book a Rental <span aria-hidden>→</span>
             </a>
             <a href="/podcast-studio-san-francisco/" className="inline-flex items-center gap-3 px-8 py-4 border border-white/20 text-white font-semibold text-sm rounded-full hover:border-white/40 transition-colors">
               View Podcast Studios

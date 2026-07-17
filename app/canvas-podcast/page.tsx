@@ -4,23 +4,24 @@ import { studioServiceSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
   title: 'Canvas Podcast Studio',
-  description: 'Customizable LED backdrop podcast studio in San Francisco. Programmable lighting, cinema-grade equipment, premium aesthetics. $400/hr with crew included.',
-  keywords: 'podcast studio san francisco, premium podcast recording, customizable backgrounds, LED backdrop studio, podcast production sf',
+  description: 'Customizable LED backdrop podcast studio in San Francisco. Programmable lighting, cinema-grade equipment, same-day footage delivery. $400/hr with crew included.',
+  keywords: 'podcast studio san francisco, professional podcast recording, customizable backgrounds, LED backdrop studio, podcast production sf',
   alternates: { canonical: 'https://www.vibeshackstudios.com/canvas-podcast/' },
   openGraph: {
-    title: 'Canvas Podcast Studio — VibeShack Studios',
-    description: 'Professional podcast production with customizable LED backgrounds and premium lighting.',
+    title: 'Canvas Podcast Studio | VibeShack Studios',
+    description: 'Professional podcast production with customizable LED backgrounds and cinema-grade lighting.',
     url: 'https://www.vibeshackstudios.com/canvas-podcast',
+    images: ['/studio-images/enhanced-canvas-podcast-red-set-wide-v20260510.jpg'],
   },
 }
 
 const canvasPodcastServiceSchema = studioServiceSchema({
   name: 'Canvas Podcast Studio Rental in San Francisco',
-  description: 'Premium podcast studio in San Francisco with customizable LED backgrounds, cinema-grade lighting, and full crew included.',
+  description: 'Podcast studio in San Francisco with customizable LED backgrounds, cinema-grade lighting, and full crew included.',
   url: 'https://www.vibeshackstudios.com/canvas-podcast/',
   image: 'https://www.vibeshackstudios.com/studio-images/enhanced-canvas-podcast-warm-panel-wide-v20260510.jpg',
   price: '400',
-  serviceType: 'Premium Podcast Studio Rental',
+  serviceType: 'Podcast Studio Rental',
 })
 
 export default function CanvasPodcastPage() {
@@ -50,7 +51,7 @@ export default function CanvasPodcastPage() {
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <p className="text-gray-600 text-xs tracking-[0.3em] uppercase mb-6">Premium Podcast Production</p>
+          <p className="text-gray-400 text-xs tracking-[0.3em] uppercase mb-6">Full-Crew Podcast Production</p>
           <h1
             className="font-black text-white leading-tight mb-6"
             style={{
@@ -65,7 +66,7 @@ export default function CanvasPodcastPage() {
           </p>
           <a
             href="/book/?studio=canvas-podcast"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
+            className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
           >
             Book Canvas Podcast
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -98,7 +99,7 @@ export default function CanvasPodcastPage() {
               <div className="relative overflow-hidden rounded-2xl mb-8 h-72">
                 <Image
                   src="/studio-images/enhanced-canvas-podcast-parlor-gold-wide-v20260510.jpg"
-                  alt="Parlor — Premium interview studio"
+                  alt="Parlor interview set with Chesterfield seating"
                   fill
                   className="object-cover"
                 />
@@ -106,18 +107,18 @@ export default function CanvasPodcastPage() {
               <div className="flex items-end justify-between mb-4">
                 <div>
                   <h3 className="text-white font-black text-3xl leading-tight">Parlor</h3>
-                  <p className="text-gray-400 text-sm mt-1">Premium interviews. Clean design. Impact.</p>
+                  <p className="text-gray-400 text-sm mt-1">Chesterfield seating under clean linear light.</p>
                 </div>
                 <span className="text-white font-black text-2xl">$400<span className="text-sm text-gray-400">/hr</span></span>
               </div>
-              <ul className="space-y-3 text-gray-500 text-sm mt-6 mb-8">
-                <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Linear white lights + Chesterfield seating</span></li>
-                <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Minimal, professional aesthetic</span></li>
-                <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Built for executive conversations</span></li>
-              </ul>
+              <div className="divide-y divide-white/10 border-y border-white/10 mt-6 mb-8">
+                <div className="py-3 text-gray-400 text-sm">Linear white lights + Chesterfield seating</div>
+                <div className="py-3 text-gray-400 text-sm">Minimal, professional aesthetic</div>
+                <div className="py-3 text-gray-400 text-sm">Built for executive conversations</div>
+              </div>
               <a
                 href="/book/?studio=parlor"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
+                className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
               >
                 Book Parlor
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -131,7 +132,7 @@ export default function CanvasPodcastPage() {
               <div className="relative overflow-hidden rounded-2xl mb-8 h-72">
                 <Image
                   src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg"
-                  alt="Horizon — Immersive creative space"
+                  alt="Horizon podcast set with warm sunset backdrop"
                   fill
                   className="object-cover"
                 />
@@ -139,18 +140,18 @@ export default function CanvasPodcastPage() {
               <div className="flex items-end justify-between mb-4">
                 <div>
                   <h3 className="text-white font-black text-3xl leading-tight">Horizon</h3>
-                  <p className="text-gray-400 text-sm mt-1">Dreamy. Cinematic. Immersive.</p>
+                  <p className="text-gray-400 text-sm mt-1">Sage green seating on a warm, backlit set.</p>
                 </div>
                 <span className="text-white font-black text-2xl">$400<span className="text-sm text-gray-400">/hr</span></span>
               </div>
-              <ul className="space-y-3 text-gray-500 text-sm mt-6 mb-8">
-                <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Curated sunset environment + warm atmosphere</span></li>
-                <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Perfect for creative storytelling</span></li>
-                <li className="flex gap-3"><span className="text-brand-red flex-shrink-0">✓</span> <span>Modern sage seating + impact</span></li>
-              </ul>
+              <div className="divide-y divide-white/10 border-y border-white/10 mt-6 mb-8">
+                <div className="py-3 text-gray-400 text-sm">Curated sunset environment + warm atmosphere</div>
+                <div className="py-3 text-gray-400 text-sm">Perfect for creative storytelling</div>
+                <div className="py-3 text-gray-400 text-sm">Modern sage seating + impact</div>
+              </div>
               <a
                 href="/book/?studio=horizon"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
+                className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
               >
                 Book Horizon
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -162,16 +163,13 @@ export default function CanvasPodcastPage() {
 
           {/* Custom Setup CTA */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-12 text-center">
-            <svg className="w-12 h-12 mx-auto mb-6 text-brand-red opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
-            </svg>
             <h3 className="text-white font-black text-2xl mb-2">Design Your Own</h3>
             <p className="text-gray-400 text-sm mb-8 max-w-md mx-auto">
-              Not seeing exactly what you need? Tell us your vision. Custom lighting, backdrops, furniture, equipment — we'll build it.
+              Not seeing exactly what you need? Custom lighting, backdrops, furniture, equipment. Tell us and we'll build it.
             </p>
             <a
               href="/canvas-podcast/custom-setup/"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors"
+              className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
             >
               Start Custom Setup
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -182,7 +180,7 @@ export default function CanvasPodcastPage() {
         </div>
       </section>
 
-      {/* Why Canvas — Alternating Layout */}
+      {/* Why Canvas: Alternating Layout */}
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="mb-32">
@@ -194,7 +192,7 @@ export default function CanvasPodcastPage() {
                 letterSpacing: '-0.04em',
               }}
             >
-              Premium production. No compromises.
+              Full-crew production. No compromises.
             </h2>
           </div>
 
@@ -205,7 +203,7 @@ export default function CanvasPodcastPage() {
                 src="/studio-images/enhanced-canvas-podcast-red-set-wide-v20260510.jpg"
                 alt="Customizable lighting moods"
                 fill
-                className="object-contain"
+                className="object-cover"
               />
             </div>
             <div>
@@ -219,7 +217,7 @@ export default function CanvasPodcastPage() {
                 Customizable Moods
               </h3>
               <p className="text-gray-400 text-lg leading-relaxed max-w-lg">
-                LED backdrop shifts your aesthetic instantly. Warm sunset, moody nights, crisp mornings — match your brand in seconds.
+                LED backdrop shifts your aesthetic instantly. Warm sunset, moody nights, crisp mornings. Match your brand in seconds.
               </p>
             </div>
           </div>
@@ -237,7 +235,7 @@ export default function CanvasPodcastPage() {
                 Cinema-Grade Lighting
               </h3>
               <p className="text-gray-400 text-lg leading-relaxed max-w-lg">
-                Professional diffused rigs + custom LED backdrop. Your talent looks premium. Every frame is production-ready.
+                Professional diffused rigs + custom LED backdrop. Soft, even light on every face. Every frame is production-ready.
               </p>
             </div>
             <div className="relative overflow-hidden rounded-2xl bg-black aspect-video">
@@ -245,7 +243,7 @@ export default function CanvasPodcastPage() {
                 src="/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg"
                 alt="Cinema-grade lighting setup"
                 fill
-                className="object-contain"
+                className="object-cover"
               />
             </div>
           </div>
@@ -255,9 +253,9 @@ export default function CanvasPodcastPage() {
             <div className="relative overflow-hidden rounded-2xl bg-black aspect-video">
               <Image
                 src="/studio-images/enhanced-canvas-podcast-white-studio-closeup-v20260510.jpg"
-                alt="Premium comfort and design"
+                alt="Guest seating and set design in the white studio"
                 fill
-                className="object-contain"
+                className="object-cover"
               />
             </div>
             <div>
@@ -271,7 +269,7 @@ export default function CanvasPodcastPage() {
                 Designed for Your Show
               </h3>
               <p className="text-gray-400 text-lg leading-relaxed max-w-lg">
-                Not the gear room. Premium seating, clean sightlines, Instagram-worthy aesthetics. Your guests will feel it immediately.
+                Not the gear room. Comfortable seating and clean sightlines that hold up in vertical crops. Your guests will feel it immediately.
               </p>
             </div>
           </div>
@@ -289,11 +287,11 @@ export default function CanvasPodcastPage() {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4">
-              <div className="bg-white/5 border border-white/10 rounded-xl p-8">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
                 <div className="text-brand-red font-black text-3xl mb-2">24/7</div>
                 <p className="text-gray-400 text-sm">Studio always ready. No setup delays.</p>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-8">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
                 <div className="text-brand-red font-black text-3xl mb-2">$400/hr</div>
                 <p className="text-gray-400 text-sm">Crew, gear, space all included. No surprises.</p>
               </div>
@@ -310,27 +308,27 @@ export default function CanvasPodcastPage() {
             {[
               {
                 title: 'Brand Podcasts',
-                desc: 'Companies launching flagship shows. Canvas looks like your brand deserves.',
+                desc: 'Companies launching flagship shows. Canvas looks the way your brand should.',
               },
               {
                 title: 'Interview Series',
-                desc: 'Conversations matter. Premium guests expect premium production. Canvas delivers.',
+                desc: 'High-profile guests on camera, with a sound engineer riding levels the whole session.',
               },
               {
-                title: 'Premium Content Shows',
-                desc: 'Scripted, produced, high-budget shows. Canvas matches your production value.',
+                title: 'Produced Shows',
+                desc: 'Scripted, multi-camera episodes with cinema-grade lighting and same-day footage delivery.',
               },
               {
                 title: 'Visual Podcasts',
-                desc: 'Video components? YouTube integration? Canvas is built for it.',
+                desc: 'Filmed for YouTube first, with LED backdrops that read on camera at any resolution.',
               },
               {
                 title: 'Network Productions',
-                desc: 'Studios that need consistency across episodes. Customizable yet repeatable.',
+                desc: 'Studios that need consistency across episodes. Saved lighting looks make every setup repeatable.',
               },
               {
                 title: 'Product Launches',
-                desc: 'Announce, interview, celebrate. Canvas makes it feel like the big moment it is.',
+                desc: 'Announce on a set dressed in your launch colors, with footage in hand the same day.',
               },
             ].map(({ title, desc }) => (
               <div key={title} className="border-t border-white/[0.08] pt-8">
@@ -361,7 +359,7 @@ export default function CanvasPodcastPage() {
 
           <div className="bg-black rounded-xl p-12 mb-12 border border-white/10">
             <h3 className="text-white font-bold text-xl mb-6">What's Included</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-8">
+            <div className="divide-y divide-white/10 border-y border-white/10 text-left">
               {[
                 'Sound Engineer on-site',
                 'Lighting Tech on-site',
@@ -372,17 +370,14 @@ export default function CanvasPodcastPage() {
                 'Comfortable guest seating',
                 'Same-day footage delivery',
               ].map((item) => (
-                <div key={item} className="flex gap-3">
-                  <span className="text-brand-red font-black flex-shrink-0">✓</span>
-                  <span className="text-gray-400 text-sm">{item}</span>
-                </div>
+                <div key={item} className="py-3 text-gray-400 text-sm">{item}</div>
               ))}
             </div>
           </div>
 
           <a
             href="/book/?studio=canvas-podcast"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors mb-8"
+            className="mb-8 inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
           >
             Book Your Episode
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -391,7 +386,7 @@ export default function CanvasPodcastPage() {
           </a>
 
           <p className="text-gray-600 text-sm">
-            Available 24/7. Book instantly. Confirmation within 1 hour.
+            Open 24/7. Instant confirmation. Free cancellation 48hrs before.
           </p>
         </div>
       </section>
@@ -413,7 +408,7 @@ export default function CanvasPodcastPage() {
           </p>
           <a
             href="/book/?studio=canvas-podcast"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-base tracking-wide rounded hover:bg-red-700 transition-colors"
+            className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
           >
             Book Canvas Podcast
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

@@ -19,7 +19,7 @@ export default function AboutPage() {
             Factory.
           </h1>
           <p className="text-gray-400 text-xl leading-relaxed max-w-2xl mb-6">
-            Every creator deserves the infrastructure to make their best work — regardless of budget, background, or experience.
+            Every creator deserves the infrastructure to make their best work, whatever their budget or background.
           </p>
           <p className="text-gray-600 text-sm tracking-[0.15em] uppercase">The Creative Standard · SF Northern Waterfront</p>
         </div>
@@ -31,14 +31,14 @@ export default function AboutPage() {
           <div className="px-6 sm:px-10 lg:px-20 py-32 flex flex-col justify-center">
             <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">The Belief</p>
             <h2 className="font-black text-white leading-none mb-8" style={{ fontSize: 'clamp(2.5rem, 5vw, 5rem)', letterSpacing: '-0.05em' }}>
-              Just bring<br />
+              Bring<br />
               your <span className="text-brand-red">idea.</span>
             </h2>
             <p className="text-gray-500 text-lg leading-relaxed mb-8 max-w-sm">
-              We built The Dream Factory because creators in San Francisco deserved better. Not a repurposed warehouse. Not borrowed gear. Not a studio that prices out the people doing the most interesting work.
+              We built The Dream Factory because creators in San Francisco deserved better. A purpose-built studio with its own gear, at a rate working creators can afford.
             </p>
             <p className="text-gray-500 text-lg leading-relaxed max-w-sm">
-              Every studio. Cinema-grade equipment. Open every hour of every day. The infrastructure is here. You just show up.
+              Every studio. Cinema-grade equipment. Open every hour of every day. The infrastructure is here. You show up.
             </p>
           </div>
           <div className="relative min-h-[500px] lg:min-h-0 overflow-hidden rounded-2xl">
@@ -109,7 +109,7 @@ export default function AboutPage() {
               The studio is where<br />it <span className="text-brand-red">starts.</span>
             </h2>
             <p className="text-gray-500 text-lg leading-relaxed mb-6">
-              VibeShack is creative infrastructure. The studio is where it lives right now. Multiple studios, professional gear, open every hour of every day, at a price that doesn&apos;t require a production budget to walk through the door.
+              VibeShack is creative infrastructure. The studio is where it lives right now. Multiple studios, professional gear, open 24/7, at a price that doesn&apos;t require a production budget to walk through the door.
             </p>
             <p className="text-gray-500 text-lg leading-relaxed">
               The belief behind it is simple: the quality of an idea should determine what gets made. Not access. Not money. Not who you know. We built VibeShack so that stops being the reason good work doesn&apos;t get done.
@@ -145,14 +145,14 @@ export default function AboutPage() {
                 The Creative Standard is not a tagline. It&apos;s a commitment to the quality of what happens inside this building.
               </p>
               <p className="text-gray-500 text-lg leading-relaxed mb-6">
-                Every room is at the level it was promised to be. Every session starts on time. Every piece of equipment works. Every creator — whether they&apos;ve been here once or fifty times — is treated with the same level of respect and care.
+                Every room is at the level it was promised to be. Every session starts on time. Every piece of equipment works. Every creator is treated with the same respect and care, on their first visit or their fiftieth.
               </p>
               <p className="text-gray-400 text-lg leading-relaxed">
                 When you say &ldquo;made at VibeShack,&rdquo; people know what that means.
               </p>
             </div>
             <div className="overflow-hidden rounded-2xl">
-              <Image src="/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg" alt="Podcast guest recording at VibeShack Studios" width={800} height={480} className="w-full object-cover" style={{height: '480px'}} />
+              <Image src="/studio-images/parlor-production-v20260509.jpg" alt="Production underway on the Parlor set at VibeShack Studios" width={800} height={480} className="w-full object-cover" style={{height: '480px'}} />
             </div>
           </div>
         </div>
@@ -203,12 +203,12 @@ export default function AboutPage() {
           />
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ zIndex: 2 }}>
             <div className="relative" style={{ marginTop: '-20px' }}>
-              <div className="absolute -inset-4 rounded-full bg-brand-red opacity-20 animate-ping" />
+              <div className="absolute -inset-4 rounded-full bg-brand-red opacity-20 animate-ping motion-reduce:animate-none" />
               <div className="absolute -inset-2 rounded-full bg-brand-red opacity-30" />
               <div className="w-4 h-4 rounded-full bg-brand-red shadow-lg" style={{ boxShadow: '0 0 20px rgba(229,0,0,0.8), 0 0 40px rgba(229,0,0,0.4)' }} />
             </div>
           </div>
-          <div className="absolute bottom-6 left-6 glass-card rounded-lg p-5" style={{ backdropFilter: 'blur(16px)' }}>
+          <div className="absolute bottom-6 left-6 glass-card rounded-lg p-5">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-2 h-2 rounded-full bg-brand-red" style={{ boxShadow: '0 0 8px #E50000' }} />
               <span className="text-white font-bold text-sm">VibeShack Studios</span>
@@ -216,8 +216,9 @@ export default function AboutPage() {
             <p className="text-gray-300 text-xs mb-1">950 Battery St</p>
             <p className="text-gray-300 text-xs mb-3">San Francisco, CA 94111</p>
             <a href="https://maps.google.com/?q=950+Battery+St+San+Francisco+CA+94111" target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-brand-red text-xs font-semibold hover:text-white transition-colors">
-              Get Directions →
+              className="group inline-flex items-center gap-2 text-brand-red text-xs font-semibold hover:text-white transition-colors">
+              Get directions
+              <span className="transition-transform group-hover:translate-x-0.5">→</span>
             </a>
           </div>
         </div>

@@ -29,10 +29,10 @@ const QUESTIONS = [
   },
   {
     id: 'size',
-    // Label changes based on format — set dynamically in component
+    // Label changes based on format, set dynamically in component
     question: 'How many people are involved?',
     options: [
-      { id: 'solo',  label: 'Just me' },
+      { id: 'solo',  label: 'Only me' },
       { id: 'two',   label: 'Two to five' },
       { id: 'small', label: 'Six to twenty' },
       { id: 'large', label: 'More than twenty' },
@@ -60,13 +60,13 @@ const RECOMMENDATIONS: Record<string, Recommendation> = {
   'video-solo-no':          { primary: 'sunset',          others: ['photography', 'horizon'],       reason: 'Strong on-camera look, simple setup, and VibeShack can handle the production flow.' },
   'video-two-no':           { primary: 'sunset',          others: ['the-executive', 'parlor'],      reason: 'A polished choice for interviews, explainers, social content, and brand videos.' },
   'video-small-no':         { primary: 'horizon',         others: ['canvas-podcast', 'green-screen'], reason: 'Premium visual control with room for a small team and a more intentional production.' },
-  'video-large-no':         { primary: 'green-screen',    others: ['sunset'],         reason: '750 sqft gives you room for a larger production.' },
-  'video-solo-yes':         { primary: 'photography',     others: ['canvas-rental'],  reason: 'Professional lighting. Your crew operates.' },
-  'video-two-yes':          { primary: 'photography',     others: ['canvas-rental'],  reason: 'Clean setup for two. Your crew operates.' },
-  'video-small-yes':        { primary: 'green-screen',    others: ['photography'],     reason: 'Room for a small crew and talent.' },
+  'video-large-no':         { primary: 'green-screen',    others: ['sunset'],         reason: 'The 750 sqft floor gives a larger crew space to stage, light, and block.' },
+  'video-solo-yes':         { primary: 'photography',     others: ['canvas-rental'],  reason: 'A controlled, pre-lit room where your photographer can start shooting on arrival.' },
+  'video-two-yes':          { primary: 'photography',     others: ['canvas-rental'],  reason: 'A clean two-person setup your own crew can run without fighting the room.' },
+  'video-small-yes':        { primary: 'green-screen',    others: ['photography'],     reason: 'Room for a small crew and talent to work without resets.' },
   'video-large-yes':        { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'The safest fit for larger crews, wide shots, lighting control, and flexible blocking.' },
   'photo-solo-no':          { primary: 'photo-services',  others: ['photography', 'canvas-rental'],  reason: 'Start with Photo Services when you need VibeShack to help plan or produce headshots, portraits, product shots, or campaign stills.' },
-  'photo-two-no':           { primary: 'photo-services',  others: ['photography', 'canvas-rental'],  reason: 'A scoped photo request is the right first step when you need help with the shoot, not just the room.' },
+  'photo-two-no':           { primary: 'photo-services',  others: ['photography', 'canvas-rental'],  reason: 'A scoped photo request is the right first step when you need help with the shoot, not the room alone.' },
   'photo-small-no':         { primary: 'photo-services',  others: ['canvas-rental', 'photography'],  reason: 'Photo Services can match the shoot to the right room, lighting plan, and production flow before you book space.' },
   'photo-large-no':         { primary: 'photo-services',  others: ['canvas-rental', 'green-screen'], reason: 'For larger photo productions, start with a scoped request so the room, staging, crew, and shot list fit the real footprint.' },
   'photo-solo-yes':         { primary: 'photography',     others: ['canvas-rental'],  reason: 'Bring your photographer into a room that is already lit and ready to shoot.' },
@@ -149,9 +149,9 @@ STUDIOS['photo-services'] = {
 }
 
 const STUDIO_GROUPS = [
-  { title: 'Signature Podcast Sets, $400/hr', ids: ['parlor', 'horizon', 'canvas-podcast'] },
-  { title: 'Podcast Studios — $300/hr', ids: ['the-executive', 'the-wing', 'encore', 'sunset'] },
-  { title: 'Rental Studios — $100/hr', ids: ['green-screen', 'photography', 'canvas-rental'] },
+  { title: 'Signature Podcast Sets · $400/hr', ids: ['parlor', 'horizon', 'canvas-podcast'] },
+  { title: 'Podcast Studios · $300/hr', ids: ['the-executive', 'the-wing', 'encore', 'sunset'] },
+  { title: 'Rental Studios · $100/hr', ids: ['green-screen', 'photography', 'canvas-rental'] },
 ]
 
 function getQuestionText(currentQ: number, answers: Record<string, string>) {
@@ -231,8 +231,8 @@ export default function FindYourStudioPage() {
 
           {/* Thin progress line at very top */}
           <div className="h-[2px] bg-white/5 fixed top-0 left-0 right-0 z-50">
-            <div className="h-full bg-brand-red transition-all duration-500 ease-out"
-              style={{width: `${(currentQ / QUESTIONS.length) * 100}%`}} />
+            <div className="h-full w-full origin-left bg-brand-red transition-transform duration-500 ease-out"
+              style={{transform: `scaleX(${currentQ / QUESTIONS.length})`}} />
           </div>
 
           <div className="flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full px-6 sm:px-10 pt-32 pb-20">
@@ -242,17 +242,17 @@ export default function FindYourStudioPage() {
               {currentQ + 1} of {QUESTIONS.length}
             </p>
 
-            {/* Question — context-aware label for Q2 */}
+            {/* Question, context-aware label for Q2 */}
             <h1 className="text-white font-black mb-16"
               style={{fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', letterSpacing: '-0.04em', lineHeight: 1.05}}>
               {questionText}
             </h1>
 
-            {/* Options — clean text rows, no boxes */}
+            {/* Options: clean text rows, no boxes */}
             <div className="space-y-0">
               {questionOptions.map((opt, i) => (
                 <button key={opt.id} onClick={() => answer(QUESTIONS[currentQ].id, opt.id)}
-                  className={`w-full text-left py-5 border-b flex items-center justify-between group transition-all duration-150 ${
+                  className={`w-full text-left py-5 border-b flex items-center justify-between group transition-colors duration-150 ${
                     selecting === opt.id
                       ? 'border-brand-red'
                       : i === 0 ? 'border-t border-b border-white/[0.08]' : 'border-white/[0.08]'
@@ -295,7 +295,7 @@ export default function FindYourStudioPage() {
             </h1>
           </div>
 
-          {/* Primary studio — hero */}
+          {/* Primary studio hero */}
           {primary && (
             <a href={primary.href}
               className="block rounded-2xl overflow-hidden mb-4 group relative h-[340px] sm:h-[420px]">
@@ -328,7 +328,7 @@ export default function FindYourStudioPage() {
             {primary && (
               <a href={primaryCtaHref}
                 className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 transition-colors">
-                {isPhotoServicesMatch ? 'Start Photo Request' : shouldTourFirst ? 'Book a Free Tour' : 'Book This Studio'}
+                {isPhotoServicesMatch ? 'Start a photo request' : shouldTourFirst ? 'Book a free tour' : 'Book this studio'}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                 </svg>

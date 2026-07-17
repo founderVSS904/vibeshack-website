@@ -324,7 +324,7 @@ export default function GuidesPageClient() {
                   style={{ left: s.dot.left, top: s.dot.top }}
                 >
                   <span
-                    className={`block h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                    className={`block h-2.5 w-2.5 rounded-full transition-[background-color,border-color,box-shadow] duration-300 ${
                       active
                         ? 'bg-brand-red shadow-[0_0_0_6px_rgba(236,0,0,0.18),0_0_28px_rgba(236,0,0,0.55)]'
                         : 'border border-white/40 bg-black'
@@ -458,7 +458,7 @@ export default function GuidesPageClient() {
                   <p className="mt-4 max-w-sm text-sm leading-relaxed text-zinc-400">{featured.description}</p>
                   <p className="mt-auto flex items-center gap-4 pt-9 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-brand-red">
                     {readMinutes(featured)} min guide
-                    <span className="relative h-px w-24 bg-brand-red/70 transition-all duration-300 group-hover:w-32">
+                    <span className="relative h-px w-24 bg-brand-red/70 origin-left transition-transform duration-300 ease-out group-hover:scale-x-125">
                       <span className="absolute -right-px -top-[3.5px] block h-[7px] w-[7px] rotate-45 border-r border-t border-brand-red/70" />
                     </span>
                   </p>

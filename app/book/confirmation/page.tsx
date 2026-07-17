@@ -40,7 +40,7 @@ function ConfirmationContent() {
           {[
             { n: '01', title: 'Check your email', body: 'You should receive a VibeShack booking confirmation plus an official Stripe payment receipt. Check spam if you don\'t see them.' },
             { n: '02', title: 'Get to the studio', body: '950 Battery St, SF 94111 · Northern Waterfront. Street parking on Battery St. 10 min walk from the Ferry Building.' },
-            { n: '03', title: 'Walk in ready to work', body: "Everything is set up before you arrive. Cameras on. Lights calibrated. Mics live. Just show up." },
+            { n: '03', title: 'Walk in ready to work', body: "Everything is set up before you arrive. Cameras on. Lights calibrated. Mics live. Show up and start." },
             { n: '04', title: 'Free cancellation', body: 'Plans change. Cancel up to 48 hours before your session for a full refund. No questions asked.' },
           ].map(({ n, title, body }) => (
             <div key={n} className="flex gap-6 py-5 border-b border-white/[0.08]">

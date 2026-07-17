@@ -12,7 +12,7 @@ export const studioGuides = [
     imageAlt: 'Prepared podcast studio setup with microphones at VibeShack Studios in San Francisco',
     primaryPage: '/podcast-studio-san-francisco/',
     intro:
-      'A professional podcast session is not just microphones and chairs. The difference is preparation: clear episode structure, a room that fits the conversation, camera-friendly wardrobe, and a plan for the assets you need after the conversation ends.',
+      'A professional podcast session is more than microphones and chairs. The difference is preparation: clear episode structure, a room that fits the conversation, camera-friendly wardrobe, and a plan for the assets you need after the conversation ends.',
     sections: [
       {
         heading: 'Lock the format before you choose the room',
@@ -142,7 +142,7 @@ export const studioGuides = [
     imageAlt: 'Clean white-background headshot photographed at VibeShack Studios in San Francisco',
     primaryPage: '/photography-studio-san-francisco/',
     intro:
-      'A good photo shoot is decided by the shot list, surfaces, wardrobe, props, and final crop requirements before anyone steps in front of the camera. The goal is not just good photos; it is useful photos that fit the places they need to live.',
+      'A good photo shoot is decided by the shot list, surfaces, wardrobe, props, and final crop requirements before anyone steps in front of the camera. The goal is a repeatable look, not one good photo: useful images that fit the places they need to live.',
     sections: [
       {
         heading: 'Define the image set by priority',
@@ -160,7 +160,7 @@ export const studioGuides = [
           'A second jacket, alternate shirt, different shoes, and texture options can change the whole campaign without changing the lighting setup. Bring clothes on hangers when possible and avoid pieces that wrinkle immediately.',
       },
       {
-        heading: 'Shoot for the crop, not just the frame',
+        heading: 'Shoot for the crop, not the frame',
         body:
           'Website banners, LinkedIn portraits, Instagram squares, Reels covers, ad placements, and press kits all crop differently. Capture wide, medium, tight, horizontal, square, and vertical versions while the lighting is already dialed.',
       },
@@ -192,7 +192,7 @@ export const studioGuides = [
       {
         question: 'Can I shoot products and portraits in the same booking?',
         answer:
-          'Yes, but plan the order in advance so lighting changes are efficient and the most important shots happen first.',
+          'Yes. Put the highest-stakes shots first and batch the day by lighting setup: portraits wrap while talent is fresh, then product and detail work runs without anyone waiting on set.',
       },
     ],
   },
@@ -250,9 +250,9 @@ export const studioGuides = [
     ],
     faqs: [
       {
-        question: 'What is a white cyc studio best for?',
+        question: 'How should I book white cyc studio time?',
         answer:
-          'A white cyc is best for clean, distraction-free visuals where the subject, product, or movement should stand out.',
+          'Book by the hour and pad the first block for lighting setup. If the day also includes portraits or interviews, check availability for an adjacent room so the whole shoot stays at one address.',
       },
       {
         question: 'Can I use a white cyc for video?',

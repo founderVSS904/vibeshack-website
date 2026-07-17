@@ -67,7 +67,7 @@ export default function MadeAtVibeShackPage() {
           <div className="mb-12 max-w-3xl">
             <span className="number-label mb-6 block w-fit">Photography Made Here</span>
             <h2 className="text-4xl font-black leading-none text-white sm:text-5xl" style={{ letterSpacing: '-0.04em' }}>
-              Finished work, not just empty rooms.
+              Finished work, not empty rooms.
             </h2>
             <p className="mt-5 text-sm leading-relaxed text-gray-500 sm:text-base">
               A small look at what the studios can actually produce: movement, portraits, clean cyc work, and color-driven editorial images.
@@ -76,7 +76,7 @@ export default function MadeAtVibeShackPage() {
 
           <div className="grid auto-rows-[320px] grid-cols-1 gap-3 md:grid-cols-4">
             {photographyWall.map((photo) => (
-              <figure key={photo.src} className={`group relative overflow-hidden rounded-lg bg-black ${photo.className}`}>
+              <figure key={photo.src} className={`group relative overflow-hidden rounded-xl bg-black ${photo.className}`}>
                 <Image
                   src={photo.src}
                   alt={photo.alt}
@@ -100,7 +100,7 @@ export default function MadeAtVibeShackPage() {
           {/* Badge display */}
           <div className="flex flex-col md:flex-row gap-16 items-start mb-20">
             <div className="flex-shrink-0">
-              <div className="bg-zinc-900 rounded-2xl p-10 flex items-center justify-center" style={{minWidth: '280px'}}>
+              <div className="bg-zinc-900 rounded-xl p-10 flex items-center justify-center" style={{minWidth: '280px'}}>
                 <Image src="/brand/vibeshack/lockup-red-white-transparent.png" alt="Made at VibeShack badge" width={568} height={192} className="w-56" />
               </div>
               <p className="text-gray-600 text-xs mt-4 text-center tracking-wide">The Creative Standard</p>
@@ -147,11 +147,9 @@ export default function MadeAtVibeShackPage() {
           {/* CTA */}
           <div className="border-t border-white/[0.08] pt-16 text-center">
             <p className="text-gray-500 text-sm mb-6">Ready to join the wall?</p>
-            <Link href="/book/" prefetch={false} className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+            <Link href="/book/" prefetch={false} className="group inline-flex items-center gap-2.5 rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <span className="transition-transform group-hover:translate-x-0.5">→</span>
             </Link>
           </div>
         </div>

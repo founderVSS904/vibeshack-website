@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { breadcrumbSchema } from '@/lib/schemas'
-import { absoluteUrl, business, citationTargets, externalProfiles, founders, moneyPages, parentBrand, peerspaceListings } from '@/lib/seo/site'
+import { absoluteUrl, business, externalProfiles, founders, moneyPages, parentBrand, peerspaceListings } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Press & Media Kit',
@@ -160,14 +160,6 @@ export default function PressPage() {
               </div>
             </div>
 
-            <div>
-              <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Citation Checklist</p>
-              <div className="flex flex-wrap gap-2">
-                {citationTargets.map((target) => (
-                  <span key={target} className="rounded-full border border-white/10 px-4 py-2 text-gray-400 text-sm">{target}</span>
-                ))}
-              </div>
-            </div>
           </div>
 
           <aside className="lg:sticky lg:top-28 self-start">

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | VibeShack Studios',
+  title: 'Terms of Service (Full Legal)',
   description: 'Complete Terms of Service for VibeShack Studios. Comprehensive legal agreement covering bookings, cancellations, liability, content rights, and dispute resolution.',
   robots: { index: false, follow: true },
   alternates: { canonical: 'https://www.vibeshackstudios.com/terms/' },
@@ -13,7 +13,7 @@ export default function TermsProfessionalPage() {
       <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
         {/* Header */}
         <div className="mb-16">
-          <h1 className="text-white font-black leading-tight mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+          <h1 className="text-white font-black leading-none mb-4" style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: '-0.05em' }}>
             Terms of Service
           </h1>
           <p className="text-gray-400 text-sm mb-2"><strong>VibeShack Studios, Inc.</strong></p>
@@ -51,14 +51,14 @@ export default function TermsProfessionalPage() {
           <section>
             <h2>1. DEFINED TERMS</h2>
             <ul>
-              <li><strong>Booking</strong> — A confirmed reservation for studio space, services, or equipment made through the Studio's booking system, confirmed upon receipt of full payment.</li>
-              <li><strong>Content</strong> — All photography, video, audio, and other creative works produced, recorded, or created during your session.</li>
-              <li><strong>Equipment</strong> — All cameras, microphones, lighting, teleprompters, furniture, fixtures, and other items provided by the Studio.</li>
-              <li><strong>Event</strong> — A force majeure event, including acts of God, pandemics, war, government action, terrorism, strikes, or natural disasters.</li>
-              <li><strong>Guest</strong> — Any individual invited by you to attend your session, including production crew, talent, or observers.</li>
-              <li><strong>Session</strong> — The period of time during which you are authorized to occupy and use the Studio.</li>
-              <li><strong>Services</strong> — The provision of studio space, equipment, and optional services (cameraman, crew, teleprompter operation, etc.).</li>
-              <li><strong>Studio</strong> — The physical production facility at 950 Battery St, San Francisco, CA 94111, including all studios, equipment, and related facilities.</li>
+              <li><strong>Booking:</strong> A confirmed reservation for studio space, services, or equipment made through the Studio's booking system, confirmed upon receipt of full payment.</li>
+              <li><strong>Content:</strong> All photography, video, audio, and other creative works produced, recorded, or created during your session.</li>
+              <li><strong>Equipment:</strong> All cameras, microphones, lighting, teleprompters, furniture, fixtures, and other items provided by the Studio.</li>
+              <li><strong>Event:</strong> A force majeure event, including acts of God, pandemics, war, government action, terrorism, strikes, or natural disasters.</li>
+              <li><strong>Guest:</strong> Any individual invited by you to attend your session, including production crew, talent, or observers.</li>
+              <li><strong>Session:</strong> The period of time during which you are authorized to occupy and use the Studio.</li>
+              <li><strong>Services:</strong> The provision of studio space, equipment, and optional services (cameraman, crew, teleprompter operation, etc.).</li>
+              <li><strong>Studio:</strong> The physical production facility at 950 Battery St, San Francisco, CA 94111, including all studios, equipment, and related facilities.</li>
             </ul>
           </section>
 
@@ -110,16 +110,16 @@ export default function TermsProfessionalPage() {
             <h2>4. PROHIBITED USE</h2>
             <p>You shall not, and shall ensure your Guests do not:</p>
             <ul>
-              <li><strong>Illegal Activity</strong> — Use the Studio for any illegal purpose</li>
-              <li><strong>Harmful Content</strong> — Create content that is defamatory, obscene, or promotes violence</li>
-              <li><strong>Discrimination &amp; Harassment</strong> — Engage in discrimination, harassment, bullying, or hate speech</li>
-              <li><strong>IP Infringement</strong> — Produce content that infringes intellectual property without proper licensing</li>
-              <li><strong>Privacy Violation</strong> — Record individuals without informed consent</li>
-              <li><strong>Malicious Use</strong> — Attempt to damage, disrupt, hack, or sabotage Studio systems</li>
-              <li><strong>Unauthorized Commercial Use</strong> — Use beyond the scope of your booking authorization</li>
-              <li><strong>Prohibited Substances</strong> — Bring illegal drugs, alcohol without authorization, etc.</li>
-              <li><strong>Smoking &amp; Open Flame</strong> — Strictly prohibited</li>
-              <li><strong>Weapons</strong> — Not permitted without prior written authorization</li>
+              <li><strong>Illegal Activity:</strong> Use the Studio for any illegal purpose</li>
+              <li><strong>Harmful Content:</strong> Create content that is defamatory, obscene, or promotes violence</li>
+              <li><strong>Discrimination &amp; Harassment:</strong> Engage in discrimination, harassment, bullying, or hate speech</li>
+              <li><strong>IP Infringement:</strong> Produce content that infringes intellectual property without proper licensing</li>
+              <li><strong>Privacy Violation:</strong> Record individuals without informed consent</li>
+              <li><strong>Malicious Use:</strong> Attempt to damage, disrupt, hack, or sabotage Studio systems</li>
+              <li><strong>Unauthorized Commercial Use:</strong> Use beyond the scope of your booking authorization</li>
+              <li><strong>Prohibited Substances:</strong> Bring illegal drugs, alcohol without authorization, etc.</li>
+              <li><strong>Smoking &amp; Open Flame:</strong> Strictly prohibited</li>
+              <li><strong>Weapons:</strong> Not permitted without prior written authorization</li>
             </ul>
           </section>
 
@@ -173,11 +173,11 @@ export default function TermsProfessionalPage() {
             
             <h3>6.1.1 Disclaimers of Warranty</h3>
             <ul>
-              <li><strong>No Warranty of Merchantability</strong> — The Studio is not fit for any particular purpose or merchantable quality</li>
-              <li><strong>No Warranty of Fitness</strong> — The Studio does not meet your specific needs or expectations</li>
-              <li><strong>No Warranty of Title</strong> — Equipment is not free from liens or claims</li>
-              <li><strong>No Warranty of Non-Infringement</strong> — Services do not infringe third-party IP rights</li>
-              <li><strong>No Warranty of Uninterrupted Service</strong> — Equipment or connectivity may fail without notice</li>
+              <li><strong>No Warranty of Merchantability:</strong> The Studio is not fit for any particular purpose or merchantable quality</li>
+              <li><strong>No Warranty of Fitness:</strong> The Studio does not meet your specific needs or expectations</li>
+              <li><strong>No Warranty of Title:</strong> Equipment is not free from liens or claims</li>
+              <li><strong>No Warranty of Non-Infringement:</strong> Services do not infringe third-party IP rights</li>
+              <li><strong>No Warranty of Uninterrupted Service:</strong> Equipment or connectivity may fail without notice</li>
             </ul>
             
             <h3>6.1.2 Assumption of Risk</h3>

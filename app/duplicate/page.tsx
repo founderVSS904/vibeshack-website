@@ -9,7 +9,7 @@ import { studioGuides } from '@/lib/seo/studioGuides'
 import { useCases } from '@/lib/seo/useCases'
 
 export const metadata: Metadata = {
-  title: 'Duplicate Homepage | VibeShack Studios',
+  title: 'Archived Homepage',
   description: 'Temporary duplicate of the previous VibeShack Studios homepage layout.',
   alternates: { canonical: 'https://www.vibeshackstudios.com/duplicate/' },
   robots: { index: false, follow: false },
@@ -87,17 +87,17 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-3">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {[
-              { src: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', label: 'The Executive', href: '/the-executive/', alt: 'The Executive — Podcast table setup in use — VibeShack Studios SF' },
-              { src: '/studio-images/sunset-hero-v20260509.jpg', label: 'Sunset', href: '/sunset-studio/', alt: 'Sunset — Warm programmable podcast set in use — VibeShack Studios SF' },
-              { src: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg',        label: 'Encore',         href: '/encore/', alt: 'Encore — Modern podcast studio with professional lighting — VibeShack Studios SF' },
-              { src: '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg',      label: 'The Wing',       href: '/the-wing/', alt: 'The Wing — Cozy podcast studio in Walnut Series — VibeShack Studios SF' },
-              { src: '/studio-images/inside-green-screen-v20260509.jpg', label: 'Green Screen', href: '/green-screen-studio-sf/', alt: 'Green screen production stage — VibeShack Studios SF' },
-              { src: '/studio-images/inside-photography-red-v20260509.jpg', label: 'Photography Studio', href: '/photography-studio-san-francisco/', alt: 'Photography studio rental room with red backdrop — VibeShack Studios SF' },
-              { src: '/studio-images/parlor-production-v20260509.jpg', label: 'Parlor', href: '/parlor/', alt: 'Parlor — Premium interview session with Chesterfield seating — VibeShack Studios SF' },
-              { src: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg', label: 'Horizon', href: '/horizon/', alt: 'Horizon — Immersive creative podcast space in use — VibeShack Studios SF' },
-              { src: '/studio-images/enhanced-canvas-podcast-white-cyc-duo-v20260510.jpg', label: 'Canvas Rental', href: '/canvas-rental/', alt: 'Canvas Rental — White cyc podcast setup in use — VibeShack Studios SF' },
+              { src: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', label: 'The Executive', href: '/the-executive/', alt: 'The Executive, Podcast table setup in use, VibeShack Studios SF' },
+              { src: '/studio-images/sunset-hero-v20260509.jpg', label: 'Sunset', href: '/sunset-studio/', alt: 'Sunset, Warm programmable podcast set in use, VibeShack Studios SF' },
+              { src: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg',        label: 'Encore',         href: '/encore/', alt: 'Encore, Modern podcast studio with professional lighting, VibeShack Studios SF' },
+              { src: '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg',      label: 'The Wing',       href: '/the-wing/', alt: 'The Wing, Cozy podcast studio in Walnut Series, VibeShack Studios SF' },
+              { src: '/studio-images/inside-green-screen-v20260509.jpg', label: 'Green Screen', href: '/green-screen-studio-sf/', alt: 'Green screen production stage, VibeShack Studios SF' },
+              { src: '/studio-images/inside-photography-red-v20260509.jpg', label: 'Photography Studio', href: '/photography-studio-san-francisco/', alt: 'Photography studio rental room with red backdrop, VibeShack Studios SF' },
+              { src: '/studio-images/parlor-production-v20260509.jpg', label: 'Parlor', href: '/parlor/', alt: 'Parlor, Premium interview session with Chesterfield seating, VibeShack Studios SF' },
+              { src: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg', label: 'Horizon', href: '/horizon/', alt: 'Horizon, Immersive creative podcast space in use, VibeShack Studios SF' },
+              { src: '/studio-images/enhanced-canvas-podcast-white-cyc-duo-v20260510.jpg', label: 'Canvas Rental', href: '/canvas-rental/', alt: 'Canvas Rental, White cyc podcast setup in use, VibeShack Studios SF' },
             ].map(({ src, label, href, alt }) => (
-              <div key={label} className="studio-grid-card card-lift">
+              <div key={label} className="studio-grid-card">
                 <a href={href} className="homepage-studio-link relative overflow-hidden rounded-xl group block" style={{height: '160px'}}>
                   <Image
                     src={src}
@@ -172,7 +172,7 @@ export default function HomePage() {
               { n: '24/7', label: 'Always Open', sub: 'Every hour. Every day. No exceptions.' },
               { n: '$100', label: 'Rental studios', sub: 'Bring your crew. We provide everything else.' },
               { n: '$300', label: 'Podcast studios', sub: 'Cameraman included on every booking.' },
-              { n: '6hr', label: 'Footage turnaround', sub: 'Your footage delivered same day. 6–12hr turnaround.' },
+              { n: '6–12hr', label: 'Footage turnaround', sub: 'Footage delivered same day.' },
             ].map(({ n, label, sub }) => (
               <div key={label}>
                 <div className="py-10 md:py-0 md:px-12 first:md:pl-0 last:md:pr-0">
@@ -227,7 +227,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Single quote — early trust signal */}
+      {/* Single quote, early trust signal */}
       <section className="py-16 bg-black border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <p className="text-white font-light text-xl sm:text-2xl leading-relaxed max-w-3xl" style={{letterSpacing: '-0.01em'}}>
@@ -253,22 +253,22 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {/* Large left — duo shot */}
+            {/* Large left, duo shot */}
             <div className="md:col-span-2 overflow-hidden rounded-2xl group relative" style={{height: '480px'}}>
               <Image
                 src="/studio-images/enhanced-canvas-podcast-white-cyc-duo-v20260510.jpg"
-                alt="Two-person podcast session on white cyc wall — VibeShack Studios SF"
+                alt="Two-person podcast session on white cyc wall, VibeShack Studios SF"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                 style={{objectPosition: 'center'}}
               />
             </div>
-            {/* Right column — two stacked */}
+            {/* Right column, two stacked */}
             <div className="flex flex-col gap-3">
               <div className="overflow-hidden rounded-2xl flex-1 group relative" style={{height: '232px'}}>
                 <Image
                   src="/studio-images/enhanced-canvas-podcast-white-studio-closeup-v20260510.jpg"
-                  alt="Solo podcast host — white cyc wall — VibeShack Studios SF"
+                  alt="Solo podcast host, white cyc wall, VibeShack Studios SF"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   style={{objectPosition: 'center top'}}
@@ -277,7 +277,7 @@ export default function HomePage() {
               <div className="overflow-hidden rounded-2xl flex-1 group relative" style={{height: '232px'}}>
                 <Image
                   src="/studio-images/enhanced-canvas-podcast-purple-portrait-v20260510.jpg"
-                  alt="Podcast guest — studio session — VibeShack Studios SF"
+                  alt="Podcast guest, studio session, VibeShack Studios SF"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   style={{objectPosition: 'center top'}}
@@ -290,7 +290,7 @@ export default function HomePage() {
             {[
               { label: 'Clean white cyc backdrop', sub: 'Minimal. Timeless. Versatile.' },
               { label: 'Professional mics & cameras', sub: 'Already set up. Walk in and record.' },
-              { label: 'From $100/hr', sub: 'Cameraman included on podcast packages.' },
+              { label: 'From $300/hr', sub: 'Cameraman included on podcast packages.' },
             ].map(({ label, sub }) => (
               <div key={label}>
                 <p className="text-white text-sm font-semibold">{label}</p>
@@ -302,7 +302,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          STUDIOS — Editorial bento grid
+          STUDIOS, Editorial bento grid
           Inspired by: Folioblox image grid + SYNTH numbered drops
       ═══════════════════════════════════════════ */}
       <section className="py-24 bg-zinc-950">
@@ -324,7 +324,7 @@ export default function HomePage() {
           <a href="/the-executive/" className="studio-card block relative mb-3 group overflow-hidden rounded-2xl">
 
             <Image src="/studio-images/the-executive-hero.jpg"
-              alt="The Executive — VibeShack Studios"
+              alt="The Executive, VibeShack Studios"
               width={1200} height={620}
               className="w-full object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
               style={{height: '620px', objectPosition: 'center 40%'}} />
@@ -350,7 +350,7 @@ export default function HomePage() {
               { slug: '/canvas-rental/', img: '/studio-images/inside-canvas-cyc-v20260509.jpg', name: 'Canvas Rental', series: 'Creative Series', seriesColor: '#99f6e4', seriesBg: 'rgba(13,148,136,0.4)', price: '$100', sub: 'White cyc wall · Overhead lighting grid' },
             ].map(({ slug, img, name, series, seriesColor, seriesBg, price, sub }) => (
               <a key={name} href={slug} className="img-reveal studio-card block relative group overflow-hidden rounded-2xl" style={{height: '380px'}}>
-                <Image src={img} alt={`${name} — VibeShack Studios San Francisco`} fill className="object-cover" />
+                <Image src={img} alt={`${name}, VibeShack Studios San Francisco`} fill className="object-cover" />
                 <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)'}} />
                 <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-4 p-6 sm:flex-row sm:items-end sm:justify-between sm:p-8">
                   <div className="min-w-0">
@@ -367,7 +367,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* 4 remaining studios — clean list rows, no muddy dark cards */}
+          {/* 4 remaining studios, clean list rows, no muddy dark cards */}
           <div className="border-t border-white/10 mt-3">
             {[
               { name: 'The Executive', price: '$300/hr', slug: '/the-executive/', note: 'Walnut Series · Podcast · cameraman included' },
@@ -393,7 +393,7 @@ export default function HomePage() {
       <InsideStudiosCarousel />
 
       {/* ═══════════════════════════════════════════
-          WHY — 3 columns, editorial numbers
+          WHY, 3 columns, editorial numbers
           Inspired by: Folioblox "Behind the Designs"
       ═══════════════════════════════════════════ */}
       {/* ═══ STATEMENT ═══ */}
@@ -406,19 +406,19 @@ export default function HomePage() {
               Your job is to look good.
             </p>
             <p className="text-gray-500 font-light leading-relaxed" style={{fontSize: 'clamp(1rem, 1.8vw, 1.4rem)', maxWidth: '680px', letterSpacing: '-0.01em'}}>
-              You don&apos;t need to know how any of this works. That&apos;s what we&apos;re here for. Every creator deserves the infrastructure to make their best work. We built it. You just show up.
+              You don&apos;t need to know how any of this works. That&apos;s what we&apos;re here for. Every creator deserves the infrastructure to make their best work. We built it. You show up.
             </p>
             <p className="text-gray-700 text-xs mt-8 tracking-[0.2em] uppercase">The Creative Standard</p>
           </div>
         </div>
       </section>
 
-      {/* ═══ COMBINED: Why + How — one section, two halves ═══ */}
+      {/* ═══ COMBINED: Why + How, one section, two halves ═══ */}
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
 
-            {/* Left — Why VibeShack: 3 reasons, no numbers */}
+            {/* Left, Why VibeShack: 3 reasons, no numbers */}
             <div className="lg:pr-20 lg:border-r border-white/10 pb-16 lg:pb-0">
               <span className="number-label mb-12 block">Why VibeShack</span>
               <div className="space-y-10">
@@ -435,7 +435,7 @@ export default function HomePage() {
             </div>
             </div>
 
-            {/* Right — How It Works: numbered, minimal */}
+            {/* Right, How It Works: numbered, minimal */}
             <div className="lg:pl-20 pt-16 lg:pt-0">
               <div className="flex items-start justify-between mb-12">
                 <span className="number-label">How It Works</span>
@@ -457,7 +457,7 @@ export default function HomePage() {
                 ))}
               </div>
               <div className="mt-10">
-                <a href="/book/" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+                <a href="/book/" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors cursor-pointer">
                   Book Your Session
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
@@ -486,13 +486,13 @@ export default function HomePage() {
             The creative <span className="text-brand-red">standard.</span>
           </h2>
           <p className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed">
-            Just bring your idea. We handle everything else.
+            Bring your idea. We handle everything else.
           </p>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════
-          TESTIMONIAL — Single big quote
+          TESTIMONIAL, Single big quote
           Inspired by: Folioblox minimal trust section
       ═══════════════════════════════════════════ */}
       <section className="py-32 bg-zinc-950 border-t border-white/5">
@@ -523,7 +523,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          LOCATION — Split layout
+          LOCATION, Split layout
       ═══════════════════════════════════════════ */}
       <section className="py-16 sm:py-28 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
@@ -565,7 +565,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          FREE TOUR CTA — Cinematic full screen
+          FREE TOUR CTA, Cinematic full screen
           "Come see the space. Book a free tour."
       ═══════════════════════════════════════════ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden border-t border-white/5 bg-black">
@@ -584,7 +584,7 @@ export default function HomePage() {
           <p className="text-gray-400 text-lg mb-16 leading-relaxed max-w-xl mx-auto">
             Pick a live tour time and see the space before you book. 950 Battery St, San Francisco.
           </p>
-          <a href="/tour/" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-base tracking-wide rounded-full hover:bg-gray-100 hover:scale-[1.03] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+          <a href="/tour/" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-base tracking-wide rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
             Book a Free Tour
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
           </a>
@@ -592,7 +592,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          FINAL CTA — Cinematic, hexagon bg
+          FINAL CTA, Cinematic, hexagon bg
           Inspired by: SYNTH "WEAR IT LIKE ARMOR"
       ═══════════════════════════════════════════ */}
       <section className="relative py-40 overflow-hidden border-t border-white/5" style={{background: '#000'}}>
@@ -606,7 +606,7 @@ export default function HomePage() {
             Your next<br/>session <span className="text-brand-red" >starts<br/>here.</span>
           </h2>
           <div className="flex flex-wrap gap-6 items-center">
-            <a href="/book/" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 hover:scale-[1.02] hover:gap-4 active:scale-[0.98] transition-all duration-300 cursor-pointer">
+            <a href="/book/" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors cursor-pointer">
               Book Your Session
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
             </a>

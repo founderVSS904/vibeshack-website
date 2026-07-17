@@ -121,7 +121,7 @@ export function RevenueCategoryPage({
               ))}
             </div>
             <div className="flex flex-wrap items-center gap-4">
-              <Link href={primaryCta.href} className="inline-flex items-center gap-3 rounded bg-brand-red px-8 py-4 text-sm font-bold tracking-wide text-white transition-colors hover:bg-red-700">
+              <Link href={primaryCta.href} className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
                 {primaryCta.label}
               </Link>
               <Link href={secondaryCta.href} prefetch={secondaryCta.href === '/book/' ? false : undefined} className="text-sm font-semibold text-gray-400 transition-colors hover:text-white">
@@ -175,7 +175,7 @@ export function RevenueCategoryPage({
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.78fr_1.22fr]">
             <div>
-              <p className="number-label mb-6">Pricing logic</p>
+              <p className="number-label mb-6">Pricing</p>
               <h2 className="mb-6 font-black leading-[0.98] text-white" style={{ fontSize: 'clamp(2.2rem, 4.2vw, 4.4rem)', letterSpacing: 0 }}>
                 Package the scope before the number.
               </h2>
@@ -200,11 +200,11 @@ export function RevenueCategoryPage({
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.75fr_1.25fr]">
             <div>
-              <p className="number-label mb-6">How it converts</p>
+              <p className="number-label mb-6">How it works</p>
               <h2 className="mb-6 font-black leading-[0.98] text-white" style={{ fontSize: 'clamp(2.2rem, 4.2vw, 4.4rem)', letterSpacing: 0 }}>
-                A cleaner path from idea to paid project.
+                From brief to finished assets.
               </h2>
-              <Link href={primaryCta.href} className="inline-flex items-center gap-3 rounded bg-brand-red px-8 py-4 text-sm font-bold tracking-wide text-white transition-colors hover:bg-red-700">
+              <Link href={primaryCta.href} className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
                 {primaryCta.label}
               </Link>
             </div>
@@ -259,7 +259,7 @@ export function RevenueCategoryPage({
           </h2>
           <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-gray-500">{finalBody}</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href={primaryCta.href} className="inline-flex items-center gap-3 rounded bg-brand-red px-8 py-4 text-sm font-bold tracking-wide text-white transition-colors hover:bg-red-700">
+            <Link href={primaryCta.href} className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               {primaryCta.label}
             </Link>
             <Link href={secondaryCta.href} prefetch={secondaryCta.href === '/book/' ? false : undefined} className="self-center text-sm text-gray-500 transition-colors hover:text-white">

@@ -104,7 +104,7 @@ const videoFormats: VideoFormat[] = [
 
 const productionRules = [
   ['Define the deliverables', 'A commercial, a reel package, a music video, and a founder film should not be planned the same way. Define format, aspect ratios, length, usage, and must-have shots before choosing the studio.'],
-  ['Design the visual language', 'White cyc feels clean and flexible. Green screen creates worlds. Warm sets feel human and premium. Black curtains and controlled light feel cinematic. Pick the set for the story, not just availability.'],
+  ['Design the visual language', 'White cyc feels clean and flexible. Green screen creates worlds. Warm sets feel human and premium. Black curtains and controlled light feel cinematic. Pick the set for the story, not for availability.'],
   ['Protect sound and pacing', 'If anyone speaks on camera, sound is part of the image. Build the schedule around mics, camera resets, lighting moves, wardrobe changes, props, and social cutaways.'],
   ['Capture more than the hero take', 'A strong production day leaves with the main video plus thumbnails, stills, cutdowns, behind-the-scenes, vertical clips, and extra hooks when the campaign needs them.'],
 ]
@@ -246,7 +246,7 @@ export default function VideoProductionPage() {
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.54)_44%,rgba(0,0,0,0.12)_78%),linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.08)_48%,rgba(0,0,0,0.9)_100%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-10 pt-28 sm:px-10 sm:pb-12 lg:px-16 lg:pb-14">
+        <div className="relative z-10 mx-auto w-full max-w-[1680px] px-6 pb-10 pt-28 sm:px-10 sm:pb-12 lg:px-16 lg:pb-14">
           <div className="video-hero-copy max-w-[830px]">
             <p className="mb-6 text-sm font-semibold text-white/70">950 Battery St / San Francisco</p>
             <h1 className="font-black uppercase leading-[0.88] text-white" style={{ fontSize: 'clamp(4.1rem, 9vw, 8.8rem)', letterSpacing: 0 }}>
@@ -257,11 +257,11 @@ export default function VideoProductionPage() {
               Commercials, music videos, branded content, and documentaries produced at VibeShack Studios.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-6">
-              <Link href="/contact/?service=video-production" className="inline-flex min-h-[52px] items-center justify-center rounded-md bg-brand-red px-8 text-sm font-bold text-white transition-colors hover:bg-red-700">
+              <Link href="/contact/?service=video-production" className="inline-flex items-center justify-center rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
                 Discuss a project
               </Link>
               <Link href="#selected-films" className="text-sm font-semibold text-white/70 transition-colors hover:text-white">
-                View selected work <span className="ml-2" aria-hidden="true">-&gt;</span>
+                View selected work <span className="ml-2" aria-hidden="true">→</span>
               </Link>
             </div>
 
@@ -302,7 +302,7 @@ export default function VideoProductionPage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="mb-12 grid gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.55fr)] lg:items-end lg:gap-16">
             <div>
-              <span className="mb-5 block text-sm font-semibold text-white/45">Selected work</span>
+              <p className="number-label mb-6">Selected work</p>
               <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl" style={{ letterSpacing: 0 }}>
                 Recent productions.
               </h2>
@@ -320,7 +320,7 @@ export default function VideoProductionPage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.58fr)] lg:items-end lg:gap-16">
             <div>
-              <span className="mb-5 block text-sm font-semibold text-white/45">Formats</span>
+              <p className="number-label mb-6">Formats</p>
               <h2 className="brand-sans max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
                 Built around the brief.
               </h2>
@@ -338,7 +338,7 @@ export default function VideoProductionPage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="grid gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
             <div>
-              <span className="mb-5 block text-sm font-semibold text-white/45">Production planning</span>
+              <p className="number-label mb-6">Production planning</p>
               <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-5xl">
                 Plan from the deliverables back.
               </h2>
@@ -378,7 +378,7 @@ export default function VideoProductionPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-14">
             <div>
-              <span className="mb-5 block text-sm font-semibold text-white/45">Studios and sets</span>
+              <p className="number-label mb-6">Studios and sets</p>
               <h2 className="brand-sans max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl">
                 The set follows the shot list.
               </h2>
@@ -410,7 +410,7 @@ export default function VideoProductionPage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="grid items-start gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
             <div>
-              <span className="mb-5 block text-sm font-semibold text-white/45">Pricing</span>
+              <p className="number-label mb-6">Pricing</p>
               <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-5xl">
                 Quoted to the production scope.
               </h2>
@@ -431,7 +431,7 @@ export default function VideoProductionPage() {
             </div>
 
             <div>
-              <span className="mb-5 block text-sm font-semibold text-white/45">FAQ</span>
+              <p className="number-label mb-6">FAQ</p>
               <h3 className="brand-sans text-3xl font-semibold text-white sm:text-4xl">Common questions.</h3>
               <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
                 {videoFaqs.map(({ question, answer }) => (
@@ -461,7 +461,7 @@ export default function VideoProductionPage() {
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#000_0%,rgba(0,0,0,0.5)_42%,#000_100%)]" />
         <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <p className="mb-5 text-sm font-semibold text-white/50">Start a project</p>
+          <p className="number-label mb-6">Start a project</p>
           <h2 className="brand-sans mb-6 text-4xl font-semibold leading-tight text-white sm:text-6xl">
             Tell us what you are making.
           </h2>
@@ -469,7 +469,7 @@ export default function VideoProductionPage() {
             Send the brief. We will recommend the studio, crew, and production scope that fit it.
           </p>
           <div className="flex flex-wrap justify-center gap-6">
-            <Link href="/contact/?service=video-production" className="inline-flex min-h-[52px] items-center justify-center rounded-md bg-brand-red px-8 text-sm font-bold text-white transition-colors hover:bg-red-700">
+            <Link href="/contact/?service=video-production" className="inline-flex items-center justify-center rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Discuss the project
             </Link>
             <Link href="/book/" prefetch={false} className="self-center text-sm font-semibold text-white/60 transition-colors hover:text-white">

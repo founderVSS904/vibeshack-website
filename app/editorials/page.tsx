@@ -53,12 +53,12 @@ export default function EditorialsPage() {
         ]}
         introEyebrow="Editorial paths"
         introTitle="A shoot day should leave with a usable image system."
-        introBody="The page gives editorial buyers clear categories, then separates custom production from simple hourly rental so the next step is obvious."
+        introBody="Pick the kind of shoot, then choose produced work or hourly room rental. The next step is always one click."
         offers={[
           {
             eyebrow: 'Fashion',
             title: 'Fashion editorials',
-            body: 'Full-body frames, movement, wardrobe changes, strong crops, and controlled backgrounds for campaigns and lookbooks.',
+            body: 'Built for campaigns and lookbooks. Full-body frames, movement, wardrobe changes, strong crops, and controlled backgrounds.',
             image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
             alt: 'Fashion editorial photographed at VibeShack Studios',
             objectPosition: '42% center',
@@ -66,7 +66,7 @@ export default function EditorialsPage() {
           {
             eyebrow: 'Beauty',
             title: 'Beauty and close-up portraits',
-            body: 'Tight portraits, makeup details, jewelry, skin, expression, and high-impact hero images for launch and social.',
+            body: 'The camera gets close. Tight portraits that hold makeup detail, jewelry, skin, and expression, with hero images ready for launch and social.',
             image: '/studio-images/photo-gallery-editorial-makeup-closeup-v20260520.jpg',
             alt: 'Beauty editorial makeup close-up at VibeShack Studios',
             objectPosition: 'center 38%',
@@ -88,7 +88,7 @@ export default function EditorialsPage() {
           {
             eyebrow: 'Content day',
             title: 'Portrait and content systems',
-            body: 'A single shoot planned to produce headshots, editorial portraits, social crops, website assets, and press options.',
+            body: 'One shoot, five jobs done. Headshots, editorial portraits, social crops, website assets, and press options from a single day.',
             image: '/studio-images/enhanced-photography-editorial-male-portrait-v20260510.jpg',
             alt: 'Editorial male portrait photographed at VibeShack Studios',
             objectPosition: 'center 34%',
@@ -110,7 +110,7 @@ export default function EditorialsPage() {
           { title: 'Reference', body: 'We look at the mood, brand, styling, audience, and placements so the shoot has direction before the camera comes out.' },
           { title: 'Shot list', body: 'We protect the must-have images first: hero, close-up, full-body, negative-space, product, press, and social crops.' },
           { title: 'Set rhythm', body: 'The day is paced around wardrobe changes, hair and makeup, lighting changes, selects, and any product or prop resets.' },
-          { title: 'Route', body: 'Produced editorial work goes to inquiry. Room-only photography rental stays one click away when the buyer already has a crew.' },
+          { title: 'Selects', body: 'You leave with rated selects and a clear retouch list, sized for every placement.' },
         ]}
         proofEyebrow="Editorial proof"
         proofTitle="Beauty, fashion, portraits, and campaign stills."

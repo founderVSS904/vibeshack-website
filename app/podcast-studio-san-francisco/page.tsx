@@ -232,7 +232,7 @@ export default function PodcastStudiosPage() {
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.76)_0%,rgba(0,0,0,0.38)_38%,rgba(0,0,0,0.06)_72%),linear-gradient(180deg,rgba(0,0,0,0.12)_0%,rgba(0,0,0,0.08)_48%,rgba(0,0,0,0.88)_100%)]" />
 
-        <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-12 sm:px-10 sm:pb-16 lg:px-16 lg:pb-20">
+        <div className="relative z-10 mx-auto w-full max-w-[1680px] px-6 pb-12 sm:px-10 sm:pb-16 lg:px-16 lg:pb-20">
           <div className="podcast-hero-copy max-w-[760px]">
             <p className="mb-6 text-sm font-semibold text-white/70">San Francisco / Open 24/7</p>
             <h1 className="font-black uppercase leading-[0.88] text-white" style={{ fontSize: 'clamp(4.1rem, 9vw, 8.8rem)', letterSpacing: 0 }}>
@@ -246,12 +246,12 @@ export default function PodcastStudiosPage() {
               <Link
                 href="/book/?service=podcast"
                 prefetch={false}
-                className="inline-flex min-h-[52px] items-center justify-center rounded-md bg-brand-red px-8 text-sm font-bold text-white transition-colors hover:bg-red-700"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
               >
                 Book a session
               </Link>
               <Link href="#sets" className="text-sm font-semibold text-white/70 transition-colors hover:text-white">
-                Explore the sets <span className="ml-2" aria-hidden="true">-&gt;</span>
+                Explore the sets <span className="ml-2" aria-hidden="true">→</span>
               </Link>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function PodcastStudiosPage() {
 
       <div className="podcast-page bg-black text-white">
         <section className="border-y border-white/10">
-          <div className="mx-auto grid max-w-[1420px] grid-cols-2 sm:grid-cols-4">
+          <div className="mx-auto grid max-w-7xl grid-cols-2 sm:grid-cols-4">
             {studioFacts.map(([value, label], index) => (
               <div key={label} className={`px-6 py-7 sm:px-7 ${index % 2 === 1 ? 'border-l border-white/10' : ''} ${index > 1 ? 'border-t border-white/10 sm:border-t-0' : ''} ${index > 0 ? 'sm:border-l sm:border-white/10' : ''}`}>
                 <p className="text-2xl font-semibold text-white sm:text-3xl">{value}</p>
@@ -271,7 +271,7 @@ export default function PodcastStudiosPage() {
         </section>
 
         <section id="sets" className="scroll-mt-20 px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
-          <div className="mx-auto max-w-[1420px]">
+          <div className="mx-auto max-w-7xl">
             <div data-podcast-reveal className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.58fr)] lg:items-end lg:gap-16">
               <div>
                 <p className="number-label mb-6">Seven sets</p>
@@ -288,14 +288,14 @@ export default function PodcastStudiosPage() {
         </section>
 
         <section className="border-y border-white/10 bg-zinc-950 px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
-          <div className="mx-auto max-w-[1420px]">
+          <div className="mx-auto max-w-7xl">
             <div data-podcast-reveal className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="number-label mb-6">Made here</p>
                 <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl">See how the sets translate on screen.</h2>
               </div>
               <Link href="/our-work/" className="shrink-0 text-sm font-semibold text-white/55 transition-colors hover:text-white">
-                View all work <span className="ml-2" aria-hidden="true">-&gt;</span>
+                View all work <span className="ml-2" aria-hidden="true">→</span>
               </Link>
             </div>
 
@@ -337,7 +337,7 @@ export default function PodcastStudiosPage() {
         </section>
 
         <section className="px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
-          <div className="mx-auto max-w-[1420px]">
+          <div className="mx-auto max-w-7xl">
             <div data-podcast-reveal className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(380px,0.9fr)] lg:items-start lg:gap-16">
               <div className="lg:sticky lg:top-28">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg sm:aspect-[16/10]">
@@ -377,7 +377,7 @@ export default function PodcastStudiosPage() {
         </section>
 
         <section className="border-y border-white/10 px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
-          <div className="mx-auto grid max-w-[1420px] gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+          <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
             <div data-podcast-reveal className="lg:sticky lg:top-32 lg:self-start">
               <p className="number-label mb-6">What you leave with</p>
               <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl">
@@ -396,7 +396,7 @@ export default function PodcastStudiosPage() {
         </section>
 
         <section className="px-6 py-24 sm:px-10 sm:py-28 lg:px-16">
-          <div className="mx-auto max-w-[1100px]">
+          <div className="mx-auto max-w-7xl">
             <div data-podcast-reveal className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl">
                 Before you book.
@@ -437,11 +437,11 @@ export default function PodcastStudiosPage() {
               Choose the look, reserve the time, and arrive ready to record in San Francisco.
             </p>
             <div className="mt-9 flex flex-wrap justify-center gap-6">
-              <Link href="/book/?service=podcast" prefetch={false} className="inline-flex min-h-[52px] items-center justify-center rounded-md bg-brand-red px-8 text-sm font-bold text-white transition-colors hover:bg-red-700">
+              <Link href="/book/?service=podcast" prefetch={false} className="inline-flex items-center justify-center rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
                 Book a session
               </Link>
               <Link href="#sets" className="self-center text-sm font-semibold text-white/65 transition-colors hover:text-white">
-                Compare sets <span className="ml-2" aria-hidden="true">-&gt;</span>
+                Compare sets <span className="ml-2" aria-hidden="true">→</span>
               </Link>
             </div>
           </div>

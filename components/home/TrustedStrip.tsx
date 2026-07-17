@@ -34,7 +34,7 @@ export function TrustedStrip() {
     <section className="border-y border-white/10 bg-black" aria-label="Brands that trust VibeShack">
       <div className="mx-auto flex max-w-[1680px] flex-col items-center gap-5 px-6 py-9 sm:flex-row sm:gap-10 sm:px-12 lg:px-24">
         <p className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.26em] text-white/60">
-          Trusted by visionaries
+          Brands that shoot here
         </p>
         <div className="shot-logo-marquee trusted-strip-marquee w-full min-w-0 flex-1">
           <div className="shot-logo-track">
@@ -49,7 +49,7 @@ export function TrustedStrip() {
           href="/made-at-vibeshack/"
           className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.26em] text-white/60 transition-colors hover:text-white"
         >
-          And more <span aria-hidden="true">-&gt;</span>
+          And more <span aria-hidden="true">&rarr;</span>
         </Link>
       </div>
     </section>

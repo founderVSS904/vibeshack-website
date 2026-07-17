@@ -53,7 +53,7 @@ export default function BrandingPage() {
         ]}
         introEyebrow="Branding scopes"
         introTitle="Turn taste into assets people can use."
-        introBody="The goal is not just a logo. It is a working system that helps your site, content, sales material, campaigns, and studio production feel like they belong to the same world."
+        introBody="The goal is a working system, not a logo file. Your site, content, sales material, campaigns, and studio production should feel like they belong to the same world."
         offers={[
           {
             eyebrow: 'Identity',
@@ -66,7 +66,7 @@ export default function BrandingPage() {
           {
             eyebrow: 'Lookbooks',
             title: 'Lookbooks and brand books',
-            body: 'A polished visual package for collections, products, artists, founders, and brands that need a clear presentation system.',
+            body: 'One document that sells the whole collection. A polished visual package for products, artists, founders, and brands that need a clear presentation system.',
             image: '/studio-images/work-pure-magic-branding-wide-v20260623.png',
             alt: 'Pure Magic product branding image for lookbook and brand book direction',
             objectPosition: 'center',
@@ -96,7 +96,7 @@ export default function BrandingPage() {
           {
             eyebrow: 'Decks',
             title: 'Pitch decks and media kits',
-            body: 'A clean narrative and visual system for investor decks, sponsor decks, capabilities decks, press kits, launch decks, and partnership materials.',
+            body: 'The story has to hold up in the room. A clean narrative and visual system for investor, sponsor, capabilities, and launch decks, plus press kits and partnership materials.',
             image: '/studio-images/enhanced-canvas-podcast-amber-collage-v20260510.jpg',
             alt: 'Collage-style production visuals for brand deck direction',
           },
@@ -110,7 +110,7 @@ export default function BrandingPage() {
           {
             eyebrow: 'Founder',
             title: 'Founder brand systems',
-            body: 'Profile images, founder videos, language, content pillars, press visuals, and the repeatable look around the person leading the brand.',
+            body: 'The person leading the brand needs a repeatable look. We build it from profile images, founder videos, language, content pillars, and press visuals.',
             image: '/studio-images/enhanced-photography-editorial-male-portrait-v20260510.jpg',
             alt: 'Founder portrait for personal brand system',
             objectPosition: 'center 34%',
@@ -125,7 +125,7 @@ export default function BrandingPage() {
           { title: 'Diagnose', body: 'We identify what feels unclear: positioning, visual identity, content direction, campaign language, or production assets.' },
           { title: 'Systemize', body: 'We shape the rules: look, voice, references, formats, shot list, asset types, and what should be repeatable.' },
           { title: 'Produce', body: 'Because VibeShack has studios, the brand system can move into photos, video, podcasts, commercials, and launch content without a handoff gap.' },
-          { title: 'Monetize', body: 'Branding gets routed to inquiry because pricing depends on deliverables, but every page also points to bookable production paths.' },
+          { title: 'Launch', body: 'The system ships with the assets, templates, and shoot plan your team needs to keep producing without us.' },
         ]}
         proofEyebrow="Brand proof"
         proofTitle="Creative direction that can become real footage."

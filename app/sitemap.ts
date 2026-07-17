@@ -6,7 +6,7 @@ import { allWorkProjects } from '@/lib/seo/workProjects'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.vibeshackstudios.com'
-  const lastModified = new Date('2026-05-09')
+  const lastModified = new Date('2026-07-16')
   const absoluteUrl = (path: string) => `${baseUrl}${path === '/' ? '/' : `${path}/`}`
 
   // Main pages. The parked old homepage at /duplicate/ is intentionally

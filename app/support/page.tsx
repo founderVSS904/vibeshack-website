@@ -28,7 +28,7 @@ const FAQS = [
       },
       {
         q: 'Can I set up a recurring booking?',
-        a: 'Yes. During checkout, you can select a recurring schedule - weekly, bi-weekly, or monthly. We\'ll lock in your slot and apply a discount.',
+        a: 'Yes. During checkout, you can select a recurring schedule: weekly, bi-weekly, or monthly. We\'ll lock in your slot and apply a discount.',
       },
     ],
   },
@@ -37,7 +37,7 @@ const FAQS = [
     questions: [
       {
         q: 'What is the difference between a Podcast Studio and a Rental?',
-        a: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment - you operate it yourself or bring your own crew.',
+        a: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment. You operate it yourself or bring your own crew.',
       },
       {
         q: 'Is the equipment already set up when I arrive?',
@@ -49,11 +49,11 @@ const FAQS = [
       },
       {
         q: 'Do you have Hair and Makeup on-site?',
-        a: 'We have dedicated Hair and Makeup rooms and wardrobe changing rooms at several of our studios - spaces where your talent can get ready before the session. We do not provide Hair and Makeup artists or services. Bring your own team, or arrive ready.',
+        a: 'We have dedicated Hair and Makeup rooms and wardrobe changing rooms at several of our studios: spaces where your talent can get ready before the session. We do not provide Hair and Makeup artists or services. Bring your own team, or arrive ready.',
       },
       {
         q: 'How quickly do I get my footage?',
-        a: 'We offer a 6 to 12 hour turnaround. Your footage is delivered the same day as your session. We process and send it directly to you — no waiting, no delays.',
+        a: 'We offer a 6 to 12 hour turnaround. We process your footage and send it to you the same day as your session.',
       },
       {
         q: 'Can I do a free tour before I book?',
@@ -104,7 +104,7 @@ const FAQS = [
       },
       {
         q: 'What should I bring?',
-        a: 'Just yourself and your content plan. All equipment is provided. For photography and video, bring outfit options and any products or props you want in frame. For podcast, have your talking points ready.',
+        a: 'Yourself and your content plan. All equipment is provided. For photography and video, bring outfit options and any products or props you want in frame. For podcast, have your talking points ready.',
       },
       {
         q: 'What if I\'m running late?',
@@ -139,7 +139,7 @@ const faqSchema = {
       name: 'What is the difference between a Podcast Studio and a Rental?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment - you operate it yourself or bring your own crew.',
+        text: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment. You operate it yourself or bring your own crew.',
       },
     },
     {

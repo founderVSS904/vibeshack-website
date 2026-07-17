@@ -28,8 +28,8 @@ export default function ContactPage() {
             className="font-black text-white leading-none mb-6"
             style={{ fontSize: 'clamp(3rem, 7vw, 6rem)', letterSpacing: '-0.05em' }}
           >
-            Let&apos;s Build<br />
-            <span className="text-brand-red">Something.</span>
+            Talk To The<br />
+            <span className="text-brand-red">Studio.</span>
           </h1>
           <p className="text-gray-500 text-lg max-w-lg">
             Book a studio, schedule a tour, or ask us anything.
@@ -52,12 +52,12 @@ export default function ContactPage() {
           />
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ zIndex: 2 }}>
             <div className="relative" style={{ marginTop: '-20px' }}>
-              <div className="absolute -inset-4 rounded-full bg-brand-red opacity-20 animate-ping" />
+              <div className="absolute -inset-4 rounded-full bg-brand-red opacity-20 animate-ping motion-reduce:animate-none" />
               <div className="absolute -inset-2 rounded-full bg-brand-red opacity-30" />
               <div className="w-4 h-4 rounded-full bg-brand-red shadow-lg" style={{ boxShadow: '0 0 20px rgba(229,0,0,0.8), 0 0 40px rgba(229,0,0,0.4)' }} />
             </div>
           </div>
-          <div className="absolute bottom-6 left-6 glass-card rounded-lg p-5" style={{ backdropFilter: 'blur(16px)' }}>
+          <div className="absolute bottom-6 left-6 glass-card rounded-lg p-5">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-brand-red" style={{ boxShadow: '0 0 8px #E50000' }} />
               <span className="text-white font-bold text-sm">VibeShack Studios</span>
@@ -67,9 +67,10 @@ export default function ContactPage() {
               href="https://maps.google.com/?q=950+Battery+St+San+Francisco+CA+94111"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-brand-red text-xs font-semibold hover:text-white transition-colors mt-2"
+              className="group inline-flex items-center gap-2 text-brand-red text-xs font-semibold hover:text-white transition-colors mt-2"
             >
-              Get Directions →
+              Get directions
+              <span className="transition-transform group-hover:translate-x-0.5">→</span>
             </a>
           </div>
         </div>
@@ -102,9 +103,10 @@ export default function ContactPage() {
                 </p>
                 <a
                   href="/book/"
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded-lg hover:bg-red-700 transition-colors"
+                  className="group inline-flex items-center gap-2.5 rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
                 >
-                  Book a Session →
+                  Book Your Session
+                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
                 </a>
               </div>
 

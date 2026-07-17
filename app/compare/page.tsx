@@ -36,7 +36,7 @@ export default function ComparePage() {
       <section className="border-b border-white/10 bg-black px-6 pb-20 pt-32 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
           <div>
-            <p className="text-xs font-bold uppercase text-brand-red">Compare studio options</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Compare studio options</p>
             <h1 className="mt-8 max-w-5xl text-5xl font-black leading-[0.94] text-white sm:text-6xl lg:text-7xl">
               Decide by what changes after the shoot.
             </h1>
@@ -52,7 +52,7 @@ export default function ComparePage() {
       <section className="bg-black px-6 py-20 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[0.72fr_1fr]">
           <div>
-            <p className="text-xs font-bold uppercase text-brand-red">Decision discipline</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Decision discipline</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-5xl">
               The right answer is the one that removes the biggest production risk.
             </h2>
@@ -71,7 +71,7 @@ export default function ComparePage() {
       <section className="border-y border-white/10 bg-zinc-950 px-6 py-20 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 max-w-4xl">
-            <p className="text-xs font-bold uppercase text-brand-red">Comparison library</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Comparison library</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-6xl">
               The questions clients ask before they choose the wrong room.
             </h2>

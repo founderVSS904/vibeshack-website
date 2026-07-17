@@ -41,28 +41,26 @@ export default function ParlorPage() {
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/parlor-hero.jpg"
-          alt="Parlor premium interview studio — VibeShack Studios San Francisco"
+          alt="Parlor premium interview studio, VibeShack Studios San Francisco"
           fill className="object-cover opacity-80" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
-          <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color: '#99f6e4'}}>Creative Series</p>
+          <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">Creative Series</p>
           <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
-            Parlor.
+            Parlor<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8">
             Premium interview setup. Chesterfield seating. Full crew included.
           </p>
-          <a href="/book/?studio=parlor" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+          <a href="/book/?studio=parlor" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book This Studio
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
         </div>
       </section>
 
       {/* Show up. Record */}
-      <section className="py-32 bg-zinc-950 border-t" style={{borderColor: '#99f6e4'}}>
+      <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features */}
@@ -72,14 +70,14 @@ export default function ParlorPage() {
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {[
-                  'Custom setup — tailored to your production',
-                  'Full 4K production, all angles covered',
+                  'Custom setup, tailored to your production',
+                  'Full 4K production framed for interviews',
                   'Cameraman + producer included',
-                  'Chesterfield seating — looks expensive on camera',
-                  'Broadcast microphones, zero compromise',
-                  'Acoustic treatment, no echo',
-                  '6–12hr footage turnaround',
-                  'On-site support throughout',
+                  'Chesterfield seating that looks expensive on camera',
+                  'Broadcast mics on host and guest',
+                  'Treated acoustics, clean dialogue',
+                  'Footage back in 6 to 12 hours',
+                  'Support in the room, start to finish',
                 ].map(item => (
                   <div key={item} className="py-4 text-gray-400 text-base">{item}</div>
                 ))}
@@ -87,14 +85,14 @@ export default function ParlorPage() {
             </div>
             {/* Right: Photo */}
             <div>
-              <Image src="/studio-images/parlor-side-v20260509.jpg" alt="Parlor premium interview setup with Chesterfield seating — VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
+              <Image src="/studio-images/parlor-side-v20260509.jpg" alt="Parlor premium interview setup with Chesterfield seating, VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-3xl" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Studio Details */}
-      <section className="py-32 bg-black border-t border-white/5">
+      <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">The Room</span>
           <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
@@ -109,8 +107,8 @@ export default function ParlorPage() {
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Chesterfield Seating That Reads on Camera</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">Classic tufted leather. The kind of seating that signals your guests that they're sitting somewhere serious. It looks like a private club. The camera loves it.</p>
-                <p className="text-gray-400 text-lg leading-relaxed">Paired with lighting that flatters every skin tone — warm, directional, no harsh shadows. You and your guest look like you belong in a Netflix doc.</p>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">Classic tufted leather. The kind of seating that tells your guests they're somewhere serious. It looks like a private club. The camera loves it.</p>
+                <p className="text-gray-400 text-lg leading-relaxed">Paired with lighting that flatters every skin tone: warm, directional, no harsh shadows. You and your guest look like you belong in a Netflix doc.</p>
               </div>
             </div>
 
@@ -129,12 +127,12 @@ export default function ParlorPage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-32 bg-zinc-950 border-t border-white/5">
+      <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
           <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$400</div>
           <p className="text-gray-500 text-lg mb-1">per hour</p>
-          <p className="text-white font-semibold mb-12">Cameraman included. 1 hour minimum. Open 24/7.</p>
+          <p className="text-white font-semibold mb-12">Cameraman + producer included. 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
               { label: '2 Hours', price: '$800' },
@@ -147,11 +145,9 @@ export default function ParlorPage() {
               </div>
             ))}
           </div>
-          <a href="/book/?studio=parlor" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+          <a href="/book/?studio=parlor" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book Parlor
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
           <p className="text-gray-700 text-xs mt-4">Instant confirmation. Free cancellation 48hrs before.</p>
         </div>
@@ -163,13 +159,11 @@ export default function ParlorPage() {
           <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}>
             Ready to <span className="text-brand-red">Record?</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10">$400/hr. Cameraman included. Instant confirmation.</p>
+          <p className="text-gray-500 text-lg mb-10">$400/hr. Cameraman + producer included. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book/?studio=parlor" className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded hover:bg-red-700 transition-colors">
+            <a href="/book/?studio=parlor" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </a>
             <a href="/tour/?studio=parlor" className="text-gray-500 hover:text-white transition-colors text-sm self-center">Schedule a free tour →</a>
           </div>

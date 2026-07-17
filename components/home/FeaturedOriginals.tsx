@@ -121,7 +121,7 @@ export function FeaturedOriginals() {
       onBlurCapture={() => setIsSettled(false)}
     >
       <div
-        className="flex transition-transform duration-[760ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+        className="flex transition-transform duration-[760ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
         style={{ transform: `translateX(-${index * 100}%)` }}
       >
         {slides.map((slide, i) => (
@@ -197,7 +197,7 @@ export function FeaturedOriginals() {
                     href={slide.primaryCta.href}
                     target={slide.primaryCta.external ? '_blank' : undefined}
                     rel={slide.primaryCta.external ? 'noopener noreferrer' : undefined}
-                    className="inline-flex items-center gap-2.5 rounded-md bg-brand-red px-6 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-red-600"
+                    className="inline-flex items-center gap-2.5 rounded-md bg-brand-red px-6 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-red-700"
                     tabIndex={i === index ? undefined : -1}
                   >
                     {slide.primaryCta.play && (
@@ -212,7 +212,7 @@ export function FeaturedOriginals() {
                     className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-white/80 transition-colors hover:text-white"
                     tabIndex={i === index ? undefined : -1}
                   >
-                    {slide.secondaryCta.label} <span aria-hidden="true">-&gt;</span>
+                    {slide.secondaryCta.label} <span aria-hidden="true">&rarr;</span>
                   </Link>
                 </div>
               </div>
@@ -255,7 +255,7 @@ export function FeaturedOriginals() {
             className="group/dot flex h-8 min-w-8 items-center justify-center px-2"
           >
             <span
-              className={`h-1.5 rounded-full transition-all duration-300 ${
+              className={`h-1.5 rounded-full transition-[width,background-color] duration-300 ${
                 i === index ? 'w-6 bg-brand-red' : 'w-1.5 bg-white/50 group-hover/dot:bg-white/70'
               }`}
             />

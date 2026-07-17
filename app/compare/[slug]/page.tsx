@@ -88,7 +88,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
       <section className="bg-black px-6 py-24 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-14 lg:grid-cols-[0.72fr_1fr]">
           <div>
-            <p className="text-[11px] font-bold uppercase text-brand-red">Recommendation</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Recommendation</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-6xl">
               Make the room serve the edit.
             </h2>
@@ -102,7 +102,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
       <section className="border-y border-white/10 bg-zinc-950 px-6 py-24 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 max-w-3xl">
-            <p className="text-[11px] font-bold uppercase text-brand-red">How to choose</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">How to choose</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-5xl">
               The difference is usually operational, not cosmetic.
             </h2>
@@ -123,7 +123,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
       <section className="bg-black px-6 py-24 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[0.72fr_1fr]">
           <div>
-            <p className="text-[11px] font-bold uppercase text-brand-red">Next step</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Next step</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-5xl">
               Choose the option that removes the bigger production risk.
             </h2>
@@ -132,14 +132,14 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
             <Link href={comparison.primaryPage} className="group grid gap-4 py-7 sm:grid-cols-[1fr_auto]">
               <div>
                 <p className="text-2xl font-black text-white transition-colors group-hover:text-brand-red">{primaryLabel}</p>
-                <p className="mt-2 text-sm leading-relaxed text-gray-500">Start here if this is the stronger fit for the final deliverable.</p>
+                <p className="mt-2 text-sm leading-relaxed text-gray-500">{comparison.primaryReason}</p>
               </div>
               <span className="self-center text-sm font-bold text-gray-400 transition-colors group-hover:text-white">Open &rarr;</span>
             </Link>
             <Link href={comparison.secondaryPage} className="group grid gap-4 py-7 sm:grid-cols-[1fr_auto]">
               <div>
                 <p className="text-2xl font-black text-white transition-colors group-hover:text-brand-red">{secondaryLabel}</p>
-                <p className="mt-2 text-sm leading-relaxed text-gray-500">Use this when the creative problem changes after the first decision.</p>
+                <p className="mt-2 text-sm leading-relaxed text-gray-500">{comparison.secondaryReason}</p>
               </div>
               <span className="self-center text-sm font-bold text-gray-400 transition-colors group-hover:text-white">Open &rarr;</span>
             </Link>
@@ -157,7 +157,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
       <section className="border-y border-white/10 bg-zinc-950 px-6 py-20 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-[11px] font-bold uppercase text-brand-red">Questions</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Questions</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white">Before you decide.</h2>
           </div>
           <div className="divide-y divide-white/10 border-y border-white/10">

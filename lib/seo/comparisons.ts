@@ -12,6 +12,8 @@ export const comparisons = [
     primaryPage: '/green-screen-studio-sf/',
     secondaryPage: '/canvas-rental/',
     winner: 'Use green screen for compositing. Use white cyc for clean finished visuals.',
+    primaryReason: 'Book green screen when the background gets built in post.',
+    secondaryReason: 'Book the white cyc when the clean room is already the final look.',
     sections: [
       { heading: 'Choose green screen when the background changes later', body: 'Green screen is built for replacement: virtual sets, motion graphics, training modules, explainers, and backgrounds that do not exist in the physical room.' },
       { heading: 'Choose white cyc when the clean space is the look', body: 'White cyc keeps the subject in a real, minimal environment. It works beautifully for product launches, portraits, music videos, social ads, tutorials, and campaign visuals.' },
@@ -33,6 +35,8 @@ export const comparisons = [
     primaryPage: '/podcast-studio-san-francisco/',
     secondaryPage: '/book/',
     winner: 'Use a podcast studio when the content needs to look and sound like a real brand asset.',
+    primaryReason: 'Book a podcast set when the show needs clean audio and a look that stays consistent across episodes.',
+    secondaryReason: 'Start a custom booking when the session mixes formats or needs a plan built around your team and gear.',
     sections: [
       { heading: 'Audio is the first quality signal', body: 'Offices have HVAC noise, glass reflections, hard walls, and interruptions. Podcast sets are built around microphones, controlled sound, and camera-ready conversations.' },
       { heading: 'Visual consistency is hard to fake', body: 'A dedicated studio keeps lighting, seating, camera positions, and background choices consistent across episodes and clips.' },
@@ -54,6 +58,8 @@ export const comparisons = [
     primaryPage: '/photography-studio-san-francisco/',
     secondaryPage: '/canvas-rental/',
     winner: 'Use a studio for control and repeatability. Use location when the place itself is part of the story.',
+    primaryReason: 'Book the photography studio when lighting, timing, and repeatable results decide the campaign.',
+    secondaryReason: 'Book the white cyc when the shoot needs full-body framing, movement, or photo and video from one space.',
     sections: [
       { heading: 'Studios create control', body: 'Lighting, background, sound, weather, privacy, load-in, and timing are easier to control in a studio.' },
       { heading: 'Locations create context', body: 'A real office, store, street, or home can add authenticity when the place matters to the story.' },

@@ -121,7 +121,7 @@ export default function SelectedFilmGallery({ films }: SelectedFilmGalleryProps)
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/55 sm:text-base">{activeFilm.summary}</p>
         </div>
         <Link href={`/our-work/${activeFilm.slug}/`} className="mt-6 inline-flex text-sm font-semibold text-white/60 transition-colors hover:text-white lg:mt-0">
-          View film details <span className="ml-2" aria-hidden="true">-&gt;</span>
+          View film details <span className="ml-2" aria-hidden="true">→</span>
         </Link>
       </div>
     </div>

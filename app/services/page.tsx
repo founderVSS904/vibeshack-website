@@ -82,7 +82,7 @@ const services = [
     alt: 'Portfolio work made at VibeShack Studios San Francisco',
     body:
       'For buyers who need to see the taste first: commercials, music videos, editorials, podcasts, brand content, and production proof.',
-    price: 'Explore',
+    price: 'Portfolio',
     fit: 'Proof path',
   },
 ]
@@ -161,7 +161,7 @@ export default function ServicesPage() {
               Choose the right path for the shoot.
             </h1>
             <p className="text-gray-200 text-base leading-relaxed max-w-lg">
-              Start with the outcome, then pick the service or room that fits. VibeShack separates direct bookings, custom creative work, and proof-first portfolio browsing so clients do not have to guess.
+              Start with what you are making. Some paths book directly, some start with a brief, and the work is always one click away.
             </p>
           </div>
 
@@ -180,11 +180,11 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="py-20 bg-black border-t border-white/5">
+      <section className="py-24 bg-black border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-[0.75fr_1.25fr] gap-12 lg:gap-16 items-end mb-12">
             <div>
-              <p className="number-label mb-5">Start here</p>
+              <p className="number-label mb-6">Start here</p>
               <h2 className="text-white font-black leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.4rem)', letterSpacing: 0 }}>
                 Service first. Room second.
               </h2>
@@ -224,7 +224,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="py-28 bg-zinc-950 border-t border-white/5">
+      <section className="py-24 bg-zinc-950 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-16">
             <div>
@@ -233,7 +233,7 @@ export default function ServicesPage() {
                 Start with what you need to leave with.
               </h2>
               <p className="text-gray-500 text-sm leading-relaxed max-w-md mt-6">
-                The cleanest buying experience happens when the service matches the final asset. A commercial, editorial shoot, podcast episode, branding project, and room rental should not be sold like the same product.
+                A commercial, an editorial shoot, a podcast episode, and a room rental are different jobs. Pick by the asset you need to leave with.
               </p>
             </div>
             <div className="divide-y divide-white/10 border-y border-white/10">
@@ -254,7 +254,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="py-24 bg-black border-t border-white/5">
+      <section className="py-24 bg-black border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.85fr] gap-12 items-center">
             <div>

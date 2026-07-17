@@ -45,7 +45,7 @@ export default function PressReleasePage() {
         <div className="max-w-4xl mx-auto">
           <Link href="/press/" className="text-gray-500 hover:text-white text-sm transition-colors">← Press Kit</Link>
           <p className="text-brand-red text-xs font-bold tracking-[0.25em] uppercase mt-10 mb-6">Press Release</p>
-          <h1 className="text-white font-black leading-none" style={{ fontSize: 'clamp(3rem, 7vw, 6rem)', letterSpacing: '-0.05em' }}>
+          <h1 className="text-white font-black leading-none" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.05em' }}>
             VibeShack Studios builds a 24/7 production studio in San Francisco.
           </h1>
           <p className="text-gray-500 text-lg leading-relaxed mt-8">

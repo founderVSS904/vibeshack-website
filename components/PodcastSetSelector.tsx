@@ -178,7 +178,7 @@ export default function PodcastSetSelector({ sets }: PodcastSetSelectorProps) {
                 Book this set
               </Link>
               <Link href={activeSet.href} className="text-sm font-semibold text-white/60 transition-colors hover:text-white">
-                View set details <span aria-hidden="true">-&gt;</span>
+                View set details <span aria-hidden="true">→</span>
               </Link>
             </div>
           </div>

@@ -211,8 +211,8 @@ function Stepper({ step, onJump }: { step: Step; onJump: (s: Exclude<Step, 'paym
             {i > 0 && (
               <div className="relative mx-4 h-px flex-1 bg-white/[0.12] sm:mx-6">
                 <span
-                  className="absolute inset-y-0 left-0 bg-brand-red transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                  style={{ width: i <= activeIndex ? '100%' : i === activeIndex + 1 ? '45%' : '0%' }}
+                  className="absolute inset-0 origin-left bg-brand-red transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  style={{ transform: `scaleX(${i <= activeIndex ? 1 : i === activeIndex + 1 ? 0.45 : 0})` }}
                 />
               </div>
             )}
@@ -1184,7 +1184,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full rounded-xl bg-brand-red py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 lg:hidden"
+                    className="w-full rounded-lg bg-brand-red py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 lg:hidden"
                   >
                     {submitting ? 'Processing…' : `Lock In Session · $${grandTotal}`}
                   </button>
@@ -1325,7 +1325,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   type="button"
                   onClick={continueFlow}
                   disabled={!continueReady}
-                  className={`mt-5 w-full rounded-xl py-4 font-mono text-[12px] font-bold uppercase tracking-[0.14em] transition-colors ${
+                  className={`mt-5 w-full rounded-lg py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] transition-colors ${
                     continueReady
                       ? 'bg-brand-red text-white hover:bg-red-700'
                       : 'cursor-not-allowed bg-white/[0.04] text-zinc-600'
@@ -1373,7 +1373,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
               type="button"
               onClick={continueFlow}
               disabled={!continueReady}
-              className={`rounded-lg px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.12em] transition-colors ${
+              className={`rounded-lg px-6 py-3 font-mono text-[12px] font-bold uppercase tracking-[0.16em] transition-colors ${
                 continueReady
                   ? 'bg-brand-red text-white hover:bg-red-700'
                   : 'cursor-not-allowed bg-white/[0.06] text-zinc-600'
@@ -1388,7 +1388,30 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
   )
 }
 
-const BookPageClient = dynamic(() => Promise.resolve(BookPageInner), { ssr: false })
+function BookingSkeleton() {
+  return (
+    <div className="mx-auto min-h-screen max-w-[1680px] px-6 pb-32 pt-28 sm:px-10 lg:px-16" aria-busy="true" aria-label="Loading booking">
+      <div className="h-4 w-40 rounded bg-white/[0.06]" />
+      <div className="mt-6 h-12 w-72 max-w-full rounded bg-white/[0.08]" />
+      <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]">
+        <div className="space-y-6">
+          <div className="h-8 w-full max-w-md rounded bg-white/[0.05]" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {Array.from({ length: 6 }, (_, i) => (
+              <div key={i} className="aspect-[4/3] rounded-xl bg-white/[0.04]" />
+            ))}
+          </div>
+        </div>
+        <div className="hidden h-80 rounded-2xl border border-white/[0.08] bg-white/[0.02] lg:block" />
+      </div>
+    </div>
+  )
+}
+
+const BookPageClient = dynamic(() => Promise.resolve(BookPageInner), {
+  ssr: false,
+  loading: () => <BookingSkeleton />,
+})
 
 export default function BookPage() {
   return <BookPageClient studios={DEFAULT_STUDIOS} addons={DEFAULT_ADDONS} />

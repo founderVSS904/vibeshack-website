@@ -56,7 +56,7 @@ export const useCases = [
       {
         name: 'Parlor',
         href: '/parlor/',
-        fit: 'Best for premium guest interviews, documentary-style conversations, and a more elevated lounge look.',
+        fit: 'Best for premium guest interviews, documentary-style conversations, and a richer lounge look.',
         price: '$400/hr',
       },
       {
@@ -114,8 +114,8 @@ export const useCases = [
       'Intro, outro, sponsor, or call-to-action reads while the set is already lit',
     ],
     watchouts: [
-      'Do not arrive with only a vague topic. Bring enough structure to keep the conversation from drifting.',
-      'Avoid tiny patterns, shiny jewelry, and loud fabrics that fight the camera or microphone.',
+      'A wandering episode is hard to cut. Without clear segments, the best moments get buried in the edit.',
+      'Fabric rustle against a lav mic can quietly ruin takes. Nobody hears it until the edit.',
       'Leave buffer time for guests, resets, and a final review of must-capture lines.',
     ],
     proof: ['Broadcast microphones', 'Multi-camera rooms', 'Camera-ready sets', 'Crew options', '24/7 booking'],
@@ -245,8 +245,8 @@ export const useCases = [
     ],
     watchouts: [
       'Do not overpack the schedule with too many wardrobe, room, and script changes.',
-      'Assign one person to own the shot list and make decisions on set.',
-      'Bring final brand references so lighting, wardrobe, and backdrop choices do not happen by committee.',
+      'When approvals happen by committee, every setup runs long and the last assets on the list get dropped.',
+      'A look debated on set costs a relight, and that relight usually comes out of the hero asset block.',
     ],
     proof: ['Multiple studios at one address', 'Podcast, photo, green screen, and white cyc options', 'Hair and makeup room', 'Hourly booking', 'Same-building flexibility'],
     faqs: [
@@ -276,7 +276,7 @@ export const useCases = [
     serviceType: 'Green Screen Studio Rental',
     audience: ['Video teams', 'Course creators', 'Corporate trainers', 'Agencies', 'Commercial productions'],
     clientNeed:
-      'Green screen is not just a green wall. It is a post-production decision. The shoot has to protect clean edges, consistent lighting, proper distance from the background, and enough reference material for the editor to build the final world without fighting the footage.',
+      'Green screen is more than a green wall. It is a post-production decision. The shoot has to protect clean edges, consistent lighting, proper distance from the background, and enough reference material for the editor to build the final world without fighting the footage.',
     decisionPoints: [
       {
         label: 'Best first decision',
@@ -356,7 +356,7 @@ export const useCases = [
       },
     ],
     preProduction: [
-      'Bring mockups or reference frames for the final background, not just a verbal description.',
+      'Bring mockups or reference frames for the final background, not a verbal description.',
       'Confirm final aspect ratios before filming: 16:9, 9:16, square, paid ads, or all of the above.',
       'Avoid green wardrobe, reflective jewelry, glossy props, and translucent products unless the effect is deliberate.',
       'Tell the editor what will be captured so they can ask for safety material before the shoot is over.',
@@ -368,8 +368,8 @@ export const useCases = [
       'Clean plates and reference frames for the post-production team',
     ],
     watchouts: [
-      'Do not wear green, bright lime, reflective sequins, or transparent materials unless the look is planned.',
-      'Do not shoot without knowing the final aspect ratio and background direction.',
+      'Spill and edge problems are invisible on the set monitor. They surface as hours of cleanup once the key is pulled.',
+      'Footage framed for one composite rarely survives a different one. A late background change can strand the whole shoot.',
       'Avoid last-minute prop changes that create reflections or difficult edges.',
     ],
     proof: ['750 sqft production floor', 'Floor-to-ceiling green screen', 'Lighting grid', 'Easy load-in', '24/7 booking'],
@@ -498,9 +498,9 @@ export const useCases = [
       'Behind-the-scenes stills that support launch storytelling',
     ],
     watchouts: [
-      'Do not rely on one hero crop. Capture room for text, thumbnails, and mobile placements.',
-      'Bring duplicate products if anything can scratch, melt, dent, spill, or lose shape.',
-      'Decide whether the final look is clinical, premium, warm, editorial, or social-first before styling starts.',
+      'The frame that looks perfect on the studio monitor often dies at mobile size. Check priority crops before wrap.',
+      'A scratch or fingerprint repeats through every frame it touches. Catching it on set is cheap; retouching it across the campaign is not.',
+      'A style pivot mid-shoot resets lighting, surfaces, and props, and the first half of the day stops matching the second.',
     ],
     proof: ['Professional lighting', 'Backdrops', 'Hair and makeup room', 'Hourly rental', 'White cyc nearby'],
     faqs: [
@@ -622,9 +622,9 @@ export const useCases = [
       'Movement-based clips without a distracting background',
     ],
     watchouts: [
-      'All-white wardrobe can disappear unless that is the creative direction.',
-      'Dirty soles, dragging stands, and unplanned props can mark the floor fast.',
-      'If you need the background replaced later, green screen may be the better room.',
+      'Walk the setups before the first take; improvising positions on the cyc burns time and scuffs the floor.',
+      'Leave time for verticals; the last hour disappears fast.',
+      'Deciding to replace the background after a cyc shoot means masking every frame by hand. Make that call before booking.',
     ],
     proof: ['White cyc wall', '750 sqft open space', 'Photo and video use', 'Hourly rental', '24/7 booking'],
     faqs: [

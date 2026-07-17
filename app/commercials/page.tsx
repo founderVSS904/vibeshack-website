@@ -53,12 +53,12 @@ export default function CommercialsPage() {
         ]}
         introEyebrow="Commercial formats"
         introTitle="Make the page, ad, or launch feel real."
-        introBody="A commercial page should not dump every video service into one bucket. Buyers need to see the exact job they are hiring for, then have a clear next step."
+        introBody="Every commercial job is different. Pick the format that matches what you are launching, then send the brief."
         offers={[
           {
             eyebrow: 'Launch',
             title: 'Product launch videos',
-            body: 'Hero video, social cutdowns, product details, thumbnails, and short edits built around a release moment.',
+            body: 'One shoot planned around the release moment. You leave with the hero video, social cutdowns, product details, thumbnails, and short edits.',
             image: '/studio-images/usecase-brand-content-v20260509.jpg',
             alt: 'Brand content production setup at VibeShack Studios',
           },
@@ -73,7 +73,7 @@ export default function CommercialsPage() {
           {
             eyebrow: 'Product',
             title: 'Demos and explainers',
-            body: 'Controlled footage for apps, products, services, explainers, training, and green screen compositing.',
+            body: 'Show the product clearly. Controlled footage for apps, services, explainers, training, and green screen compositing.',
             image: '/studio-images/guide-green-screen-prep-v20260509.jpg',
             alt: 'Green screen production studio for demo videos',
           },
@@ -87,14 +87,14 @@ export default function CommercialsPage() {
           {
             eyebrow: 'Campaign',
             title: 'Brand films and campaign spots',
-            body: 'A more produced in-studio day when the footage has to carry a campaign, not just fill a content calendar.',
+            body: 'A more produced in-studio day for footage that has to carry a campaign, not pad a content calendar.',
             image: '/studio-images/canvas-production-2-v1775100125.jpg',
             alt: 'Commercial campaign production inside VibeShack Studios',
           },
           {
             eyebrow: 'Testimonials',
             title: 'Customer and interview videos',
-            body: 'Polished interview setups for sales pages, case studies, course content, executive updates, and brand proof.',
+            body: 'Real people, filmed well. Polished interviews for sales pages, case studies, course content, executive updates, and brand proof.',
             image: '/studio-images/parlor-production-v20260509.jpg',
             alt: 'Premium interview production at VibeShack Studios',
           },
@@ -108,7 +108,7 @@ export default function CommercialsPage() {
           { title: 'Brief', body: 'We define the offer, audience, usage, platform, length, examples, required shots, and final deliverables.' },
           { title: 'Scope', body: 'We decide if this is room-only, lightly supported, or a fuller production with direction, crew, set changes, and post needs.' },
           { title: 'Shoot', body: 'The schedule protects the hero take first, then captures alternate hooks, product angles, verticals, stills, and campaign support assets.' },
-          { title: 'Convert', body: 'The page points custom commercial work to inquiry, while simple room rentals stay bookable with live availability.' },
+          { title: 'Deliver', body: 'You leave with the hero cut plus the cutdowns, stills, and thumbnails scoped in the brief.' },
         ]}
         proofEyebrow="Commercial proof"
         proofTitle="Controlled rooms. Campaign-ready footage."

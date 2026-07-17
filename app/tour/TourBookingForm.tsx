@@ -190,7 +190,7 @@ export default function TourBookingForm() {
                   key={ds}
                   type="button"
                   onClick={() => selectDate(ds)}
-                  className={`flex flex-col items-center rounded-xl py-2.5 transition-all ${selected ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/[0.08]'}`}
+                  className={`flex flex-col items-center rounded-xl py-2.5 transition-colors ${selected ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/[0.08]'}`}
                 >
                   <span className="text-xs leading-none mb-1 opacity-60">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
                   <span className="text-sm font-black leading-none">{date.getDate()}</span>
@@ -207,7 +207,7 @@ export default function TourBookingForm() {
 
           {selectedDate && slotsLoading && (
             <div className="flex h-44 items-center justify-center border-t border-white/[0.08]">
-              <p className="text-gray-600 text-sm animate-pulse">Checking the studio calendar...</p>
+              <p className="text-gray-600 text-sm animate-pulse">Checking the studio calendar…</p>
             </div>
           )}
 
@@ -231,7 +231,7 @@ export default function TourBookingForm() {
                       type="button"
                       disabled={!slot.available}
                       onClick={() => slot.available && setSelectedSlot(slot.time)}
-                      className={`rounded-xl py-3 text-sm font-semibold transition-all ${
+                      className={`rounded-xl py-3 text-sm font-semibold transition-colors ${
                         !slot.available ? 'cursor-not-allowed text-gray-800 line-through'
                           : selected ? 'bg-brand-red text-white'
                             : 'text-gray-400 hover:bg-white/[0.08] hover:text-white'
@@ -287,7 +287,7 @@ export default function TourBookingForm() {
                   value={field.value}
                   onChange={(event) => field.set(event.target.value)}
                   placeholder={field.placeholder}
-                  className="w-full border-b border-white/20 bg-transparent pb-3 text-white placeholder-gray-700 focus:border-white/50 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-white placeholder-gray-700 focus:border-white/40 focus:outline-none"
                 />
               </div>
             ))}
@@ -309,9 +309,9 @@ export default function TourBookingForm() {
           <button
             type="submit"
             disabled={submitting || !availabilityVerified}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-black transition-all hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-black transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? 'Booking tour...' : 'Book Free Tour'}
+            {submitting ? 'Booking tour…' : 'Book Free Tour'}
           </button>
 
           <p className="mt-5 text-xs leading-relaxed text-gray-600">

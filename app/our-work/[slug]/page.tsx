@@ -60,9 +60,9 @@ export default async function WorkProjectPage({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
 
       <section className="bg-black pt-20 text-white">
-        <div className="mx-auto max-w-[1536px] px-6 pb-12 pt-7 sm:px-10 lg:px-[70px]">
+        <div className="mx-auto max-w-[1680px] px-6 pb-12 pt-7 sm:px-10 lg:px-16">
           <div className="mb-6 flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-5 sm:items-center">
-            <Link href="/our-work/" className="text-sm font-semibold text-white/48 transition-colors hover:text-white">
+            <Link href="/our-work/" className="text-sm font-semibold text-white/[0.48] transition-colors hover:text-white">
               Back to Our Work
             </Link>
             <p className="w-full text-left text-xs font-bold uppercase tracking-[0.16em] text-white/35 sm:w-auto sm:text-right">
@@ -98,7 +98,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
                   </svg>
                   Watch on YouTube
                 </a>
-                <Link href={project.serviceHref} className="text-sm font-semibold text-white/48 transition-colors hover:text-white">
+                <Link href={project.serviceHref} className="text-sm font-semibold text-white/[0.48] transition-colors hover:text-white">
                   Start a similar project
                 </Link>
               </div>
@@ -109,7 +109,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
                 <div className="relative aspect-video">
                   <iframe
                     src={`https://www.youtube-nocookie.com/embed/${project.youtubeId}`}
-                    title={`${project.title} — ${project.client}`}
+                    title={`${project.title} by ${project.client}`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerPolicy="strict-origin-when-cross-origin"
                     allowFullScreen
@@ -125,7 +125,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
 
       <main className="bg-black text-white">
         <section className="border-y border-white/10">
-          <div className="mx-auto grid max-w-[1536px] grid-cols-1 divide-y divide-white/10 px-6 sm:px-10 md:grid-cols-3 md:divide-x md:divide-y-0 lg:px-[70px]">
+          <div className="mx-auto grid max-w-[1680px] grid-cols-1 divide-y divide-white/10 px-6 sm:px-10 md:grid-cols-3 md:divide-x md:divide-y-0 lg:px-16">
             {[
               ['Client', project.client],
               ['Format', project.categoryLabel],
@@ -140,7 +140,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
         </section>
 
         <section className="border-b border-white/10 py-20 sm:py-24">
-          <div className="mx-auto max-w-[1536px] px-6 sm:px-10 lg:px-[70px]">
+          <div className="mx-auto max-w-[1680px] px-6 sm:px-10 lg:px-16">
             <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="number-label mb-5">Related</p>

@@ -38,7 +38,7 @@ export const STUDIOS: Studio[] = [
     prep: [
       'Have your talking points or outline ready.',
       'Hair & Makeup room on-site.',
-      "Wear what you'd wear on camera. Avoid busy patterns, fine stripes, or logos - solid colors film best.",
+      "Wear what you'd wear on camera. Avoid busy patterns, fine stripes, or logos. Solid colors film best.",
       'Everything is set up and ready when you arrive.',
     ],
   },
@@ -54,9 +54,9 @@ export const STUDIOS: Studio[] = [
     type: 'podcast',
     prep: [
       'Great for interviews and co-hosted formats.',
-      "Have your guest's name ready - we'll label their mic.",
+      "Have your guest's name ready and we'll label their mic.",
       'Hair & Makeup room on-site for both host and guest.',
-      "Arrive together or separately - we'll have both seats ready.",
+      "Arrive together or separately. Both seats will be ready.",
     ],
   },
   {
@@ -72,7 +72,7 @@ export const STUDIOS: Studio[] = [
     prep: [
       'Have your talking points or outline ready.',
       'Hair & Makeup room on-site.',
-      "Wear what you'd wear on camera. Avoid busy patterns, fine stripes, or logos - solid colors film best.",
+      "Wear what you'd wear on camera. Avoid busy patterns, fine stripes, or logos. Solid colors film best.",
       'Everything is set up and ready when you arrive.',
     ],
   },
@@ -87,8 +87,8 @@ export const STUDIOS: Studio[] = [
     includes: ['3-camera 4K setup', 'Broadcast microphones', 'Cameraman included', 'Programmable color backdrop', 'Two leather sofas', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
-      "Pick your backdrop color before you arrive - we'll have it set.",
-      "Wear what you'd wear on camera. Avoid busy patterns, fine stripes, or logos - solid colors film best.",
+      "Pick your backdrop color before you arrive and we'll have it set.",
+      "Wear what you'd wear on camera. Avoid busy patterns, fine stripes, or logos. Solid colors film best.",
       'Have your talking points ready.',
       'Everything is set up when you walk in.',
     ],
@@ -155,7 +155,7 @@ export const STUDIOS: Studio[] = [
     includes: ['750 sqft green screen', 'Full lighting grid', 'RED Komodo X available', 'Professional lighting', 'Floor-to-ceiling setup'],
     type: 'greenscreen',
     prep: [
-      'Avoid wearing green or bright lime - it will blend with the screen.',
+      'Avoid wearing green or bright lime. It blends with the screen.',
       'Solid colors work best. Avoid fine patterns or stripes.',
       'Bring your shot list or storyboard if you have one.',
       'Lighting is pre-rigged. Walk in and start shooting.',
@@ -172,7 +172,7 @@ export const STUDIOS: Studio[] = [
     includes: ['Professional lighting', 'White seamless backdrop', 'Hair & Makeup room', 'Kino Flo + ARRI lighting', 'Full vanity station'],
     type: 'photo',
     prep: [
-      'Hair & Makeup room on-site - arrive as you are.',
+      'Hair & Makeup room on-site. Arrive as you are.',
       'Bring 2-3 outfit options. More variety, more content.',
       'Bring any props, products, or branded items you want in frame.',
       'Lighting is set and calibrated before you walk in.',
@@ -189,7 +189,7 @@ export const STUDIOS: Studio[] = [
     includes: ['White cyc wall', 'Overhead lighting grid', 'Black floor mats', 'All equipment included'],
     type: 'photo',
     prep: [
-      'White backdrop works with almost any outfit - avoid all-white.',
+      'White backdrop works with almost any outfit. Avoid all-white.',
       'Great for headshots, product shots, and clean video content.',
       'Bring any products or props you want featured.',
       'Setup is ready when you walk in.',

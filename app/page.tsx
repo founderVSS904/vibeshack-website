@@ -6,14 +6,14 @@ import { WhatWeDo } from '@/components/home/WhatWeDo'
 import { StudioSpaces } from '@/components/home/StudioSpaces'
 
 export const metadata: Metadata = {
-  title: 'VibeShack Studios | San Francisco Production Studio',
+  title: { absolute: 'VibeShack Studios | San Francisco Production Studio' },
   description:
-    'Book podcast, video production, photography, branding, portfolio, and rental studio services at VibeShack Studios in San Francisco.',
+    'Podcast, video, and photo studios at 950 Battery St, San Francisco. Book by the hour, 24/7, from $100/hr.',
   alternates: { canonical: 'https://www.vibeshackstudios.com/' },
   openGraph: {
     title: 'VibeShack Studios | San Francisco Production Studio',
     description:
-      'Podcast, video production, photography, branding, portfolio, and rental studio services in San Francisco.',
+      'Podcast, video, and photo studios at 950 Battery St, San Francisco. Book by the hour, 24/7, from $100/hr.',
     url: 'https://www.vibeshackstudios.com/',
     images: [
       {
