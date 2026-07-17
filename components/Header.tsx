@@ -54,13 +54,6 @@ const planningLinks: HeaderLink[] = [
   { href: '/tour/', label: 'Tour the Studio', detail: 'Book a walkthrough before a bigger shoot' },
 ]
 
-const studioHubLinks: HeaderLink[] = [
-  { href: '/podcast-studio-san-francisco/', label: 'Podcast Studios', detail: 'Interview and show sets with cameras and audio' },
-  { href: '/rental-studios/', label: 'Rental Studios', detail: 'White cyc, green screen, photo rooms' },
-  { href: '/find-your-studio/', label: 'Find a Studio', detail: 'Choose by outcome, not guesswork' },
-  { href: '/book/', label: 'Book a Session', detail: 'Live availability and checkout' },
-]
-
 const proofLinks: HeaderLink[] = [
   { href: '/our-work/', label: 'Our Work', detail: 'Portfolio, music videos, campaigns, proof' },
   { href: '/made-at-vibeshack/', label: 'Brands That Trust Us', detail: 'See the trusted-by wall' },
@@ -311,100 +304,80 @@ function DesktopMenuTrigger({
 
 
 function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
-  const featured = podcastStudios[1]
-  const coreRows = podcastStudios.slice(2, 5)
   const showMedia = useContext(MenuMediaContext)
+  const podcastCore = podcastStudios.slice(1, 5) // The Executive, The Wing, Encore, Sunset
 
   return (
-    <DesktopMegaMenu
-      className="grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,1fr)_minmax(0,1fr)] gap-x-8 2xl:gap-x-12"
-      footer={
-        <div className="flex items-center gap-10 border-t border-white/[0.08] pt-5">
-          <MenuFooterLink href="/tour/" label="Tour the studio" onNavigate={onNavigate} />
-          <MenuFooterLink href="/compare/" label="Compare studios" onNavigate={onNavigate} />
-        </div>
-      }
-    >
-      <div>
-        <span className="relative block h-56 overflow-hidden rounded-lg border border-white/[0.08] 2xl:h-64">
-          {showMedia && featured.image && (
-            <Image src={featured.image} alt="The Executive podcast set at VibeShack Studios" fill sizes="768px" quality={85} className="object-cover" />
-          )}
-          <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" aria-hidden="true" />
-        </span>
-        <p className="mt-6 text-[2rem] font-bold leading-none tracking-tight text-white">
-          Choose your room<span className="text-brand-red">.</span>
-        </p>
-        <div className="mt-6 divide-y divide-white/[0.06]">
-          {studioHubLinks.map(({ href, label }) => (
-            <Link
-              key={href + label}
-              href={href}
-              prefetch={href === '/book/' ? false : undefined}
-              onClick={(event) => {
-                onNavigate()
-                event.currentTarget.blur()
-              }}
-              className="group/hub flex items-center justify-between py-3.5 text-[15px] font-medium text-zinc-300 transition-colors duration-300 hover:text-white"
-            >
-              {label}
-              <span className="text-zinc-600 transition-[transform,color] duration-300 group-hover/hub:translate-x-0.5 group-hover/hub:text-white" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                  <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-            </Link>
-          ))}
-        </div>
-      </div>
-
+    // Exactly FOUR direct grid children below: three room columns and the plan
+    // rail. The panel's reveal stagger (globals.css) only defines nth-child
+    // delays through 4. A fifth child would arrive with no delay and break the
+    // cascade, so keep this at four or add a nth-child(5) delay first.
+    <DesktopMegaMenu className="grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.9fr)] gap-x-8 2xl:gap-x-10">
       <div className="flex flex-col">
-        <MenuColumnHeader>Podcast Sets</MenuColumnHeader>
-        <Link
-          href={featured.href}
-          onClick={(event) => {
-            onNavigate()
-            event.currentTarget.blur()
-          }}
-          className="group/feat block overflow-hidden rounded-lg bg-white/[0.03] ring-1 ring-white/15 transition-[background-color,box-shadow] duration-300 hover:bg-white/[0.05] hover:ring-white/25"
-        >
-          <span className="relative block h-44 overflow-hidden">
-            {showMedia && featured.image && (
-              <Image src={featured.image} alt="" fill sizes="768px" quality={85} className="object-cover transition-transform duration-700 group-hover/feat:scale-[1.04]" />
-            )}
-            <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" aria-hidden="true" />
-            <span className="absolute inset-x-4 bottom-3.5 flex items-baseline justify-between gap-3">
-              <span className="text-[17px] font-bold leading-tight text-white">{featured.label}</span>
-              <span className="shrink-0 font-mono text-xs text-zinc-300">{featured.price}</span>
-            </span>
-          </span>
-        </Link>
-        <div className="mt-1 flex-1 divide-y divide-white/[0.06]">
-          {coreRows.map((room) => (
-            <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
+        <MenuColumnHeader>Podcast Studios</MenuColumnHeader>
+        <div className="divide-y divide-white/[0.06]">
+          {podcastCore.map((room, i) => (
+            <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} flagship={i === 0} />
           ))}
         </div>
-        <MenuViewAll href="/podcast-studio-san-francisco/" label="All podcast sets" onNavigate={onNavigate} />
+        <MenuViewAll href="/podcast-studio-san-francisco/" label="All podcast studios" onNavigate={onNavigate} />
       </div>
 
       <div className="flex flex-col">
         <MenuColumnHeader>Signature &amp; Custom</MenuColumnHeader>
-        <div className="flex-1 divide-y divide-white/[0.06]">
+        <div className="divide-y divide-white/[0.06]">
           {signaturePodcastStudios.map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
         </div>
-        <MenuViewAll href="/compare/" label="Compare all rooms" onNavigate={onNavigate} />
+        <p className="mt-auto border-t border-white/[0.06] pt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+          Custom builds on request
+        </p>
       </div>
 
       <div className="flex flex-col">
         <MenuColumnHeader>Rental Studios</MenuColumnHeader>
-        <div className="flex-1 divide-y divide-white/[0.06]">
+        <div className="divide-y divide-white/[0.06]">
           {rentalStudios.slice(1).map((room) => (
             <MenuRoomRow key={room.href} room={room} onNavigate={onNavigate} />
           ))}
         </div>
         <MenuViewAll href="/rental-studios/" label="All rental studios" onNavigate={onNavigate} />
+      </div>
+
+      {/* Plan rail: one tinted card that balances the panel and points at the
+          two actions that matter, Find a Studio and Book. */}
+      <div className="flex min-h-[300px] flex-col rounded-lg border border-white/[0.06] bg-white/[0.02] p-5">
+        <MenuColumnHeader>Plan Your Visit</MenuColumnHeader>
+        <Link
+          href="/find-your-studio/"
+          onClick={(event) => {
+            onNavigate()
+            event.currentTarget.blur()
+          }}
+          className="group/plan relative block h-28 overflow-hidden rounded-md ring-1 ring-white/10 transition-[box-shadow] duration-300 hover:ring-white/25"
+        >
+          {showMedia && (
+            <Image src="/studio-images/canvas-rental-space-v20260509.jpg" alt="" fill sizes="384px" quality={85} className="object-cover transition-transform duration-700 ease-out group-hover/plan:scale-[1.04]" />
+          )}
+          <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" aria-hidden="true" />
+          <span className="absolute inset-x-4 bottom-3.5 block">
+            <span className="block text-[12px] text-zinc-300">Not sure which room?</span>
+            <span className="mt-0.5 flex items-center gap-2 text-[15px] font-semibold text-white">
+              Find a Studio
+              <span className="transition-transform duration-300 group-hover/plan:translate-x-0.5" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </span>
+          </span>
+        </Link>
+        <div className="mt-auto divide-y divide-white/[0.06] pt-5">
+          <MenuPlanLink href="/book/" label="Book a Session" onNavigate={onNavigate} primary />
+          <MenuPlanLink href="/tour/" label="Tour the Studio" onNavigate={onNavigate} />
+          <MenuPlanLink href="/compare/" label="Compare Studios" onNavigate={onNavigate} />
+        </div>
       </div>
     </DesktopMegaMenu>
   )
@@ -439,7 +412,7 @@ function MenuViewAll({ href, label, onNavigate }: { href: string; label: string;
   )
 }
 
-function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () => void }) {
+function MenuRoomRow({ room, onNavigate, flagship = false }: { room: HeaderLink; onNavigate: () => void; flagship?: boolean }) {
   const showMedia = useContext(MenuMediaContext)
   return (
     <Link
@@ -448,40 +421,53 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/room -mx-3 flex items-center gap-4 rounded-lg px-3 py-3 transition-colors duration-300 hover:bg-white/[0.04]"
+      className="group/room -mx-3 flex items-center gap-4 rounded-lg px-3 py-3 transition-colors duration-200 hover:bg-white/[0.04]"
     >
-      <span className="relative h-[64px] w-[96px] shrink-0 overflow-hidden rounded-lg bg-white/5">
+      <span className="relative h-[64px] w-[96px] shrink-0 overflow-hidden rounded-md bg-white/5">
         {showMedia && room.image && (
-          <Image src={room.image} alt="" fill sizes="192px" quality={85} className="object-cover transition-transform duration-500 group-hover/room:scale-[1.06]" />
+          <Image src={room.image} alt="" fill sizes="192px" quality={85} className="object-cover transition-transform duration-500 ease-out group-hover/room:scale-[1.05]" />
         )}
       </span>
-      <span className="flex min-w-0 flex-1 items-baseline justify-between gap-3">
-        <span className="truncate text-[15px] font-medium leading-tight text-white">{room.label}</span>
-        {room.price && <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-300 group-hover/room:text-white">{room.price}</span>}
-      </span>
+      {flagship ? (
+        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-brand-red">Flagship</span>
+          <span className="flex items-baseline justify-between gap-3">
+            <span className="truncate text-[15px] font-medium leading-tight text-white">{room.label}</span>
+            {room.price && <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-200 group-hover/room:text-white">{room.price}</span>}
+          </span>
+          {room.detail && <span className="truncate text-xs text-zinc-500">{room.detail}</span>}
+        </span>
+      ) : (
+        <span className="flex min-w-0 flex-1 items-baseline justify-between gap-3">
+          <span className="truncate text-[15px] font-medium leading-tight text-white">{room.label}</span>
+          {room.price && <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-200 group-hover/room:text-white">{room.price}</span>}
+        </span>
+      )}
     </Link>
   )
 }
 
-function MenuFooterLink({ href, label, onNavigate }: { href: string; label: string; onNavigate: () => void }) {
+function MenuPlanLink({ href, label, onNavigate, primary = false }: { href: string; label: string; onNavigate: () => void; primary?: boolean }) {
   return (
     <Link
       href={href}
+      prefetch={href === '/book/' ? false : undefined}
       onClick={(event) => {
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/foot flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors duration-300 hover:text-white"
+      className={`group/planrow flex items-center justify-between py-3 text-[15px] font-medium transition-colors duration-300 hover:text-white ${primary ? 'text-white' : 'text-zinc-300'}`}
     >
       {label}
-      <span className="transition-transform duration-300 group-hover/foot:translate-x-0.5" aria-hidden="true">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+      <span className="text-zinc-600 transition-[transform,color] duration-300 group-hover/planrow:translate-x-0.5 group-hover/planrow:text-white" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
           <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </span>
     </Link>
   )
 }
+
 
 const serviceCards = [
   { href: '/commercials/', label: 'Commercials', detail: 'Launch ads, talking heads, product demos', kicker: 'Campaign ready', image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg' },

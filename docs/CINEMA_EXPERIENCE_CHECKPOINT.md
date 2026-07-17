@@ -2,7 +2,7 @@
 
 Checkpoint date: 2026-07-17  
 Owner: Tay / Emmanuel  
-Status: v012 Blender composition/lighting preview complete; owner approval, full-motion render, and real-website integration pending
+Status: v012 picture preview complete; QuickTime audio sync rejected; A/V repair, owner approval, 4K render, and real-website integration pending
 Primary local review URL: `http://localhost:3011/our-work/`
 
 ## 1. Purpose of this document
@@ -596,9 +596,21 @@ lenses rather than shiny plastic. No full v012 animation or 4K master has been
 rendered; the speed-first workflow keeps that work gated on owner approval. The
 first QuickTime attempt incorrectly used crossfades between seven still states
 and was rejected. It was replaced at the same path with a true continuous
-1280x720 Blender render of all 288 frames and correctly timed audio. The
-corrected movie validates as 288 H.264 frames at `24000/1001` plus 48 kHz
-stereo AAC and decodes end to end.
+1280x720 Blender render of all 288 frames. That replacement validates
+structurally as 288 H.264 frames at `24000/1001` plus 48 kHz stereo AAC and
+decodes end to end, but the owner then reported that its sound does not match
+the on-screen film. Its audio is rejected; do not use the `.mov` for approval
+or website integration.
+
+The screen film begins at Blender frame 73. At `24000/1001`, that is nominally
+3.003 seconds after frame 1. The screen reads a 168-frame PNG sequence from
+`blender/textures/video_sequences/the_client_v010_proof/`. The current v012
+mastering script trims the source master at 97.5 seconds and delays the audio by
+3003 ms, inherited from v010/v011 without a fresh visual sync check. The next
+builder must match sequence `frame_0001.png` to its exact source-master PTS,
+place that audio PTS at Blender frame 73, remux the existing continuous picture
+frames to a new `_avsync_fixed.mov`, and watch a visible sync event before
+claiming success. Container validation alone does not prove A/V sync.
 
 ## 10. Why the current hosted result is wrong
 
@@ -1048,18 +1060,25 @@ The next builder should perform these steps in order:
 
 1. Read `AGENTS.md`, `CLAUDE.md`, and this checkpoint.
 2. Verify the real local site is still available at `http://localhost:3011/our-work/`.
-3. Review `renders/theater_v012_composition_lighting_contact.jpg` and
+3. Treat `renders/theater_v012_continuous_quicktime_review.mov` as picture-only;
+   its audio sync is rejected and it is not an approval file.
+4. Match `the_client_v010_proof/frame_0001.png` to the exact source-master PTS,
+   align that audio PTS to Blender frame 73, and write a new
+   `theater_v012_continuous_quicktime_review_avsync_fixed.mov`.
+5. Watch picture and sound together at an observable sync event; do not rely
+   only on `ffprobe`, duration, or successful decoding.
+6. Review `renders/theater_v012_composition_lighting_contact.jpg` and
    `renders/theater_v011_to_v012_before_after.jpg` with the owner.
-4. If the corrected continuous v012 QuickTime, closer composition, and revised
+7. If the A/V-fixed continuous v012 QuickTime, closer composition, and revised
    practicals are approved, proceed to a new 4K master.
-5. Confirm the 16:9-to-2.35:1 screen policy and whether the tuned Eevee result
+8. Confirm the 16:9-to-2.35:1 screen policy and whether the tuned Eevee result
    is sufficient or requires a targeted Cycles comparison.
-6. Preserve the v011 Blender scene, corrected frames, and ProRes master as the
+9. Preserve the v011 Blender scene, corrected frames, and ProRes master as the
    validated motion reference. Keep v010 only as historical failure evidence.
-7. After proof approval, build the two-player crossfade prototype inside the
+10. After proof approval, build the two-player crossfade prototype inside the
    real Next.js `/our-work/` route.
-8. Validate seamless switching, playback, accessibility, and mobile fallback locally.
-9. Only after proof and web-transition approval, batch the three curated films.
+11. Validate seamless switching, playback, accessibility, and mobile fallback locally.
+12. Only after proof and web-transition approval, batch the three curated films.
 
 ## 22. Definition of done for the launch experience
 
@@ -1089,9 +1108,10 @@ theater feels unified.
 
 The mistake was not the v008 architecture. The mistake was treating its preview resolution and incomplete lighting animation as a reason to replace it with a separate browser video layer.
 
-The next decision is owner approval of the v012 look against the validated v011
-motion proof. After that, use the approved template for the three-film launch
-library and integrate the experience into the real VibeShack Next.js site at
-`http://localhost:3011/our-work/`.
+The immediate blocker is v012 audio sync. After a newly named A/V-fixed review
+passes an actual watch test, the next decision is owner approval of the v012
+look against the validated v011 motion proof. Only then should the approved
+template be used for the three-film launch library and integrated into the real
+VibeShack Next.js site at `http://localhost:3011/our-work/`.
 
 The future real-time 3D version should be pursued only as a measured scalability project that must match the approved Blender-integrated reference.
