@@ -113,7 +113,7 @@ export default function GreenScreenPage() {
         <div className="absolute inset-0 bg-black">
           <Image
             src="/studio-images/inside-green-screen-v20260509.jpg"
-            fill
+            fill sizes="100vw"
             className="object-cover"
             alt="750 sq ft green screen studio floor-to-ceiling hero view, VibeShack Studios San Francisco"
             style={{objectPosition: 'center center'}}
@@ -127,7 +127,7 @@ export default function GreenScreenPage() {
           <div className="max-w-lg">
             <h1
               className="font-black text-white leading-none mb-6"
-              style={{ fontSize: 'clamp(3.5rem, 7vw, 7rem)', letterSpacing: '-0.05em' }}
+              style={{ fontSize: 'clamp(3.5rem, 7vw, 7rem)', letterSpacing: 0 }}
             >
               Build Any<br/>
               <span className="text-brand-red">World.</span>
@@ -151,22 +151,22 @@ export default function GreenScreenPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/10">
             {/* Featured stat, biggest */}
             <div className="py-10 md:py-0 md:pr-16">
-              <div className="font-black text-white leading-none mb-2" style={{fontSize: 'clamp(4rem, 8vw, 7rem)', letterSpacing: '-0.05em'}}>750</div>
+              <div className="font-black text-white leading-none mb-2" style={{fontSize: 'clamp(4rem, 8vw, 7rem)', letterSpacing: 0}}>750</div>
               <div className="text-gray-500 text-sm mb-1">Square feet</div>
               <div className="text-gray-600 text-xs">Full production floor. Enough room for crew, equipment, and talent.</div>
             </div>
             {/* Two smaller stats */}
             <div className="py-10 md:py-0 md:px-16 flex flex-col justify-center">
-              <div className="font-black text-white leading-none mb-2" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>Floor-to-ceiling</div>
+              <div className="font-black text-white leading-none mb-2" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: 0}}>Floor-to-ceiling</div>
               <div className="text-gray-500 text-sm">Green Screen coverage. No corners. No seams. Any camera angle works.</div>
             </div>
             <div className="py-10 md:py-0 md:pl-16 flex flex-col justify-center gap-8">
               <div>
-                <div className="font-black text-brand-red leading-none mb-1" style={{fontSize: 'clamp(2rem, 3vw, 2.5rem)', letterSpacing: '-0.03em'}}>$100/hr</div>
+                <div className="font-black text-brand-red leading-none mb-1" style={{fontSize: 'clamp(2rem, 3vw, 2.5rem)', letterSpacing: 0}}>$100/hr</div>
                 <div className="text-gray-600 text-xs">1 hour minimum</div>
               </div>
               <div>
-                <div className="font-black text-white leading-none mb-1" style={{fontSize: 'clamp(2rem, 3vw, 2.5rem)', letterSpacing: '-0.03em'}}>24/7</div>
+                <div className="font-black text-white leading-none mb-1" style={{fontSize: 'clamp(2rem, 3vw, 2.5rem)', letterSpacing: 0}}>24/7</div>
                 <div className="text-gray-600 text-xs">Book any time, day or night</div>
               </div>
             </div>
@@ -185,7 +185,7 @@ export default function GreenScreenPage() {
             >
               <span
                 className="font-black text-white/[0.04] leading-none"
-                style={{ fontSize: '20vw', letterSpacing: '-0.06em', whiteSpace: 'nowrap' }}
+                style={{ fontSize: '20vw', letterSpacing: 0, whiteSpace: 'nowrap' }}
               >
                 750
               </span>
@@ -195,7 +195,7 @@ export default function GreenScreenPage() {
               <span className="number-label mb-12 block">Best Green Screen Uses</span>
               <h2
                 className="font-black text-white leading-tight mb-16"
-                style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}
+                style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}
               >
                 The most versatile<br />
                 <span className="text-brand-red">stage in SF.</span>
@@ -206,7 +206,7 @@ export default function GreenScreenPage() {
                     <span className="text-gray-700 text-xs tracking-widest font-mono w-6 flex-shrink-0">{index}</span>
                     <span
                       className="text-white font-black"
-                      style={{ fontSize: 'clamp(1.2rem, 2.5vw, 1.75rem)', letterSpacing: '-0.02em' }}
+                      style={{ fontSize: 'clamp(1.2rem, 2.5vw, 1.75rem)', letterSpacing: 0 }}
                     >
                       {label}
                     </span>
@@ -229,8 +229,8 @@ export default function GreenScreenPage() {
               { src: '/studio-images/greenscreen-shoot-2.jpg', alt: 'Production crew filming on green screen stage, VibeShack Studios San Francisco' },
               { src: '/studio-images/greenscreen-empty.jpg',   alt: 'Green screen studio empty stage ready for production, VibeShack Studios San Francisco' },
             ].map(({ src, alt }) => (
-              <div key={src} className="overflow-hidden rounded-xl relative" style={{height: '220px'}}>
-                <Image src={src} alt={alt} fill className="object-cover" />
+              <div key={src} className="overflow-hidden rounded-lg relative" style={{height: '220px'}}>
+                <Image src={src} alt={alt} fill sizes="100vw" className="object-cover" />
               </div>
             ))}
           </div>
@@ -240,17 +240,17 @@ export default function GreenScreenPage() {
                 alt="Green Screen Studio with professional overhead lighting grid, VibeShack Studios San Francisco"
                 width={800}
                 height={600}
-                className="w-full h-auto rounded-2xl"
+                className="w-full h-auto rounded-lg"
                 style={{ height: '600px', objectFit: 'cover' }}
               />
             <div>
               <span className="number-label mb-12 block">Specifications</span>
               <h2
                 className="font-black text-white leading-tight mb-12"
-                style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}
+                style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}
               >
-                Built for<br />
-                <span className="text-brand-red">professionals.</span>
+                Stage<br />
+                <span className="text-brand-red">specifications.</span>
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {specs.map(({ label, detail }) => (
@@ -271,7 +271,7 @@ export default function GreenScreenPage() {
           <span className="number-label mb-12 block">Pricing</span>
           <div
             className="font-black text-brand-red leading-none mb-2"
-            style={{ fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em' }}
+            style={{ fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0 }}
           >
             $100
           </div>
@@ -305,7 +305,7 @@ export default function GreenScreenPage() {
       <section className="py-32 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex items-end justify-between mb-20">
-            <h2 className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
+            <h2 className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0}}>
               Questions.
             </h2>
             <span className="number-label">FAQ</span>
@@ -326,16 +326,16 @@ export default function GreenScreenPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <p className="text-gray-600 text-xs uppercase tracking-widest mb-6">Also in the Creative Series</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <a href="/photography-studio-san-francisco/" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
-              <Image src="/studio-images/inside-photography-red-v20260509.jpg" alt="Photography Studio, Creative Series, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <a href="/photography-studio-san-francisco/" className="relative overflow-hidden rounded-lg group block" style={{height: '200px'}}>
+              <Image src="/studio-images/inside-photography-red-v20260509.jpg" alt="Photography Studio, Creative Series, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
                 <p className="text-white font-black">Photography Studio</p>
                 <p className="text-gray-400 text-xs">$100/hr · Hair & Makeup room</p>
               </div>
             </a>
-            <a href="/canvas-rental/" className="relative overflow-hidden rounded-2xl group block" style={{height: '200px'}}>
-              <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg" alt="Canvas, seamless white cyc wall, VibeShack Studios San Francisco" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <a href="/canvas-rental/" className="relative overflow-hidden rounded-lg group block" style={{height: '200px'}}>
+              <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg" alt="Canvas, seamless white cyc wall, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
                 <p className="text-white font-black">Canvas</p>
@@ -351,7 +351,7 @@ export default function GreenScreenPage() {
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
           <h2
             className="font-black text-white leading-none mb-4"
-            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}
+            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0 }}
           >
             Book the <span className="text-brand-red">Green Screen.</span>
           </h2>

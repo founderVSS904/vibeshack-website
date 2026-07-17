@@ -222,14 +222,14 @@ export default function GuidesPageClient() {
               VibeShack Field Guide
             </p>
             <h1 className="mt-6 text-white" style={{ fontSize: 'clamp(2.75rem, 4vw, 4rem)' }}>
-              Make the shoot feel easy<span className="text-brand-red">.</span>
+              Studio guides<span className="text-brand-red">.</span>
             </h1>
             <p className="mt-5 max-w-md text-base leading-relaxed text-zinc-300">
-              Clear answers for planning, producing, and leaving with exactly what you came for.
+              Planning notes for podcast, photo, green screen, and white cyc sessions at VibeShack.
             </p>
 
             <form
-              className="mt-8 flex max-w-lg items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.03] py-2 pl-6 pr-2 transition-colors focus-within:border-white/35"
+              className="mt-8 flex max-w-lg items-center gap-3 rounded-lg border border-white/15 bg-white/[0.03] py-2 pl-6 pr-2 transition-colors focus-within:border-white/35"
               onSubmit={(e) => {
                 e.preventDefault()
                 goToLibrary()
@@ -326,7 +326,7 @@ export default function GuidesPageClient() {
                   <span
                     className={`block h-2.5 w-2.5 rounded-full transition-[background-color,border-color,box-shadow] duration-300 ${
                       active
-                        ? 'bg-brand-red shadow-[0_0_0_6px_rgba(236,0,0,0.18),0_0_28px_rgba(236,0,0,0.55)]'
+                        ? 'bg-brand-red'
                         : 'border border-white/40 bg-black'
                     }`}
                   />
@@ -345,7 +345,7 @@ export default function GuidesPageClient() {
           </div>
 
           {/* Active station, docked below the compass so it never covers the gear */}
-          <div className="mt-4 flex items-center gap-6 rounded-xl border border-white/10 bg-[#0b0b0b] px-7 py-5">
+          <div className="mt-4 flex items-center gap-6 rounded-lg border border-white/10 bg-[#0b0b0b] px-7 py-5">
             <div className="flex shrink-0 items-baseline gap-3">
               <span className="font-mono text-[26px] leading-none text-brand-red">{station.n}</span>
               <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-white">{station.name}</span>
@@ -377,7 +377,7 @@ export default function GuidesPageClient() {
                     type="button"
                     onClick={() => pickStation(i)}
                     aria-pressed={active}
-                    className={`rounded-xl border px-2 py-3 text-center transition-colors ${
+                    className={`rounded-lg border px-2 py-3 text-center transition-colors ${
                       active ? 'border-brand-red' : 'border-white/10'
                     }`}
                   >
@@ -389,7 +389,7 @@ export default function GuidesPageClient() {
                 )
               })}
             </div>
-            <div key={station.n} className="booking-media-enter mt-3 rounded-xl border border-white/15 bg-white/[0.02] p-5">
+            <div key={station.n} className="booking-media-enter mt-3 rounded-lg border border-white/15 bg-white/[0.02] p-5">
               <p className="font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-white">{station.title}</p>
               <p className="mt-2.5 text-[13px] leading-relaxed text-zinc-400">{station.body}</p>
               <Link
@@ -446,7 +446,7 @@ export default function GuidesPageClient() {
               {/* Featured guide */}
               <Link
                 href={`/studio-guides/${featured.slug}/`}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0b] transition-colors hover:border-white/25 lg:flex-row"
+                className="group flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0b0b0b] transition-colors hover:border-white/25 lg:flex-row"
               >
                 <div className="flex flex-col p-8 lg:w-[54%] lg:p-10">
                   <span className="flex h-12 w-12 items-center justify-center rounded-full border border-brand-red/60">
@@ -486,7 +486,7 @@ export default function GuidesPageClient() {
                     <Link
                       key={guide.slug}
                       href={`/studio-guides/${guide.slug}/`}
-                      className="group relative flex flex-1 overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0b] transition-colors hover:border-white/25"
+                      className="group relative flex flex-1 overflow-hidden rounded-lg border border-white/10 bg-[#0b0b0b] transition-colors hover:border-white/25"
                     >
                       <div className="flex w-[58%] flex-col justify-center gap-4 p-7">
                         <span className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-red/60">

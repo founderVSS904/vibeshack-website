@@ -47,11 +47,11 @@ export default function PressPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pressSchema) }} />
 
       <section className="relative min-h-[78vh] flex items-end bg-black overflow-hidden">
-        <Image src="/studio-images/the-executive-hero.jpg" alt="VibeShack Studios podcast set in San Francisco" fill priority className="object-cover opacity-70" />
+        <Image src="/studio-images/the-executive-hero.jpg" alt="VibeShack Studios podcast set in San Francisco" fill sizes="100vw" priority className="object-cover opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-black/10" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-32 w-full">
           <p className="text-brand-red text-xs font-bold tracking-[0.25em] uppercase mb-6">Official Media Kit</p>
-          <h1 className="text-white font-black leading-none max-w-5xl" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.05em' }}>
+          <h1 className="text-white font-black leading-none max-w-5xl" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: 0 }}>
             VibeShack Studios.
           </h1>
           <p className="text-gray-300 text-lg leading-relaxed max-w-2xl mt-8">
@@ -75,14 +75,14 @@ export default function PressPage() {
 
             <div>
               <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Brand Architecture</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-px border border-white/10 bg-white/10 md:grid-cols-2">
                 {[
                   ['VibeShack', parentBrand.descriptor, parentBrand.shortDescription],
                   ['VibeShack Studios', 'Production arm / local studio', business.entityRelationship],
                 ].map(([name, role, copy]) => (
-                  <div key={name} className="rounded-2xl border border-white/10 bg-zinc-950 p-6">
+                  <div key={name} className="bg-black p-6">
                     <p className="text-brand-red text-xs font-bold tracking-[0.18em] uppercase mb-4">{role}</p>
-                    <h2 className="text-white font-black text-2xl mb-4" style={{ letterSpacing: '-0.03em' }}>{name}</h2>
+                    <h2 className="text-white font-black text-2xl mb-4" style={{ letterSpacing: 0 }}>{name}</h2>
                     <p className="text-gray-400 text-sm leading-relaxed">{copy}</p>
                   </div>
                 ))}
@@ -111,21 +111,21 @@ export default function PressPage() {
 
             <div>
               <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Founders</p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-px border border-white/10 bg-white/10 md:grid-cols-3">
                 {founders.map((founder) => {
                   const card = (
                     <>
-                      <h2 className="text-white font-black text-xl mb-2" style={{ letterSpacing: '-0.02em' }}>{founder.name}</h2>
+                      <h2 className="text-white font-black text-xl mb-2" style={{ letterSpacing: 0 }}>{founder.name}</h2>
                       <p className="text-gray-500 text-sm">{founder.role}</p>
                     </>
                   )
 
                   return founder.sameAs ? (
-                    <a key={founder.name} href={founder.sameAs} target="_blank" rel="noopener noreferrer" className="block rounded-2xl border border-white/10 p-6 hover:border-white/30 transition-colors">
+                    <a key={founder.name} href={founder.sameAs} target="_blank" rel="noopener noreferrer" className="block bg-black p-6 transition-colors hover:bg-zinc-950">
                       {card}
                     </a>
                   ) : (
-                    <div key={founder.name} className="block rounded-2xl border border-white/10 p-6">
+                    <div key={founder.name} className="block bg-black p-6">
                       {card}
                     </div>
                   )
@@ -135,10 +135,10 @@ export default function PressPage() {
 
             <div>
               <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Service Pages</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-px border border-white/10 bg-white/10 md:grid-cols-2">
                 {moneyPages.map((page) => (
-                  <Link key={page.href} href={page.href} className="block rounded-2xl border border-white/10 p-6 hover:border-white/30 transition-colors">
-                    <h2 className="text-white font-black text-xl mb-3" style={{ letterSpacing: '-0.02em' }}>{page.label}</h2>
+                  <Link key={page.href} href={page.href} className="block bg-black p-6 transition-colors hover:bg-zinc-950">
+                    <h2 className="text-white font-black text-xl mb-3" style={{ letterSpacing: 0 }}>{page.label}</h2>
                     <p className="text-gray-500 text-sm leading-relaxed">{page.description}</p>
                   </Link>
                 ))}
@@ -147,9 +147,9 @@ export default function PressPage() {
 
             <div>
               <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Peerspace Footprint</p>
-              <div className="space-y-3">
+              <div className="divide-y divide-white/10 border-y border-white/10">
                 {peerspaceListings.map((listing) => (
-                  <a key={listing.href} href={listing.href} target="_blank" rel="noopener noreferrer" className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 rounded-2xl border border-white/10 p-5 hover:border-white/30 transition-colors">
+                  <a key={listing.href} href={listing.href} target="_blank" rel="noopener noreferrer" className="grid grid-cols-1 gap-3 px-1 py-5 transition-colors hover:bg-white/[0.025] md:grid-cols-[1fr_auto]">
                     <span>
                       <span className="block text-white font-bold">{listing.name}</span>
                       <span className="block text-gray-500 text-sm mt-1">{listing.serviceType}</span>
@@ -163,7 +163,7 @@ export default function PressPage() {
           </div>
 
           <aside className="lg:sticky lg:top-28 self-start">
-            <div className="rounded-2xl border border-white/10 bg-zinc-950 p-8">
+            <div className="rounded-lg border border-white/10 bg-zinc-950 p-8">
               <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6">Official Links</p>
               <div className="space-y-4">
                 <a href={business.mapUrl} target="_blank" rel="noopener noreferrer" className="block text-white hover:text-brand-red transition-colors">Google Maps →</a>
@@ -176,7 +176,7 @@ export default function PressPage() {
                 <a href={`tel:${business.phone.replace(/[^\d+]/g, '')}`} className="block text-gray-400 hover:text-white transition-colors">{business.phone}</a>
               </div>
               <div className="border-t border-white/10 mt-8 pt-8">
-                <Link href="/book/" prefetch={false} className="inline-flex items-center justify-center w-full bg-white text-black font-bold rounded-full px-6 py-4 hover:bg-gray-100 transition-colors">
+                <Link href="/book/" prefetch={false} className="inline-flex items-center justify-center w-full bg-white text-black font-bold rounded-lg px-6 py-4 hover:bg-gray-100 transition-colors">
                   Book a Session
                 </Link>
               </div>

@@ -140,12 +140,12 @@ export default function ServicesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceItemList) }}
       />
 
-      <section className="relative min-h-[86vh] overflow-hidden bg-black border-b border-white/10">
+      <section className="relative min-h-[80svh] overflow-hidden bg-black border-b border-white/10 lg:min-h-[82vh]">
         <div className="absolute inset-0">
           <Image
             src="/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg"
             alt="Blue-lit production set at VibeShack Studios San Francisco"
-            fill
+            fill sizes="100vw"
             priority
             className="object-cover"
             style={{ objectPosition: 'center center' }}
@@ -154,26 +154,26 @@ export default function ServicesPage() {
           <div className="absolute inset-0 lg:hidden" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.2) 38%, rgba(0,0,0,0.68) 100%)' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.18) 28%, transparent 58%)' }} />
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-32 pb-10 min-h-[86vh] flex flex-col justify-between">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-32 pb-10 min-h-[80svh] lg:min-h-[82vh] flex flex-col justify-between">
           <div className="max-w-xl pt-6 lg:pt-10">
             <p className="number-label mb-6">Services</p>
             <h1 className="font-black text-white leading-[0.98] max-w-xl mb-6" style={{ fontSize: 'clamp(2.35rem, 4vw, 4.05rem)', letterSpacing: 0 }}>
-              Choose the right path for the shoot.
+              Production services<span className="text-brand-red">.</span>
             </h1>
             <p className="text-gray-200 text-base leading-relaxed max-w-lg">
-              Start with what you are making. Some paths book directly, some start with a brief, and the work is always one click away.
+              Podcast production, campaign video, editorial photography, branding, and studio rentals at 950 Battery St.
             </p>
           </div>
 
-          <div className="mt-12 flex flex-wrap gap-2 lg:max-w-3xl">
+          <div className="mt-12 grid border-y border-white/15 sm:grid-cols-3 lg:max-w-3xl">
             {[
               ['01', 'Custom creative work'],
               ['02', 'Podcast production'],
-              ['03', 'Room-only rentals'],
+              ['03', 'Studio rentals'],
             ].map(([n, label]) => (
-              <div key={n} className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-black/20 px-4 py-2.5 backdrop-blur-sm">
-                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.18em]">{n}</p>
-                <p className="text-white text-sm font-semibold">{label}</p>
+              <div key={n} className="flex items-center gap-3 py-4 sm:border-l sm:border-white/15 sm:px-5 sm:first:border-l-0 sm:first:pl-0">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">{n}</p>
+                <p className="text-sm font-semibold text-white">{label}</p>
               </div>
             ))}
           </div>
@@ -201,7 +201,7 @@ export default function ServicesPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {services.map(({ href, title, eyebrow, image, alt, body, price, fit }) => (
-              <Link key={href} href={href} className="group flex min-h-[520px] flex-col overflow-hidden rounded-xl border border-white/10 bg-zinc-950 hover:border-white/25 transition-colors">
+              <Link key={href} href={href} className="group flex min-h-[520px] flex-col overflow-hidden rounded-lg border border-white/10 bg-zinc-950 hover:border-white/25 transition-colors">
                 <div className="relative h-64 overflow-hidden">
                   <Image src={image} alt={alt} fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" />
                   <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.72), transparent 58%)' }} />

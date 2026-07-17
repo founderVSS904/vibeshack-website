@@ -80,7 +80,7 @@ const RECOMMENDATIONS: Record<string, Recommendation> = {
   'greenscreen-solo-yes':   { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Your crew gets the full 750 sqft green screen room and pre-rigged lighting grid.' },
   'greenscreen-two-yes':    { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'A clean chroma setup with enough space to operate cameras and lights properly.' },
   'greenscreen-small-yes':  { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Space for crew, talent, camera lanes, and proper background separation.' },
-  'greenscreen-large-yes':  { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Built for larger green screen productions that need room to stage and shoot.' },
+  'greenscreen-large-yes':  { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'The larger green screen stage leaves room for talent, camera movement, and lighting.' },
   'notsure-solo-no':        { primary: 'the-executive',   others: ['sunset', 'photography'], reason: 'Start with a tour. We can show you what changes when the goal is podcast, video, or photo.' },
   'notsure-two-no':         { primary: 'the-executive',   others: ['parlor', 'photography'], reason: 'Start with a tour and we will match the room to your format, crew, and final deliverables.' },
   'notsure-small-no':       { primary: 'canvas-podcast',  others: ['horizon', 'green-screen'], reason: 'Start with a tour because setup choice matters more once guests, crew, and gear increase.' },
@@ -244,7 +244,7 @@ export default function FindYourStudioPage() {
 
             {/* Question, context-aware label for Q2 */}
             <h1 className="text-white font-black mb-16"
-              style={{fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', letterSpacing: '-0.04em', lineHeight: 1.05}}>
+              style={{fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', letterSpacing: 0, lineHeight: 1.05}}>
               {questionText}
             </h1>
 
@@ -259,7 +259,7 @@ export default function FindYourStudioPage() {
                   }`}>
                   <span className={`font-semibold text-lg transition-colors duration-150 ${
                     selecting === opt.id ? 'text-brand-red' : 'text-gray-300 group-hover:text-white'
-                  }`} style={{letterSpacing: '-0.01em'}}>
+                  }`} style={{letterSpacing: 0}}>
                     {opt.label}
                   </span>
                   <span className={`text-sm transition-colors duration-150 flex-shrink-0 ml-4 ${
@@ -290,7 +290,7 @@ export default function FindYourStudioPage() {
             </button>
             <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-4">Your match</p>
             <h1 className="text-white font-black leading-none"
-              style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.05em'}}>
+              style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0}}>
               {primary?.name}
             </h1>
           </div>
@@ -298,23 +298,23 @@ export default function FindYourStudioPage() {
           {/* Primary studio hero */}
           {primary && (
             <a href={primary.href}
-              className="block rounded-2xl overflow-hidden mb-4 group relative h-[340px] sm:h-[420px]">
+              className="block rounded-lg overflow-hidden mb-4 group relative h-[340px] sm:h-[420px]">
               <Image src={primary.img} alt={primary.name}
-                fill
+                fill sizes="100vw"
                 className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
                 priority />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 50%, transparent 80%)'}} />
               <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="text-white font-black text-2xl mb-1" style={{letterSpacing: '-0.03em'}}>{primary.name}</p>
+                  <p className="text-white font-black text-2xl mb-1" style={{letterSpacing: 0}}>{primary.name}</p>
                   <p className="text-gray-400 text-sm">{rec?.reason}</p>
                 </div>
                 <div className="sm:text-right flex-shrink-0 sm:ml-6">
                   {primary.priceLabel ? (
-                    <p className="text-white font-black text-xl" style={{letterSpacing: '-0.03em'}}>{primary.priceLabel}</p>
+                    <p className="text-white font-black text-xl" style={{letterSpacing: 0}}>{primary.priceLabel}</p>
                   ) : (
                     <>
-                      <p className="text-white font-black text-2xl" style={{letterSpacing: '-0.03em'}}>${primary.price}</p>
+                      <p className="text-white font-black text-2xl" style={{letterSpacing: 0}}>${primary.price}</p>
                       <p className="text-gray-500 text-xs">/hr</p>
                     </>
                   )}
@@ -327,7 +327,7 @@ export default function FindYourStudioPage() {
           <div className="flex flex-wrap gap-3 mb-16">
             {primary && (
               <a href={primaryCtaHref}
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-100 transition-colors">
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-black font-bold text-sm rounded-lg hover:bg-gray-100 transition-colors">
                 {isPhotoServicesMatch ? 'Start a photo request' : shouldTourFirst ? 'Book a free tour' : 'Book this studio'}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -335,7 +335,7 @@ export default function FindYourStudioPage() {
               </a>
             )}
             <a href={isPhotoServicesMatch ? '/photography-studio-san-francisco/' : shouldTourFirst ? '/pricing/' : `/tour/?studio=${rec?.primary}`}
-              className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/20 text-white text-sm font-semibold rounded-full hover:border-white/40 transition-colors">
+              className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/20 text-white text-sm font-semibold rounded-lg hover:border-white/40 transition-colors">
               {isPhotoServicesMatch ? 'Need room-only rental?' : shouldTourFirst ? 'View pricing' : 'Book a free tour'}
             </a>
             <button onClick={reset}
@@ -350,10 +350,10 @@ export default function FindYourStudioPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {otherStudios.map((s) => (
                   <a key={s.id} href={s.href}
-                    className="block rounded-2xl overflow-hidden group">
+                    className="block rounded-lg overflow-hidden group">
                     <div className="relative h-[170px]">
                       <Image src={s.img} alt={s.name}
-                        fill
+                        fill sizes="100vw"
                         className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out" />
                       <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 62%)'}} />
                       <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 flex items-end justify-between gap-4">
@@ -386,10 +386,10 @@ export default function FindYourStudioPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {studios.map((s) => (
                       <a key={s.id} href={s.href}
-                        className="block rounded-2xl overflow-hidden group">
+                        className="block rounded-lg overflow-hidden group">
                         <div className="relative h-[160px]">
                           <Image src={s.img} alt={s.name}
-                            fill
+                            fill sizes="100vw"
                             className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out" />
                           <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 55%)'}} />
                           <div className="absolute bottom-0 left-0 right-0 px-5 pb-3">

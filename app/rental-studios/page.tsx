@@ -46,7 +46,7 @@ const studios = [
 const rentalFaqs = [
   {
     question: 'What rental studios are available at VibeShack?',
-    answer: 'You can rent Canvas, the Photography Studio, and the Green Screen Studio. They are built for photo, video, product, social, and creator shoots.',
+    answer: 'You can rent Canvas, the Photography Studio, and the Green Screen Studio for photo, video, product, social, and creator shoots.',
   },
   {
     question: 'Can I bring my own crew and equipment?',
@@ -86,12 +86,12 @@ export default function RentalStudiosPage() {
       <section className="relative min-h-[70vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg"
           alt="VibeShack Rental Studios San Francisco"
-          fill className="object-cover"
+          fill sizes="100vw" className="object-cover"
           style={{opacity: 0.7, objectPosition: 'center'}} priority />
         <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, transparent 70%)'}} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-gray-500 text-xs tracking-[0.3em] uppercase mb-4">VibeShack Studios · SF Northern Waterfront</p>
-          <h1 className="font-black text-white leading-none mb-4" style={{fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: '-0.05em'}}>
+          <h1 className="font-black text-white leading-none mb-4" style={{fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: 0}}>
             Rental<br /><span className="text-brand-red">Studios.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl">
@@ -106,10 +106,10 @@ export default function RentalStudiosPage() {
           <div className="space-y-3">
             {studios.map((s, i) => (
               <div key={s.name}
-                className="relative block overflow-hidden rounded-2xl group studio-card"
+                className="relative block overflow-hidden rounded-lg group studio-card"
                 style={{height: '420px'}}>
                 <Image src={s.img} alt={s.name}
-                  fill className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out" />
+                  fill sizes="100vw" className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out" />
                 <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)'}} />
 
                 {/* Series label */}
@@ -127,7 +127,7 @@ export default function RentalStudiosPage() {
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 px-8 pb-8 flex items-end justify-between">
                   <div>
-                    <a href={s.href} className="text-white font-black mb-1 inline-block hover:text-gray-200 transition-colors" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em'}}>{s.name}</a>
+                    <a href={s.href} className="text-white font-black mb-1 inline-block hover:text-gray-200 transition-colors" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: 0}}>{s.name}</a>
                     <p className="text-gray-400 text-sm max-w-md">{s.desc}</p>
                   </div>
                   <div className="flex-shrink-0 ml-8 text-right">
@@ -151,7 +151,7 @@ export default function RentalStudiosPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
               <span className="number-label mb-8 block">Every Rental</span>
-              <h2 className="font-black text-white leading-none mb-8" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+              <h2 className="font-black text-white leading-none mb-8" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0}}>
                 Your crew.<br /><span className="text-brand-red">Our space.</span>
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
@@ -179,8 +179,8 @@ export default function RentalStudiosPage() {
                 { src: '/studio-images/podcast-cyc-duo.jpg', alt: 'Two hosts recording on a podcast set' },
                 { src: '/studio-images/greenscreen-empty.jpg', alt: 'The green screen stage with a camera set up' },
               ].map(({ src, alt }) => (
-                <div key={src} className="overflow-hidden rounded-xl">
-                  <Image src={src} alt={alt} width={400} height={180} className="w-full object-cover" style={{height: '180px'}} />
+                <div key={src} className="relative h-[180px] overflow-hidden rounded-lg">
+                  <Image src={src} alt={alt} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
                 </div>
               ))}
             </div>
@@ -192,7 +192,7 @@ export default function RentalStudiosPage() {
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex items-end justify-between mb-16">
-            <h2 className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
+            <h2 className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0}}>
               Rental studio<br /><span className="text-brand-red">questions.</span>
             </h2>
             <span className="number-label">FAQ</span>
@@ -211,7 +211,7 @@ export default function RentalStudiosPage() {
       {/* CTA */}
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <h2 className="font-black text-white leading-tight mb-6" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
+          <h2 className="font-black text-white leading-tight mb-6" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0}}>
             Need a cameraman too?<br /><span className="text-brand-red">We&apos;ve got you.</span>
           </h2>
           <p className="text-gray-500 text-lg mb-10">Upgrade to a Podcast Studio and we handle the whole production.</p>
@@ -219,7 +219,7 @@ export default function RentalStudiosPage() {
             <a href="/book/?studio=canvas-rental" className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book a Rental <span aria-hidden>→</span>
             </a>
-            <a href="/podcast-studio-san-francisco/" className="inline-flex items-center gap-3 px-8 py-4 border border-white/20 text-white font-semibold text-sm rounded-full hover:border-white/40 transition-colors">
+            <a href="/podcast-studio-san-francisco/" className="inline-flex items-center gap-3 px-8 py-4 border border-white/20 text-white font-semibold text-sm rounded-lg hover:border-white/40 transition-colors">
               View Podcast Studios
             </a>
           </div>

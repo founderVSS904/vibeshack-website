@@ -152,7 +152,7 @@ export default function PhotographyStudioPage() {
         <div className="absolute inset-0">
           <Image
             src="/studio-images/photography-hero-service-v20260509.jpg"
-            fill
+            fill sizes="100vw"
             className="object-cover"
             alt="Fashion campaign photography created at VibeShack Studios San Francisco"
             style={{ objectPosition: 'center right' }}
@@ -210,8 +210,8 @@ export default function PhotographyStudioPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-16 items-start">
             <div>
               <span className="number-label mb-6 block">The point</span>
-              <h2 className="text-white font-black leading-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
-                More than a room. A repeatable visual system.
+              <h2 className="text-white font-black leading-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
+                Backdrops, white cyc, and makeup space in one studio.
               </h2>
               <p className="text-gray-500 text-base leading-relaxed mb-8">
                 Strong photo sessions are planned around the final use: website hero, press bio, product page, ad creative, cover art, social crop, or sales deck. The studio gives you the control to shoot those variations without changing locations.
@@ -222,8 +222,8 @@ export default function PhotographyStudioPage() {
                   ['24/7', 'Live availability'],
                   ['1 address', 'Studio, makeup, staging'],
                 ].map(([value, label]) => (
-                  <div key={value} className="border border-white/10 rounded-2xl p-5 bg-zinc-950">
-                    <p className="text-white font-black text-2xl leading-none mb-2" style={{ letterSpacing: '-0.035em' }}>{value}</p>
+                  <div key={value} className="border border-white/10 rounded-lg p-5 bg-zinc-950">
+                    <p className="text-white font-black text-2xl leading-none mb-2" style={{ letterSpacing: 0 }}>{value}</p>
                     <p className="text-gray-600 text-xs leading-relaxed">{label}</p>
                   </div>
                 ))}
@@ -231,15 +231,15 @@ export default function PhotographyStudioPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="relative h-[520px] rounded-2xl overflow-hidden">
-                <Image src="/studio-images/photography-room-red-backdrop-v20260509.jpg" alt="Photography room with red backdrop at VibeShack Studios San Francisco" fill className="object-cover" />
+              <div className="relative h-[520px] rounded-lg overflow-hidden">
+                <Image src="/studio-images/photography-room-red-backdrop-v20260509.jpg" alt="Photography room with red backdrop at VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="space-y-3">
-                <div className="relative h-[254px] rounded-2xl overflow-hidden">
-                  <Image src="/studio-images/photography-cyc-editorial-v20260509.jpg" alt="Editorial photography created on a white cyc at VibeShack Studios San Francisco" fill className="object-cover" />
+                <div className="relative h-[254px] rounded-lg overflow-hidden">
+                  <Image src="/studio-images/photography-cyc-editorial-v20260509.jpg" alt="Editorial photography created on a white cyc at VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover" />
                 </div>
-                <div className="relative h-[254px] rounded-2xl overflow-hidden">
-                  <Image src="/studio-images/drive-video-studio.jpg" alt="Hair and makeup room at VibeShack Studios San Francisco" fill className="object-cover" />
+                <div className="relative h-[254px] rounded-lg overflow-hidden">
+                  <Image src="/studio-images/drive-video-studio.jpg" alt="Hair and makeup room at VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover" />
                 </div>
               </div>
             </div>
@@ -252,8 +252,8 @@ export default function PhotographyStudioPage() {
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-14">
             <div>
               <span className="number-label mb-6 block">What to shoot here</span>
-              <h2 className="text-white font-black leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
-                Built for the photos your shoot actually needs.
+              <h2 className="text-white font-black leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
+                A practical studio for the full shot list.
               </h2>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed max-w-md">
@@ -263,8 +263,8 @@ export default function PhotographyStudioPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {shootTypes.map(({ title, pressure, roomAdvantage }) => (
-              <div key={title} className="rounded-2xl border border-white/10 bg-black p-7">
-                <h3 className="text-white font-black text-2xl mb-5 leading-none" style={{ letterSpacing: '-0.03em' }}>{title}</h3>
+              <div key={title} className="rounded-lg border border-white/10 bg-black p-7">
+                <h3 className="text-white font-black text-2xl mb-5 leading-none" style={{ letterSpacing: 0 }}>{title}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-white/10 pt-5">
                   <div>
                     <p className="text-gray-600 text-[10px] tracking-[0.22em] uppercase mb-3">What matters</p>
@@ -286,7 +286,7 @@ export default function PhotographyStudioPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-16">
             <div>
               <span className="number-label mb-6 block">Plan the session</span>
-              <h2 className="text-white font-black leading-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+              <h2 className="text-white font-black leading-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
                 The shoot gets better before anyone arrives.
               </h2>
               <p className="text-gray-500 text-sm leading-relaxed max-w-md">
@@ -310,7 +310,7 @@ export default function PhotographyStudioPage() {
           <div className="flex items-end justify-between mb-12">
             <div>
               <span className="number-label mb-6 block">Shot here</span>
-              <h2 className="text-white font-black leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+              <h2 className="text-white font-black leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
                 Real photo work, not placeholder polish.
               </h2>
             </div>
@@ -319,7 +319,7 @@ export default function PhotographyStudioPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             {gallery.map(({ src, alt, label }, index) => (
-              <div key={src} className={`relative overflow-hidden rounded-2xl ${index === 0 ? 'md:col-span-2 md:row-span-2 h-[520px]' : 'h-[254px]'}`}>
+              <div key={src} className={`relative overflow-hidden rounded-lg ${index === 0 ? 'md:col-span-2 md:row-span-2 h-[520px]' : 'h-[254px]'}`}>
                 <Image src={src} alt={alt} fill className="object-cover" sizes={index === 0 ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 768px) 25vw, 100vw'} />
                 <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 48%)' }} />
                 <p className="absolute bottom-4 left-4 text-white text-sm font-semibold">{label}</p>
@@ -334,14 +334,14 @@ export default function PhotographyStudioPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-16">
             <div>
               <span className="number-label mb-6 block">Included</span>
-              <h2 className="text-white font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+              <h2 className="text-white font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
                 The boring details that save the shoot.
               </h2>
               <Link href="/book/?studio=photography" className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
                 Book Studio Rental
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 border border-white/10 rounded-2xl overflow-hidden">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 border border-white/10 rounded-lg overflow-hidden">
               {included.map((item) => (
                 <div key={item} className="p-5 border-b sm:odd:border-r border-white/10">
                   <p className="text-gray-300 text-sm font-semibold">{item}</p>
@@ -357,7 +357,7 @@ export default function PhotographyStudioPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[0.75fr_1.25fr] gap-16 items-start">
             <div>
               <span className="number-label mb-6 block">Pricing</span>
-              <div className="font-black text-brand-red leading-none mb-3" style={{ fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.055em' }}>
+              <div className="font-black text-brand-red leading-none mb-3" style={{ fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0 }}>
                 $100
               </div>
               <p className="text-white font-semibold mb-2">per hour for studio rental</p>
@@ -381,7 +381,7 @@ export default function PhotographyStudioPage() {
       <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
           <p className="number-label mb-8">Ready</p>
-          <h2 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', letterSpacing: '-0.05em' }}>
+          <h2 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', letterSpacing: 0 }}>
             Book the room that makes the photo look intentional.
           </h2>
           <p className="text-gray-500 text-lg mb-10">

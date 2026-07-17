@@ -102,11 +102,11 @@ export default function SunsetPage() {
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/sunset-hero-v20260509.jpg"
           alt="Sunset studio with warm golden backdrop lighting"
-          fill className="object-cover opacity-85" priority />
+          fill sizes="100vw" className="object-cover opacity-85" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">Creative Series</p>
-          <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>
+          <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: 0}}>
             Sunset<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8">
@@ -122,7 +122,7 @@ export default function SunsetPage() {
       {/* Choose Your Mood - Carousel */}
       <section className="py-32 bg-black border-t border-white/5 overflow-hidden" data-carousel>
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 mb-12">
-          <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+          <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0}}>
             Choose your <span className="text-brand-red">mood.</span>
           </h2>
         </div>
@@ -215,7 +215,7 @@ export default function SunsetPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features */}
             <div>
-              <h2 className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+              <h2 className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: 0}}>
                 You control<br/>the <span className="text-brand-red">mood.</span>
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
@@ -235,7 +235,7 @@ export default function SunsetPage() {
             </div>
             {/* Right: Photo */}
             <div>
-              <Image src="/studio-images/sunset-hero-v20260509.jpg" alt="Sunset studio setup" width={800} height={600} className="w-full h-auto rounded-3xl" />
+              <Image src="/studio-images/sunset-hero-v20260509.jpg" alt="Sunset studio setup" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -245,7 +245,7 @@ export default function SunsetPage() {
       <section className="py-32 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">The Difference</span>
-          <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+          <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0}}>
             Programmable <span className="text-brand-red">means you decide.</span>
           </h2>
           <p className="text-gray-500 text-lg mb-20 max-w-2xl">Every color is pre-calibrated and one dial away. Don't compromise on the mood your show needs. Paint the room to match your vision, not the other way around.</p>
@@ -254,10 +254,10 @@ export default function SunsetPage() {
             {/* Detail 1 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/sunset-detail-02.jpg" alt="Sunset warm orange tones" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/sunset-detail-02.jpg" alt="Sunset warm orange tones" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
               <div className="order-2">
-                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Warm Tones Make People Look Human</h3>
+                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Warm Tones Make People Look Human</h3>
                 <p className="text-gray-400 text-lg leading-relaxed mb-4">Gold. Orange. Warm reds. These colors do the heavy lifting for you. They make skin look healthy. They feel intimate. They photograph true to what people expect. Most shows live in these tones for a reason. One dial does all of it.</p>
                 <p className="text-gray-500 text-sm">Podcast hosts use this. Creators use this. Brands use this.</p>
               </div>
@@ -266,12 +266,12 @@ export default function SunsetPage() {
             {/* Detail 2 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1">
-                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: '-0.02em'}}>Bold Colors Stop Scrolls</h3>
+                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Bold Colors Stop Scrolls</h3>
                 <p className="text-gray-400 text-lg leading-relaxed mb-4">Red. Purple. Magenta. White. Blue. Saber Green. When you need your show to command attention, paint the room. Your audience's eyes lock in. Your brand pops out of the feed. Energy, edge, presence you can't ignore. All from the color dial. No gels. No rewiring. One turn.</p>
                 <p className="text-gray-500 text-sm">Music videos and comedy specials book this room for exactly this.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/sunset-detail-01.jpg" alt="Sunset bold red colors" width={800} height={600} className="w-full h-auto rounded-3xl object-cover" />
+                <Image src="/studio-images/sunset-detail-01.jpg" alt="Sunset bold red colors" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
             </div>
           </div>
@@ -371,7 +371,7 @@ export default function SunsetPage() {
                   }}
                 />
               </svg>
-              <div className="rounded-2xl border border-white/10 bg-zinc-950/80 p-5 text-center lg:text-left">
+              <div className="rounded-lg border border-white/10 bg-zinc-950/80 p-5 text-center lg:text-left">
                 <p className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-2">Selected mood</p>
                 <p className="text-white text-2xl font-black" style={{ color: activeWheelColor.color }}>
                   {activeWheelColor.label}
@@ -382,10 +382,10 @@ export default function SunsetPage() {
             
             {/* Right: CTA */}
             <div>
-              <h2 className="text-white font-black leading-none mb-6" style={{fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+              <h2 className="text-white font-black leading-none mb-6" style={{fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', letterSpacing: 0}}>
                 Pick your <span style={{color: activeWheelColor.color}}>color.</span>
               </h2>
-              <h3 className="text-white font-black leading-none mb-8" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em', color: activeWheelColor.color}}>
+              <h3 className="text-white font-black leading-none mb-8" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: 0, color: activeWheelColor.color}}>
                 {activeWheelColor.label}. We'll handle the rest.
               </h3>
               <p className="text-gray-400 text-base mb-12">$300/hr · Cameraman included · Open 24/7</p>
@@ -402,7 +402,7 @@ export default function SunsetPage() {
       <section className="py-32 bg-zinc-950 border-t border-white/5">
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
-          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em'}}>$300</div>
+          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>$300</div>
           <p className="text-gray-500 text-lg mb-1">per hour</p>
           <p className="text-white font-semibold mb-12">Cameraman included. 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
@@ -430,16 +430,16 @@ export default function SunsetPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="mb-16">
             <span className="number-label mb-6 block">More Studios</span>
-            <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em'}}>
+            <h2 className="text-white font-black leading-none" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0}}>
               Other rooms in the<br/><span className="text-brand-red">Creative Series.</span>
             </h2>
           </div>
-          <a href="/canvas-podcast/" className="relative overflow-hidden rounded-3xl group block w-full" style={{height: '400px'}}>
-            <Image src="/studio-images/parlor-hero.jpg" alt="Canvas Podcast premium studio" fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
+          <a href="/canvas-podcast/" className="relative overflow-hidden rounded-lg group block w-full" style={{height: '400px'}}>
+            <Image src="/studio-images/parlor-hero.jpg" alt="Canvas Podcast premium studio" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
             <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%)'}} />
             <div className="absolute bottom-0 left-0 right-0 p-12">
               <p className="text-xs font-bold tracking-widest uppercase mb-3 text-brand-red">Creative Series</p>
-              <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: '-0.04em'}}>Canvas Podcast</h3>
+              <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: 0}}>Canvas Podcast</h3>
               <p className="text-gray-300 text-lg max-w-md mb-6">Signature podcast spaces. Customizable setups. Premium production crew included.</p>
               <p className="text-gray-400 text-sm">$400/hr · Podcast production</p>
             </div>
@@ -450,7 +450,7 @@ export default function SunsetPage() {
       {/* Final CTA */}
       <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-          <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}>
+          <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0 }}>
             Pick your <span className="text-brand-red">color.</span>
           </h2>
           <p className="text-gray-500 text-lg mb-10">$300/hr. Cameraman included. Instant confirmation.</p>

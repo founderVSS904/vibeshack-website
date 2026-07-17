@@ -249,7 +249,6 @@ export function DynamicFrameHero() {
                     />
                   )}
                   <div className="dynamic-frame-vignette" />
-                  <div className="dynamic-frame-noise" aria-hidden="true" />
                   <div className="dynamic-frame-copy">
                     <p className="dynamic-frame-eyebrow">{frame.eyebrow}</p>
                     <p className="dynamic-frame-label" aria-label={frame.label}>

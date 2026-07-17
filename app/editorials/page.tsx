@@ -58,7 +58,7 @@ export default function EditorialsPage() {
           {
             eyebrow: 'Fashion',
             title: 'Fashion editorials',
-            body: 'Built for campaigns and lookbooks. Full-body frames, movement, wardrobe changes, strong crops, and controlled backgrounds.',
+            body: 'Campaigns and lookbooks with full-body frames, movement, wardrobe changes, strong crops, and controlled backgrounds.',
             image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
             alt: 'Fashion editorial photographed at VibeShack Studios',
             objectPosition: '42% center',
@@ -81,7 +81,7 @@ export default function EditorialsPage() {
           {
             eyebrow: 'Brands',
             title: 'Campaign stills',
-            body: 'Product, talent, wardrobe, texture, movement, and negative-space frames built for ads, web, decks, and social.',
+            body: 'Product, talent, wardrobe, texture, movement, and negative-space frames for ads, web, decks, and social.',
             image: '/studio-images/usecase-photography-campaign-v20260509.jpg',
             alt: 'Photography campaign image at VibeShack Studios',
           },

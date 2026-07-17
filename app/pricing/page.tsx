@@ -89,7 +89,7 @@ export default function PricingPage() {
           <span className="number-label mb-12 block">Pricing</span>
           <h1
             className="font-black text-white leading-none mb-6"
-            style={{ fontSize: 'clamp(3rem, 7vw, 6rem)', letterSpacing: '-0.05em' }}
+            style={{ fontSize: 'clamp(3rem, 7vw, 6rem)', letterSpacing: 0 }}
           >
             <span className="transparent-word">Transparent</span><br />
             Pricing<span className="text-brand-red">.</span>
@@ -118,7 +118,7 @@ export default function PricingPage() {
                     <span className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-600 text-sm">→</span>
                   </span>
                   <div className="flex flex-wrap items-baseline gap-x-1 gap-y-1 sm:block sm:text-right">
-                    <span className="text-white font-black text-lg" style={{ letterSpacing: '-0.02em' }}>{studio.price}</span>
+                    <span className="text-white font-black text-lg" style={{ letterSpacing: 0 }}>{studio.price}</span>
                     <span className="text-gray-500 text-sm">/hr</span>
                     {studio.note && <span className="text-gray-600 text-xs ml-3 hidden sm:inline">{studio.note}</span>}
                   </div>
@@ -142,7 +142,7 @@ export default function PricingPage() {
                     <span className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-600 text-sm">→</span>
                   </span>
                   <div className="flex items-baseline gap-x-1 sm:block sm:text-right">
-                    <span className="text-white font-black text-lg" style={{ letterSpacing: '-0.02em' }}>{studio.price}</span>
+                    <span className="text-white font-black text-lg" style={{ letterSpacing: 0 }}>{studio.price}</span>
                     <span className="text-gray-500 text-sm">/hr</span>
                   </div>
                 </a>
@@ -165,7 +165,7 @@ export default function PricingPage() {
                     <span className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-600 text-sm">→</span>
                   </span>
                   <div className="flex flex-wrap items-baseline gap-x-1 gap-y-1 sm:block sm:text-right">
-                    <span className="text-white font-black text-lg" style={{ letterSpacing: '-0.02em' }}>{service.price}</span>
+                    <span className="text-white font-black text-lg" style={{ letterSpacing: 0 }}>{service.price}</span>
                     {service.note && <span className="text-gray-600 text-xs ml-3 hidden sm:inline">{service.note}</span>}
                   </div>
                 </a>
@@ -194,7 +194,7 @@ export default function PricingPage() {
           <span className="number-label mb-12 block">Add-Ons</span>
           <h2
             className="font-black text-white leading-tight mb-16"
-            style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em' }}
+            style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: 0 }}
           >
             Add to your session.
           </h2>
@@ -226,7 +226,7 @@ export default function PricingPage() {
       <section className="py-32 bg-black border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex items-end justify-between mb-20">
-            <h2 className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em'}}>
+            <h2 className="font-black text-white leading-none" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0}}>
               Questions.
             </h2>
             <span className="number-label">FAQ</span>
@@ -247,7 +247,7 @@ export default function PricingPage() {
         <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
           <h2
             className="font-black text-white leading-tight mb-6"
-            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.04em' }}
+            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0 }}
           >
             Every studio.<br />
             <span className="text-brand-red">Book yours.</span>

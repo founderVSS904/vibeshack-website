@@ -89,7 +89,7 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
         meta={[
           { label: 'Best first room', value: bestRoom.name },
           { label: 'Starting point', value: bestRoom.price },
-          { label: 'Built for', value: useCase.audience.slice(0, 2).join(' / ') },
+          { label: 'Audience', value: useCase.audience.slice(0, 2).join(' / ') },
         ]}
       />
 
@@ -268,10 +268,10 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
             </h2>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href={useCase.bookHref} className="rounded-full bg-white px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-gray-200">
+            <Link href={useCase.bookHref} className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-gray-200">
               Book this setup
             </Link>
-            <Link href="/tour/" className="rounded-full border border-white/15 px-6 py-3 text-sm font-bold text-white transition-colors hover:border-white/40">
+            <Link href="/tour/" className="rounded-lg border border-white/15 px-6 py-3 text-sm font-bold text-white transition-colors hover:border-white/40">
               Tour first
             </Link>
           </div>

@@ -13,7 +13,7 @@ export default function TermsProfessionalPage() {
       <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
         {/* Header */}
         <div className="mb-16">
-          <h1 className="text-white font-black leading-none mb-4" style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: '-0.05em' }}>
+          <h1 className="text-white font-black leading-none mb-4" style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: 0 }}>
             Terms of Service
           </h1>
           <p className="text-gray-400 text-sm mb-2"><strong>VibeShack Studios, Inc.</strong></p>

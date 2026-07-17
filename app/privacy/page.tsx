@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">Legal</p>
         <h1
           className="font-black text-white leading-none mb-6"
-          style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: '-0.05em' }}
+          style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: 0 }}
         >
           Privacy.
         </h1>
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               What we collect
             </h2>
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               How we use it
             </h2>
@@ -81,7 +81,7 @@ export default function PrivacyPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Third parties
             </h2>
@@ -129,7 +129,7 @@ export default function PrivacyPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Data retention
             </h2>
@@ -151,7 +151,7 @@ export default function PrivacyPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Your rights
             </h2>
@@ -173,7 +173,7 @@ export default function PrivacyPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Contact
             </h2>

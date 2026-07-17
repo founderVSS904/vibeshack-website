@@ -277,12 +277,12 @@ export default function PhotoServicesHero() {
             Photography Services · San Francisco
           </p>
           <h1 className="mx-auto mt-6 max-w-4xl text-white" style={{ fontSize: 'clamp(2.75rem, 5vw, 5rem)' }}>
-            Make the image
+            Photography
             <br />
-            impossible to ignore<span className="text-brand-red">.</span>
+            services<span className="text-brand-red">.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-zinc-300">
-            From first shot list to final selects, we plan and produce photography built for where your brand is going next.
+            Portrait, product, campaign, and editorial photography planned and produced in San Francisco.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
@@ -410,22 +410,15 @@ export default function PhotoServicesHero() {
             }
           }}
         >
-          {/* The glass sea: a horizon sheen at the contact line and a soft
-              falloff below it. Card bottoms sit ~155px above the stage bottom
-              at every breakpoint, so the plane holds without per-size math. */}
           <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[155px]">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
-            <div
-              className="absolute inset-0"
-              style={{ background: 'radial-gradient(58% 130% at 50% 0%, rgba(255,255,255,0.05), transparent 70%)' }}
-            />
           </div>
           {CATEGORIES.map((category, i) => {
             const isHovered = hovered === i && !dragging
             // The spans permanently occupy the wide box; hovering animates a
             // clip-path reveal, which composites in Safari instead of
             // relayouting and re-rastering the reflection mask every frame.
-            const clip = isHovered ? 'inset(0% 0% round 12px)' : 'inset(0% 10.3175% round 12px)'
+            const clip = isHovered ? 'inset(0% 0% round 8px)' : 'inset(0% 10.3175% round 8px)'
             const frameTransition = 'clip-path 500ms cubic-bezier(0.32, 0.72, 0, 1), -webkit-clip-path 500ms cubic-bezier(0.32, 0.72, 0, 1)'
             return (
               <button
@@ -488,7 +481,7 @@ export default function PhotoServicesHero() {
                 </span>
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute top-full mt-[5px] block h-full overflow-hidden rounded-xl"
+                  className="pointer-events-none absolute top-full mt-[5px] block h-full overflow-hidden rounded-lg"
                   style={{
                     left: '-13%',
                     right: '-13%',
@@ -549,9 +542,6 @@ export default function PhotoServicesHero() {
                 <path d="m9 6 6 6-6 6" />
               </svg>
             </button>
-            <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-zinc-400" aria-hidden>
-              Drag
-            </span>
             <button
               type="button"
               aria-label="Next category"

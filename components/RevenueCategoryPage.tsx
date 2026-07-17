@@ -93,7 +93,7 @@ export function RevenueCategoryPage({
         <Image
           src={heroImage}
           alt={heroAlt}
-          fill
+          fill sizes="100vw"
           priority
           className="object-cover"
           style={{ objectPosition: heroPosition }}

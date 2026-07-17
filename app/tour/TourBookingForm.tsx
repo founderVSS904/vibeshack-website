@@ -138,9 +138,9 @@ export default function TourBookingForm() {
 
   if (confirmed) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-zinc-950 p-8 sm:p-10">
+      <div className="rounded-lg border border-white/10 bg-zinc-950 p-8 sm:p-10">
         <p className="text-gray-600 text-xs uppercase tracking-widest mb-4">Tour booked</p>
-        <h2 className="text-white font-black leading-tight mb-5" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em' }}>
+        <h2 className="text-white font-black leading-tight mb-5" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: 0 }}>
           You&apos;re on the calendar.
         </h2>
         <div className="space-y-3 border-y border-white/[0.08] py-6 mb-6">
@@ -160,7 +160,7 @@ export default function TourBookingForm() {
     <form onSubmit={handleSubmit} className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
       <div>
         <p className="text-gray-600 text-xs uppercase tracking-widest mb-5">Pick a tour window</p>
-        <div className="rounded-3xl border border-white/10 bg-zinc-950 p-5 sm:p-6">
+        <div className="rounded-lg border border-white/10 bg-zinc-950 p-5 sm:p-6">
           <div className="flex items-center justify-between mb-5">
             <button
               type="button"
@@ -190,7 +190,7 @@ export default function TourBookingForm() {
                   key={ds}
                   type="button"
                   onClick={() => selectDate(ds)}
-                  className={`flex flex-col items-center rounded-xl py-2.5 transition-colors ${selected ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/[0.08]'}`}
+                  className={`flex flex-col items-center rounded-lg py-2.5 transition-colors ${selected ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/[0.08]'}`}
                 >
                   <span className="text-xs leading-none mb-1 opacity-60">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
                   <span className="text-sm font-black leading-none">{date.getDate()}</span>
@@ -218,7 +218,7 @@ export default function TourBookingForm() {
                 <p className="text-gray-600 text-xs">30 min</p>
               </div>
               {!availabilityVerified && (
-                <div className="mb-4 rounded-xl border border-yellow-900/60 bg-yellow-950/30 px-4 py-3">
+                <div className="mb-4 rounded-lg border border-yellow-900/60 bg-yellow-950/30 px-4 py-3">
                   <p className="text-yellow-300 text-xs font-semibold">Calendar verification is unavailable, so tour booking is paused for this date.</p>
                 </div>
               )}
@@ -231,7 +231,7 @@ export default function TourBookingForm() {
                       type="button"
                       disabled={!slot.available}
                       onClick={() => slot.available && setSelectedSlot(slot.time)}
-                      className={`rounded-xl py-3 text-sm font-semibold transition-colors ${
+                      className={`rounded-lg py-3 text-sm font-semibold transition-colors ${
                         !slot.available ? 'cursor-not-allowed text-gray-800 line-through'
                           : selected ? 'bg-brand-red text-white'
                             : 'text-gray-400 hover:bg-white/[0.08] hover:text-white'
@@ -249,7 +249,7 @@ export default function TourBookingForm() {
 
       <div>
         <p className="text-gray-600 text-xs uppercase tracking-widest mb-5">Your details</p>
-        <div className="rounded-3xl border border-white/10 bg-zinc-950 p-5 sm:p-6">
+        <div className="rounded-lg border border-white/10 bg-zinc-950 p-5 sm:p-6">
           <div className="hidden">
             <label>
               Company
@@ -263,7 +263,7 @@ export default function TourBookingForm() {
               <select
                 value={studioId}
                 onChange={(event) => setStudioId(event.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-white focus:border-white/40 focus:outline-none"
+                className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-white focus:border-white/40 focus:outline-none"
               >
                 <option value="">Not sure yet</option>
                 {STUDIOS.map((studio) => (
@@ -287,7 +287,7 @@ export default function TourBookingForm() {
                   value={field.value}
                   onChange={(event) => field.set(event.target.value)}
                   placeholder={field.placeholder}
-                  className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-white placeholder-gray-700 focus:border-white/40 focus:outline-none"
+                  className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-white placeholder-gray-700 focus:border-white/40 focus:outline-none"
                 />
               </div>
             ))}
@@ -299,7 +299,7 @@ export default function TourBookingForm() {
                 onChange={(event) => setNotes(event.target.value)}
                 placeholder="What are you trying to create? Any rooms you want to compare?"
                 rows={4}
-                className="w-full resize-none rounded-xl border border-white/10 bg-black px-4 py-3 text-white placeholder-gray-700 focus:border-white/40 focus:outline-none"
+                className="w-full resize-none rounded-lg border border-white/10 bg-black px-4 py-3 text-white placeholder-gray-700 focus:border-white/40 focus:outline-none"
               />
             </div>
           </div>
@@ -309,7 +309,7 @@ export default function TourBookingForm() {
           <button
             type="submit"
             disabled={submitting || !availabilityVerified}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-black transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-white py-4 text-sm font-bold text-black transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? 'Booking tour…' : 'Book Free Tour'}
           </button>

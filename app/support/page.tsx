@@ -171,7 +171,7 @@ export default function SupportPage() {
       <section className="bg-black pt-32 sm:pt-48 pb-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Support</span>
-          <h1 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: '-0.05em' }}>
+          <h1 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: 0 }}>
             How can we<br /><span className="text-brand-red">help?</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl leading-relaxed">
@@ -251,7 +251,7 @@ export default function SupportPage() {
                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="border-t border-white/[0.08] pt-8 group">
                 <p className="text-gray-600 text-xs uppercase tracking-widest mb-3">{label}</p>
-                <p className="text-white font-bold text-lg group-hover:text-brand-red transition-colors" style={{letterSpacing: '-0.02em'}}>{value}</p>
+                <p className="text-white font-bold text-lg group-hover:text-brand-red transition-colors" style={{letterSpacing: 0}}>{value}</p>
                 <p className="text-gray-500 text-sm mt-1">{sub}</p>
               </a>
             ))}

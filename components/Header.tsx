@@ -26,7 +26,7 @@ const podcastStudios: HeaderLink[] = [
   { href: '/encore/', label: 'Encore', detail: 'Treated set with clean sightlines', price: '$300/hr', image: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg' },
   { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast set', price: '$300/hr', image: '/studio-images/sunset-hero-v20260509.jpg' },
   { href: '/parlor/', label: 'Parlor', detail: 'Signature lounge interview set', price: '$400/hr', image: '/studio-images/parlor-production-v20260509.jpg' },
-  { href: '/horizon/', label: 'Horizon', detail: 'Warm curated sunset podcast set', price: '$400/hr', image: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg' },
+  { href: '/horizon/', label: 'Horizon', detail: 'Warm sunset podcast and interview set', price: '$400/hr', image: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg' },
   { href: '/canvas-podcast/', label: 'Canvas Podcast', detail: 'Large-format custom podcast set', price: '$400/hr', image: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg' },
 ]
 
@@ -56,7 +56,7 @@ const planningLinks: HeaderLink[] = [
 ]
 
 const studioHubLinks: HeaderLink[] = [
-  { href: '/podcast-studio-san-francisco/', label: 'Podcast Studios', detail: 'Sets built for interviews and shows' },
+  { href: '/podcast-studio-san-francisco/', label: 'Podcast Studios', detail: 'Interview and show sets with cameras and audio' },
   { href: '/rental-studios/', label: 'Rental Studios', detail: 'White cyc, green screen, photo rooms' },
   { href: '/find-your-studio/', label: 'Find a Studio', detail: 'Choose by outcome, not guesswork' },
   { href: '/book/', label: 'Book a Session', detail: 'Live availability and checkout' },
@@ -272,7 +272,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
       }
     >
       <div>
-        <span className="relative block h-56 overflow-hidden rounded-2xl border border-white/[0.08] 2xl:h-64">
+        <span className="relative block h-56 overflow-hidden rounded-lg border border-white/[0.08] 2xl:h-64">
           {showMedia && featured.image && (
             <Image src={featured.image} alt="The Executive podcast set at VibeShack Studios" fill sizes="768px" quality={85} className="object-cover" />
           )}
@@ -312,7 +312,7 @@ function DesktopStudiosMenu({ onNavigate }: { onNavigate: () => void }) {
             onNavigate()
             event.currentTarget.blur()
           }}
-          className="group/feat block overflow-hidden rounded-2xl bg-white/[0.03] ring-1 ring-white/15 transition-[background-color,box-shadow] duration-300 hover:bg-white/[0.05] hover:ring-white/25"
+          className="group/feat block overflow-hidden rounded-lg bg-white/[0.03] ring-1 ring-white/15 transition-[background-color,box-shadow] duration-300 hover:bg-white/[0.05] hover:ring-white/25"
         >
           <span className="relative block h-44 overflow-hidden">
             {showMedia && featured.image && (
@@ -394,7 +394,7 @@ function MenuRoomRow({ room, onNavigate }: { room: HeaderLink; onNavigate: () =>
         onNavigate()
         event.currentTarget.blur()
       }}
-      className="group/room -mx-3 flex items-center gap-4 rounded-xl px-3 py-3 transition-colors duration-300 hover:bg-white/[0.04]"
+      className="group/room -mx-3 flex items-center gap-4 rounded-lg px-3 py-3 transition-colors duration-300 hover:bg-white/[0.04]"
     >
       <span className="relative h-[64px] w-[96px] shrink-0 overflow-hidden rounded-lg bg-white/5">
         {showMedia && room.image && (
@@ -494,7 +494,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
           </span>
           <span className="absolute inset-x-0 top-[27px] h-px bg-brand-red/20" />
           <span
-            className="absolute top-[27px] h-[7px] w-[7px] -translate-y-1/2 rounded-full bg-brand-red shadow-[0_0_10px_rgba(236,0,0,0.55)] transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            className="absolute top-[27px] h-[7px] w-[7px] -translate-y-1/2 rounded-full bg-brand-red transition-[left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
             style={{ left: `calc(${(((activeCard + 1.5) / 8) * 100).toFixed(3)}% - 3.5px)` }}
           />
         </div>
@@ -514,7 +514,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                 onNavigate()
                 event.currentTarget.blur()
               }}
-              className={`group/svc relative min-w-0 overflow-hidden rounded-xl ring-1 transition-[flex-grow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              className={`group/svc relative min-w-0 overflow-hidden rounded-lg ring-1 transition-[flex-grow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 isActive ? 'flex-[3_1_0%] ring-brand-red/70' : 'flex-[1_1_0%] ring-white/[0.08] hover:ring-white/20'
               }`}
             >
@@ -567,7 +567,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
       </div>
 
       <div className="grid grid-cols-[1.6fr_1fr] gap-5">
-        <div className="grid grid-cols-6 divide-x divide-white/[0.06] rounded-2xl border border-white/[0.08] bg-white/[0.02]">
+        <div className="grid grid-cols-6 divide-x divide-white/[0.06] rounded-lg border border-white/[0.08] bg-white/[0.02]">
           {proofStripLinks.map(({ href, label }, index) => (
             <Link
               key={href + label}
@@ -576,7 +576,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                 onNavigate()
                 event.currentTarget.blur()
               }}
-              className="group/proof flex flex-col items-center justify-center gap-3.5 px-3 py-7 text-zinc-400 transition-colors duration-300 first:rounded-l-2xl last:rounded-r-2xl hover:bg-white/[0.04] hover:text-white"
+              className="group/proof flex flex-col items-center justify-center gap-3.5 px-3 py-7 text-zinc-400 transition-colors duration-300 first:rounded-l-lg last:rounded-r-lg hover:bg-white/[0.04] hover:text-white"
             >
               {proofIcons[index]}
               <span className="whitespace-nowrap text-center font-mono text-[10px] font-bold uppercase tracking-[0.18em]">{label}</span>
@@ -589,7 +589,7 @@ function DesktopServicesMenu({ onNavigate }: { onNavigate: () => void }) {
             onNavigate()
             event.currentTarget.blur()
           }}
-          className="group/find flex overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.04]"
+          className="group/find flex overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.02] transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.04]"
         >
           <span className="relative w-2/5 shrink-0 overflow-hidden bg-white/5">
             {showMedia && (
@@ -623,7 +623,7 @@ function DesktopMegaMenu({
   footer?: ReactNode
 }) {
   return (
-    <div className="desktop-mega-menu pointer-events-none invisible fixed inset-x-0 top-[calc(5rem-1px)] mx-auto hidden max-h-[calc(100vh-6.5rem)] w-[min(calc(100vw-2rem),1680px)] translate-y-[-6px] overflow-y-auto overscroll-contain rounded-[20px] border border-white/[0.08] bg-[#0c0c0c] text-white opacity-0 shadow-[0_48px_140px_rgba(0,0,0,0.72)] transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-hover:delay-[60ms] group-hover:duration-[420ms] group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-focus-within:delay-[60ms] group-focus-within:duration-[420ms] xl:block">
+    <div className="desktop-mega-menu pointer-events-none invisible fixed inset-x-0 top-[calc(5rem-1px)] mx-auto hidden max-h-[calc(100vh-6.5rem)] w-[min(calc(100vw-2rem),1680px)] translate-y-[-6px] overflow-y-auto overscroll-contain rounded-lg border border-white/[0.08] bg-[#0c0c0c] text-white opacity-0 shadow-[0_48px_140px_rgba(0,0,0,0.72)] transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-hover:delay-[60ms] group-hover:duration-[420ms] group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-focus-within:delay-[60ms] group-focus-within:duration-[420ms] xl:block">
       <div className={`desktop-mega-grid mx-auto grid px-10 pb-7 pt-9 lg:px-14 ${className}`}>
         {children}
       </div>

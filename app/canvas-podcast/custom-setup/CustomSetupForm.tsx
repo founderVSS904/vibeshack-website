@@ -66,7 +66,7 @@ export default function CustomSetupForm() {
 
   if (status === 'success') {
     return (
-      <div className="rounded-2xl border border-brand-red/30 bg-brand-red/10 p-10 text-center">
+      <div className="rounded-lg border border-brand-red/30 bg-brand-red/10 p-10 text-center">
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-red/20">
           <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
             <path d="M8 16l6 6 10-12" stroke="#E50000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />

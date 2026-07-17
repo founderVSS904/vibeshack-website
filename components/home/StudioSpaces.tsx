@@ -23,7 +23,7 @@ export function StudioSpaces() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5 sm:gap-5">
           {studios.map(({ src, label, href, alt }) => (
             <div key={label} className="studio-grid-card">
-              <Link href={href} className="homepage-studio-link relative overflow-hidden rounded-xl group block h-[170px] sm:h-[190px] lg:h-[220px]">
+              <Link href={href} className="homepage-studio-link relative overflow-hidden rounded-lg group block h-[170px] sm:h-[190px] lg:h-[220px]">
                 <Image
                   src={src}
                   alt={alt}

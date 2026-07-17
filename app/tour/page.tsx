@@ -16,11 +16,11 @@ export default function TourPage() {
         <div className="mb-14 max-w-2xl">
           <p className="text-gray-600 text-xs tracking-[0.2em] uppercase mb-3">VibeShack Studios · SF Northern Waterfront</p>
           <h1 className="text-white font-black leading-none mb-4"
-            style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.05em'}}>
+            style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0}}>
             See it before<br /><span className="text-brand-red">you book.</span>
           </h1>
           <p className="text-gray-400 text-lg leading-relaxed">
-            Choose a live tour time, get added to the studio calendar, and come walk the rooms before you book. No commitment required.
+            Choose a live tour time, get added to the studio calendar, and tour the sets and rental spaces before you book. No commitment required.
           </p>
         </div>
 
@@ -28,7 +28,7 @@ export default function TourPage() {
           {/* What to expect */}
           <div className="border-t border-white/[0.08] pt-10 space-y-5">
           {[
-            { n: '01', title: 'Walk every studio', body: 'See the full space: every room, the gear, the setup. No surprises when you book.' },
+            { n: '01', title: 'Walk every studio', body: 'See each set and rental space, the gear, and the baseline setup before you book.' },
             { n: '02', title: 'Ask anything', body: 'Camera specs, lighting options, pricing, availability. Our team will be on-site to answer.' },
             { n: '03', title: 'No sales pressure', body: 'If you like what you see, book. If not, no problem. The tour is free either way.' },
           ].map(({ n, title, body }) => (

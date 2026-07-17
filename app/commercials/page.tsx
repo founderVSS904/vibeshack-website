@@ -40,7 +40,7 @@ export default function CommercialsPage() {
       <RevenueCategoryPage
         eyebrow="Commercials"
         title="Video that sells the thing."
-        lead="Commercial shoots at VibeShack are built around the final use: launch ads, founder videos, product demos, talking-head spots, and cutdowns that can actually move a campaign."
+        lead="Commercial shoots at VibeShack start with the final use: launch ads, founder videos, product demos, talking-head spots, and campaign cutdowns."
         heroImage="/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg"
         heroAlt="Commercial video production lighting setup at VibeShack Studios San Francisco"
         heroPosition="center 42%"
@@ -52,7 +52,7 @@ export default function CommercialsPage() {
           { label: 'Room-only', value: 'from $100/hr', detail: 'For teams bringing their own director, operator, crew, and edit plan.' },
         ]}
         introEyebrow="Commercial formats"
-        introTitle="Make the page, ad, or launch feel real."
+        introTitle="Plan the shoot around the placement."
         introBody="Every commercial job is different. Pick the format that matches what you are launching, then send the brief."
         offers={[
           {

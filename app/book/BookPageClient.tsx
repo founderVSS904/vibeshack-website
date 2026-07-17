@@ -37,7 +37,7 @@ interface Slot { time: string; label: string; available: boolean }
 
 const STEP_ORDER: Exclude<Step, 'payment'>[] = ['room', 'datetime', 'extras', 'review']
 const STEP_LABELS: Record<Exclude<Step, 'payment'>, string> = {
-  room: 'Room',
+  room: 'Studio',
   datetime: 'Date & Time',
   extras: 'Extras',
   review: 'Review',
@@ -49,7 +49,7 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'podcast', label: 'Podcast' },
   { id: 'photo', label: 'Photo' },
   { id: 'rental', label: 'Rental' },
-  { id: 'all', label: 'All Rooms' },
+  { id: 'all', label: 'All Studios' },
 ]
 
 function matchesFilter(studio: Studio, filter: Filter) {
@@ -497,7 +497,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
   async function handlePay(e: React.FormEvent) {
     e.preventDefault()
     if (!selectedStudio || !blockValid) {
-      setError('Pick a room, date, and start time first.')
+      setError('Pick a studio, date, and start time first.')
       return
     }
     if (!name || !email) { setError('Name and email are required.'); return }
@@ -568,7 +568,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
             : 'Secure payment'
 
   const subline =
-    step === 'room' ? 'Start with the room. We handle the rest.'
+    step === 'room' ? 'Choose a studio, then select a date and time.'
       : step === 'datetime' ? 'All times Pacific. Availability is checked live.'
         : step === 'extras' ? 'Add what the session needs. Skip what it does not.'
           : step === 'review' ? 'Check the details, add your info, and lock it in.'
@@ -620,7 +620,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
               <div>
                 <div className="flex flex-col gap-8 xl:flex-row 2xl:gap-12">
                   {/* Hero */}
-                  <div className="relative h-[320px] min-w-0 overflow-hidden rounded-[20px] border border-white/[0.08] sm:h-[420px] xl:flex-1 2xl:h-[520px]">
+                  <div className="relative h-[320px] min-w-0 overflow-hidden rounded-lg border border-white/[0.08] sm:h-[420px] xl:flex-1 2xl:h-[520px]">
                     <Image
                       key={previewStudio.photos[photoIndex] ?? previewStudio.heroImage}
                       src={previewStudio.photos[photoIndex] ?? previewStudio.heroImage}
@@ -671,7 +671,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
                           <path d="m5 12.5 4.5 4.5L19 7.5" />
                         </svg>
-                        Room selected
+                        Studio selected
                       </button>
                     ) : (
                       <button
@@ -679,7 +679,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                         onClick={selectRoom}
                         className="mt-7 inline-flex w-fit items-center gap-2.5 rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700"
                       >
-                        Select this room <span aria-hidden>→</span>
+                        Select this studio <span aria-hidden>→</span>
                       </button>
                     )}
                   </div>
@@ -698,7 +698,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                           type="button"
                           aria-pressed={isPreview}
                           onClick={() => previewRoom(s.id)}
-                          className={`group w-[220px] shrink-0 snap-start overflow-hidden rounded-xl border text-left transition-colors ${
+                          className={`group w-[220px] shrink-0 snap-start overflow-hidden rounded-lg border text-left transition-colors ${
                             isSelected
                               ? 'border-brand-red ring-1 ring-brand-red'
                               : isPreview
@@ -727,7 +727,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   {filteredStudios.length > 5 && (
                     <button
                       type="button"
-                      aria-label="Scroll rooms"
+                      aria-label="Scroll studios"
                       onClick={() => railRef.current?.scrollBy({ left: 480, behavior: 'smooth' })}
                       className="absolute -right-3 top-[62px] hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/80 text-white backdrop-blur transition-colors hover:border-white/40 lg:flex"
                     >
@@ -778,7 +778,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                     onClick={() => goToStep('room')}
                     className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500 transition-colors hover:text-white"
                   >
-                    Change room
+                    Change studio
                   </button>
                 </div>
 
@@ -885,7 +885,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                       </p>
                     </div>
                     {!date && (
-                      <div className="flex h-44 items-center justify-center rounded-xl border border-dashed border-white/10">
+                      <div className="flex h-44 items-center justify-center rounded-lg border border-dashed border-white/10">
                         <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Select a date first</p>
                       </div>
                     )}
@@ -897,7 +897,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                     {date && !slotsLoading && (
                       <>
                         {!availabilityVerified && (
-                          <div className="mb-4 rounded-xl border border-white/15 bg-white/[0.03] px-4 py-3" role="alert">
+                          <div className="mb-4 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3" role="alert">
                             <p className="text-xs font-semibold leading-relaxed text-zinc-300">
                               Live availability is temporarily unavailable. Refresh, or contact us and we will book you in.
                             </p>
@@ -978,7 +978,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                         type="button"
                         aria-pressed={active}
                         onClick={() => toggleAddon(addon)}
-                        className={`flex w-full items-start justify-between gap-6 rounded-xl border px-5 py-5 text-left transition-colors ${
+                        className={`flex w-full items-start justify-between gap-6 rounded-lg border px-5 py-5 text-left transition-colors ${
                           active ? 'border-brand-red bg-brand-red/5' : 'border-white/10 hover:border-white/25'
                         }`}
                       >
@@ -1012,7 +1012,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                         type="button"
                         aria-pressed={active}
                         onClick={() => setRecurring(active ? null : opt.id)}
-                        className={`flex w-full items-center justify-between rounded-xl border px-5 py-4 text-left transition-colors ${
+                        className={`flex w-full items-center justify-between rounded-lg border px-5 py-4 text-left transition-colors ${
                           active ? 'border-brand-red bg-brand-red/5' : 'border-white/10 hover:border-white/25'
                         }`}
                       >
@@ -1199,7 +1199,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   Complete payment here on VibeShack. Your booking lands on the studio calendar only after payment succeeds.
                 </p>
                 {checkoutPublishableKey && checkoutClientSecret ? (
-                  <div className="rounded-2xl bg-white p-2 sm:p-4">
+                  <div className="rounded-lg bg-white p-2 sm:p-4">
                     <StripeEmbeddedCheckout
                       publishableKey={checkoutPublishableKey}
                       clientSecret={checkoutClientSecret}
@@ -1227,23 +1227,23 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
 
           {/* ══════════════════ YOUR SESSION ══════════════════ */}
           <div className="hidden lg:block">
-            <div className="sticky top-24 rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6">
+            <div className="sticky top-24 rounded-lg border border-white/10 bg-[#0b0b0b] p-6">
               <p className="text-[15px] font-bold uppercase tracking-[0.12em] text-white">Your Session</p>
 
               {selectedStudio ? (
-                <div className="relative mt-5 h-40 overflow-hidden rounded-xl 2xl:h-44">
+                <div className="relative mt-5 h-40 overflow-hidden rounded-lg 2xl:h-44">
                   <Image src={selectedStudio.heroImage} alt={selectedStudio.name} fill quality={80} sizes="800px" className="object-cover" />
                 </div>
               ) : (
-                <div className="mt-5 flex h-40 items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/[0.02] 2xl:h-44">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Pick a room to start</p>
+                <div className="mt-5 flex h-40 items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/[0.02] 2xl:h-44">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Pick a studio to start</p>
                 </div>
               )}
 
               <div className="mt-2 divide-y divide-white/[0.06]">
                 <div className="flex items-center gap-3 py-3.5 text-zinc-500">
                   <RoomIcon />
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Room</span>
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Studio</span>
                   <span className={`ml-auto text-right text-[13px] ${selectedStudio ? 'text-white' : 'text-zinc-500'}`}>
                     {selectedStudio ? selectedStudio.name : 'Not selected'}
                   </span>
@@ -1398,11 +1398,11 @@ function BookingSkeleton() {
           <div className="h-8 w-full max-w-md rounded bg-white/[0.05]" />
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="aspect-[4/3] rounded-xl bg-white/[0.04]" />
+              <div key={i} className="aspect-[4/3] rounded-lg bg-white/[0.04]" />
             ))}
           </div>
         </div>
-        <div className="hidden h-80 rounded-2xl border border-white/[0.08] bg-white/[0.02] lg:block" />
+        <div className="hidden h-80 rounded-lg border border-white/[0.08] bg-white/[0.02] lg:block" />
       </div>
     </div>
   )

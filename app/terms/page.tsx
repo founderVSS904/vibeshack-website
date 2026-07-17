@@ -15,7 +15,7 @@ export default function TermsPage() {
         <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">Legal</p>
         <h1
           className="font-black text-white leading-none mb-6"
-          style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: '-0.05em' }}
+          style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: 0 }}
         >
           Terms.
         </h1>
@@ -31,7 +31,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Bookings
             </h2>
@@ -53,7 +53,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Cancellation
             </h2>
@@ -88,7 +88,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Payment
             </h2>
@@ -110,7 +110,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Studio rules
             </h2>
@@ -135,7 +135,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Your content
             </h2>
@@ -157,7 +157,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Liability
             </h2>
@@ -182,7 +182,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Governing law
             </h2>
@@ -201,7 +201,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Contact
             </h2>

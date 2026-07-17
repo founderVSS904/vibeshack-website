@@ -37,7 +37,7 @@ export default function CanvasPodcastPage() {
           <Image
             src="/studio-images/enhanced-canvas-podcast-warm-panel-wide-v20260510.jpg"
             alt="Canvas Podcast Studio with warm custom podcast setup"
-            fill
+            fill sizes="100vw"
             priority
             className="object-cover"
             style={{ opacity: 0.4 }}
@@ -56,13 +56,13 @@ export default function CanvasPodcastPage() {
             className="font-black text-white leading-tight mb-6"
             style={{
               fontSize: 'clamp(3rem, 8vw, 6rem)',
-              letterSpacing: '-0.05em',
+              letterSpacing: 0,
             }}
           >
             Canvas <span className="text-brand-red">Podcast</span>
           </h1>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed mb-12">
-            Customizable LED backgrounds. Cinema-grade lighting. Everything you need to produce a show that looks and sounds premium.
+            Customizable LED backgrounds, cinema lighting, broadcast audio, and crew for large-format shows.
           </p>
           <a
             href="/book/?studio=canvas-podcast"
@@ -85,7 +85,7 @@ export default function CanvasPodcastPage() {
               className="font-black text-white leading-tight"
               style={{
                 fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-                letterSpacing: '-0.04em',
+                letterSpacing: 0,
               }}
             >
               Signature spaces. Or design your own.
@@ -96,11 +96,11 @@ export default function CanvasPodcastPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Parlor */}
             <div>
-              <div className="relative overflow-hidden rounded-2xl mb-8 h-72">
+              <div className="relative overflow-hidden rounded-lg mb-8 h-72">
                 <Image
                   src="/studio-images/enhanced-canvas-podcast-parlor-gold-wide-v20260510.jpg"
                   alt="Parlor interview set with Chesterfield seating"
-                  fill
+                  fill sizes="100vw"
                   className="object-cover"
                 />
               </div>
@@ -114,7 +114,7 @@ export default function CanvasPodcastPage() {
               <div className="divide-y divide-white/10 border-y border-white/10 mt-6 mb-8">
                 <div className="py-3 text-gray-400 text-sm">Linear white lights + Chesterfield seating</div>
                 <div className="py-3 text-gray-400 text-sm">Minimal, professional aesthetic</div>
-                <div className="py-3 text-gray-400 text-sm">Built for executive conversations</div>
+                <div className="py-3 text-gray-400 text-sm">Executive interview framing</div>
               </div>
               <a
                 href="/book/?studio=parlor"
@@ -129,11 +129,11 @@ export default function CanvasPodcastPage() {
 
             {/* Horizon */}
             <div>
-              <div className="relative overflow-hidden rounded-2xl mb-8 h-72">
+              <div className="relative overflow-hidden rounded-lg mb-8 h-72">
                 <Image
                   src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg"
                   alt="Horizon podcast set with warm sunset backdrop"
-                  fill
+                  fill sizes="100vw"
                   className="object-cover"
                 />
               </div>
@@ -145,7 +145,7 @@ export default function CanvasPodcastPage() {
                 <span className="text-white font-black text-2xl">$400<span className="text-sm text-gray-400">/hr</span></span>
               </div>
               <div className="divide-y divide-white/10 border-y border-white/10 mt-6 mb-8">
-                <div className="py-3 text-gray-400 text-sm">Curated sunset environment + warm atmosphere</div>
+                <div className="py-3 text-gray-400 text-sm">Warm sunset backdrop and practical lighting</div>
                 <div className="py-3 text-gray-400 text-sm">Perfect for creative storytelling</div>
                 <div className="py-3 text-gray-400 text-sm">Modern sage seating + impact</div>
               </div>
@@ -162,7 +162,7 @@ export default function CanvasPodcastPage() {
           </div>
 
           {/* Custom Setup CTA */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-12 text-center">
+          <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center">
             <h3 className="text-white font-black text-2xl mb-2">Design Your Own</h3>
             <p className="text-gray-400 text-sm mb-8 max-w-md mx-auto">
               Not seeing exactly what you need? Custom lighting, backdrops, furniture, equipment. Tell us and we'll build it.
@@ -189,7 +189,7 @@ export default function CanvasPodcastPage() {
               className="font-black text-white leading-tight"
               style={{
                 fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-                letterSpacing: '-0.04em',
+                letterSpacing: 0,
               }}
             >
               Full-crew production. No compromises.
@@ -198,11 +198,11 @@ export default function CanvasPodcastPage() {
 
           {/* Feature 1: Image Left */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
-            <div className="relative overflow-hidden rounded-2xl bg-black aspect-video">
+            <div className="relative overflow-hidden rounded-lg bg-black aspect-video">
               <Image
                 src="/studio-images/enhanced-canvas-podcast-red-set-wide-v20260510.jpg"
                 alt="Customizable lighting moods"
-                fill
+                fill sizes="100vw"
                 className="object-cover"
               />
             </div>
@@ -211,7 +211,7 @@ export default function CanvasPodcastPage() {
                 className="text-white font-black mb-6"
                 style={{
                   fontSize: 'clamp(2rem, 4vw, 3rem)',
-                  letterSpacing: '-0.04em',
+                  letterSpacing: 0,
                 }}
               >
                 Customizable Moods
@@ -229,7 +229,7 @@ export default function CanvasPodcastPage() {
                 className="text-white font-black mb-6"
                 style={{
                   fontSize: 'clamp(2rem, 4vw, 3rem)',
-                  letterSpacing: '-0.04em',
+                  letterSpacing: 0,
                 }}
               >
                 Cinema-Grade Lighting
@@ -238,11 +238,11 @@ export default function CanvasPodcastPage() {
                 Professional diffused rigs + custom LED backdrop. Soft, even light on every face. Every frame is production-ready.
               </p>
             </div>
-            <div className="relative overflow-hidden rounded-2xl bg-black aspect-video">
+            <div className="relative overflow-hidden rounded-lg bg-black aspect-video">
               <Image
                 src="/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg"
                 alt="Cinema-grade lighting setup"
-                fill
+                fill sizes="100vw"
                 className="object-cover"
               />
             </div>
@@ -250,11 +250,11 @@ export default function CanvasPodcastPage() {
 
           {/* Feature 3: Image Left */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
-            <div className="relative overflow-hidden rounded-2xl bg-black aspect-video">
+            <div className="relative overflow-hidden rounded-lg bg-black aspect-video">
               <Image
                 src="/studio-images/enhanced-canvas-podcast-white-studio-closeup-v20260510.jpg"
                 alt="Guest seating and set design in the white studio"
-                fill
+                fill sizes="100vw"
                 className="object-cover"
               />
             </div>
@@ -263,7 +263,7 @@ export default function CanvasPodcastPage() {
                 className="text-white font-black mb-6"
                 style={{
                   fontSize: 'clamp(2rem, 4vw, 3rem)',
-                  letterSpacing: '-0.04em',
+                  letterSpacing: 0,
                 }}
               >
                 Designed for Your Show
@@ -287,11 +287,11 @@ export default function CanvasPodcastPage() {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4">
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+              <div className="bg-white/5 border border-white/10 rounded-lg p-8">
                 <div className="text-brand-red font-black text-3xl mb-2">24/7</div>
                 <p className="text-gray-400 text-sm">Studio always ready. No setup delays.</p>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+              <div className="bg-white/5 border border-white/10 rounded-lg p-8">
                 <div className="text-brand-red font-black text-3xl mb-2">$400/hr</div>
                 <p className="text-gray-400 text-sm">Crew, gear, space all included. No surprises.</p>
               </div>
@@ -348,7 +348,7 @@ export default function CanvasPodcastPage() {
             className="font-black text-white leading-tight mb-8"
             style={{
               fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              letterSpacing: '-0.04em',
+              letterSpacing: 0,
             }}
           >
             <span className="text-brand-red">$400</span> / hour
@@ -357,7 +357,7 @@ export default function CanvasPodcastPage() {
             Everything included. Crew, lighting setup, background customization, dual-mic audio, the space itself.
           </p>
 
-          <div className="bg-black rounded-xl p-12 mb-12 border border-white/10">
+          <div className="bg-black rounded-lg p-12 mb-12 border border-white/10">
             <h3 className="text-white font-bold text-xl mb-6">What's Included</h3>
             <div className="divide-y divide-white/10 border-y border-white/10 text-left">
               {[
@@ -398,10 +398,10 @@ export default function CanvasPodcastPage() {
             className="font-black text-white leading-tight mb-8"
             style={{
               fontSize: 'clamp(2rem, 4vw, 3.5rem)',
-              letterSpacing: '-0.04em',
+              letterSpacing: 0,
             }}
           >
-            Ready to make your <span className="text-brand-red">next episode</span> look premium?
+            Ready to plan your <span className="text-brand-red">next episode?</span>
           </h2>
           <p className="text-gray-500 text-lg mb-12">
             Canvas Podcast is available now. Book your session and let's create something great.

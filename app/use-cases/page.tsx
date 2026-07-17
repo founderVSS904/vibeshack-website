@@ -67,7 +67,7 @@ export default function UseCasesPage() {
           <div>
             <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Popular use cases</p>
             <h1 className="mt-8 max-w-5xl text-5xl font-black leading-[0.94] text-white sm:text-6xl lg:text-7xl">
-              Choose the room by the work it has to produce.
+              Studio use cases.
             </h1>
           </div>
 
@@ -100,7 +100,7 @@ export default function UseCasesPage() {
             <div>
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">How we think</p>
               <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-5xl">
-                A professional shoot is an operating system, not a pretty room.
+                Start with the deliverable, then work backward.
               </h2>
             </div>
             <div className="divide-y divide-white/10 border-y border-white/10">
@@ -123,7 +123,7 @@ export default function UseCasesPage() {
           <div className="mb-12 max-w-4xl">
             <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Production paths</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-6xl">
-              Start with the situation your client, guest, product, or campaign is actually in.
+              Six common production briefs.
             </h2>
           </div>
 
@@ -155,7 +155,7 @@ export default function UseCasesPage() {
                   <p className="mt-5 max-w-3xl text-base leading-relaxed text-gray-400">{useCase.clientNeed}</p>
                   <div className="mt-7 grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-3">
                     <div>
-                      <p className="text-xs font-bold uppercase text-gray-600">First room</p>
+                      <p className="text-xs font-bold uppercase text-gray-600">First studio</p>
                       <p className="mt-2 text-sm text-gray-200">{useCase.roomMatches[0].name}</p>
                     </div>
                     <div>
@@ -189,10 +189,10 @@ export default function UseCasesPage() {
             </h2>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href="/find-your-studio/" className="rounded-full bg-white px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-gray-200">
+            <Link href="/find-your-studio/" className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-gray-200">
               Find a studio
             </Link>
-            <Link href="/tour/" className="rounded-full border border-white/15 px-6 py-3 text-sm font-bold text-white transition-colors hover:border-white/40">
+            <Link href="/tour/" className="rounded-lg border border-white/15 px-6 py-3 text-sm font-bold text-white transition-colors hover:border-white/40">
               Book a tour
             </Link>
           </div>

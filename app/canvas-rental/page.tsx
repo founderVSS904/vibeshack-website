@@ -28,7 +28,7 @@ export default function CanvasRentalPage() {
         .use-card {
           position: relative;
           display: block;
-          border-radius: 1rem;
+          border-radius: 0.5rem;
           overflow: hidden;
           background: #18181b;
           transition: transform 0.3s ease-out;
@@ -62,13 +62,13 @@ export default function CanvasRentalPage() {
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
         <Image src="/studio-images/canvas-rental-hero-v1775094073.jpg"
           alt="Canvas rental studio white cyc backdrop at VibeShack Studios San Francisco"
-          fill
+          fill sizes="100vw"
           className="object-cover opacity-85"
           priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 pt-28 sm:pt-40 w-full">
           <p className="text-xs font-bold tracking-widest uppercase mb-4 text-brand-red">White Cyc Studio</p>
-          <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: '-0.04em'}}>Canvas<span className="text-brand-red">.</span></h1>
+          <h1 className="text-6xl sm:text-7xl font-black text-white leading-none mb-4" style={{letterSpacing: 0}}>Canvas<span className="text-brand-red">.</span></h1>
           <p className="text-lg sm:text-xl text-gray-300 max-w-2xl leading-relaxed mb-8">
             White cyc backdrop. Overhead lighting grid. Total creative control. Rent by the hour for any production.
           </p>
@@ -86,10 +86,10 @@ export default function CanvasRentalPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
             <div className="order-1">
-              <Image src="/studio-images/canvas-rental-blackfloor-v1775094171.jpg" alt="Canvas rental with black floor options" width={800} height={600} className="w-full h-auto rounded-3xl" />
+              <Image src="/studio-images/canvas-rental-blackfloor-v1775094171.jpg" alt="Canvas rental with black floor options" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
             <div className="order-2 flex flex-col justify-center">
-              <h2 className="text-white font-black text-4xl mb-6" style={{letterSpacing: '-0.02em'}}>Flexible Space</h2>
+              <h2 className="text-white font-black text-4xl mb-6" style={{letterSpacing: 0}}>Flexible Space</h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 <div className="py-4 text-gray-400 text-base">Seamless white cyc wall</div>
                 <div className="py-4 text-gray-400 text-base">Black floor mats available</div>
@@ -102,11 +102,11 @@ export default function CanvasRentalPage() {
           </div>
 
           <div>
-            <h3 className="text-white font-black text-3xl mb-12" style={{letterSpacing: '-0.02em'}}>Create Anything</h3>
+            <h3 className="text-white font-black text-3xl mb-12" style={{letterSpacing: 0}}>Create Anything</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <a href="/book/?studio=canvas-rental" className="use-card">
                 <div className="use-card-img-wrapper">
-                  <Image src="/studio-images/canvas-rental-podcast-v1775096685.jpg" alt="Podcast production setup at Canvas" fill className="object-cover" />
+                  <Image src="/studio-images/canvas-rental-podcast-v1775096685.jpg" alt="Podcast production setup at Canvas" fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="bg-zinc-900 p-4">
                   <p className="text-white font-bold text-sm">Podcast & Interview</p>
@@ -115,7 +115,7 @@ export default function CanvasRentalPage() {
               </a>
               <a href="/book/?studio=canvas-rental" className="use-card">
                 <div className="use-card-img-wrapper">
-                  <Image src="/studio-images/canvas-rental-music-v1775095665.jpg" alt="Music video production at Canvas" fill className="object-cover" />
+                  <Image src="/studio-images/canvas-rental-music-v1775095665.jpg" alt="Music video production at Canvas" fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="bg-zinc-900 p-4">
                   <p className="text-white font-bold text-sm">Music Video & Performance</p>
@@ -124,7 +124,7 @@ export default function CanvasRentalPage() {
               </a>
               <a href="/book/?studio=canvas-rental" className="use-card">
                 <div className="use-card-img-wrapper">
-                  <Image src="/studio-images/canvas-rental-portrait-v1775096209.jpg" alt="Professional portrait shoot at Canvas" fill className="object-cover" />
+                  <Image src="/studio-images/canvas-rental-portrait-v1775096209.jpg" alt="Professional portrait shoot at Canvas" fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="bg-zinc-900 p-4">
                   <p className="text-white font-bold text-sm">Portraits & Headshots</p>
@@ -133,7 +133,7 @@ export default function CanvasRentalPage() {
               </a>
               <a href="/book/?studio=canvas-rental" className="use-card">
                 <div className="use-card-img-wrapper">
-                  <Image src="/studio-images/canvas-rental-space-v20260509.jpg" alt="Canvas rental studio space ready for your project" fill className="object-cover" />
+                  <Image src="/studio-images/canvas-rental-space-v20260509.jpg" alt="Canvas rental studio space ready for your project" fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="bg-zinc-900 p-4">
                   <p className="text-white font-bold text-sm">Your Project Here</p>
@@ -151,7 +151,7 @@ export default function CanvasRentalPage() {
           <span className="number-label mb-12 block">Pricing</span>
           <div
             className="font-black text-brand-red leading-none mb-2"
-            style={{ fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: '-0.05em' }}
+            style={{ fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0 }}
           >
             $100
           </div>
@@ -184,7 +184,7 @@ export default function CanvasRentalPage() {
       <section className="bg-black py-20 sm:py-28 px-6 sm:px-10 lg:px-16 border-t border-white/10">
         <div className="max-w-2xl mx-auto text-center">
           <div className="h-1 w-16 rounded-full mx-auto mb-8 bg-white/10" />
-          <h2 className="text-5xl sm:text-6xl font-black text-white mb-6" style={{letterSpacing: '-0.03em'}}>Ready to Create?</h2>
+          <h2 className="text-5xl sm:text-6xl font-black text-white mb-6" style={{letterSpacing: 0}}>Ready to Create?</h2>
           <p className="text-gray-400 text-lg mb-8">Book your studio time. No production crew needed. Full control. 24/7 access.</p>
           <a href="/book/?studio=canvas-rental" className="inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Reserve Canvas
