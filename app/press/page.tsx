@@ -66,7 +66,7 @@ export default function PressPage() {
             <div>
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-6">Boilerplate</p>
               <p className="text-white text-2xl sm:text-3xl font-light leading-relaxed max-w-4xl">
-                VibeShack is a media company and brand studio for creators, founders, and companies that need content, campaigns, and production support. VibeShack Studios is the San Francisco production arm: a 24/7 production studio with podcast sets, green screen, photo services, video production, photography studio rental, and white cyc rental spaces at 950 Battery St in the Northern Waterfront.
+                VibeShack is a media company and brand studio for creators, founders, and companies that need content, campaigns, and production support. VibeShack Studios is the San Francisco production arm: a 24/7 production studio with podcast sets, green screen, photo services, video production, and white cyc rental spaces at 950 Battery St in the Northern Waterfront.
               </p>
               <Link href="/press/24-7-san-francisco-production-studio/" className="inline-flex text-brand-red font-bold text-sm hover:text-white transition-colors mt-6">
                 Read the launch press release →

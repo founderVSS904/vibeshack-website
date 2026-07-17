@@ -157,7 +157,6 @@ const businessNode = {
     'Headshot photography',
     'Portrait photography',
     'Product photography',
-    'Photography studio rental',
     'White cyc studio rental',
     'Video production studio',
     'San Francisco production studio',

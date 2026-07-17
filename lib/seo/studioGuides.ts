@@ -133,16 +133,16 @@ export const studioGuides = [
   },
   {
     slug: 'photography-studio-prep',
-    title: 'Photography Studio Prep Guide',
+    title: 'Studio Photography Prep Guide',
     shortTitle: 'Photography Prep',
     description:
-      'A practical guide for planning a portrait, product, brand, or campaign shoot in a San Francisco photography studio.',
+      'A practical guide for planning a portrait, product, brand, or campaign shoot at Canvas Rental, the white cyc photo studio in San Francisco.',
     keyword: 'photography studio prep san francisco',
     image: '/studio-images/enhanced-photography-headshot-black-blazer-v20260510.jpg',
     imageAlt: 'Clean white-background headshot photographed at VibeShack Studios in San Francisco',
-    primaryPage: '/photography-studio-san-francisco/',
+    primaryPage: '/canvas-rental/',
     intro:
-      'A good photo shoot is decided by the shot list, surfaces, wardrobe, props, and final crop requirements before anyone steps in front of the camera. The goal is a repeatable look, not one good photo: useful images that fit the places they need to live.',
+      'Photo shoots at VibeShack happen in Canvas Rental: a seamless white cyc wall with an overhead lighting grid, booked by the hour at $100. A good shoot is decided by the shot list, surfaces, wardrobe, props, and final crop requirements before anyone steps in front of the camera. The goal is a repeatable look, not one good photo: useful images that fit the places they need to live.',
     sections: [
       {
         heading: 'Define the image set by priority',
@@ -187,12 +187,12 @@ export const studioGuides = [
       {
         question: 'Is a photography studio better than shooting at an office?',
         answer:
-          'A studio gives you controlled lighting, cleaner backgrounds, fewer interruptions, and more reliable image consistency across a campaign.',
+          'A studio gives you controlled lighting, cleaner backgrounds, fewer interruptions, and more reliable image consistency across a campaign. Canvas Rental is the room photo work happens in at VibeShack.',
       },
       {
         question: 'Can I shoot products and portraits in the same booking?',
         answer:
-          'Yes. Put the highest-stakes shots first and batch the day by lighting setup: portraits wrap while talent is fresh, then product and detail work runs without anyone waiting on set.',
+          'Yes. Canvas Rental handles both. Put the highest-stakes shots first and batch the day by lighting setup: portraits wrap while talent is fresh, then product and detail work runs without anyone waiting on set.',
       },
     ],
   },
@@ -266,7 +266,7 @@ export const studioGuides = [
     title: 'How to Choose the Best Studio for Your Shoot',
     shortTitle: 'Choose Your Studio',
     description:
-      'A decision guide for choosing between podcast sets, green screen, photo services, photography studio rental, and white cyc rental studios in San Francisco.',
+      'A decision guide for choosing between podcast sets, green screen, photo services, and white cyc rental studios in San Francisco.',
     keyword: 'best production studio san francisco',
     image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
     imageAlt: 'Crew rigging cyc lighting ahead of a production at VibeShack Studios in San Francisco',
@@ -285,14 +285,14 @@ export const studioGuides = [
           'If the background needs to become something else, choose green screen. It is the right move for virtual sets, explainer content, training videos, product demos, and brand worlds that will be built in post.',
       },
       {
-        heading: 'Choose photography for controlled stills',
+        heading: 'Choose Photo Services for controlled stills',
         body:
-          'If the deliverable is still imagery, choose photography. You get controlled lighting, cleaner surfaces, and efficient transitions between headshots, product shots, portraits, and campaign assets.',
+          'If the deliverable is still imagery and you want VibeShack to shoot it, choose Photo Services. You get controlled lighting, cleaner surfaces, and efficient transitions between headshots, product shots, portraits, and campaign assets.',
       },
       {
-        heading: 'Choose white cyc for clean visual range',
+        heading: 'Choose the white cyc for clean visual range',
         body:
-          'If you need flexible photo and video assets with a minimal background, choose the white cyc. It is one of the most reusable production environments because it does not lock the brand into a specific set.',
+          'If you need flexible photo and video assets with a minimal background, choose Canvas Rental. The white cyc is one of the most reusable production environments because it does not lock the brand into a specific set, and it is the room to book when your own photographer and crew are already set.',
       },
     ],
     producerNotes: [
@@ -317,7 +317,7 @@ export const studioGuides = [
       {
         question: 'Which VibeShack studio should I book first?',
         answer:
-          'Book a podcast set for interviews, green screen for virtual backgrounds, photography for stills, and Canvas Rental for clean white cyc photo or video.',
+          'Book a podcast set for interviews, green screen for virtual backgrounds, and Canvas Rental for stills or clean white cyc video. Ask about Photo Services when you want VibeShack to shoot it for you.',
       },
       {
         question: 'Can I book multiple studios in one session?',

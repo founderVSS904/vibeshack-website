@@ -43,7 +43,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/branding', lastModified, changeFrequency: 'monthly' as const, priority: 0.82 },
     { url: '/green-screen-studio-sf', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
     { url: '/photo-services', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
-    { url: '/photography-studio-san-francisco', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
     { url: '/video-production', lastModified, changeFrequency: 'monthly' as const, priority: 0.85 },
     { url: '/rental-studios', lastModified, changeFrequency: 'monthly' as const, priority: 0.75 },
   ]

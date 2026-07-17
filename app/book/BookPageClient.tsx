@@ -55,13 +55,12 @@ const FILTERS: { id: Filter; label: string }[] = [
 function matchesFilter(studio: Studio, filter: Filter) {
   if (filter === 'all') return true
   if (filter === 'podcast') return studio.type === 'podcast'
-  if (filter === 'photo') return studio.id === 'photography' || studio.id === 'canvas-rental'
+  if (filter === 'photo') return studio.type === 'photo'
   return studio.id === 'green-screen' || studio.id === 'canvas-rental'
 }
 
 function filterForStudio(studio: Studio): Filter {
   if (studio.type === 'podcast') return 'podcast'
-  if (studio.id === 'photography') return 'photo'
   return 'rental'
 }
 

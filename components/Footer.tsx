@@ -74,7 +74,6 @@ export default function Footer() {
                   { href: '/rental-studios/', label: 'All Rental Studios' },
                   { href: '/video-production/', label: 'Video Production' },
                   { href: '/photo-services/', label: 'Photo Services' },
-                  { href: '/photography-studio-san-francisco/', label: 'Photography Studio Rental' },
                   { href: '/canvas-rental/', label: 'Canvas Rental' },
                   { href: '/green-screen-studio-sf/', label: 'Green Screen' },
                 ].map(({ href, label }) => (

@@ -25,7 +25,6 @@ const pageImages = [
       ['/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg', 'The Wing cozy podcast studio at VibeShack Studios San Francisco'],
       ['/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg', 'Canvas Podcast white cyc stage at VibeShack Studios San Francisco'],
       ['/studio-images/inside-green-screen-v20260509.jpg', 'Green screen studio at VibeShack Studios San Francisco'],
-      ['/studio-images/inside-photography-red-v20260509.jpg', 'Photography studio at VibeShack Studios San Francisco'],
       ['/studio-images/parlor-production-v20260509.jpg', 'Parlor premium interview studio at VibeShack Studios San Francisco'],
       ['/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg', 'Horizon immersive podcast studio at VibeShack Studios San Francisco'],
       ['/studio-images/inside-canvas-cyc-v20260509.jpg', 'Canvas white cyc studio at VibeShack Studios San Francisco'],
@@ -97,15 +96,6 @@ const pageImages = [
   {
     loc: '/sunset-studio/',
     images: [['/studio-images/sunset-hero-v20260509.jpg', 'Sunset color podcast studio rental in San Francisco at VibeShack Studios']],
-  },
-  {
-    loc: '/photography-studio-san-francisco/',
-    images: [
-      ['/studio-images/photography-hero-service-v20260509.jpg', 'Fashion campaign photography created at VibeShack Studios San Francisco'],
-      ['/studio-images/photography-room-red-backdrop-v20260509.jpg', 'Photography room rental in San Francisco at VibeShack Studios'],
-      ['/studio-images/photography-spotlight-portrait-v20260509.jpg', 'Spotlight portrait photography created at VibeShack Studios San Francisco'],
-      ['/studio-images/photography-cyc-editorial-v20260509.jpg', 'Editorial cyc photography created at VibeShack Studios San Francisco'],
-    ],
   },
   {
     loc: '/video-production/',

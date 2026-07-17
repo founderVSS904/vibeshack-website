@@ -54,7 +54,7 @@ const videoFormats: VideoFormat[] = [
     alt: 'Set prepared for social media content production at VibeShack Studios San Francisco',
     objectPosition: 'center center',
     pressure: 'You need more than one good clip: hooks, vertical cuts, thumbnails, transitions, stills, and enough variation to feed the campaign.',
-    bestRoom: 'We plan the set around the platform: warm stages for talking-head content, white cyc for movement, green screen for edits, and a photo/video studio for fast changes.',
+    bestRoom: 'We plan the set around the platform: warm stages for talking-head content, white cyc for movement and fast changes, and green screen for edits.',
   },
   {
     eyebrow: '02 / Commercials',
@@ -63,7 +63,7 @@ const videoFormats: VideoFormat[] = [
     alt: 'Behind the scenes lighting setup for commercial video production at VibeShack Studios',
     objectPosition: 'center 42%',
     pressure: 'Commercials need control: clean sound, consistent light, camera movement, product angles, and room for alternate takes without resetting the whole day.',
-    bestRoom: 'Canvas, Green Screen, Photography Studio, or a warm interview set depending on whether the spot needs product clarity, performance, or brand presence.',
+    bestRoom: 'Canvas, Green Screen, or a warm interview set depending on whether the spot needs product clarity, performance, or brand presence.',
   },
   {
     eyebrow: '03 / Documentary',
@@ -99,7 +99,7 @@ const videoFormats: VideoFormat[] = [
     alt: 'Green screen studio for product demo and explainer video production at VibeShack Studios',
     objectPosition: 'center center',
     pressure: 'The viewer has to understand the product quickly. That means clean audio, deliberate framing, visual inserts, screen moments, and no distracting background noise.',
-    bestRoom: 'Green Screen for compositing, Canvas for clean product clarity, or Photography Studio when you need controlled light and tabletop-style setups.',
+    bestRoom: 'Green Screen for compositing, or Canvas when you need clean product clarity, controlled light, and tabletop-style setups.',
   },
 ]
 
@@ -116,7 +116,7 @@ const recommendedRooms = [
     title: 'White Cyc / Canvas',
     image: '/studio-images/enhanced-canvas-podcast-white-cyc-duo-v20260510.jpg',
     alt: 'White cyc studio for commercials and social video production at VibeShack Studios San Francisco',
-    fit: 'Commercials, music videos, social cutdowns, product movement, clean performance visuals, and full-body framing.',
+    fit: 'Commercials, music videos, social cutdowns, product demos, beauty and creator content, clean performance visuals, and full-body framing.',
     price: '$100/hr',
   },
   {
@@ -125,14 +125,6 @@ const recommendedRooms = [
     image: '/studio-images/guide-green-screen-prep-v20260509.jpg',
     alt: 'Green screen studio for explainer and commercial video production at VibeShack Studios San Francisco',
     fit: 'Virtual sets, training videos, app walkthroughs, product explainers, commercial compositing, and scripted scenes.',
-    price: '$100/hr',
-  },
-  {
-    href: '/photography-studio-san-francisco/',
-    title: 'Photo / Video Studio',
-    image: '/studio-images/inside-photography-red-v20260509.jpg',
-    alt: 'Flexible photo and video production room at VibeShack Studios San Francisco',
-    fit: 'Product demos, head-and-shoulder video, wardrobe changes, beauty content, creator shoots, and fast social setups.',
     price: '$100/hr',
   },
   {
@@ -387,7 +379,7 @@ export default function VideoProductionPage() {
             <Link href="/find-your-studio/" className="text-gray-600 hover:text-white text-sm transition-colors">Find your studio</Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {recommendedRooms.map(({ href, title, image, alt, fit, price }) => (
               <Link key={href} href={href} className="group block overflow-hidden rounded-lg border border-white/10 bg-zinc-950 hover:border-white/25 transition-colors">
                 <div className="relative h-72 overflow-hidden">

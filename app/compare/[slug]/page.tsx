@@ -10,7 +10,7 @@ const pageLabels: Record<string, string> = {
   '/green-screen-studio-sf/': 'Green Screen',
   '/canvas-rental/': 'Canvas Rental',
   '/podcast-studio-san-francisco/': 'Podcast Studios',
-  '/photography-studio-san-francisco/': 'Photography Studio',
+  '/photo-services/': 'Photo Services',
   '/book/': 'Custom booking',
 }
 

@@ -5,11 +5,11 @@ import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Rental Studios San Francisco',
-  description: 'Rent green screen, photography, and white cyc studios in San Francisco. Bring your crew or shoot solo. From $100/hr. Open 24/7.',
+  description: 'Rent green screen and white cyc studios in San Francisco. Bring your crew or shoot solo. From $100/hr. Open 24/7.',
   alternates: { canonical: `${siteUrl}/rental-studios/` },
   openGraph: {
     title: 'Rental Studios SF | VibeShack Studios',
-    description: 'Canvas, Photography, Green Screen. $100/hr. Your crew, our space. Open 24/7.',
+    description: 'Canvas and Green Screen. $100/hr. Your crew, our space. Open 24/7.',
     url: `${siteUrl}/rental-studios/`,
     images: [
       {
@@ -33,15 +33,6 @@ const studios = [
     price: '$100',
   },
   {
-    name: 'Photography Studio',
-    href: '/photography-studio-san-francisco/',
-    bookHref: '/book/?studio=photography',
-    img: '/studio-images/inside-photography-red-v20260509.jpg',
-    series: 'Creative Series',
-    desc: 'Professional lighting. White backdrop. Hair & Makeup room on-site.',
-    price: '$100',
-  },
-  {
     name: 'Green Screen',
     href: '/green-screen-studio-sf/',
     bookHref: '/book/?studio=green-screen',
@@ -55,7 +46,7 @@ const studios = [
 const rentalFaqs = [
   {
     question: 'What rental studios are available at VibeShack?',
-    answer: 'You can rent Canvas, the Photography Studio, and the Green Screen Studio for photo, video, product, social, and creator shoots.',
+    answer: 'You can rent Canvas and the Green Screen Studio for photo, video, product, social, and creator shoots.',
   },
   {
     question: 'Can I bring my own crew and equipment?',
@@ -73,7 +64,7 @@ const rentalFaqs = [
 
 const rentalServiceSchema = studioServiceSchema({
   name: 'Production Studio Rental in San Francisco',
-  description: 'Green screen, photography, white cyc, and creative studio rentals in San Francisco for photo, video, product, and content shoots.',
+  description: 'Green screen, white cyc, and creative studio rentals in San Francisco for photo, video, product, and content shoots.',
   url: `${siteUrl}/rental-studios/`,
   image: `${siteUrl}/studio-images/inside-canvas-cyc-v20260509.jpg`,
   price: '100',

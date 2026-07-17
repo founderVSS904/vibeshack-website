@@ -142,9 +142,9 @@ const gallery = [
 
 const faqs = [
   {
-    question: 'Is this the same as renting the photography studio?',
+    question: 'Is this the same as renting a room?',
     answer:
-      'No. Photo services means VibeShack plans and produces the shoot: product photography, headshots and portraits, food and beverage, editorials and lookbooks, wedding and event content, and full content days. If you already have a photographer and only need the room, book the Photography Studio under rentals instead.',
+      'No. Photo services means VibeShack plans and produces the shoot: product photography, headshots and portraits, food and beverage, editorials and lookbooks, wedding and event content, and full content days. If you already have a photographer and only need the room, book Canvas Rental under rentals instead.',
   },
   {
     question: 'Do you shoot headshots and portraits?',
@@ -159,7 +159,7 @@ const faqs = [
   {
     question: 'How is pricing handled?',
     answer:
-      'Photo services are quoted after the brief, shot list, crew needs, number of people or products, usage, timeline, and post-production expectations are clear. Room-only photography studio rental is separate and starts at $100 per hour.',
+      'Photo services are quoted after the brief, shot list, crew needs, number of people or products, usage, timeline, and post-production expectations are clear. Room-only rental is separate and starts at $100 per hour.',
   },
   {
     question: 'Can you shoot products and portraits in one session?',

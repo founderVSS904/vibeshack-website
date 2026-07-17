@@ -175,7 +175,7 @@ export default function AboutPage() {
               <Image src="/studio-images/parlor-side-v20260509.jpg" alt="Parlor lounge production set at VibeShack Studios" fill sizes="(min-width: 768px) 33vw, 50vw" className="object-cover" />
             </div>
             <div className="relative h-[174px] overflow-hidden rounded-lg sm:h-[234px]">
-              <Image src="/studio-images/inside-photography-red-v20260509.jpg" alt="Red backdrop photography set at VibeShack Studios" fill sizes="(min-width: 768px) 33vw, 50vw" className="object-cover" />
+              <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg" alt="Canvas white cyc set at VibeShack Studios" fill sizes="(min-width: 768px) 33vw, 50vw" className="object-cover" />
             </div>
           </div>
         </div>

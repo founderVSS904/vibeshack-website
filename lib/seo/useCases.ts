@@ -178,16 +178,16 @@ export const useCases = [
         price: '$300-$400/hr',
       },
       {
-        name: 'Photography studio',
-        href: '/photography-studio-san-francisco/',
-        fit: 'Use for headshots, team photos, product details, profile images, and campaign stills.',
+        name: 'Canvas Rental',
+        href: '/canvas-rental/',
+        fit: 'Use for headshots, team photos, product details, campaign stills, clean white cyc video, and movement.',
         price: '$100/hr',
       },
       {
-        name: 'Canvas Rental',
-        href: '/canvas-rental/',
-        fit: 'Use for clean white cyc video, movement, product moments, and reusable campaign visuals.',
-        price: '$100/hr',
+        name: 'Photo Services',
+        href: '/photo-services/',
+        fit: 'Use when you want VibeShack to shoot the portraits, product, and campaign stills for you.',
+        price: 'Contact us',
       },
       {
         name: 'Green Screen',
@@ -432,15 +432,9 @@ export const useCases = [
         price: 'Contact us',
       },
       {
-        name: 'Photography Studio Rental',
-        href: '/photography-studio-san-francisco/',
-        fit: 'Best when your photographer and crew are already set and you only need the controlled room, backdrops, and prep space.',
-        price: '$100/hr',
-      },
-      {
         name: 'Canvas Rental',
         href: '/canvas-rental/',
-        fit: 'Best when the shoot needs white cyc space, movement, larger props, or video and stills together.',
+        fit: 'Best when your photographer and crew are already set and you only need the room: white cyc space, movement, larger props, or video and stills together.',
         price: '$100/hr',
       },
       {
@@ -562,10 +556,10 @@ export const useCases = [
         price: '$100/hr',
       },
       {
-        name: 'Photography Studio',
-        href: '/photography-studio-san-francisco/',
-        fit: 'Best for smaller portrait, product, and backdrop-driven shoots with controlled lighting.',
-        price: '$100/hr',
+        name: 'Photo Services',
+        href: '/photo-services/',
+        fit: 'Best when you want VibeShack to shoot the portraits, product, and campaign stills for you.',
+        price: 'Contact us',
       },
       {
         name: 'Canvas Podcast',

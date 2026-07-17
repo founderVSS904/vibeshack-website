@@ -33,7 +33,6 @@ const podcastStudios: HeaderLink[] = [
 const rentalStudios: HeaderLink[] = [
   { href: '/rental-studios/', label: 'All Rental Studios', detail: 'White cyc, green screen, photo rooms', image: '/studio-images/canvas-rental-space-v20260509.jpg' },
   { href: '/canvas-rental/', label: 'Canvas Rental', detail: 'White cyc and open production floor', price: '$100/hr', image: '/studio-images/enhanced-canvas-podcast-white-cyc-duo-v20260510.jpg' },
-  { href: '/photography-studio-san-francisco/', label: 'Photography Studio', detail: 'Backdrops, glam room, lighting', price: '$100/hr', image: '/studio-images/inside-photography-red-v20260509.jpg' },
   { href: '/green-screen-studio-sf/', label: 'Green Screen', detail: 'Full green wall for compositing', price: '$100/hr', image: '/studio-images/inside-green-screen-v20260509.jpg' },
 ]
 
@@ -490,7 +489,7 @@ const serviceCards = [
   { href: '/branding/', label: 'Branding', detail: 'Creative direction, launches, content systems', kicker: 'Identity systems', image: '/studio-images/home-branding-pure-magic-v20260716.jpg' },
   { href: '/podcast-studio-san-francisco/', label: 'Podcasts', detail: 'Sets with cameras, audio, and crew', kicker: 'Broadcast ready', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
   { href: '/video-production/', label: 'Video Production', detail: 'Social content, music videos, brand video', kicker: 'Concept to screen', image: '/studio-images/encore-production.jpg' },
-  { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, campaigns', kicker: 'Every frame styled', image: '/studio-images/inside-photography-red-v20260509.jpg' },
+  { href: '/photo-services/', label: 'Photo Services', detail: 'Headshots, portraits, products, campaigns', kicker: 'Every frame styled', image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg' },
 ]
 
 const proofStripLinks = [

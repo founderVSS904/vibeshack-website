@@ -80,6 +80,18 @@ const nextConfig = {
         permanent: true,
       },
       {
+        // The Photography Studio rental is retired. Canvas is the cyc room
+        // photo work happens in now, so inbound links land somewhere real.
+        source: '/photography-studio-san-francisco',
+        destination: '/canvas-rental/',
+        permanent: true,
+      },
+      {
+        source: '/photography-studio-san-francisco/',
+        destination: '/canvas-rental/',
+        permanent: true,
+      },
+      {
         source: '/premier',
         destination: '/find-your-studio/',
         permanent: true,

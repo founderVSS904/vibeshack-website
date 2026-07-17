@@ -327,20 +327,20 @@ export default function GreenScreenPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-6">Also in the Creative Series</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <a href="/photography-studio-san-francisco/" className="relative overflow-hidden rounded-lg group block" style={{height: '200px'}}>
-              <Image src="/studio-images/inside-photography-red-v20260509.jpg" alt="Photography Studio, Creative Series, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
-              <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
-              <div className="absolute bottom-4 left-4">
-                <p className="text-white font-black">Photography Studio</p>
-                <p className="text-gray-400 text-xs">$100/hr · Hair & Makeup room</p>
-              </div>
-            </a>
             <a href="/canvas-rental/" className="relative overflow-hidden rounded-lg group block" style={{height: '200px'}}>
               <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg" alt="Canvas, seamless white cyc wall, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
               <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
               <div className="absolute bottom-4 left-4">
                 <p className="text-white font-black">Canvas</p>
                 <p className="text-gray-400 text-xs">$100/hr · White cyc wall</p>
+              </div>
+            </a>
+            <a href="/sunset-studio/" className="relative overflow-hidden rounded-lg group block" style={{height: '200px'}}>
+              <Image src="/studio-images/sunset-hero-v20260509.jpg" alt="Sunset, color-changing backdrop studio, VibeShack Studios San Francisco" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]" />
+              <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)'}} />
+              <div className="absolute bottom-4 left-4">
+                <p className="text-white font-black">Sunset</p>
+                <p className="text-gray-400 text-xs">$300/hr · 12 backdrop colors</p>
               </div>
             </a>
           </div>

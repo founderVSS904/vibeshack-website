@@ -45,11 +45,11 @@ export default function EditorialsPage() {
         heroAlt="Editorial beauty portrait photographed at VibeShack Studios San Francisco"
         heroPosition="center 36%"
         primaryCta={{ href: '/contact/?service=editorials', label: 'Start an editorial request' }}
-        secondaryCta={{ href: '/photography-studio-san-francisco/', label: 'Rent the photo room' }}
+        secondaryCta={{ href: '/canvas-rental/', label: 'Rent the Canvas room' }}
         stats={[
           { label: 'Best for', value: 'Campaigns', detail: 'Fashion, beauty, portraits, lookbooks, cover art, press, and content-day stills.' },
           { label: 'Produced shoot', value: 'Contact us', detail: 'Quoted around people, products, usage, sets, styling, and post expectations.' },
-          { label: 'Room-only', value: '$100/hr', detail: 'Photography studio rental when your photographer and crew are already set.' },
+          { label: 'Room-only', value: '$100/hr', detail: 'Canvas Rental when your photographer and crew are already set.' },
         ]}
         introEyebrow="Editorial paths"
         introTitle="A shoot day should leave with a usable image system."
@@ -102,7 +102,7 @@ export default function EditorialsPage() {
           },
         ]}
         packages={[
-          { title: 'Photo room rental', price: '$100/hr', detail: 'For photographers and crews who only need the room, lighting access, backdrop options, and HMU space.' },
+          { title: 'Canvas room rental', price: '$100/hr', detail: 'For photographers and crews who need the room only. Seamless white cyc wall and a full overhead lighting grid.' },
           { title: 'Editorial session', price: 'Contact us', detail: 'For portraits, cover art, lookbooks, beauty, and campaign stills with a clearer creative direction.' },
           { title: 'Campaign content day', price: 'Contact us', detail: 'For teams that need a wider image system: portraits, product, social crops, press, and campaign stills.' },
         ]}

@@ -40,7 +40,6 @@ const studios = [
   { name: 'Horizon', price: '$400', note: 'full crew included · Signature Series', href: '/horizon/', category: 'Podcast' },
   { name: 'Canvas Podcast', price: '$400', note: 'LED backdrop · full crew included', href: '/canvas-podcast/', category: 'Podcast' },
   { name: 'Green Screen', price: '$100', note: 'floor-to-ceiling · Creative Series', href: '/green-screen-studio-sf/', category: 'Rental' },
-  { name: 'Photography Studio', price: '$100', note: 'room-only rental · Creative Series', href: '/photography-studio-san-francisco/', category: 'Rental' },
   { name: 'Canvas Rental', price: '$100', note: 'white backdrop · Creative Series', href: '/canvas-rental/', category: 'Rental' },
 ]
 
@@ -57,7 +56,7 @@ const pricingFaqs = [
   { question: 'What does the rate include?', answer: 'The rate includes the studio and the equipment listed on each studio page. Podcast sets include crew options and production setup.' },
   { question: 'How are photo and video services priced?', answer: 'Photo and video services are quoted after the brief, shot list, deliverables, crew needs, usage, and timeline are clear.' },
   { question: 'How do I book?', answer: 'Book directly on the website. Choose your studio, pick a date and time, add any options, and confirm online.' },
-  { question: 'Can I book multiple studios in one day?', answer: 'Yes. You can book multiple studios for the same day, such as a podcast set plus photography studio rental time.' },
+  { question: 'Can I book multiple studios in one day?', answer: 'Yes. You can book multiple studios for the same day, such as a podcast set plus Canvas Rental time.' },
   { question: 'Is there a cancellation policy?', answer: 'Cancel at least 48 hours before your session for a full refund. Within 48 hours, sessions are non-refundable.' },
   { question: 'Do you offer monthly rates?', answer: 'Yes. Contact us for recurring bookings or blocks of hours with priority access to the calendar.' },
   { question: 'Is parking available?', answer: 'Street parking is available on Battery St. The studio is also about a 10-minute walk from the Ferry Building.' },
@@ -93,7 +92,7 @@ const quotedOffer = (name: string, description: string) => ({
 const pricingServiceSchema = {
   ...studioServiceSchema({
     name: 'Studio Rental Pricing in San Francisco',
-    description: 'Hourly pricing for VibeShack Studios podcast sets, green screen, photography studio rental, Canvas Podcast, white cyc rentals, and production service quote requests in San Francisco.',
+    description: 'Hourly pricing for VibeShack Studios podcast sets, green screen, Canvas Podcast, white cyc rentals, and production service quote requests in San Francisco.',
     url: `${siteUrl}/pricing/`,
     image: `${siteUrl}/og-image.jpg`,
     serviceType: 'Studio Rental Pricing',
@@ -101,7 +100,7 @@ const pricingServiceSchema = {
   offers: [
     hourlyOffer('Podcast Studios', '300'),
     hourlyOffer('Canvas Podcast Studio', '400'),
-    hourlyOffer('Rental Studios (Green Screen, Photography Studio, Canvas)', '100'),
+    hourlyOffer('Rental Studios (Green Screen, Canvas)', '100'),
     quotedOffer('Photo Services', 'Contact VibeShack Studios for a scoped photo services quote.'),
     quotedOffer('Video Production Services', 'Contact VibeShack Studios for a scoped video production quote.'),
   ],

@@ -144,7 +144,6 @@ export default function ContactForm() {
           <option value="branding" style={{ background: '#111' }}>Branding / Creative Direction</option>
           <option value="green-screen" style={{ background: '#111' }}>Green Screen / VFX</option>
           <option value="photo-services" style={{ background: '#111' }}>Photo Services / Headshots / Portraits</option>
-          <option value="photography-studio-rental" style={{ background: '#111' }}>Photography Studio Rental / Room Only</option>
           <option value="video-interview" style={{ background: '#111' }}>Video / Interview / Corporate</option>
           <option value="music-video" style={{ background: '#111' }}>Music Video</option>
           <option value="content-creation" style={{ background: '#111' }}>Social Media Content</option>

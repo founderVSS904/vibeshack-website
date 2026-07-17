@@ -26,7 +26,7 @@ const planningPrinciples = [
 export const metadata: Metadata = {
   title: 'Studio Use Cases',
   description:
-    'Choose the right VibeShack Studios path for podcast interviews, content days, green screen, photo services, photography studio rental, and white cyc social shoots.',
+    'Choose the right VibeShack Studios path for podcast interviews, content days, green screen, photo services, and white cyc social shoots.',
   alternates: { canonical: absoluteUrl('/use-cases/') },
   openGraph: {
     title: 'Studio Use Cases | VibeShack Studios',

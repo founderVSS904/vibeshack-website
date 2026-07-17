@@ -594,10 +594,10 @@ export default function PhotoServicesHero() {
                   Plan this shoot <span aria-hidden>→</span>
                 </Link>
                 <Link
-                  href="/photography-studio-san-francisco/"
+                  href="/canvas-rental/"
                   className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:text-white"
                 >
-                  Need room-only rental?
+                  Need the room only? Rent Canvas
                 </Link>
               </div>
             </div>

@@ -162,23 +162,6 @@ export const STUDIOS: Studio[] = [
     ],
   },
   {
-    id: 'photography',
-    name: 'Photography Studio',
-    price: 100,
-    tag: null,
-    description: 'Professional lighting. White backdrop. Hair & Makeup room.',
-    heroImage: '/studio-images/inside-photography-red-v20260509.jpg',
-    photos: ['/studio-images/inside-photography-red-v20260509.jpg', '/studio-images/enhanced-photography-headshot-black-blazer-v20260510.jpg', '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg'],
-    includes: ['Professional lighting', 'White seamless backdrop', 'Hair & Makeup room', 'Kino Flo + ARRI lighting', 'Full vanity station'],
-    type: 'photo',
-    prep: [
-      'Hair & Makeup room on-site. Arrive as you are.',
-      'Bring 2-3 outfit options. More variety, more content.',
-      'Bring any props, products, or branded items you want in frame.',
-      'Lighting is set and calibrated before you walk in.',
-    ],
-  },
-  {
     id: 'canvas-rental',
     name: 'Canvas Rental',
     price: 100,
