@@ -48,7 +48,7 @@ export default async function OurWorkPage({
       <section className="relative h-[540px] overflow-hidden border-b border-white/10 bg-black pt-20 text-white">
         <div className="absolute inset-x-0 bottom-0 top-20 opacity-95">
           <OurWorkShowreel
-            src="/studio-videos/our-work-showreel-v20260714.mp4"
+            src="/studio-videos/our-work-showreel-v20260716.mp4"
             poster={featuredWorkProject.image}
             posterAlt={featuredWorkProject.alt}
           />
