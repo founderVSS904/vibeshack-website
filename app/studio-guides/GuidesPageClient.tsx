@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { studioGuides, type StudioGuide } from '@/lib/seo/studioGuides'
 
 // ─── Data shaping ─────────────────────────────────────────────────────────────
@@ -32,7 +32,7 @@ const CHIPS: { label: string; tab: TabId }[] = [
   { label: 'A Content Day', tab: 'planning' },
 ]
 
-// Stations sit on the compass ellipse (cx 50, cy 50, rx 46, ry 40, percent units).
+// How a session runs. Read as a static rail under the library.
 const STATIONS = [
   {
     n: '01',
@@ -41,8 +41,6 @@ const STATIONS = [
     body: 'Choose by the final asset: conversation, campaign still, keyed composite, or clean cyc movement.',
     href: '/studio-guides/best-studio-for-your-shoot/',
     cta: 'Open the guide',
-    dot: { left: '13.3%', top: '25.9%' },
-    label: '-translate-x-full -translate-y-full pr-4 pb-1 text-right',
   },
   {
     n: '02',
@@ -51,8 +49,6 @@ const STATIONS = [
     body: 'What to bring, what to confirm, and what not to leave until the room is booked.',
     href: '/studio-guides/podcast-studio-prep/',
     cta: 'Open the checklist',
-    dot: { left: '95.3%', top: '43.1%' },
-    label: '-translate-y-full pl-4 pb-1 text-left',
   },
   {
     n: '03',
@@ -61,8 +57,6 @@ const STATIONS = [
     body: 'Arrival, wardrobe, framing, and audio checks in the right order keep the session calm.',
     href: '/studio-guides/photography-studio-prep/',
     cta: 'Open the guide',
-    dot: { left: '86.2%', top: '74.6%' },
-    label: 'pl-4 pt-2 text-left',
   },
   {
     n: '04',
@@ -71,30 +65,7 @@ const STATIONS = [
     body: 'Hero takes plus crops, stills, and hooks. Decide the asset list before you wrap.',
     href: '/book/',
     cta: 'Book the session',
-    dot: { left: '13.3%', top: '74.1%' },
-    label: '-translate-x-full pr-4 pt-2 text-right',
   },
-]
-
-// Individual gear cutouts, placed on the compass. left/top/w are percent of the
-// container; px is the PNG's natural size; z stacks the cluster.
-const GEAR = [
-  { src: '/studio-images/guides-gear/gear-camera-v20260715.webp', label: 'Cinema camera', px: [349, 331], w: 24, left: 41, top: 16, z: 3 },
-  { src: '/studio-images/guides-gear/gear-mic-v20260715.webp', label: 'Shotgun mic', px: [250, 159], w: 17, left: 27, top: 17, z: 2 },
-  { src: '/studio-images/guides-gear/gear-headphones-v20260715.webp', label: 'Headphones', px: [195, 216], w: 12, left: 64, top: 23, z: 2 },
-  { src: '/studio-images/guides-gear/gear-cable-v20260715.webp', label: 'XLR cable', px: [180, 202], w: 11, left: 29, top: 40, z: 1 },
-  { src: '/studio-images/guides-gear/gear-ssd-v20260715.webp', label: 'Portable SSD', px: [149, 120], w: 9, left: 39, top: 60, z: 1 },
-  { src: '/studio-images/guides-gear/gear-led-v20260715.webp', label: 'LED panel', px: [130, 147], w: 8, left: 48, top: 62, z: 2 },
-  { src: '/studio-images/guides-gear/gear-clapper-v20260715.webp', label: 'Clapperboard', px: [229, 199], w: 13, left: 56, top: 45, z: 2 },
-]
-
-// Dotted red connectors between gear pieces, in the same percent space.
-const CONNECTORS: [number, number, number, number][] = [
-  [37, 25, 44, 28],
-  [60, 30, 65, 31],
-  [35, 52, 41, 62],
-  [57, 37, 60, 46],
-  [46, 66, 49, 66],
 ]
 
 function readMinutes(guide: StudioGuide) {
@@ -177,26 +148,11 @@ function GuideIcon({ slug, className }: { slug: string; className: string }) {
 export default function GuidesPageClient() {
   const [tab, setTab] = useState<TabId>('all')
   const [query, setQuery] = useState('')
-  const [activeStation, setActiveStation] = useState(0)
-  const pinnedRef = useRef(false)
-
-  // Ambient walk around the compass until the user takes over.
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const interval = setInterval(() => {
-      if (document.hidden || pinnedRef.current) return
-      setActiveStation((s) => (s + 1) % STATIONS.length)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const pickStation = (index: number) => {
-    pinnedRef.current = true
-    setActiveStation(index)
-  }
 
   const goToLibrary = () => {
-    document.getElementById('guide-library')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // globals.css already sets scroll-behavior: smooth inside a reduced-motion
+    // guard. Passing 'smooth' here would override that guard.
+    document.getElementById('guide-library')?.scrollIntoView({ block: 'start' })
   }
 
   // Choose Your Studio leads the library; it is the orientation guide.
@@ -210,195 +166,102 @@ export default function GuidesPageClient() {
   const featured = filtered[0]
   const sideGuides = filtered.slice(1, 3)
   const restGuides = filtered.slice(3)
-  const station = STATIONS[activeStation]
 
   return (
     <div className="bg-black">
-      {/* ── Hero ── */}
-      <section className="border-b border-white/10 px-6 pb-16 pt-28 sm:px-10 lg:px-16">
-        <div className="mx-auto grid max-w-[1680px] grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-          <div>
-            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-zinc-400">
-              VibeShack Field Guide
-            </p>
-            <h1 className="mt-6 text-white" style={{ fontSize: 'clamp(2.75rem, 4vw, 4rem)' }}>
-              Studio guides<span className="text-brand-red">.</span>
-            </h1>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-zinc-300">
-              Planning notes for podcast, photo, green screen, and white cyc sessions at VibeShack.
-            </p>
+      {/* ── Hero: one centered field, one job ── */}
+      <section className="border-b border-white/10 px-6 pb-14 pt-28 sm:px-10 sm:pt-32 lg:px-16 lg:pb-28 lg:pt-40">
+        <div className="mx-auto max-w-[720px] text-center">
+          {/* globals.css already sets h1 condensed, 900, uppercase, lh 0.88 and
+              forces letter-spacing. Size is the only knob here. */}
+          <h1 className="text-white" style={{ fontSize: 'clamp(2.5rem, 7vw, 5rem)' }}>
+            Studio guides<span className="text-brand-red">.</span>
+          </h1>
+          <p className="mx-auto mt-7 max-w-[30rem] text-[17px] leading-relaxed text-zinc-400">
+            Planning notes for podcast, photo, green screen, and white cyc sessions.
+          </p>
 
-            <form
-              className="mt-8 flex max-w-lg items-center gap-3 rounded-lg border border-white/15 bg-white/[0.03] py-2 pl-6 pr-2 transition-colors focus-within:border-white/35"
-              onSubmit={(e) => {
-                e.preventDefault()
-                goToLibrary()
-              }}
-            >
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value)
-                  if (tab !== 'all') setTab('all')
-                }}
-                placeholder="What are you making?"
-                aria-label="Search the guides"
-                className="min-w-0 flex-1 bg-transparent py-2.5 text-[17px] text-white placeholder-zinc-500 focus:outline-none"
-              />
-              <button
-                type="submit"
-                aria-label="Search"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-red text-white transition-colors hover:bg-red-700"
-              >
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
-                  <path d="M4 12h15M13 6l6 6-6 6" />
-                </svg>
-              </button>
-            </form>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              {CHIPS.map((chip) => (
-                <button
-                  key={chip.tab}
-                  type="button"
-                  onClick={() => {
-                    setQuery('')
-                    setTab(chip.tab)
-                    goToLibrary()
-                  }}
-                  className="rounded-full border border-white/15 px-3.5 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:border-white/40 hover:text-white"
-                >
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Compass (desktop) ── */}
-          <div className="hidden lg:block">
-          <div className="relative aspect-[13/9] select-none" aria-label="The VibeShack process: plan, prepare, produce, deliver">
-            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
-              <ellipse cx="50" cy="50" rx="46" ry="40" fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="0.18" strokeDasharray="0.9 1.6" />
-              {CONNECTORS.map(([x1, y1, x2, y2]) => (
-                <line
-                  key={`${x1}-${y1}-${x2}-${y2}`}
-                  x1={x1} y1={y1} x2={x2} y2={y2}
-                  stroke="rgba(236,0,0,0.35)"
-                  strokeWidth="0.16"
-                  strokeDasharray="0.7 1.5"
-                />
-              ))}
+          {/* The one object. The 40px above it is what makes it the focal point. */}
+          <form
+            role="search"
+            className="mx-auto mt-10 flex max-w-[560px] items-center gap-3 rounded-full border border-white/15 bg-white/[0.04] py-2 pl-6 pr-2 transition-colors duration-200 hover:border-white/25 focus-within:border-brand-red/60 focus-within:ring-2 focus-within:ring-brand-red/50"
+            onSubmit={(e) => {
+              e.preventDefault()
+              goToLibrary()
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" className="shrink-0 text-zinc-500" aria-hidden>
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20.5 20.5 16.65 16.65" />
             </svg>
+            <label htmlFor="guide-search" className="sr-only">Search the guides</label>
+            {/* focus:shadow-none beats the global input:focus red glow, which would
+                otherwise paint a rectangle inside the pill. appearance-none stops
+                Safari's search field forcing a min width that blows out the row. */}
+            <input
+              id="guide-search"
+              type="search"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                if (tab !== 'all') setTab('all')
+              }}
+              placeholder="What are you making?"
+              className="min-w-0 flex-1 appearance-none border-0 bg-transparent py-3 text-[17px] text-white placeholder-zinc-500 focus:shadow-none focus:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
+            />
+            <button
+              type="submit"
+              aria-label="Search"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-red text-white transition-colors duration-200 hover:bg-red-700 sm:h-12 sm:w-12"
+            >
+              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
+                <path d="M4 12h15M13 6l6 6-6 6" />
+              </svg>
+            </button>
+          </form>
 
-            {GEAR.map((item) => (
-              <div
-                key={item.label}
-                className="group absolute"
-                style={{ left: `${item.left}%`, top: `${item.top}%`, width: `${item.w}%`, zIndex: item.z }}
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {CHIPS.map((chip) => (
+              <button
+                key={chip.tab}
+                type="button"
+                onClick={() => {
+                  setQuery('')
+                  setTab(chip.tab)
+                  goToLibrary()
+                }}
+                className="rounded-full border border-white/10 px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors duration-200 hover:border-white/40 hover:text-white"
               >
-                <Image
-                  src={item.src}
-                  alt={item.label}
-                  width={item.px[0]}
-                  height={item.px[1]}
-                  unoptimized
-                  className="h-auto w-full transition-transform duration-300 ease-out group-hover:scale-110"
-                  draggable={false}
-                />
-                <span className="pointer-events-none absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/15 bg-black/85 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
-                  {item.label}
-                </span>
-              </div>
+                {chip.label}
+              </button>
             ))}
+          </div>
 
-            {STATIONS.map((s, i) => {
-              const active = i === activeStation
-              return (
+          {/* Typing filters a library that sits below the fold, so say what happened.
+              The reserved height stops the row shifting as text appears. */}
+          <div className="mt-6 min-h-[22px]" aria-live="polite">
+            {query.trim().length > 0 && (
+              filtered.length > 0 ? (
                 <button
-                  key={s.n}
                   type="button"
-                  onClick={() => pickStation(i)}
-                  aria-pressed={active}
-                  className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
-                  style={{ left: s.dot.left, top: s.dot.top }}
+                  onClick={goToLibrary}
+                  className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors duration-200 hover:text-red-400"
                 >
-                  <span
-                    className={`block h-2.5 w-2.5 rounded-full transition-[background-color,border-color,box-shadow] duration-300 ${
-                      active
-                        ? 'bg-brand-red'
-                        : 'border border-white/40 bg-black'
-                    }`}
-                  />
-                  <span className={`absolute left-1/2 top-1/2 block w-max ${s.label}`}>
-                    <span className={`block font-mono text-[22px] leading-none transition-colors ${active ? 'text-brand-red' : 'text-zinc-500'}`}>
-                      {s.n}
-                    </span>
-                    <span className={`mt-1 block font-mono text-[11px] font-bold uppercase tracking-[0.22em] transition-colors ${active ? 'text-white' : 'text-zinc-400'}`}>
-                      {s.name}
-                    </span>
-                  </span>
+                  {filtered.length} {filtered.length === 1 ? 'guide' : 'guides'} match <span aria-hidden>→</span>
                 </button>
-              )
-            })}
-
-          </div>
-
-          {/* Active station, docked below the compass so it never covers the gear */}
-          <div className="mt-4 flex items-center gap-6 rounded-lg border border-white/10 bg-[#0b0b0b] px-7 py-5">
-            <div className="flex shrink-0 items-baseline gap-3">
-              <span className="font-mono text-[26px] leading-none text-brand-red">{station.n}</span>
-              <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-white">{station.name}</span>
-            </div>
-            <span className="h-9 w-px shrink-0 bg-white/10" aria-hidden />
-            <div key={station.n} className="booking-media-enter flex min-w-0 flex-1 items-center gap-6">
-              <p className="min-w-0 flex-1 text-[13px] leading-relaxed text-zinc-400">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white">{station.title}. </span>
-                {station.body}
-              </p>
-              <Link
-                href={station.href}
-                className="shrink-0 whitespace-nowrap font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors hover:text-red-400"
-              >
-                {station.cta} <span aria-hidden>→</span>
-              </Link>
-            </div>
-          </div>
-          </div>
-
-          {/* ── Compass (mobile): stations as steps ── */}
-          <div className="lg:hidden">
-            <div className="grid grid-cols-4 gap-2">
-              {STATIONS.map((s, i) => {
-                const active = i === activeStation
-                return (
+              ) : (
+                <p className="text-[13px] text-zinc-400">
+                  No guides match that search.{' '}
                   <button
-                    key={s.n}
                     type="button"
-                    onClick={() => pickStation(i)}
-                    aria-pressed={active}
-                    className={`rounded-lg border px-2 py-3 text-center transition-colors ${
-                      active ? 'border-brand-red' : 'border-white/10'
-                    }`}
+                    onClick={() => setQuery('')}
+                    className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors duration-200 hover:text-red-400"
                   >
-                    <span className={`block font-mono text-base leading-none ${active ? 'text-brand-red' : 'text-zinc-500'}`}>{s.n}</span>
-                    <span className={`mt-1.5 block font-mono text-[10px] font-bold uppercase tracking-[0.14em] ${active ? 'text-white' : 'text-zinc-400'}`}>
-                      {s.name}
-                    </span>
+                    Clear
                   </button>
-                )
-              })}
-            </div>
-            <div key={station.n} className="booking-media-enter mt-3 rounded-lg border border-white/15 bg-white/[0.02] p-5">
-              <p className="font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-white">{station.title}</p>
-              <p className="mt-2.5 text-[13px] leading-relaxed text-zinc-400">{station.body}</p>
-              <Link
-                href={station.href}
-                className="mt-4 inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors hover:text-red-400"
-              >
-                {station.cta} <span aria-hidden>→</span>
-              </Link>
-            </div>
+                </p>
+              )
+            )}
           </div>
         </div>
       </section>
@@ -556,6 +419,35 @@ export default function GuidesPageClient() {
             >
               Find a studio <span aria-hidden>→</span>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How a session runs: the orientation rail, for whoever scrolled the
+             whole library and still does not know where to start. ── */}
+      <section className="border-t border-white/10 px-6 py-16 sm:px-10 lg:px-16">
+        <div className="mx-auto max-w-[1680px]">
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-zinc-500">
+            How a session runs
+          </p>
+          <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            {STATIONS.map((s) => (
+              <Link
+                key={s.n}
+                href={s.href}
+                className="group block border-t border-white/10 pt-6 transition-colors duration-200 hover:border-white/30"
+              >
+                <span className="flex items-baseline gap-3">
+                  <span className="font-mono text-[12px] tracking-[0.2em] text-zinc-500">{s.n}</span>
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">{s.name}</span>
+                </span>
+                <span className="mt-4 block text-[17px] font-bold leading-snug text-white">{s.title}</span>
+                <span className="mt-2.5 block text-[13px] leading-relaxed text-zinc-400">{s.body}</span>
+                <span className="mt-5 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500 transition-colors duration-200 group-hover:text-brand-red">
+                  {s.cta} <span aria-hidden>→</span>
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
