@@ -20,6 +20,8 @@ export type WorkProject = {
   // films hosted on the site itself.
   youtubeId?: string
   video?: string
+  // Short muted loop that plays while the card is hovered.
+  hoverClip?: string
   serviceHref: string
   summary: string
   credits: string[]
@@ -32,6 +34,7 @@ export type ShotAtVibeshackItem = {
   image: string
   alt: string
   objectPosition?: string
+  hoverClip?: string
 }
 
 export const workCategories: { slug: WorkCategorySlug; label: string }[] = [
@@ -50,6 +53,7 @@ export const featuredWorkProject: WorkProject = {
   categoryLabel: 'Music Video',
   client: 'Varii x Josh Sidhu',
   image: '/studio-images/work-body-is-tea-dancers-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-body-is-tea-v20260716.mp4',
   alt: 'Dancer mid-move in front of red lowriders in the Body Is Tea music video',
   objectPosition: 'center',
   year: '2026',
@@ -68,6 +72,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Series',
     client: 'Silicon Mania',
     image: '/studio-images/work-the-buzzer-set-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-the-buzzer-v20260716.mp4',
     alt: 'A founder pitches an investor across the buzzer table on the Silicon Mania set',
     year: '2026',
     youtubeId: '3mLFnCovlF8',
@@ -83,6 +88,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Event Film',
     client: "Melinda's Foods",
     image: '/studio-images/work-wing-battle-toast-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-wing-battle-v20260716.mp4',
     alt: "A competitor raises a drink outside the bar at Melinda's Wing Battle",
     year: '2025',
     youtubeId: 'tX5nk9EEBHs',
@@ -98,6 +104,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Sports Film',
     client: 'Oakland Ballers',
     image: '/studio-images/work-damian-stone-gloves-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-damian-stone-v20260716.mp4',
     alt: 'Damian Stone pulls on his batting gloves in the dugout',
     year: '2026',
     youtubeId: 'i-YfBQia7UI',
@@ -113,6 +120,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Player Feature',
     client: 'Oakland Ballers',
     image: '/studio-images/work-damian-stone-feature-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-damian-stone-feature-v20260716.mp4',
     alt: 'Damian Stone jogging across the outfield in his Oakland Ballers uniform',
     year: '2026',
     youtubeId: 'WWF3sDSyLJw',
@@ -128,6 +136,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Music Video',
     client: 'Varii',
     image: '/studio-images/work-evil-eye-hummer-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-evil-eye-v20260716.mp4',
     alt: "Varii in front of a white Hummer's light bar at night",
     year: '2026',
     youtubeId: 'uNwd86wwgtc',
@@ -143,6 +152,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Music Video',
     client: 'TeYo',
     image: '/studio-images/work-chilled-teyo-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-chilled-v20260716.mp4',
     alt: 'Two friends on rooftop couches over a foggy San Francisco skyline in the Chilled music video',
     year: '2025',
     youtubeId: 'Y5GQGx1gbPE',
@@ -158,6 +168,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Short Film',
     client: 'The Babysitters',
     image: '/studio-images/work-the-client-bar-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-the-client-v20260716.mp4',
     alt: 'The client and the fixer across a candlelit reading table in a neon bar',
     year: '2026',
     video: '/studio-videos/film-the-client-v20260716.mp4',
@@ -173,6 +184,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Short Film',
     client: 'Zen Studios',
     image: '/studio-images/work-remote-film-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-remote-v20260716.mp4',
     alt: 'A lone figure on a BART platform as the train stops in the Remote short film',
     year: '2026',
     video: '/studio-videos/film-remote-v20260716.mp4',
@@ -188,6 +200,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Short Film',
     client: 'VibeShack Studios',
     image: '/studio-images/work-unforgiven-scene-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-unforgiven-v20260716.mp4',
     alt: 'Isabella confronts Andrew in the bathroom in Unforgiven',
     year: '2026',
     video: '/studio-videos/film-unforgiven-v20260716.mp4',
@@ -203,6 +216,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Short Film',
     client: 'Huey Lee',
     image: '/studio-images/work-restless-moment-dinner-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-in-a-restless-moment-v20260716.mp4',
     alt: 'A man in a tuxedo waits at a candlelit dinner table in In a Restless Moment',
     year: '2024',
     youtubeId: 't1dglFWDYKQ',
@@ -218,6 +232,7 @@ export const workProjects: WorkProject[] = [
     categoryLabel: 'Visualizer',
     client: 'Varii',
     image: '/studio-images/work-betrayed-rider-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-betrayed-v20260716.mp4',
     alt: 'A rider on a motorcycle under an overpass at night in Betrayed',
     year: '2025',
     youtubeId: 'Lmp5XUxPGYY',
@@ -241,6 +256,7 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
     detail: 'Toxins, stress, and your hormones',
     youtubeId: 'ReIQcS8L6Hs',
     image: '/studio-images/work-unpaused-haver-podcast-v20260708.jpg',
+    hoverClip: '/studio-videos/work-hover-unpaused-v20260716.mp4',
     alt: 'unPAUSED podcast recording in The Executive at VibeShack Studios',
     objectPosition: '80% center',
   },
@@ -249,6 +265,7 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
     detail: 'The AI world has a human problem',
     youtubeId: 'QMXrpJteBXA',
     image: '/studio-images/work-second-nature-set-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-second-nature-v20260716.mp4',
     alt: 'Second Nature hosts in conversation on the white set at VibeShack Studios',
   },
   {
@@ -256,6 +273,7 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
     detail: 'The man behind Terminal Lance',
     youtubeId: 'E893IZTGmrQ',
     image: '/studio-images/work-vegas-veteran-voices-v20260709.jpg',
+    hoverClip: '/studio-videos/work-hover-vegas-veteran-v20260716.mp4',
     alt: 'Vegas Veteran Voices interview at VibeShack Studios',
   },
   {
@@ -263,6 +281,7 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
     detail: 'Protecting your IP from AI training',
     youtubeId: 'dKY24SpeYKo',
     image: '/studio-images/work-ai-show-host-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-ai-show-v20260716.mp4',
     alt: 'Scott Stephenson recording the AI Show at VibeShack Studios',
   },
   {
@@ -270,6 +289,7 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
     detail: 'Ross Pomerantz, the BTS of Corporate Bro',
     youtubeId: '4zd17_NxABw',
     image: '/studio-images/work-tartick-corporate-bro-v20260709.jpg',
+    hoverClip: '/studio-videos/work-hover-jason-tartick-v20260716.mp4',
     alt: 'Jason Tartick podcast conversation at VibeShack Studios',
   },
   {
@@ -277,6 +297,7 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
     detail: 'Supernova, official music video',
     youtubeId: 'J4ZKUYv4JqY',
     image: '/studio-images/work-gavriella-tableau-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-gavriella-v20260716.mp4',
     alt: 'Gavriella and dancers in a white tableau from the Supernova music video',
   },
   {
@@ -284,6 +305,7 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
     detail: 'Ballin Out, official video',
     youtubeId: '2nJD5lCXbuo',
     image: '/studio-images/work-ballin-out-court-v20260716.jpg',
+    hoverClip: '/studio-videos/work-hover-ballin-out-v20260716.mp4',
     alt: 'Varii on the basketball court in the Ballin Out music video',
   },
 ]

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
+import WorkCardMedia from '@/components/WorkCardMedia'
 import { OurWorkShowreel } from '@/components/our-work/OurWorkShowreel'
 import { absoluteUrl } from '@/lib/seo/site'
 import { allWorkProjects, featuredWorkProject, shotAtVibeshack, workCategories, type WorkCategorySlug } from '@/lib/seo/workProjects'
@@ -95,15 +95,15 @@ export default async function OurWorkPage({
           </nav>
 
           <div id="work-projects" className="grid scroll-mt-24 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {visibleProjects.map(({ slug, title, categoryLabel, client, image, alt, objectPosition }) => (
+            {visibleProjects.map(({ slug, title, categoryLabel, client, image, alt, objectPosition, hoverClip }) => (
               <Link key={slug} href={`/our-work/${slug}/`} className="group block">
                 <figure className="relative h-[206px] overflow-hidden rounded-md border border-white/10 bg-zinc-950">
-                  <Image
-                    src={image}
+                  <WorkCardMedia
+                    image={image}
                     alt={alt}
-                    fill
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
-                    style={{ objectPosition: objectPosition || 'center' }}
+                    clip={hoverClip}
+                    objectPosition={objectPosition}
+                    imageClassName="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
                     sizes="(min-width: 1280px) 32vw, (min-width: 768px) 50vw, 100vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/82 via-black/12 to-transparent" />
@@ -140,7 +140,7 @@ export default async function OurWorkPage({
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
-              {shotAtVibeshack.map(({ title, detail, youtubeId, image, alt, objectPosition }) => (
+              {shotAtVibeshack.map(({ title, detail, youtubeId, image, alt, objectPosition, hoverClip }) => (
                 <a
                   key={youtubeId}
                   href={`https://www.youtube.com/watch?v=${youtubeId}`}
@@ -149,13 +149,12 @@ export default async function OurWorkPage({
                   className="group block"
                 >
                   <figure className="relative h-[150px] overflow-hidden rounded-md border border-white/10 bg-zinc-950">
-                    <Image
-                      src={image}
+                    <WorkCardMedia
+                      image={image}
                       alt={alt}
-                      fill
-                      loading="lazy"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
-                      style={{ objectPosition: objectPosition || 'center' }}
+                      clip={hoverClip}
+                      objectPosition={objectPosition}
+                      imageClassName="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
                       sizes="(min-width: 1280px) 19vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
