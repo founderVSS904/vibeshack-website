@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { studioGuides, type StudioGuide } from '@/lib/seo/studioGuides'
+import { rankGuides } from '@/lib/seo/guideSearch'
 
 // ─── Data shaping ─────────────────────────────────────────────────────────────
 
@@ -81,17 +82,6 @@ function readMinutes(guide: StudioGuide) {
   return Math.min(9, Math.max(4, Math.round(words / 180)))
 }
 
-function matchesQuery(guide: StudioGuide, query: string) {
-  const q = query.trim().toLowerCase()
-  if (!q) return true
-  return [guide.title, guide.shortTitle, guide.keyword, guide.intro, guide.description]
-    .join(' ')
-    .toLowerCase()
-    .includes(q)
-}
-
-// ─── Icons ────────────────────────────────────────────────────────────────────
-
 const guideIconProps = {
   fill: 'none',
   stroke: 'currentColor',
@@ -160,9 +150,12 @@ export default function GuidesPageClient() {
     ...studioGuides.filter((g) => g.slug === 'best-studio-for-your-shoot'),
     ...studioGuides.filter((g) => g.slug !== 'best-studio-for-your-shoot'),
   ]
-  const filtered = ordered.filter(
-    (guide) => (tab === 'all' || (GUIDE_TABS[guide.slug] ?? []).includes(tab)) && matchesQuery(guide, query),
-  )
+  const trimmed = query.trim()
+  const inTab = ordered.filter((guide) => tab === 'all' || (GUIDE_TABS[guide.slug] ?? []).includes(tab))
+  const ranked = trimmed ? rankGuides(inTab, trimmed) : inTab
+  // Five guides. A dead end is never more useful than showing them.
+  const noMatch = trimmed.length > 0 && ranked.length === 0
+  const filtered = noMatch ? inTab : ranked
   const featured = filtered[0]
   const sideGuides = filtered.slice(1, 3)
   const restGuides = filtered.slice(3)
@@ -240,27 +233,17 @@ export default function GuidesPageClient() {
           {/* Typing filters a library that sits below the fold, so say what happened.
               The reserved height stops the row shifting as text appears. */}
           <div className="mt-6 min-h-[22px]" aria-live="polite">
-            {query.trim().length > 0 && (
-              filtered.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={goToLibrary}
-                  className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors duration-200 hover:text-red-400"
-                >
-                  {filtered.length} {filtered.length === 1 ? 'guide' : 'guides'} match <span aria-hidden>→</span>
-                </button>
-              ) : (
-                <p className="text-[13px] text-zinc-400">
-                  No guides match that search.{' '}
-                  <button
-                    type="button"
-                    onClick={() => setQuery('')}
-                    className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors duration-200 hover:text-red-400"
-                  >
-                    Clear
-                  </button>
-                </p>
-              )
+            {trimmed.length > 0 && (
+              <button
+                type="button"
+                onClick={goToLibrary}
+                className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors duration-200 hover:text-red-400"
+              >
+                {noMatch
+                  ? `Nothing matches that. All ${filtered.length} guides`
+                  : `${filtered.length} ${filtered.length === 1 ? 'guide' : 'guides'} match`}{' '}
+                <span aria-hidden>→</span>
+              </button>
             )}
           </div>
         </div>

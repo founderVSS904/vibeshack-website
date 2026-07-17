@@ -2,7 +2,7 @@
 
 Checkpoint date: 2026-07-17  
 Owner: Tay / Emmanuel  
-Status: Architecture direction approved; production integration has not started in the real website  
+Status: v010 Blender production proof complete; owner approval and real-website integration pending
 Primary local review URL: `http://localhost:3011/our-work/`
 
 ## 1. Purpose of this document
@@ -494,6 +494,43 @@ The architecture was correct. The source resolution, output resolution, and deli
 
 The proof did not contain a real lights-on to lights-off animation. Its response lighting used only four broad transport lights and coarse temporal/spatial sampling. It was designed to prove moving color integration, not final projection behavior.
 
+### v010: first production-quality proof
+
+The v010 proof implements the planned production upgrade with *The Client*.
+
+Primary files:
+
+```text
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/vibeshack_cinema_theater_v010_client_production_proof.blend
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/scripts/build_theater_production_proof_v010.py
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/scripts/master_theater_production_proof_v010.sh
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/video/theater_v010_client_production_proof_prores.mov
+/Users/emmanueltay/Desktop/VibeShack Cinema Experience/renders/theater_v010_client_production_proof_4k.mp4
+```
+
+Exact production facts:
+
+- Source master: `/Users/emmanueltay/Desktop/VibeShack Footage/The Client [4K master].mp4`
+- Source segment: `01:37.500–01:44.507`
+- Timeline: 288 frames / 12.012 seconds at native `24000/1001` fps
+- Output: 3840×2160, Eevee, AgX Medium High Contrast
+- Sequence: 288 16-bit RGB PNG frames
+- Transition: lights-on hold, true house-light dim, dark handoff, film
+  fade-in/out, and matched lights-up return
+- Transport: 20 every-frame, temporally smoothed lights across diffuse,
+  lower-room, stage, glossy, and rear-wall receiver groups
+- Screen-fit review setting: 16:9 contain with black side mattes inside the
+  2.35:1 architectural screen; not a final owner-approved crop policy
+- ProRes master: 10-bit 4:2:2, 48 kHz stereo 24-bit PCM
+- Review copy: 4K H.264, CRF 16, 48 kHz stereo AAC
+
+Validation completed on 2026-07-17: every PNG decodes at 3840×2160
+`rgb48be`; the ProRes and H.264 outputs both decode end to end; each contains
+4K `24000/1001` video, stereo audio, and a 12.012-second duration.
+
+This proof is ready for owner review. It does not authorize full-film batch
+rendering, the final screen-fit policy, or production website deployment.
+
 ## 10. Why the current hosted result is wrong
 
 The current hosted page uses:
@@ -575,6 +612,10 @@ The template should include:
 
 Create a deterministic script instead of manually rebuilding nodes for every film.
 
+Implemented proof milestone: v010 now provides the reusable deterministic
+structure and *The Client* review render. Convert it into the final shared
+template only after owner review of its timing, screen fit, and Eevee quality.
+
 ### Phase C: Improve the film transport model
 
 Upgrade the v008 proof as follows:
@@ -620,6 +661,10 @@ First produce one 8 to 12 second proof containing:
 Render an Eevee and Cycles comparison at the intended final resolution. Choose the production renderer only after comparing quality, render time, temporal stability, and noise.
 
 For maximum quality, Cycles is the reference. If a full-length Cycles render is operationally impractical, Eevee must be tuned against the Cycles reference and approved by the owner. Do not silently substitute a faster renderer.
+
+Current result: the v010 4K Eevee proof is complete and validated. Owner review
+must decide whether it is sufficient or whether a targeted Cycles comparison is
+required before full-film rendering.
 
 ### Phase F: Render an image sequence
 
@@ -934,16 +979,14 @@ The next builder should perform these steps in order:
 
 1. Read `AGENTS.md`, `CLAUDE.md`, and this checkpoint.
 2. Verify the real local site is still available at `http://localhost:3011/our-work/`.
-3. Review `/Users/emmanueltay/Desktop/VibeShack Cinema Experience/video/launch_films.json` and confirm which selected film supplies the short production proof.
-4. Duplicate the v005/v008 work into a new v010 production-template milestone.
-5. Build a true lights-on to lights-off animation.
-6. Upgrade film transport to more receiver zones with every-frame temporal smoothing.
-7. Render one 8 to 12 second production-quality 4K proof as an image sequence.
-8. Produce high-quality review encodes without changing the Blender master.
-9. Review the result with the owner before rendering full films.
-10. Build the two-player crossfade prototype inside the real Next.js `/our-work/` route.
-11. Validate seamless switching, playback, accessibility, and mobile fallback locally.
-12. Only after approval, batch the remaining curated films.
+3. Review `renders/theater_v010_client_production_proof_4k.mp4` with the owner.
+4. Confirm the 16:9-to-2.35:1 screen policy and whether the tuned Eevee result
+   is sufficient or requires a targeted Cycles comparison.
+5. Preserve the v010 Blender scene, 16-bit frame sequence, and ProRes master.
+6. After proof approval, build the two-player crossfade prototype inside the
+   real Next.js `/our-work/` route.
+7. Validate seamless switching, playback, accessibility, and mobile fallback locally.
+8. Only after proof and web-transition approval, batch the three curated films.
 
 ## 22. Definition of done for the launch experience
 
@@ -965,10 +1008,14 @@ The launch cinema is not done until:
 
 ## 23. Final checkpoint summary
 
-The project already proved the hardest visual idea with v008: when the film is inside Blender and the room is rendered with it, the theater feels unified.
+The project proved the hardest visual idea with v008 and has now completed the
+first production-quality implementation with v010: when the film is inside
+Blender and the room is rendered with it, the theater feels unified.
 
 The mistake was not the v008 architecture. The mistake was treating its preview resolution and incomplete lighting animation as a reason to replace it with a separate browser video layer.
 
-The approved plan is to finish the v008 idea professionally, use it for a curated launch library, and integrate that experience into the real VibeShack Next.js site at `http://localhost:3011/our-work/`.
+The next decision is owner approval of the v010 *The Client* proof. After that,
+use the approved template for the three-film launch library and integrate the
+experience into the real VibeShack Next.js site at `http://localhost:3011/our-work/`.
 
 The future real-time 3D version should be pursued only as a measured scalability project that must match the approved Blender-integrated reference.
