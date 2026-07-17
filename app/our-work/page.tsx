@@ -3,7 +3,7 @@ import Link from 'next/link'
 import WorkCardMedia from '@/components/WorkCardMedia'
 import { OurWorkShowreel } from '@/components/our-work/OurWorkShowreel'
 import { absoluteUrl, siteUrl } from '@/lib/seo/site'
-import { allWorkProjects, featuredWorkProject, shotAtVibeshack, workCategories, type WorkCategorySlug } from '@/lib/seo/workProjects'
+import { allWorkProjects, featuredWorkProject, shotAtVibeshack } from '@/lib/seo/workProjects'
 import { breadcrumbSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
@@ -25,22 +25,7 @@ const breadcrumbs = breadcrumbSchema([
   { name: 'Our Work', url: absoluteUrl('/our-work/') },
 ])
 
-const normalizeCategory = (category?: string | string[]): WorkCategorySlug => {
-  const value = Array.isArray(category) ? category[0] : category
-  return workCategories.some((item) => item.slug === value) ? (value as WorkCategorySlug) : 'all'
-}
-
-export default async function OurWorkPage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ category?: string | string[] }>
-}) {
-  const params = await searchParams
-  const activeCategory = normalizeCategory(params?.category)
-  const visibleProjects = activeCategory === 'all'
-    ? allWorkProjects
-    : allWorkProjects.filter((project) => project.category === activeCategory)
-
+export default function OurWorkPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
@@ -74,28 +59,8 @@ export default async function OurWorkPage({
 
       <main className="bg-black pb-16 text-white">
         <div className="mx-auto max-w-[1680px] px-6 sm:px-10 lg:px-16">
-          <nav className="flex justify-center gap-8 overflow-x-auto py-5 sm:gap-12" aria-label="Work categories">
-            {workCategories.map(({ slug, label }) => {
-              const isActive = slug === activeCategory
-              const href = slug === 'all' ? '/our-work/' : `/our-work/?category=${slug}`
-
-              return (
-                <Link
-                  key={slug}
-                  href={href}
-                  className={`relative shrink-0 py-2 text-base transition-colors ${
-                    isActive ? 'text-brand-red' : 'text-white/[0.86] hover:text-white'
-                  }`}
-                >
-                  {label}
-                  {isActive && <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-brand-red" />}
-                </Link>
-              )
-            })}
-          </nav>
-
-          <div id="work-projects" className="grid scroll-mt-24 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {visibleProjects.map(({ slug, title, categoryLabel, client, image, alt, objectPosition, hoverClip }) => (
+          <div id="work-projects" className="grid scroll-mt-24 grid-cols-1 gap-3 pt-8 md:grid-cols-2 xl:grid-cols-3">
+            {allWorkProjects.map(({ slug, title, categoryLabel, client, image, alt, objectPosition, hoverClip }) => (
               <Link key={slug} href={`/our-work/${slug}/`} className="group block">
                 <figure className="relative h-[206px] overflow-hidden rounded-md border border-white/10 bg-zinc-950">
                   <WorkCardMedia

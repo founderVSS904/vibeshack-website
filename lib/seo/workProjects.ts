@@ -1,5 +1,4 @@
 export type WorkCategorySlug =
-  | 'all'
   | 'music-videos'
   | 'films'
   | 'series'
@@ -9,7 +8,7 @@ export type WorkCategorySlug =
 export type WorkProject = {
   slug: string
   title: string
-  category: Exclude<WorkCategorySlug, 'all'>
+  category: WorkCategorySlug
   categoryLabel: string
   client: string
   image: string
@@ -38,15 +37,6 @@ export type ShotAtVibeshackItem = {
   objectPosition?: string
   hoverClip?: string
 }
-
-export const workCategories: { slug: WorkCategorySlug; label: string }[] = [
-  { slug: 'all', label: 'All Work' },
-  { slug: 'music-videos', label: 'Music Videos' },
-  { slug: 'films', label: 'Films' },
-  { slug: 'series', label: 'Series' },
-  { slug: 'sports', label: 'Sports' },
-  { slug: 'events', label: 'Events' },
-]
 
 export const featuredWorkProject: WorkProject = {
   slug: 'body-is-tea',
