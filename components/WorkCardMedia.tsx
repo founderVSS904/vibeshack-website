@@ -24,13 +24,15 @@ export default function WorkCardMedia({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  // preload="none" keeps the network silent until the first hover; play()
-  // starts the fetch itself and begins the moment enough data arrives.
+  // Metadata preloads up front (the pattern the homepage tiles use, proven
+  // in Safari); the full clip only downloads once play() runs on hover.
   const enter = (e: React.PointerEvent) => {
     if (e.pointerType !== 'mouse' || !clip) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const video = videoRef.current
     if (!video) return
+    // Safari can stall play() on a pipeline that never initialized.
+    if (video.readyState === 0) video.load()
     video.style.opacity = '1'
     void video.play().catch(() => {
       // Blocked or interrupted playback falls back to the still.
@@ -63,7 +65,7 @@ export default function WorkCardMedia({
           muted
           loop
           playsInline
-          preload="none"
+          preload="metadata"
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[420ms] ease-out"
           style={{ objectPosition: objectPosition || 'center' }}
