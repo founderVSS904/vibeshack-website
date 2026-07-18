@@ -3,6 +3,7 @@ import { comparisons } from '@/lib/seo/comparisons'
 import { absoluteUrl } from '@/lib/seo/site'
 import { studioGuides } from '@/lib/seo/studioGuides'
 import { useCases } from '@/lib/seo/useCases'
+import { allWorkProjects } from '@/lib/seo/workProjects'
 
 export const dynamic = 'force-static'
 
@@ -10,18 +11,22 @@ const pageImages = [
   {
     loc: '/',
     images: [
-      ['/studio-images/the-executive-hero.jpg', 'The Executive podcast studio at VibeShack Studios San Francisco'],
       ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', 'Two-person podcast recording at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg', 'Video production lighting setup at VibeShack Studios San Francisco'],
+      ['/studio-images/canvas-rental-music-v1775095665.jpg', 'Music video production inside a VibeShack Studios rental space'],
+      ['/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg', 'Photography services portrait created at VibeShack Studios San Francisco'],
+      ['/studio-images/home-branding-pure-magic-v20260716.jpg', 'Pure Magic product branding image featured on the VibeShack Studios homepage'],
+      ['/studio-images/canvas-rental-space-v20260509.jpg', 'White cyc rental studio at VibeShack Studios San Francisco'],
+      ['/studio-images/work-body-is-tea-music-v20260708b.jpg', 'Body Is Tea music video by Varii, presented by VibeShack Studios'],
+      ['/studio-images/work-the-buzzer-silicon-mania-v20260708.jpg', 'The Buzzer pitch show by Silicon Mania, shot at VibeShack Studios'],
+      ['/studio-images/work-wing-battle-melindas-v20260708b.jpg', "Melinda's Hot Sauce Wing Battle event film by VibeShack Studios"],
       ['/studio-images/sunset-hero-v20260509.jpg', 'Sunset color podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-encore-podcast-wide-v20260510.jpg', 'Encore modern podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg', 'The Wing cozy podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg', 'Canvas Podcast white cyc stage at VibeShack Studios San Francisco'],
       ['/studio-images/inside-green-screen-v20260509.jpg', 'Green screen studio at VibeShack Studios San Francisco'],
-      ['/studio-images/inside-photography-red-v20260509.jpg', 'Photography studio at VibeShack Studios San Francisco'],
-      ['/studio-images/homepage-creative-photography-gradient-motion-v20260509.jpg', 'Creative movement photography created at VibeShack Studios San Francisco'],
-      ['/studio-images/homepage-creative-photography-gradient-editorial-v20260510.jpg', 'Full-body editorial portrait photography created at VibeShack Studios San Francisco'],
-      ['/studio-images/homepage-creative-photography-beauty-gel-v20260510.jpg', 'Beauty portrait with red and blue gel lighting created at VibeShack Studios San Francisco'],
-      ['/studio-images/shot-here-red-fabric-portrait-v20260509.jpg', 'Editorial portrait photography created at VibeShack Studios San Francisco'],
-      ['/studio-images/shot-here-joshua-blue-v20260509.jpg', 'Blue gel portrait photography created at VibeShack Studios San Francisco'],
       ['/studio-images/parlor-production-v20260509.jpg', 'Parlor premium interview studio at VibeShack Studios San Francisco'],
-      ['/studio-images/horizon-wide-v20260509.jpg', 'Horizon warm sunset podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg', 'Horizon immersive podcast studio at VibeShack Studios San Francisco'],
       ['/studio-images/inside-canvas-cyc-v20260509.jpg', 'Canvas white cyc studio at VibeShack Studios San Francisco'],
     ],
   },
@@ -29,7 +34,7 @@ const pageImages = [
     loc: '/services/',
     images: [
       ['/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg', 'Blue-lit production services set at VibeShack Studios San Francisco'],
-      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg', 'Photo services and creative photoshoots at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg', 'Photo services and creative photoshoots at VibeShack Studios San Francisco'],
       ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg', 'Video production lighting setup at VibeShack Studios San Francisco'],
       ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', 'Podcast production services at VibeShack Studios San Francisco'],
     ],
@@ -41,6 +46,30 @@ const pageImages = [
       ['/studio-images/the-wing-hero.jpg', 'The Wing podcast studio at VibeShack Studios San Francisco'],
       ['/studio-images/the-executive-hero.jpg', 'The Executive podcast studio at VibeShack Studios San Francisco'],
       ['/studio-images/encore-wide.jpg', 'Encore podcast studio at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/commercials/',
+    images: [
+      ['/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg', 'Commercial video production lighting setup at VibeShack Studios San Francisco'],
+      ['/studio-images/usecase-brand-content-v20260509.jpg', 'Brand content production setup at VibeShack Studios San Francisco'],
+      ['/studio-images/parlor-production-v20260509.jpg', 'Premium interview setup for commercial videos at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/editorials/',
+    images: [
+      ['/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg', 'Editorial beauty portrait photographed at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg', 'Fashion editorial photographed at VibeShack Studios San Francisco'],
+      ['/studio-images/photo-gallery-red-blue-sunglasses-v20260520.jpg', 'Color-driven editorial portrait photographed at VibeShack Studios San Francisco'],
+    ],
+  },
+  {
+    loc: '/branding/',
+    images: [
+      ['/studio-images/photo-gallery-red-blue-sunglasses-v20260520.jpg', 'Color-driven branding and creative direction image from VibeShack Studios San Francisco'],
+      ['/studio-images/usecase-brand-content-v20260509.jpg', 'Brand content creative direction at VibeShack Studios San Francisco'],
+      ['/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg', 'Blue stage brand content system at VibeShack Studios San Francisco'],
     ],
   },
   {
@@ -67,15 +96,6 @@ const pageImages = [
   {
     loc: '/sunset-studio/',
     images: [['/studio-images/sunset-hero-v20260509.jpg', 'Sunset color podcast studio rental in San Francisco at VibeShack Studios']],
-  },
-  {
-    loc: '/photography-studio-san-francisco/',
-    images: [
-      ['/studio-images/photography-hero-service-v20260509.jpg', 'Fashion campaign photography created at VibeShack Studios San Francisco'],
-      ['/studio-images/photography-room-red-backdrop-v20260509.jpg', 'Photography room rental in San Francisco at VibeShack Studios'],
-      ['/studio-images/photography-spotlight-portrait-v20260509.jpg', 'Spotlight portrait photography created at VibeShack Studios San Francisco'],
-      ['/studio-images/photography-cyc-editorial-v20260509.jpg', 'Editorial cyc photography created at VibeShack Studios San Francisco'],
-    ],
   },
   {
     loc: '/video-production/',
@@ -131,6 +151,14 @@ const pageImages = [
       ['/studio-images/shot-here-joshua-spotlight-v20260509.jpg', 'Spotlight portrait photography created at VibeShack Studios San Francisco'],
     ],
   },
+  {
+    loc: '/our-work/',
+    images: allWorkProjects.map((project) => [project.image, project.alt]),
+  },
+  ...allWorkProjects.map((project) => ({
+    loc: `/our-work/${project.slug}/`,
+    images: [[project.image, project.alt]],
+  })),
   ...studioGuides.map((guide) => ({
     loc: `/studio-guides/${guide.slug}/`,
     images: [[guide.image, guide.imageAlt]],

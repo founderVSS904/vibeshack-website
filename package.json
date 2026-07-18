@@ -14,7 +14,7 @@
     "@stripe/stripe-js": "^8.11.0",
     "googleapis": "^171.4.0",
     "next": "^15.5.18",
-    "nodemailer": "^8.0.7",
+    "nodemailer": "^9.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sharp": "^0.34.5",
@@ -34,7 +34,9 @@
   },
   "overrides": {
     "glob": "10.5.0",
-    "postcss": "$postcss"
+    "js-yaml": "4.3.0",
+    "postcss": "$postcss",
+    "qs": "6.15.3"
   },
   "engines": {
     "node": ">=20 <25"

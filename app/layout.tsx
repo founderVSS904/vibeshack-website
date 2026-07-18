@@ -3,7 +3,21 @@ import './globals.css'
 
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import AttributionCapture from '@/components/AttributionCapture'
+import { ibmPlexMono, inter } from './fonts'
 import { business, externalProfiles, founders, parentBrand, peerspaceListings, siteUrl, studioOffers } from '@/lib/seo/site'
+
+// Overrides the :root font stacks in globals.css (inline style wins) so every
+// var(--font-brand-*) consumer gets the self-hosted webfonts. Druk Condensed is
+// a commercial font we do not license, so the display stack is the heavy
+// condensed system chain only. The look does not shift: these are the same
+// fallbacks the old stack already resolved to.
+const brandFontStyle = {
+  '--font-brand-display':
+    "'HelveticaNeue-CondensedBlack', 'Arial Narrow', 'Roboto Condensed', Impact, sans-serif",
+  '--font-brand-sans': `${inter.style.fontFamily}, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`,
+  '--font-brand-mono': `${ibmPlexMono.style.fontFamily}, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace`,
+} as React.CSSProperties
 
 export const viewport = {
   width: 'device-width',
@@ -11,7 +25,8 @@ export const viewport = {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.vibeshackstudios.com/'),
+  manifest: '/manifest.json',
+  metadataBase: new URL(siteUrl),
   icons: {
     icon: [
       {
@@ -59,7 +74,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://www.vibeshackstudios.com/',
+    url: `${siteUrl}/`,
     siteName: 'VibeShack Studios',
     title: 'VibeShack Studios | San Francisco Production Studio',
     description:
@@ -94,14 +109,18 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://www.vibeshackstudios.com/',
+    canonical: `${siteUrl}/`,
   },
 }
 
-const localBusinessSchema = {
-  '@context': 'https://schema.org',
-  '@type': ['LocalBusiness', 'ProfessionalService'],
-  '@id': 'https://www.vibeshackstudios.com/#business',
+// Schema.org structured data: a single @graph with one business entity.
+// The old duplicate Organization node (#org) is merged into #business so
+// search engines see one business, not two at the same address.
+const peerspaceHrefs = new Set(peerspaceListings.map((listing) => listing.href))
+
+const businessNode = {
+  '@type': ['Organization', 'LocalBusiness', 'ProfessionalService'],
+  '@id': `${siteUrl}/#business`,
   name: business.name,
   legalName: business.legalName,
   alternateName: ['VibeShack', 'VibeShack SF', 'The Dream Factory'],
@@ -131,11 +150,13 @@ const localBusinessSchema = {
   knowsAbout: [
     'Podcast studio rental',
     'Green screen studio rental',
+    'Commercial video production',
+    'Editorial photoshoots',
+    'Branding and creative direction',
     'Photo services',
     'Headshot photography',
     'Portrait photography',
     'Product photography',
-    'Photography studio rental',
     'White cyc studio rental',
     'Video production studio',
     'San Francisco production studio',
@@ -172,55 +193,6 @@ const localBusinessSchema = {
     jobTitle: founder.role,
     ...(founder.sameAs ? { sameAs: founder.sameAs } : {}),
   })),
-  subjectOf: peerspaceListings.map((listing) => ({
-    '@type': 'WebPage',
-    name: listing.name,
-    url: listing.href,
-    about: listing.serviceType,
-  })),
-  sameAs: business.sameAs,
-}
-
-// Organization schema for search results
-const parentBrandSchema = {
-  '@context': 'https://schema.org',
-  '@type': ['Organization', 'Brand'],
-  '@id': `${siteUrl}/#vibeshack`,
-  name: parentBrand.name,
-  description: parentBrand.description,
-  slogan: business.tagline,
-  url: `${siteUrl}/`,
-  logo: business.logo,
-  subOrganization: { '@id': `${siteUrl}/#org` },
-  department: { '@id': `${siteUrl}/#business` },
-  sameAs: business.sameAs,
-}
-
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  '@id': 'https://www.vibeshackstudios.com/#org',
-  name: business.name,
-  legalName: business.legalName,
-  alternateName: ['VibeShack', 'VibeShack SF'],
-  url: `${siteUrl}/`,
-  logo: business.logo,
-  description: business.description,
-  disambiguatingDescription: business.entityRelationship,
-  parentOrganization: { '@id': `${siteUrl}/#vibeshack` },
-  sameAs: business.sameAs,
-  founder: founders.map((founder) => ({
-    '@type': 'Person',
-    name: founder.name,
-    jobTitle: founder.role,
-    ...(founder.sameAs ? { sameAs: founder.sameAs } : {}),
-  })),
-  subjectOf: externalProfiles.map((profile) => ({
-    '@type': 'WebPage',
-    name: profile.label,
-    url: profile.href,
-  })),
-  address: { '@type': 'PostalAddress', ...business.address },
   contactPoint: {
     '@type': 'ContactPoint',
     email: business.email,
@@ -228,18 +200,48 @@ const organizationSchema = {
     areaServed: 'US',
     availableLanguage: 'English',
   },
+  subjectOf: [
+    ...peerspaceListings.map((listing) => ({
+      '@type': 'WebPage',
+      name: listing.name,
+      url: listing.href,
+      about: listing.serviceType,
+    })),
+    ...externalProfiles
+      .filter((profile) => !peerspaceHrefs.has(profile.href))
+      .map((profile) => ({
+        '@type': 'WebPage',
+        name: profile.label,
+        url: profile.href,
+      })),
+  ],
+  sameAs: business.sameAs,
 }
 
-const websiteSchema = {
-  '@context': 'https://schema.org',
+const parentBrandNode = {
+  '@type': ['Organization', 'Brand'],
+  '@id': `${siteUrl}/#vibeshack`,
+  name: parentBrand.name,
+  description: parentBrand.description,
+  slogan: business.tagline,
+  url: `${siteUrl}/`,
+  logo: business.logo,
+  subOrganization: { '@id': `${siteUrl}/#business` },
+  sameAs: business.sameAs,
+}
+
+const websiteNode = {
   '@type': 'WebSite',
-  '@id': 'https://www.vibeshackstudios.com/#website',
+  '@id': `${siteUrl}/#website`,
   name: 'VibeShack Studios',
-  url: 'https://www.vibeshackstudios.com/',
-  publisher: {
-    '@id': 'https://www.vibeshackstudios.com/#org',
-  },
+  url: `${siteUrl}/`,
+  publisher: { '@id': `${siteUrl}/#business` },
   inLanguage: 'en-US',
+}
+
+const rootStructuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [parentBrandNode, businessNode, websiteNode],
 }
 
 export default function RootLayout({
@@ -251,7 +253,7 @@ export default function RootLayout({
   const hasValidGaId = gaId && gaId !== 'undefined' && gaId !== 'G-PLACEHOLDER'
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable}`} style={brandFontStyle}>
       <head>
         {hasValidGaId && (
           <>
@@ -274,25 +276,15 @@ export default function RootLayout({
         )}
       </head>
       <body className="bg-black text-white antialiased">
+        <a href="#main-content" className="sr-only z-[100] rounded-lg bg-brand-red font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:px-6 focus:py-3">Skip to content</a>
+        <AttributionCapture />
         <Header />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
         <Footer />
         {/* Schema.org structured data */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(parentBrandSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(rootStructuredData) }}
         />
       </body>
     </html>

@@ -9,14 +9,12 @@ export const useCases = [
     description:
       'For founders, hosts, agencies, and expert guests who need a conversation to look credible on camera and sound clean enough to publish.',
     image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
-    imageAlt: 'Premium podcast interview room with microphones at VibeShack Studios in San Francisco',
+    imageAlt: 'Signature podcast interview set with microphones at VibeShack Studios in San Francisco',
     imagePosition: '34% center',
     primaryPage: '/podcast-studio-san-francisco/',
     bookHref: '/book/?studio=the-executive',
     serviceType: 'Podcast Studio Rental',
     audience: ['Podcast hosts', 'Founders', 'Brand teams', 'Agencies', 'YouTube creators'],
-    fastAnswer:
-      'Choose a podcast room when the conversation itself is the product: a founder interview, guest episode, expert panel, or thought-leadership recording that needs clean sound, flattering angles, and clips that can travel.',
     clientNeed:
       'Most interview shoots fail in the invisible details: echo, awkward eyelines, lighting that makes guests look tired, and no plan for clips. The room should make the guest comfortable, the host confident, and the footage useful after the full episode is done.',
     decisionPoints: [
@@ -35,7 +33,7 @@ export const useCases = [
     ],
     idealFor: [
       'Founder or executive interviews that need to look credible on LinkedIn and YouTube',
-      'Guest podcasts where the room needs to make a non-professional guest feel relaxed',
+      'Guest podcasts where the set needs to make a non-professional guest feel relaxed',
       'Agency or brand interviews that need a clean long-form episode plus short-form clips',
     ],
     notFor: [
@@ -58,7 +56,7 @@ export const useCases = [
       {
         name: 'Parlor',
         href: '/parlor/',
-        fit: 'Best for premium guest interviews, documentary-style conversations, and a more elevated lounge look.',
+        fit: 'Best for premium guest interviews, documentary-style conversations, and a richer lounge look.',
         price: '$400/hr',
       },
       {
@@ -116,21 +114,21 @@ export const useCases = [
       'Intro, outro, sponsor, or call-to-action reads while the set is already lit',
     ],
     watchouts: [
-      'Do not arrive with only a vague topic. Bring enough structure to keep the conversation from drifting.',
-      'Avoid tiny patterns, shiny jewelry, and loud fabrics that fight the camera or microphone.',
+      'A wandering episode is hard to cut. Without clear segments, the best moments get buried in the edit.',
+      'Fabric rustle against a lav mic can quietly ruin takes. Nobody hears it until the edit.',
       'Leave buffer time for guests, resets, and a final review of must-capture lines.',
     ],
     proof: ['Broadcast microphones', 'Multi-camera rooms', 'Camera-ready sets', 'Crew options', '24/7 booking'],
     faqs: [
       {
-        question: 'What is the best VibeShack room for a two-person podcast?',
+        question: 'What is the best VibeShack set for a two-person podcast?',
         answer:
-          'The Executive, The Wing, Premier, Parlor, Horizon, and Canvas Podcast can all work. The right choice depends on tone: executive table, intimate lounge, premium guest interview, LED backdrop, or clean cyc look.',
+          'The Executive, The Wing, Parlor, Horizon, and Canvas Podcast can all work. The right choice depends on tone: executive table, intimate lounge, premium guest interview, LED backdrop, or clean cyc look.',
       },
       {
         question: 'Can I record video and audio at the same time?',
         answer:
-          'Yes. VibeShack podcast rooms are built for video podcasts, interviews, founder content, and social clips with professional audio and camera-ready setups.',
+          'Yes. VibeShack podcast sets are built for video podcasts, interviews, founder content, and social clips with professional audio and camera-ready setups.',
       },
     ],
   },
@@ -141,14 +139,12 @@ export const useCases = [
     keyword: 'brand content day studio san francisco',
     description:
       'For teams that want one organized production day to create the founder videos, social clips, portraits, product visuals, and sales assets they keep postponing.',
-    image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
+    image: '/studio-images/usecase-brand-content-v20260509.jpg',
     imageAlt: 'Horizon studio set for a brand content production day at VibeShack Studios San Francisco',
     primaryPage: '/find-your-studio/',
     bookHref: '/book/',
     serviceType: 'Production Studio Rental',
     audience: ['Startups', 'Marketing teams', 'Founders', 'Agencies', 'Creators'],
-    fastAnswer:
-      'Use a content day when your team needs a usable asset library, not one isolated video. The win is getting founder clips, sales answers, portraits, product visuals, and social cutdowns in one coordinated session.',
     clientNeed:
       'A content day should not feel like random filming. It should feel like a production plan: one location, clear shot priorities, efficient room changes, and enough variety that the final assets can support weeks of launch, sales, recruiting, and social content.',
     decisionPoints: [
@@ -176,22 +172,22 @@ export const useCases = [
     ],
     roomMatches: [
       {
-        name: 'Podcast rooms',
+        name: 'Podcast sets',
         href: '/podcast-studio-san-francisco/',
         fit: 'Use for founder videos, interviews, expert clips, testimonials, and thought-leadership content.',
         price: '$300-$400/hr',
       },
       {
-        name: 'Photography studio',
-        href: '/photography-studio-san-francisco/',
-        fit: 'Use for headshots, team photos, product details, profile images, and campaign stills.',
+        name: 'Canvas Rental',
+        href: '/canvas-rental/',
+        fit: 'Use for headshots, team photos, product details, campaign stills, clean white cyc video, and movement.',
         price: '$100/hr',
       },
       {
-        name: 'Canvas Rental',
-        href: '/canvas-rental/',
-        fit: 'Use for clean white cyc video, movement, product moments, and reusable campaign visuals.',
-        price: '$100/hr',
+        name: 'Photo Services',
+        href: '/photo-services/',
+        fit: 'Use when you want VibeShack to shoot the portraits, product, and campaign stills for you.',
+        price: 'Contact us',
       },
       {
         name: 'Green Screen',
@@ -249,8 +245,8 @@ export const useCases = [
     ],
     watchouts: [
       'Do not overpack the schedule with too many wardrobe, room, and script changes.',
-      'Assign one person to own the shot list and make decisions on set.',
-      'Bring final brand references so lighting, wardrobe, and backdrop choices do not happen by committee.',
+      'When approvals happen by committee, every setup runs long and the last assets on the list get dropped.',
+      'A look debated on set costs a relight, and that relight usually comes out of the hero asset block.',
     ],
     proof: ['Multiple studios at one address', 'Podcast, photo, green screen, and white cyc options', 'Hair and makeup room', 'Hourly booking', 'Same-building flexibility'],
     faqs: [
@@ -279,10 +275,8 @@ export const useCases = [
     bookHref: '/book/?studio=green-screen',
     serviceType: 'Green Screen Studio Rental',
     audience: ['Video teams', 'Course creators', 'Corporate trainers', 'Agencies', 'Commercial productions'],
-    fastAnswer:
-      'Choose green screen when the final environment matters more than the physical room: training modules, app walkthroughs, virtual sets, product demos, and commercial composites.',
     clientNeed:
-      'Green screen is not just a green wall. It is a post-production decision. The shoot has to protect clean edges, consistent lighting, proper distance from the background, and enough reference material for the editor to build the final world without fighting the footage.',
+      'Green screen is more than a green wall. It is a post-production decision. The shoot has to protect clean edges, consistent lighting, proper distance from the background, and enough reference material for the editor to build the final world without fighting the footage.',
     decisionPoints: [
       {
         label: 'Best first decision',
@@ -316,7 +310,7 @@ export const useCases = [
       {
         name: 'Encore',
         href: '/encore/',
-        fit: 'Best for productions that want a podcast-style room with green screen flexibility and crew-supported capture.',
+        fit: 'Best for productions that want a podcast-style set with green screen flexibility and crew-supported capture.',
         price: '$300/hr',
       },
       {
@@ -362,7 +356,7 @@ export const useCases = [
       },
     ],
     preProduction: [
-      'Bring mockups or reference frames for the final background, not just a verbal description.',
+      'Bring mockups or reference frames for the final background, not a verbal description.',
       'Confirm final aspect ratios before filming: 16:9, 9:16, square, paid ads, or all of the above.',
       'Avoid green wardrobe, reflective jewelry, glossy props, and translucent products unless the effect is deliberate.',
       'Tell the editor what will be captured so they can ask for safety material before the shoot is over.',
@@ -374,8 +368,8 @@ export const useCases = [
       'Clean plates and reference frames for the post-production team',
     ],
     watchouts: [
-      'Do not wear green, bright lime, reflective sequins, or transparent materials unless the look is planned.',
-      'Do not shoot without knowing the final aspect ratio and background direction.',
+      'Spill and edge problems are invisible on the set monitor. They surface as hours of cleanup once the key is pulled.',
+      'Footage framed for one composite rarely survives a different one. A late background change can strand the whole shoot.',
       'Avoid last-minute prop changes that create reflections or difficult edges.',
     ],
     proof: ['750 sqft production floor', 'Floor-to-ceiling green screen', 'Lighting grid', 'Easy load-in', '24/7 booking'],
@@ -399,14 +393,12 @@ export const useCases = [
     keyword: 'product photography services san francisco',
     description:
       'For brands that need controlled product images, founder portraits, campaign stills, ecommerce assets, and social ad creative from one organized shoot.',
-    image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260510.jpg',
-    imageAlt: 'Red backdrop campaign photography created at VibeShack Studios San Francisco',
+    image: '/studio-images/home-branding-pure-magic-v20260716.jpg',
+    imageAlt: 'Styled product photography of a cosmetics jar created at VibeShack Studios San Francisco',
     primaryPage: '/photo-services/',
     bookHref: '/contact/?service=photo-services',
     serviceType: 'Photography Services',
     audience: ['DTC brands', 'Founders', 'Photographers', 'Agencies', 'Campaign teams'],
-    fastAnswer:
-      'Choose photo services when the final images need to sell something: product detail, founder credibility, clean ecommerce, launch assets, campaign stills, or a consistent visual system.',
     clientNeed:
       'Product and brand shoots need control. The color has to stay accurate, the surfaces need to behave, the crops need to work across placements, and the team needs enough room to move from product details to people without rebuilding the entire day.',
     decisionPoints: [
@@ -440,15 +432,9 @@ export const useCases = [
         price: 'Contact us',
       },
       {
-        name: 'Photography Studio Rental',
-        href: '/photography-studio-san-francisco/',
-        fit: 'Best when your photographer and crew are already set and you only need the controlled room, backdrops, and prep space.',
-        price: '$100/hr',
-      },
-      {
         name: 'Canvas Rental',
         href: '/canvas-rental/',
-        fit: 'Best when the shoot needs white cyc space, movement, larger props, or video and stills together.',
+        fit: 'Best when your photographer and crew are already set and you only need the room: white cyc space, movement, larger props, or video and stills together.',
         price: '$100/hr',
       },
       {
@@ -506,9 +492,9 @@ export const useCases = [
       'Behind-the-scenes stills that support launch storytelling',
     ],
     watchouts: [
-      'Do not rely on one hero crop. Capture room for text, thumbnails, and mobile placements.',
-      'Bring duplicate products if anything can scratch, melt, dent, spill, or lose shape.',
-      'Decide whether the final look is clinical, premium, warm, editorial, or social-first before styling starts.',
+      'The frame that looks perfect on the studio monitor often dies at mobile size. Check priority crops before wrap.',
+      'A scratch or fingerprint repeats through every frame it touches. Catching it on set is cheap; retouching it across the campaign is not.',
+      'A style pivot mid-shoot resets lighting, surfaces, and props, and the first half of the day stops matching the second.',
     ],
     proof: ['Professional lighting', 'Backdrops', 'Hair and makeup room', 'Hourly rental', 'White cyc nearby'],
     faqs: [
@@ -537,8 +523,6 @@ export const useCases = [
     bookHref: '/book/?studio=canvas-rental',
     serviceType: 'White Cyc Studio Rental',
     audience: ['Creators', 'DTC brands', 'Music video teams', 'Ad teams', 'Photographers'],
-    fastAnswer:
-      'Choose white cyc when you want the subject, product, outfit, movement, or message to be the entire visual. It is clean, flexible, and extremely reusable when you plan crops before filming.',
     clientNeed:
       'White cyc works when you want focus without clutter. It gives the editor and designer clean negative space, but it still needs planning: shoes, blocking, floor protection, wardrobe contrast, and crop strategy matter.',
     decisionPoints: [
@@ -572,10 +556,10 @@ export const useCases = [
         price: '$100/hr',
       },
       {
-        name: 'Photography Studio',
-        href: '/photography-studio-san-francisco/',
-        fit: 'Best for smaller portrait, product, and backdrop-driven shoots with controlled lighting.',
-        price: '$100/hr',
+        name: 'Photo Services',
+        href: '/photo-services/',
+        fit: 'Best when you want VibeShack to shoot the portraits, product, and campaign stills for you.',
+        price: 'Contact us',
       },
       {
         name: 'Canvas Podcast',
@@ -632,9 +616,9 @@ export const useCases = [
       'Movement-based clips without a distracting background',
     ],
     watchouts: [
-      'All-white wardrobe can disappear unless that is the creative direction.',
-      'Dirty soles, dragging stands, and unplanned props can mark the floor fast.',
-      'If you need the background replaced later, green screen may be the better room.',
+      'Walk the setups before the first take; improvising positions on the cyc burns time and scuffs the floor.',
+      'Leave time for verticals; the last hour disappears fast.',
+      'Deciding to replace the background after a cyc shoot means masking every frame by hand. Make that call before booking.',
     ],
     proof: ['White cyc wall', '750 sqft open space', 'Photo and video use', 'Hourly rental', '24/7 booking'],
     faqs: [

@@ -24,8 +24,6 @@ vibeshack-website/
 │   │   └── page.tsx                        # Podcast studio landing page
 │   ├── green-screen-studio-sf/
 │   │   └── page.tsx                        # Green screen landing page
-│   ├── photography-studio-san-francisco/
-│   │   └── page.tsx                        # Photography studio landing page
 │   ├── pricing/
 │   │   └── page.tsx                        # Full pricing table
 │   ├── about/
@@ -107,12 +105,10 @@ GCAL_STUDIO_CALENDAR_IDS='{
   "the-wing": "the-wing-calendar-id",
   "encore": "encore-calendar-id",
   "sunset": "sunset-calendar-id",
-  "premier": "premier-calendar-id",
   "parlor": "parlor-calendar-id",
   "horizon": "horizon-calendar-id",
   "canvas-podcast": "canvas-podcast-calendar-id",
   "green-screen": "green-screen-calendar-id",
-  "photography": "photography-calendar-id",
   "canvas-rental": "canvas-rental-calendar-id"
 }'
 ```
@@ -155,7 +151,6 @@ Homepage additionally includes:
 | `/` | `production studio san francisco` |
 | `/podcast-studio-san-francisco` | `podcast studio san francisco` |
 | `/green-screen-studio-sf` | `green screen studio san francisco` |
-| `/photography-studio-san-francisco` | `photography studio san francisco` |
 | `/pricing` | `studio rental san francisco pricing` |
 
 ## Partner Referral Links

@@ -1,14 +1,32 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useEffect, useState, FormEvent } from 'react'
 
 export default function ContactForm() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const [validationError, setValidationError] = useState('')
   const [startedAt] = useState(() => Date.now())
+  const [projectType, setProjectType] = useState('')
+
+  useEffect(() => {
+    const service = new URLSearchParams(window.location.search).get('service')
+    const serviceMap: Record<string, string> = {
+      branding: 'branding',
+      commercials: 'brand-commercial',
+      documentary: 'documentary',
+      editorials: 'editorial',
+      'photo-services': 'photo-services',
+      'portfolio-inquiry': 'other',
+      'video-production': 'video-interview',
+    }
+
+    if (service && serviceMap[service]) {
+      setProjectType(serviceMap[service])
+    }
+  }, [])
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setStatus('sending')
 
     const form = e.currentTarget
     const data = {
@@ -21,6 +39,17 @@ export default function ContactForm() {
       company: (form.elements.namedItem('company') as HTMLInputElement).value,
       startedAt,
     }
+
+    if (!data.name.trim() || !data.email.trim() || !data.message.trim()) {
+      setValidationError('Add your name, email, and a short message so we can reply.')
+      return
+    }
+    if (!/\S+@\S+\.\S+/.test(data.email.trim())) {
+      setValidationError('That email does not look right. Check it and try again.')
+      return
+    }
+    setValidationError('')
+    setStatus('sending')
 
     try {
       const res = await fetch('/api/contact/', {
@@ -47,13 +76,13 @@ export default function ContactForm() {
           </svg>
         </div>
         <h3 className="text-white font-black text-2xl mb-3">Message Sent.</h3>
-        <p className="text-gray-400">We will be in touch within 24 hours.</p>
+        <p className="text-gray-400">We respond same day.</p>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-10">
+    <form onSubmit={handleSubmit} noValidate className="space-y-10">
       <input type="text" name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
       <input type="hidden" name="startedAt" value={startedAt} />
       {status === 'error' && (
@@ -68,7 +97,7 @@ export default function ContactForm() {
       )}
 
       <div>
-        <label htmlFor="name" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="name" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Your Name
         </label>
         <input
@@ -82,7 +111,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="email" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Email Address
         </label>
         <input
@@ -96,23 +125,27 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="project_type" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="project_type" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Project Type
         </label>
         <select
           id="project_type"
           name="project_type"
+          value={projectType}
+          onChange={(event) => setProjectType(event.target.value)}
           className="input-clean appearance-none bg-transparent"
           style={{ backgroundImage: 'none' }}
         >
           <option value="" style={{ background: '#111' }}>Select your project type</option>
           <option value="podcast" style={{ background: '#111' }}>Podcast / Video Podcast</option>
+          <option value="brand-commercial" style={{ background: '#111' }}>Commercial / Product Launch / Ad</option>
+          <option value="documentary" style={{ background: '#111' }}>Documentary / Micro Documentary</option>
+          <option value="editorial" style={{ background: '#111' }}>Editorial / Fashion / Beauty / Campaign</option>
+          <option value="branding" style={{ background: '#111' }}>Branding / Creative Direction</option>
           <option value="green-screen" style={{ background: '#111' }}>Green Screen / VFX</option>
           <option value="photo-services" style={{ background: '#111' }}>Photo Services / Headshots / Portraits</option>
-          <option value="photography-studio-rental" style={{ background: '#111' }}>Photography Studio Rental / Room Only</option>
           <option value="video-interview" style={{ background: '#111' }}>Video / Interview / Corporate</option>
           <option value="music-video" style={{ background: '#111' }}>Music Video</option>
-          <option value="brand-commercial" style={{ background: '#111' }}>Brand Commercial</option>
           <option value="content-creation" style={{ background: '#111' }}>Social Media Content</option>
           <option value="tour" style={{ background: '#111' }}>Studio Tour</option>
           <option value="other" style={{ background: '#111' }}>Other</option>
@@ -120,7 +153,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="preferred_date" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="preferred_date" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Preferred Date
         </label>
         <input
@@ -133,7 +166,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">
+        <label htmlFor="message" className="block font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-500 mb-3">
           Message
         </label>
         <textarea
@@ -141,16 +174,17 @@ export default function ContactForm() {
           name="message"
           required
           rows={4}
-          placeholder="Tell us about your project..."
+          placeholder="Tell us about your project…"
           className="input-clean resize-none"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.15)' }}
         />
       </div>
+
+      {validationError && <p role="alert" className="text-sm text-red-500">{validationError}</p>}
 
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white font-bold text-sm tracking-wide rounded-lg hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className="group inline-flex items-center gap-2.5 rounded-lg bg-brand-red px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {status === 'sending' && (
           <svg className="animate-spin h-4 w-4 mr-2 inline" viewBox="0 0 24 24" fill="none">
@@ -160,12 +194,10 @@ export default function ContactForm() {
         )}
         {status === 'sending' ? 'Sending…' : 'Send Message'}
         {status !== 'sending' && (
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <span className="transition-transform group-hover:translate-x-0.5">→</span>
         )}
       </button>
-      <p className="text-gray-600 text-xs">We respond within 2 business hours.</p>
+      <p className="text-gray-600 text-xs">We respond same day.</p>
     </form>
   )
 }

@@ -17,9 +17,25 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-brand-sans)', 'system-ui', 'sans-serif'],
+        // --font-inter and --font-ibm-plex-mono come from next/font in app/fonts.ts
+        sans: [
+          'var(--font-inter)',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'sans-serif',
+        ],
+        // Druk Condensed is not licensed; the display stack is the heavy
+        // condensed system chain set in app/layout.tsx (brandFontStyle).
         display: ['var(--font-brand-display)'],
-        mono: ['var(--font-brand-mono)'],
+        mono: [
+          'var(--font-ibm-plex-mono)',
+          'SFMono-Regular',
+          'Consolas',
+          '"Liberation Mono"',
+          'monospace',
+        ],
       },
     },
   },

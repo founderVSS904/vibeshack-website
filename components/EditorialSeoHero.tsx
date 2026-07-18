@@ -53,7 +53,7 @@ export function EditorialSeoHero({
           <Link href={backHref} className="text-sm text-gray-500 transition-colors hover:text-white">
             &larr; {backLabel}
           </Link>
-          <p className="mt-10 text-xs font-bold uppercase text-brand-red">{eyebrow}</p>
+          <p className="mt-10 font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-red">{eyebrow}</p>
           <h1 className="mt-8 max-w-5xl text-5xl font-black leading-[0.94] text-white sm:text-6xl lg:text-7xl">
             {title}
           </h1>
@@ -77,7 +77,7 @@ export function EditorialSeoHero({
             <div className="mt-5 grid grid-cols-1 border-y border-white/10 sm:grid-cols-3">
               {meta.map((item) => (
                 <div key={item.label} className="border-b border-white/10 py-4 sm:border-b-0 sm:border-r sm:px-5 first:sm:pl-0 last:border-r-0 last:sm:pr-0">
-                  <p className="text-[10px] font-bold uppercase text-gray-600">{item.label}</p>
+                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-gray-600">{item.label}</p>
                   <p className="mt-2 text-sm font-semibold leading-tight text-gray-200">{item.value}</p>
                 </div>
               ))}

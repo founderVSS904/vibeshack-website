@@ -26,7 +26,7 @@ const planningPrinciples = [
 export const metadata: Metadata = {
   title: 'Studio Use Cases',
   description:
-    'Choose the right VibeShack Studios path for podcast interviews, content days, green screen, photo services, photography studio rental, and white cyc social shoots.',
+    'Choose the right VibeShack Studios path for podcast interviews, content days, green screen, photo services, and white cyc social shoots.',
   alternates: { canonical: absoluteUrl('/use-cases/') },
   openGraph: {
     title: 'Studio Use Cases | VibeShack Studios',
@@ -65,15 +65,15 @@ export default function UseCasesPage() {
       <section className="border-b border-white/10 bg-black px-6 pb-20 pt-32 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
           <div>
-            <p className="text-xs font-bold uppercase text-brand-red">Popular use cases</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Popular use cases</p>
             <h1 className="mt-8 max-w-5xl text-5xl font-black leading-[0.94] text-white sm:text-6xl lg:text-7xl">
-              Choose the room by the work it has to produce.
+              Studio use cases.
             </h1>
           </div>
 
           <div className="grid gap-6">
             <p className="max-w-2xl text-lg leading-relaxed text-gray-300">
-              This is the client-side way to choose VibeShack: start with the deliverable, understand the production risk, then book the setup that makes the final asset easier to trust, edit, and publish.
+              Start with the deliverable, name the production risk, then book the setup that makes the final asset easier to trust, edit, and publish.
             </p>
             <div className="grid grid-cols-3 gap-3">
               {heroCases.map((useCase) => (
@@ -98,9 +98,9 @@ export default function UseCasesPage() {
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.72fr_1fr]">
             <div>
-              <p className="text-xs font-bold uppercase text-brand-red">How we think</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">How we think</p>
               <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-5xl">
-                A professional shoot is an operating system, not a pretty room.
+                Start with the deliverable, then work backward.
               </h2>
             </div>
             <div className="divide-y divide-white/10 border-y border-white/10">
@@ -121,18 +121,18 @@ export default function UseCasesPage() {
       <section className="border-y border-white/10 bg-zinc-950 px-6 py-20 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 max-w-4xl">
-            <p className="text-xs font-bold uppercase text-brand-red">Production paths</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Production paths</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-6xl">
-              Start with the situation your client, guest, product, or campaign is actually in.
+              Six common production briefs.
             </h2>
           </div>
 
-          <div className="divide-y divide-white/10 border-y border-white/10">
+          <div className="border-t border-white/10">
             {useCases.map((useCase, index) => (
               <Link
                 key={useCase.slug}
                 href={`/use-cases/${useCase.slug}/`}
-                className="group grid gap-8 py-10 transition-colors hover:border-white/30 lg:grid-cols-[92px_280px_1fr_190px]"
+                className="group grid gap-8 border-b border-white/10 py-10 transition-colors hover:border-white/35 lg:grid-cols-[92px_280px_1fr_190px]"
               >
                 <p className="text-sm font-bold text-gray-600">{String(index + 1).padStart(2, '0')}</p>
 
@@ -155,7 +155,7 @@ export default function UseCasesPage() {
                   <p className="mt-5 max-w-3xl text-base leading-relaxed text-gray-400">{useCase.clientNeed}</p>
                   <div className="mt-7 grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-3">
                     <div>
-                      <p className="text-xs font-bold uppercase text-gray-600">First room</p>
+                      <p className="text-xs font-bold uppercase text-gray-600">First studio</p>
                       <p className="mt-2 text-sm text-gray-200">{useCase.roomMatches[0].name}</p>
                     </div>
                     <div>
@@ -189,10 +189,10 @@ export default function UseCasesPage() {
             </h2>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href="/find-your-studio/" className="rounded-full bg-white px-6 py-3 text-sm font-bold text-black transition-transform duration-300 hover:scale-[1.03]">
+            <Link href="/find-your-studio/" className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-gray-200">
               Find a studio
             </Link>
-            <Link href="/tour/" className="rounded-full border border-white/15 px-6 py-3 text-sm font-bold text-white transition-colors hover:border-white/40">
+            <Link href="/tour/" className="rounded-lg border border-white/15 px-6 py-3 text-sm font-bold text-white transition-colors hover:border-white/40">
               Book a tour
             </Link>
           </div>

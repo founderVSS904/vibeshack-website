@@ -1,10 +1,11 @@
 import { Metadata } from 'next';
+import { siteUrl } from '@/lib/seo/site';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | VibeShack Studios',
+  title: 'Terms of Service (Full Legal)',
   description: 'Complete Terms of Service for VibeShack Studios. Comprehensive legal agreement covering bookings, cancellations, liability, content rights, and dispute resolution.',
   robots: { index: false, follow: true },
-  alternates: { canonical: 'https://www.vibeshackstudios.com/terms/' },
+  alternates: { canonical: `${siteUrl}/terms/` },
 };
 
 export default function TermsProfessionalPage() {
@@ -13,7 +14,7 @@ export default function TermsProfessionalPage() {
       <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
         {/* Header */}
         <div className="mb-16">
-          <h1 className="text-white font-black leading-tight mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em' }}>
+          <h1 className="text-white font-black leading-none mb-4" style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: 0 }}>
             Terms of Service
           </h1>
           <p className="text-gray-400 text-sm mb-2"><strong>VibeShack Studios, Inc.</strong></p>
@@ -51,14 +52,14 @@ export default function TermsProfessionalPage() {
           <section>
             <h2>1. DEFINED TERMS</h2>
             <ul>
-              <li><strong>Booking</strong> — A confirmed reservation for studio space, services, or equipment made through the Studio's booking system, confirmed upon receipt of full payment.</li>
-              <li><strong>Content</strong> — All photography, video, audio, and other creative works produced, recorded, or created during your session.</li>
-              <li><strong>Equipment</strong> — All cameras, microphones, lighting, teleprompters, furniture, fixtures, and other items provided by the Studio.</li>
-              <li><strong>Event</strong> — A force majeure event, including acts of God, pandemics, war, government action, terrorism, strikes, or natural disasters.</li>
-              <li><strong>Guest</strong> — Any individual invited by you to attend your session, including production crew, talent, or observers.</li>
-              <li><strong>Session</strong> — The period of time during which you are authorized to occupy and use the Studio.</li>
-              <li><strong>Services</strong> — The provision of studio space, equipment, and optional services (cameraman, crew, teleprompter operation, etc.).</li>
-              <li><strong>Studio</strong> — The physical production facility at 950 Battery St, San Francisco, CA 94111, including all studios, equipment, and related facilities.</li>
+              <li><strong>Booking:</strong> A confirmed reservation for studio space, services, or equipment made through the Studio's booking system, confirmed upon receipt of full payment.</li>
+              <li><strong>Content:</strong> All photography, video, audio, and other creative works produced, recorded, or created during your session.</li>
+              <li><strong>Equipment:</strong> All cameras, microphones, lighting, teleprompters, furniture, fixtures, and other items provided by the Studio.</li>
+              <li><strong>Event:</strong> A force majeure event, including acts of God, pandemics, war, government action, terrorism, strikes, or natural disasters.</li>
+              <li><strong>Guest:</strong> Any individual invited by you to attend your session, including production crew, talent, or observers.</li>
+              <li><strong>Session:</strong> The period of time during which you are authorized to occupy and use the Studio.</li>
+              <li><strong>Services:</strong> The provision of studio space, equipment, and optional services (cameraman, crew, teleprompter operation, etc.).</li>
+              <li><strong>Studio:</strong> The physical production facility at 950 Battery St, San Francisco, CA 94111, including all studios, equipment, and related facilities.</li>
             </ul>
           </section>
 
@@ -99,7 +100,7 @@ export default function TermsProfessionalPage() {
             <p>Only Guests explicitly approved or listed at booking are permitted. Unauthorized persons will be asked to leave. You are liable for the conduct of all Guests and for any damage caused by Guests.</p>
             
             <h3>3.6 Property &amp; Cleanliness</h3>
-            <p>You must leave the Studio in the condition you found it. Excessive cleanup requirements result in cleaning fees ($150–$500+, depending on severity).</p>
+            <p>You must leave the Studio in the condition you found it. Excessive cleanup requirements result in cleaning fees ($150 to $500+, depending on severity).</p>
             
             <h3>3.7 Compliance with Law</h3>
             <p>You shall comply with all applicable federal, state, and local laws, including copyright, privacy, labor, building code, and San Francisco municipal ordinances.</p>
@@ -110,16 +111,16 @@ export default function TermsProfessionalPage() {
             <h2>4. PROHIBITED USE</h2>
             <p>You shall not, and shall ensure your Guests do not:</p>
             <ul>
-              <li><strong>Illegal Activity</strong> — Use the Studio for any illegal purpose</li>
-              <li><strong>Harmful Content</strong> — Create content that is defamatory, obscene, or promotes violence</li>
-              <li><strong>Discrimination &amp; Harassment</strong> — Engage in discrimination, harassment, bullying, or hate speech</li>
-              <li><strong>IP Infringement</strong> — Produce content that infringes intellectual property without proper licensing</li>
-              <li><strong>Privacy Violation</strong> — Record individuals without informed consent</li>
-              <li><strong>Malicious Use</strong> — Attempt to damage, disrupt, hack, or sabotage Studio systems</li>
-              <li><strong>Unauthorized Commercial Use</strong> — Use beyond the scope of your booking authorization</li>
-              <li><strong>Prohibited Substances</strong> — Bring illegal drugs, alcohol without authorization, etc.</li>
-              <li><strong>Smoking &amp; Open Flame</strong> — Strictly prohibited</li>
-              <li><strong>Weapons</strong> — Not permitted without prior written authorization</li>
+              <li><strong>Illegal Activity:</strong> Use the Studio for any illegal purpose</li>
+              <li><strong>Harmful Content:</strong> Create content that is defamatory, obscene, or promotes violence</li>
+              <li><strong>Discrimination &amp; Harassment:</strong> Engage in discrimination, harassment, bullying, or hate speech</li>
+              <li><strong>IP Infringement:</strong> Produce content that infringes intellectual property without proper licensing</li>
+              <li><strong>Privacy Violation:</strong> Record individuals without informed consent</li>
+              <li><strong>Malicious Use:</strong> Attempt to damage, disrupt, hack, or sabotage Studio systems</li>
+              <li><strong>Unauthorized Commercial Use:</strong> Use beyond the scope of your booking authorization</li>
+              <li><strong>Prohibited Substances:</strong> Bring illegal drugs, alcohol without authorization, etc.</li>
+              <li><strong>Smoking &amp; Open Flame:</strong> Strictly prohibited</li>
+              <li><strong>Weapons:</strong> Not permitted without prior written authorization</li>
             </ul>
           </section>
 
@@ -153,13 +154,13 @@ export default function TermsProfessionalPage() {
             <h3>5.7 Cancellation Policy</h3>
             <ul>
               <li><strong>Full Refund:</strong> Cancellations 48+ hours before session start = 100% refund</li>
-              <li><strong>Partial Refund:</strong> Cancellations 24–48 hours before = 50% refund; Rescheduling with 48+ hours notice = No charge</li>
+              <li><strong>Rescheduling:</strong> Rescheduling with 48+ hours notice = No charge</li>
               <li><strong>No Refund:</strong> Cancellations less than 48 hours before, no-shows = No refund</li>
               <li><strong>Studio-Initiated Cancellations:</strong> If the Studio must cancel, you receive full refund OR rescheduling to alternative time</li>
             </ul>
             
             <h3>5.8 Rescheduling</h3>
-            <p>Rescheduling requests must be submitted 48+ hours before the session. Rescheduling with 48+ hours notice is free. Rescheduling with less than 48 hours notice incurs a $25 fee.</p>
+            <p>Rescheduling with 48+ hours notice is free. Rescheduling with less than 48 hours notice incurs a $25 fee.</p>
             
             <h3>5.9 No-Shows &amp; Late Cancellations</h3>
             <p>No-shows forfeit 100% of fees. Cancellations within 48 hours forfeit 100% of fees.</p>
@@ -173,11 +174,11 @@ export default function TermsProfessionalPage() {
             
             <h3>6.1.1 Disclaimers of Warranty</h3>
             <ul>
-              <li><strong>No Warranty of Merchantability</strong> — The Studio is not fit for any particular purpose or merchantable quality</li>
-              <li><strong>No Warranty of Fitness</strong> — The Studio does not meet your specific needs or expectations</li>
-              <li><strong>No Warranty of Title</strong> — Equipment is not free from liens or claims</li>
-              <li><strong>No Warranty of Non-Infringement</strong> — Services do not infringe third-party IP rights</li>
-              <li><strong>No Warranty of Uninterrupted Service</strong> — Equipment or connectivity may fail without notice</li>
+              <li><strong>No Warranty of Merchantability:</strong> The Studio makes no warranty that the facility is of merchantable quality or fit for any particular purpose</li>
+              <li><strong>No Warranty of Fitness:</strong> The Studio makes no warranty that the facility meets your specific needs or expectations</li>
+              <li><strong>No Warranty of Title:</strong> The Studio makes no warranty that Equipment is free from liens or claims</li>
+              <li><strong>No Warranty of Non-Infringement:</strong> The Studio makes no warranty that Services do not infringe third-party IP rights</li>
+              <li><strong>No Warranty of Uninterrupted Service:</strong> Equipment or connectivity may fail without notice</li>
             </ul>
             
             <h3>6.1.2 Assumption of Risk</h3>
@@ -189,7 +190,7 @@ export default function TermsProfessionalPage() {
             <h3>6.3 CAP ON LIABILITY</h3>
             <p><strong className="text-brand-red">THE STUDIO'S TOTAL LIABILITY SHALL NOT EXCEED THE TOTAL FEES PAID FOR THE SESSION(S), CAPPED AT $1,000.</strong></p>
             
-            <h3>6.4–6.7 Additional Disclaimers</h3>
+            <h3>6.4 to 6.7 Additional Disclaimers</h3>
             <p>Equipment is provided as-is without warranty of performance. The Studio is not responsible for Content quality or loss. Internet, power, and utilities are not guaranteed. Studio facility conditions are as-is.</p>
           </section>
 
@@ -245,12 +246,12 @@ export default function TermsProfessionalPage() {
             
             <h3>9.2 Damage Charges Schedule</h3>
             <ul>
-              <li>Minor scuffs/marks: $25–$75</li>
-              <li>Moderate Equipment damage: $150–$1,000+</li>
-              <li>Major Equipment damage: $1,000–$5,000+</li>
-              <li>Structural damage: $500–$5,000+</li>
+              <li>Minor scuffs/marks: $25 to $75</li>
+              <li>Moderate Equipment damage: $150 to $1,000+</li>
+              <li>Major Equipment damage: $1,000 to $5,000+</li>
+              <li>Structural damage: $500 to $5,000+</li>
               <li>Theft/removal: Full replacement + $500 penalty</li>
-              <li>Deep cleaning: $200–$500+</li>
+              <li>Deep cleaning: $200 to $500+</li>
             </ul>
             
             <h3>9.3 Dispute of Damage Charges</h3>
@@ -320,7 +321,7 @@ export default function TermsProfessionalPage() {
             <h3>14.6 No Third-Party Beneficiaries</h3>
             <p>These Terms are between you and the Studio only. No third party has enforcement rights.</p>
             
-            <h3>14.7–14.12 Additional Provisions</h3>
+            <h3>14.7 to 14.12 Additional Provisions</h3>
             <p>Headings are for convenience. These Terms constitute the entire agreement and supersede prior understandings. The Studio may modify Terms with 30 days' written notice for material changes. Confidentiality and indemnification survive termination.</p>
           </section>
 
@@ -345,7 +346,7 @@ export default function TermsProfessionalPage() {
               United States<br />
               <br />
               <strong>Email:</strong> founder@vibeshackstudios.com<br />
-              <strong>Website:</strong> https://www.vibeshackstudios.com/<br />
+              <strong>Website:</strong> {siteUrl}/<br />
               <strong>Hours:</strong> 24/7 (by appointment)
             </p>
           </section>

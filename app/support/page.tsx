@@ -1,9 +1,24 @@
 import type { Metadata } from 'next'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
-  title: 'Support | VibeShack Studios',
+  title: 'Support',
   description: 'Questions about booking, pricing, studios, or your session. We\'re here. VibeShack Studios, 950 Battery St, San Francisco.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/support/' },
+  alternates: { canonical: `${siteUrl}/support/` },
+  openGraph: {
+    type: 'website',
+    siteName: 'VibeShack Studios',
+    title: 'Support | VibeShack Studios SF',
+    description: 'Questions about booking, pricing, studios, or your session. We\'re here. VibeShack Studios, 950 Battery St, San Francisco.',
+    url: `${siteUrl}/support/`,
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'VibeShack Studios support' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Support | VibeShack Studios SF',
+    description: 'Questions about booking, pricing, studios, or your session. We\'re here. VibeShack Studios, 950 Battery St, San Francisco.',
+    images: ['/og-image.jpg'],
+  },
 }
 
 const FAQS = [
@@ -28,7 +43,7 @@ const FAQS = [
       },
       {
         q: 'Can I set up a recurring booking?',
-        a: 'Yes. During checkout, you can select a recurring schedule - weekly, bi-weekly, or monthly. We\'ll lock in your slot and apply a discount.',
+        a: 'Yes. During checkout, you can select a recurring schedule: weekly, bi-weekly, or monthly. We\'ll lock in your slot and apply a discount.',
       },
     ],
   },
@@ -37,7 +52,7 @@ const FAQS = [
     questions: [
       {
         q: 'What is the difference between a Podcast Studio and a Rental?',
-        a: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment - you operate it yourself or bring your own crew.',
+        a: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment. You operate it yourself or bring your own crew.',
       },
       {
         q: 'Is the equipment already set up when I arrive?',
@@ -49,11 +64,11 @@ const FAQS = [
       },
       {
         q: 'Do you have Hair and Makeup on-site?',
-        a: 'We have dedicated Hair and Makeup rooms and wardrobe changing rooms at several of our studios - spaces where your talent can get ready before the session. We do not provide Hair and Makeup artists or services. Bring your own team, or arrive ready.',
+        a: 'We have dedicated Hair and Makeup rooms and wardrobe changing rooms at several of our studios: spaces where your talent can get ready before the session. We do not provide Hair and Makeup artists or services. Bring your own team, or arrive ready.',
       },
       {
         q: 'How quickly do I get my footage?',
-        a: 'We offer a 6 to 12 hour turnaround. Your footage is delivered the same day as your session. We process and send it directly to you — no waiting, no delays.',
+        a: 'We offer a 6 to 12 hour turnaround. We process your footage and send it to you the same day as your session.',
       },
       {
         q: 'Can I do a free tour before I book?',
@@ -104,7 +119,7 @@ const FAQS = [
       },
       {
         q: 'What should I bring?',
-        a: 'Just yourself and your content plan. All equipment is provided. For photography and video, bring outfit options and any products or props you want in frame. For podcast, have your talking points ready.',
+        a: 'Yourself and your content plan. All equipment is provided. For photography and video, bring outfit options and any products or props you want in frame. For podcast, have your talking points ready.',
       },
       {
         q: 'What if I\'m running late?',
@@ -139,7 +154,7 @@ const faqSchema = {
       name: 'What is the difference between a Podcast Studio and a Rental?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment - you operate it yourself or bring your own crew.',
+        text: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment. You operate it yourself or bring your own crew.',
       },
     },
     {
@@ -171,10 +186,10 @@ export default function SupportPage() {
       <section className="bg-black pt-32 sm:pt-48 pb-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Support</span>
-          <h1 data-reveal="up" className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: '-0.05em' }}>
+          <h1 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: 0 }}>
             How can we<br /><span className="text-brand-red">help?</span>
           </h1>
-          <p className="text-gray-400 text-xl max-w-xl leading-relaxed" data-reveal="fade">
+          <p className="text-gray-400 text-xl max-w-xl leading-relaxed">
             Find answers below. If you don&apos;t see what you need, email us directly and we&apos;ll get back to you fast.
           </p>
         </div>
@@ -194,7 +209,7 @@ export default function SupportPage() {
                     {category}
                   </a>
                 ))}
-                <div className="pt-6 border-t border-white/8 mt-6">
+                <div className="pt-6 border-t border-white/[0.08] mt-6">
                   <p className="text-gray-600 text-xs mb-3">Still need help?</p>
                   <a href="mailto:founder@vibeshackstudios.com" className="text-brand-red text-sm font-semibold hover:text-white transition-colors">
                     Email us →
@@ -207,10 +222,10 @@ export default function SupportPage() {
             <div className="pt-16 space-y-16">
               {FAQS.map(({ category, questions }) => (
                 <div key={category} id={category.toLowerCase().replace(/\s+/g, '-')}>
-                  <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">{category}</p>
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">{category}</p>
                   <div className="space-y-0">
                     {questions.map(({ q, a }) => (
-                      <div key={q} className="py-6 border-b border-white/8">
+                      <div key={q} className="py-6 border-b border-white/[0.08]">
                         <p className="text-white font-bold text-base mb-3">{q}</p>
                         <p className="text-gray-500 text-sm leading-relaxed">{a}</p>
                       </div>
@@ -249,9 +264,9 @@ export default function SupportPage() {
             ].map(({ label, value, sub, href }) => (
               <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined}
                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="border-t border-white/8 pt-8 group">
-                <p className="text-gray-600 text-xs uppercase tracking-widest mb-3">{label}</p>
-                <p className="text-white font-bold text-lg group-hover:text-brand-red transition-colors" style={{letterSpacing: '-0.02em'}}>{value}</p>
+                className="border-t border-white/[0.08] pt-8 group">
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-3">{label}</p>
+                <p className="text-white font-bold text-lg group-hover:text-brand-red transition-colors" style={{letterSpacing: 0}}>{value}</p>
                 <p className="text-gray-500 text-sm mt-1">{sub}</p>
               </a>
             ))}

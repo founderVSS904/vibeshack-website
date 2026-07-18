@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import CustomSetupForm from './CustomSetupForm'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Canvas Podcast Custom Setup Request',
   description: 'Request a custom Canvas Podcast setup at VibeShack Studios in San Francisco.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/canvas-podcast/custom-setup/' },
+  alternates: { canonical: `${siteUrl}/canvas-podcast/custom-setup/` },
   robots: { index: false, follow: true },
 }
 
@@ -14,13 +15,13 @@ export default function CanvasPodcastCustomSetupPage() {
     <>
       <section className="relative overflow-hidden bg-black pt-36 pb-20">
         <div className="absolute inset-0 opacity-35">
-          <Image src="/studio-images/podcast-cyc-duo.jpg" alt="" fill priority className="object-cover" />
+          <Image src="/studio-images/podcast-cyc-duo.jpg" alt="" fill sizes="100vw" priority className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-black/40" />
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
           <a href="/canvas-podcast/" className="mb-10 inline-block text-sm text-gray-500 transition-colors hover:text-white">← Canvas Podcast</a>
           <p className="mb-6 text-xs font-bold uppercase tracking-[0.25em] text-brand-red">Custom Setup Request</p>
-          <h1 className="max-w-4xl font-black leading-none text-white" style={{ fontSize: 'clamp(3rem, 7vw, 6rem)', letterSpacing: '-0.05em' }}>
+          <h1 className="max-w-4xl font-black leading-none text-white" style={{ fontSize: 'clamp(3rem, 7vw, 6rem)', letterSpacing: 0 }}>
             Tell us the set you want.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-gray-400">
@@ -39,7 +40,7 @@ export default function CanvasPodcastCustomSetupPage() {
               <p className="text-white">$400/hr base rate. Custom production needs may require additional setup or crew planning.</p>
             </div>
           </aside>
-          <div className="rounded-2xl border border-white/10 bg-black p-6 sm:p-10">
+          <div className="rounded-lg border border-white/10 bg-black p-6 sm:p-10">
             <CustomSetupForm />
           </div>
         </div>

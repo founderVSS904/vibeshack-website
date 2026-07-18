@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { assertCartSlotsAvailable, type BookingCartItem } from '@/lib/booking/calendar'
-import { calculateRecurringDiscountCents, getAddOnById, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
+import { calculateRecurringDiscountCents, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
 import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
 import { describeSlotRanges, formatDateForDisplay, isValidBookingDate } from '@/lib/booking/time'
 import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
 import { isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
+import { siteUrl } from '@/lib/seo/site'
 
 const ATTRIBUTION_COOKIE = 'vbs_attribution'
 const CHECKOUT_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -71,17 +72,6 @@ function buildCanonicalCart(rawCart: unknown): BookingCartItem[] {
   }
 
   return cart
-}
-
-function buildCanonicalAddons(rawAddons: unknown) {
-  const ids = new Set<string>()
-  for (const rawAddon of toArray(rawAddons)) {
-    const id = typeof rawAddon === 'string'
-      ? stripControlChars(rawAddon, 80)
-      : stripControlChars((rawAddon as Record<string, unknown> | null)?.id, 80)
-    if (id) ids.add(id)
-  }
-  return Array.from(ids).map(getAddOnById).filter(Boolean) as NonNullable<ReturnType<typeof getAddOnById>>[]
 }
 
 function applyDiscountToSessionAmounts(amounts: number[], discountCents: number) {
@@ -184,12 +174,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error }, { status: availability.status })
     }
 
-    const addons = buildCanonicalAddons(body.addons)
     const baseSessionTotalCents = cart.reduce((sum, item) => sum + item.price * 100, 0)
-    const addonTotalCents = addons.reduce((sum, addon) => sum + addon.price * 100, 0)
     const discountCents = calculateRecurringDiscountCents(baseSessionTotalCents, recurringOption?.id)
     const discountedSessionAmounts = applyDiscountToSessionAmounts(cart.map((item) => item.price * 100), discountCents)
-    const computedTotalCents = discountedSessionAmounts.reduce((sum, amount) => sum + amount, 0) + addonTotalCents
+    const computedTotalCents = discountedSessionAmounts.reduce((sum, amount) => sum + amount, 0)
     const referralInfo = buildReferralInfo(referralSource, computedTotalCents)
 
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = cart.map((item, index) => ({
@@ -198,40 +186,29 @@ export async function POST(req: NextRequest) {
         product_data: {
           name: `${item.studioName} - VibeShack Studios`,
           description: `${formatDateForDisplay(item.date)} - ${describeSlotRanges(item.slots)} - ${item.hours}hr${discountCents ? ' - recurring discount applied' : ''}`,
-          images: ['https://www.vibeshackstudios.com/og-image.jpg'],
+          images: [`${siteUrl}/og-image.jpg`],
         },
         unit_amount: discountedSessionAmounts[index],
       },
       quantity: 1,
     }))
 
-    for (const addon of addons) {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `Add-on: ${addon.name}`,
-            description: addon.description || 'Optional add-on service',
-            images: ['https://www.vibeshackstudios.com/og-image.jpg'],
-          },
-          unit_amount: addon.price * 100,
-        },
-        quantity: 1,
-      })
-    }
-
     const bookingRef = crypto.randomUUID()
     const attributionMetadata = readAttributionMetadata(req)
     const cartMetadata: Record<string, string> = {}
     cart.forEach((item, index) => {
+      // Stripe caps metadata values at 500 chars. Full ISO slot arrays overflow
+      // that for 16+ hour sessions and truncate into unparseable JSON, so slots
+      // are stored as the first slot plus hour offsets (slots arrive sorted from
+      // normalizeSlots). The webhook reconstructs and re-validates every slot,
+      // and derives name/hours/price from the catalog.
+      const firstSlotMs = Date.parse(item.slots[0])
       cartMetadata[`cart_${index}`] = JSON.stringify({
         id: item.studioId,
-        n: item.studioName,
         d: item.date,
-        s: item.slots,
-        h: item.hours,
-        p: item.price,
-      }).slice(0, 500)
+        t0: item.slots[0],
+        off: item.slots.map((slot) => Math.round((Date.parse(slot) - firstSlotMs) / 3600000)),
+      })
     })
 
     const baseUrl = getBaseUrl(req)
@@ -260,7 +237,6 @@ export async function POST(req: NextRequest) {
         computedTotalCents: String(computedTotalCents),
         recurring: recurringOption?.id || '',
         recurringDiscountCents: String(discountCents),
-        addons: addons.map((addon) => addon.id).join(',').slice(0, 500),
         teamEmails: JSON.stringify(teamEmails).slice(0, 500),
         referralSource: referralInfo?.source || '',
         referralPartner: referralInfo?.partnerName || '',
@@ -284,11 +260,11 @@ export async function POST(req: NextRequest) {
     const bodyError = jsonBodyErrorResponse(err)
     if (bodyError) return bodyError
 
+    if (err instanceof Error && err.message === 'Invalid cart item') {
+      return NextResponse.json({ error: 'Invalid booking selection' }, { status: 400 })
+    }
+
     console.error('Stripe checkout error:', err)
-    const message = err instanceof Error && err.message === 'Invalid cart item'
-      ? 'Invalid booking selection'
-      : 'Payment session failed'
-    const status = message === 'Invalid booking selection' ? 400 : 500
-    return NextResponse.json({ error: message }, { status })
+    return NextResponse.json({ error: 'Payment session failed' }, { status: 500 })
   }
 }

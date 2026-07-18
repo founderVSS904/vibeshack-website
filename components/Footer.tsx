@@ -4,6 +4,7 @@ import { studioGuides } from '@/lib/seo/studioGuides'
 import { business, peerspaceUrl } from '@/lib/seo/site'
 import { useCases } from '@/lib/seo/useCases'
 import { BrandMark } from '@/components/BrandMark'
+import FooterMonogram from '@/components/FooterMonogram'
 
 export default function Footer() {
   return (
@@ -22,10 +23,10 @@ export default function Footer() {
                 The Dream Factory
               </p>
             </div>
-            <p className="text-gray-600 text-sm leading-relaxed mb-8">
+            <p className="text-gray-400 text-sm leading-relaxed mb-8">
               Professional studios. Northern Waterfront. 24/7.
             </p>
-            <div className="space-y-1 text-sm text-gray-600">
+            <div className="space-y-1 text-sm text-gray-400">
               <p>950 Battery St</p>
               <p>San Francisco, CA 94111</p>
               <a href={`tel:${business.phone.replace(/[^\d+]/g, '')}`}
@@ -52,7 +53,6 @@ export default function Footer() {
                   { href: '/encore/', label: 'Encore' },
                   { href: '/sunset-studio/', label: 'Sunset' },
                   { href: '/canvas-podcast/', label: 'Canvas Podcast' },
-                  { href: '/premier/', label: 'Premier' },
                 ].map(({ href, label }) => (
                   <li key={href}>
                     <Link href={href} prefetch={href === '/book/' ? false : undefined} className="text-gray-500 text-sm hover:text-white hover:underline transition-colors duration-200">{label}</Link>
@@ -62,15 +62,18 @@ export default function Footer() {
             </div>
 
             {/* Services and rentals */}
-            <div className="border-l border-white/20 pl-8">
+            <div className="md:border-l md:border-white/20 md:pl-8">
               <p className="text-gray-400 text-xs tracking-[0.2em] uppercase mb-5 font-bold">Services</p>
               <ul className="space-y-3">
                 {[
                   { href: '/services/', label: 'All Services' },
-                  { href: '/photo-services/', label: 'Photo Services' },
-                  { href: '/video-production/', label: 'Video Production' },
+                  { href: '/commercials/', label: 'Commercials' },
+                  { href: '/editorials/', label: 'Editorials' },
+                  { href: '/branding/', label: 'Branding' },
+                  { href: '/our-work/', label: 'Our Work' },
                   { href: '/rental-studios/', label: 'All Rental Studios' },
-                  { href: '/photography-studio-san-francisco/', label: 'Photography Studio Rental' },
+                  { href: '/video-production/', label: 'Video Production' },
+                  { href: '/photo-services/', label: 'Photo Services' },
                   { href: '/canvas-rental/', label: 'Canvas Rental' },
                   { href: '/green-screen-studio-sf/', label: 'Green Screen' },
                 ].map(({ href, label }) => (
@@ -111,6 +114,7 @@ export default function Footer() {
                   { href: '/contact/', label: 'Contact' },
                   { href: '/book/', label: 'Book a Session' },
                   { href: '/tour/', label: 'Book a Tour' },
+                  { href: '/our-work/', label: 'Our Work' },
                   { href: '/made-at-vibeshack/', label: 'Trusted By' },
                   { href: '/press/', label: 'Press & Media' },
                   { href: '/terms/', label: 'Terms & Services' },
@@ -149,7 +153,7 @@ export default function Footer() {
             <p className="text-gray-500 text-xs tracking-[0.2em] uppercase mb-4 font-bold">Popular Use Cases</p>
             <div className="flex flex-wrap gap-x-5 gap-y-2">
               {useCases.slice(0, 5).map((useCase) => (
-                <Link key={useCase.slug} href={`/use-cases/${useCase.slug}/`} className="text-gray-600 text-sm hover:text-white hover:underline transition-colors duration-200">{useCase.shortTitle}</Link>
+                <Link key={useCase.slug} href={`/use-cases/${useCase.slug}/`} className="text-gray-400 text-sm hover:text-white hover:underline transition-colors duration-200">{useCase.shortTitle}</Link>
               ))}
             </div>
           </div>
@@ -157,7 +161,7 @@ export default function Footer() {
             <p className="text-gray-500 text-xs tracking-[0.2em] uppercase mb-4 font-bold">Decision Guides</p>
             <div className="flex flex-wrap gap-x-5 gap-y-2">
               {comparisons.map((comparison) => (
-                <Link key={comparison.slug} href={`/compare/${comparison.slug}/`} className="text-gray-600 text-sm hover:text-white hover:underline transition-colors duration-200">{comparison.shortTitle}</Link>
+                <Link key={comparison.slug} href={`/compare/${comparison.slug}/`} className="text-gray-400 text-sm hover:text-white hover:underline transition-colors duration-200">{comparison.shortTitle}</Link>
               ))}
             </div>
           </div>
@@ -165,9 +169,9 @@ export default function Footer() {
 
         {/* Bottom row */}
         <div className="border-t border-white/5 pt-12 text-center">
-          <BrandMark variant="wordmark" className="mx-auto mb-5 h-[18px] w-auto" />
+          <FooterMonogram />
           <p className="text-white text-xs tracking-[0.15em] uppercase font-bold mb-6">The Dream Factory</p>
-          <p className="text-gray-700 text-xs mt-2">© 2026 VibeShack Studios · San Francisco</p>
+          <p className="text-gray-500 text-xs mt-2">© 2026 VibeShack Studios · San Francisco</p>
 
         </div>
       </div>

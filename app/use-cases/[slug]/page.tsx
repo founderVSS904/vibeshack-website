@@ -89,7 +89,7 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
         meta={[
           { label: 'Best first room', value: bestRoom.name },
           { label: 'Starting point', value: bestRoom.price },
-          { label: 'Built for', value: useCase.audience.slice(0, 2).join(' / ') },
+          { label: 'Audience', value: useCase.audience.slice(0, 2).join(' / ') },
         ]}
       />
 
@@ -108,9 +108,9 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
       <section className="bg-black px-6 pb-24 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-4xl">
-            <p className="text-[11px] font-bold uppercase text-brand-red">Production read</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Production read</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-6xl">
-              The room choice should protect the asset, not just hold the crew.
+              The room choice should protect the asset, not only hold the crew.
             </h2>
             <p className="mt-8 text-lg leading-relaxed text-gray-400">{useCase.clientNeed}</p>
           </div>
@@ -141,7 +141,7 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
       <section className="bg-black px-6 py-24 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 max-w-3xl">
-            <p className="text-[11px] font-bold uppercase text-brand-red">Room sequence</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Room sequence</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-5xl">
               Start with the room that removes the most risk.
             </h2>
@@ -171,7 +171,7 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
       <section className="bg-zinc-950 px-6 py-24 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-14 lg:grid-cols-[0.78fr_1fr]">
           <div>
-            <p className="text-[11px] font-bold uppercase text-brand-red">Session architecture</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Session architecture</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-5xl">
               A clean day has an order.
             </h2>
@@ -190,7 +190,7 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
 
       <section className="bg-black px-6 py-24 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
-          <p className="text-[11px] font-bold uppercase text-brand-red">Producer prep</p>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Producer prep</p>
           <div className="mt-10 divide-y divide-white/10 border-y border-white/10">
             {useCase.plan.map((item, index) => (
               <div key={item.heading} className="grid gap-6 py-10 lg:grid-cols-[90px_0.82fr_1.18fr]">
@@ -227,7 +227,7 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
       <section className="bg-black px-6 py-24 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-14 lg:grid-cols-[0.74fr_1fr]">
           <div>
-            <p className="text-[11px] font-bold uppercase text-brand-red">Outputs</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Outputs</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white sm:text-5xl">
               The session should leave with assets that can travel.
             </h2>
@@ -245,7 +245,7 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
       <section className="border-y border-white/10 bg-zinc-950 px-6 py-20 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-[11px] font-bold uppercase text-brand-red">Questions</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-brand-red">Questions</p>
             <h2 className="mt-5 text-4xl font-black leading-tight text-white">Before you book.</h2>
           </div>
           <div className="divide-y divide-white/10 border-y border-white/10">
@@ -268,10 +268,10 @@ export default async function UseCasePage({ params }: { params: Promise<{ slug: 
             </h2>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href={useCase.bookHref} className="rounded-full bg-white px-6 py-3 text-sm font-bold text-black transition-transform hover:scale-[1.03]">
+            <Link href={useCase.bookHref} className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-gray-200">
               Book this setup
             </Link>
-            <Link href="/tour/" className="rounded-full border border-white/15 px-6 py-3 text-sm font-bold text-white transition-colors hover:border-white/40">
+            <Link href="/tour/" className="rounded-lg border border-white/15 px-6 py-3 text-sm font-bold text-white transition-colors hover:border-white/40">
               Tour first
             </Link>
           </div>

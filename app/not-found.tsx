@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
         <span className="font-black text-white" style={{
           fontSize: 'clamp(12rem, 35vw, 28rem)',
-          letterSpacing: '-0.06em',
+          letterSpacing: 0,
           opacity: 0.025,
           lineHeight: 1,
         }}>404</span>
@@ -20,27 +20,27 @@ export default function NotFound() {
         {/* Big red 404 */}
         <div className="font-black text-brand-red mb-6" style={{
           fontSize: 'clamp(5rem, 15vw, 9rem)',
-          letterSpacing: '-0.06em',
+          letterSpacing: 0,
           lineHeight: 1,
         }}>404</div>
 
         {/* Headline */}
         <h1 className="text-white font-black leading-tight mb-4" style={{
           fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
-          letterSpacing: '-0.04em',
+          letterSpacing: 0,
         }}>
           Nothing here.
         </h1>
 
         <p className="text-gray-500 text-base leading-relaxed mb-12 max-w-sm mx-auto">
-          This page doesn&apos;t exist — but your next session does. Let&apos;s get you back on track.
+          This page doesn&apos;t exist. Your next session can.
         </p>
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-full hover:bg-gray-100 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
           >
             Back to Home
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,14 +49,14 @@ export default function NotFound() {
           </Link>
           <Link
             href="/book/"
-            className="inline-flex items-center gap-2 px-8 py-4 text-white text-sm font-semibold border border-white/20 rounded-full hover:border-white/50 hover:bg-white/5 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-4 text-white text-sm font-semibold border border-white/20 rounded-lg hover:border-white/50 hover:bg-white/5 transition-colors cursor-pointer"
           >
             Book a Session
           </Link>
         </div>
 
         {/* Bottom divider */}
-        <div className="mt-16 pt-8 border-t border-white/8">
+        <div className="mt-16 pt-8 border-t border-white/[0.08]">
           <p className="text-gray-700 text-xs tracking-wide">950 Battery St · San Francisco · Open 24/7</p>
         </div>
       </div>

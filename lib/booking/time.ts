@@ -61,12 +61,23 @@ export function zonedDateHourToUtc(date: string, hour: number) {
   return zonedDateTimeToUtc(date, hour)
 }
 
+function nextDateString(date: string) {
+  const [year, month, day] = date.split('-').map(Number)
+  const next = new Date(Date.UTC(year, month - 1, day + 1))
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return `${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}-${pad(next.getUTCDate())}`
+}
+
 export function getTimeSlotsForDay(date: string) {
+  // Step in real UTC time from local midnight to the next local midnight.
+  // Mapping wall-clock hours instead duplicates an instant on spring-forward
+  // days and leaves a two-hour gap on fall-back days.
+  const slotMs = SLOT_DURATION_HOURS * 60 * 60 * 1000
+  const dayStart = zonedDateHourToUtc(date, START_HOUR).getTime()
+  const dayEnd = zonedDateHourToUtc(nextDateString(date), START_HOUR).getTime()
   const slots: { start: Date; end: Date }[] = []
-  for (let hour = START_HOUR; hour < END_HOUR; hour++) {
-    const start = zonedDateHourToUtc(date, hour)
-    const end = new Date(start.getTime() + SLOT_DURATION_HOURS * 60 * 60 * 1000)
-    slots.push({ start, end })
+  for (let t = dayStart; t < dayEnd; t += slotMs) {
+    slots.push({ start: new Date(t), end: new Date(t + slotMs) })
   }
   return slots
 }

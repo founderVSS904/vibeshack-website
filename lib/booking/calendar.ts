@@ -491,7 +491,7 @@ export async function assertTourSlotAvailable(date: string, slot: string) {
 
   const selected = availability.slots.find((candidate) => candidate.time === slot)
   if (!selected?.available) {
-    return { ok: false, status: 409, error: 'Sorry, that tour time was just booked or is no longer available. Please choose another open time.' }
+    return { ok: false, status: 409, error: 'Sorry, that tour time was booked moments ago or is no longer available. Please choose another open time.' }
   }
 
   return { ok: true, status: 200, error: '' }
@@ -598,6 +598,27 @@ export async function assertCartSlotsAvailable(cartItems: BookingCartItem[]) {
   }
 
   return { ok: true, status: 200, error: '' }
+}
+
+export async function hasBookingEventsForRef(bookingRef: string, studioIds: string[]) {
+  if (!bookingRef) return false
+
+  const checkedCalendarIds = new Set<string>()
+  for (const studioId of studioIds) {
+    const config = await getCalendarConfig(studioId)
+    if (!config || checkedCalendarIds.has(config.calendarId)) continue
+    checkedCalendarIds.add(config.calendarId)
+
+    const existing = await config.client.events.list({
+      calendarId: config.calendarId,
+      privateExtendedProperty: [`bookingRef=${bookingRef}`],
+      showDeleted: false,
+      maxResults: 1,
+    })
+    if (existing.data.items?.length) return true
+  }
+
+  return false
 }
 
 export async function addBookingEvents(

@@ -4,6 +4,8 @@ node_modules/
 .env.local
 .env*.local
 public/studio-images/drive/
+# Full cinema masters stay on local review storage or production object storage.
+public/studio-videos/cinema/full-v017/
 tsconfig.tsbuildinfo
 test.tsx
 out/

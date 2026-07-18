@@ -6,21 +6,21 @@ const brandMarks = {
     alt: 'VibeShack',
     width: 1836,
     height: 194,
-    sizes: '(min-width: 768px) 190px, 150px',
+    sizes: '(min-width: 768px) 380px, 300px',
   },
   monogram: {
     src: '/brand/vibeshack/monogram-red-transparent.png',
     alt: 'VS',
     width: 1229,
     height: 562,
-    sizes: '64px',
+    sizes: '160px',
   },
   lockup: {
     src: '/brand/vibeshack/lockup-red-white-transparent-tight.png',
     alt: 'VibeShack Studios',
     width: 504,
     height: 144,
-    sizes: '(min-width: 768px) 260px, 180px',
+    sizes: '(min-width: 768px) 520px, 360px',
   },
 } as const
 
@@ -45,6 +45,7 @@ export function BrandMark({
       height={mark.height}
       sizes={mark.sizes}
       priority={priority}
+      fetchPriority={priority ? 'high' : undefined}
       className={className}
     />
   )

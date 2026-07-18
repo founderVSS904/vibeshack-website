@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { STUDIOS } from '@/lib/booking/catalog'
 
 type TourSlot = { time: string; label: string; available: boolean }
@@ -45,6 +45,7 @@ export default function TourBookingForm() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [confirmed, setConfirmed] = useState<{ date: string; time: string; studioName: string } | null>(null)
+  const availabilityReqRef = useRef(0)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -69,6 +70,8 @@ export default function TourBookingForm() {
   const [monthLabel, monthDays] = months[Math.min(monthOffset, months.length - 1)] || ['', []]
 
   async function selectDate(date: string) {
+    // Only the latest request may write state; stale responses are dropped.
+    const reqId = ++availabilityReqRef.current
     setSelectedDate(date)
     setSelectedSlot('')
     setSlots([])
@@ -79,12 +82,14 @@ export default function TourBookingForm() {
     try {
       const response = await fetch(`/api/tour-availability/?date=${date}`)
       const data = await response.json()
+      if (reqId !== availabilityReqRef.current) return
       setSlots(data.slots || [])
       setAvailabilityVerified(data.verified !== false)
       if (!response.ok) {
         setError(data.error || 'Tour availability could not be verified. Please try again.')
       }
     } catch {
+      if (reqId !== availabilityReqRef.current) return
       setAvailabilityVerified(false)
       setError('Tour availability could not be verified. Please try again.')
     }
@@ -138,12 +143,12 @@ export default function TourBookingForm() {
 
   if (confirmed) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-zinc-950 p-8 sm:p-10">
+      <div className="rounded-lg border border-white/10 bg-zinc-950 p-8 sm:p-10">
         <p className="text-gray-600 text-xs uppercase tracking-widest mb-4">Tour booked</p>
-        <h2 className="text-white font-black leading-tight mb-5" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: '-0.04em' }}>
+        <h2 className="text-white font-black leading-tight mb-5" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: 0 }}>
           You&apos;re on the calendar.
         </h2>
-        <div className="space-y-3 border-y border-white/8 py-6 mb-6">
+        <div className="space-y-3 border-y border-white/[0.08] py-6 mb-6">
           <p className="text-white font-bold">{fmtDateFull(confirmed.date)}</p>
           <p className="text-brand-red font-black">{confirmed.time} PT</p>
           <p className="text-gray-500 text-sm">Studio interest: {confirmed.studioName}</p>
@@ -160,7 +165,7 @@ export default function TourBookingForm() {
     <form onSubmit={handleSubmit} className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
       <div>
         <p className="text-gray-600 text-xs uppercase tracking-widest mb-5">Pick a tour window</p>
-        <div className="rounded-3xl border border-white/10 bg-zinc-950 p-5 sm:p-6">
+        <div className="rounded-lg border border-white/10 bg-zinc-950 p-5 sm:p-6">
           <div className="flex items-center justify-between mb-5">
             <button
               type="button"
@@ -189,8 +194,10 @@ export default function TourBookingForm() {
                 <button
                   key={ds}
                   type="button"
+                  aria-pressed={selected}
+                  aria-label={date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                   onClick={() => selectDate(ds)}
-                  className={`flex flex-col items-center rounded-xl py-2.5 transition-all ${selected ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/8'}`}
+                  className={`flex flex-col items-center rounded-lg py-2.5 transition-colors ${selected ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/[0.08]'}`}
                 >
                   <span className="text-xs leading-none mb-1 opacity-60">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
                   <span className="text-sm font-black leading-none">{date.getDate()}</span>
@@ -200,25 +207,25 @@ export default function TourBookingForm() {
           </div>
 
           {!selectedDate && (
-            <div className="flex h-44 items-center justify-center border-t border-white/8">
+            <div className="flex h-44 items-center justify-center border-t border-white/[0.08]">
               <p className="text-gray-700 text-sm">Select a date to see live tour times.</p>
             </div>
           )}
 
           {selectedDate && slotsLoading && (
-            <div className="flex h-44 items-center justify-center border-t border-white/8">
-              <p className="text-gray-600 text-sm animate-pulse">Checking the studio calendar...</p>
+            <div className="flex h-44 items-center justify-center border-t border-white/[0.08]">
+              <p className="text-gray-600 text-sm animate-pulse">Checking the studio calendar…</p>
             </div>
           )}
 
           {selectedDate && !slotsLoading && (
-            <div className="border-t border-white/8 pt-5">
+            <div className="border-t border-white/[0.08] pt-5">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-white font-bold">{fmtDateFull(selectedDate)}</p>
                 <p className="text-gray-600 text-xs">30 min</p>
               </div>
               {!availabilityVerified && (
-                <div className="mb-4 rounded-xl border border-yellow-900/60 bg-yellow-950/30 px-4 py-3">
+                <div role="alert" className="mb-4 rounded-lg border border-yellow-900/60 bg-yellow-950/30 px-4 py-3">
                   <p className="text-yellow-300 text-xs font-semibold">Calendar verification is unavailable, so tour booking is paused for this date.</p>
                 </div>
               )}
@@ -230,11 +237,13 @@ export default function TourBookingForm() {
                       key={slot.time}
                       type="button"
                       disabled={!slot.available}
+                      aria-pressed={selected}
+                      aria-label={`${slot.label}${!slot.available ? (availabilityVerified ? ', booked' : ', unavailable') : ''}`}
                       onClick={() => slot.available && setSelectedSlot(slot.time)}
-                      className={`rounded-xl py-3 text-sm font-semibold transition-all ${
+                      className={`rounded-lg py-3 text-sm font-semibold transition-colors ${
                         !slot.available ? 'cursor-not-allowed text-gray-800 line-through'
                           : selected ? 'bg-brand-red text-white'
-                            : 'text-gray-400 hover:bg-white/8 hover:text-white'
+                            : 'text-gray-400 hover:bg-white/[0.08] hover:text-white'
                       }`}
                     >
                       {slot.label}
@@ -249,7 +258,7 @@ export default function TourBookingForm() {
 
       <div>
         <p className="text-gray-600 text-xs uppercase tracking-widest mb-5">Your details</p>
-        <div className="rounded-3xl border border-white/10 bg-zinc-950 p-5 sm:p-6">
+        <div className="rounded-lg border border-white/10 bg-zinc-950 p-5 sm:p-6">
           <div className="hidden">
             <label>
               Company
@@ -259,11 +268,12 @@ export default function TourBookingForm() {
 
           <div className="space-y-6">
             <div>
-              <label className="block text-gray-500 text-xs uppercase tracking-widest mb-3">Studio interest</label>
+              <label htmlFor="studio-interest" className="block text-gray-500 text-xs uppercase tracking-widest mb-3">Studio interest</label>
               <select
+                id="studio-interest"
                 value={studioId}
                 onChange={(event) => setStudioId(event.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-white focus:border-white/40 focus:outline-none"
+                className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-white focus:border-white/40 focus:outline-none"
               >
                 <option value="">Not sure yet</option>
                 {STUDIOS.map((studio) => (
@@ -276,42 +286,47 @@ export default function TourBookingForm() {
               { label: 'Full name', value: name, set: setName, type: 'text', required: true, placeholder: 'Your name' },
               { label: 'Email', value: email, set: setEmail, type: 'email', required: true, placeholder: 'you@example.com' },
               { label: 'Phone', value: phone, set: setPhone, type: 'tel', required: false, placeholder: '+1 (415) 000-0000' },
-            ].map((field) => (
-              <div key={field.label}>
-                <label className="block text-gray-500 text-xs uppercase tracking-widest mb-3">
-                  {field.label}{!field.required && <span className="text-gray-700 ml-2 normal-case tracking-normal">optional</span>}
-                </label>
-                <input
-                  type={field.type}
-                  required={field.required}
-                  value={field.value}
-                  onChange={(event) => field.set(event.target.value)}
-                  placeholder={field.placeholder}
-                  className="w-full border-b border-white/20 bg-transparent pb-3 text-white placeholder-gray-700 focus:border-white/50 focus:outline-none"
-                />
-              </div>
-            ))}
+            ].map((field) => {
+              const fieldId = `tour-${field.label.toLowerCase().replace(/\s+/g, '-')}`
+              return (
+                <div key={field.label}>
+                  <label htmlFor={fieldId} className="block text-gray-500 text-xs uppercase tracking-widest mb-3">
+                    {field.label}{!field.required && <span className="text-gray-700 ml-2 normal-case tracking-normal">optional</span>}
+                  </label>
+                  <input
+                    id={fieldId}
+                    type={field.type}
+                    required={field.required}
+                    value={field.value}
+                    onChange={(event) => field.set(event.target.value)}
+                    placeholder={field.placeholder}
+                    className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-white placeholder-gray-700 focus:border-white/40 focus:outline-none"
+                  />
+                </div>
+              )
+            })}
 
             <div>
-              <label className="block text-gray-500 text-xs uppercase tracking-widest mb-3">Anything we should know?</label>
+              <label htmlFor="tour-notes" className="block text-gray-500 text-xs uppercase tracking-widest mb-3">Anything we should know?</label>
               <textarea
+                id="tour-notes"
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
                 placeholder="What are you trying to create? Any rooms you want to compare?"
                 rows={4}
-                className="w-full resize-none rounded-xl border border-white/10 bg-black px-4 py-3 text-white placeholder-gray-700 focus:border-white/40 focus:outline-none"
+                className="w-full resize-none rounded-lg border border-white/10 bg-black px-4 py-3 text-white placeholder-gray-700 focus:border-white/40 focus:outline-none"
               />
             </div>
           </div>
 
-          {error && <p className="mt-5 text-sm text-red-500">{error}</p>}
+          {error && <p aria-live="polite" className="mt-5 text-sm text-red-500">{error}</p>}
 
           <button
             type="submit"
             disabled={submitting || !availabilityVerified}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-black transition-all hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-white py-4 text-sm font-bold text-black transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? 'Booking tour...' : 'Book Free Tour'}
+            {submitting ? 'Booking tour…' : 'Book Free Tour'}
           </button>
 
           <p className="mt-5 text-xs leading-relaxed text-gray-600">

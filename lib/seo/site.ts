@@ -110,7 +110,7 @@ export const business = {
   legalName: 'VibeShack Studios LLC',
   tagline: 'The Dream Factory',
   description:
-    "The San Francisco production arm of VibeShack, a media company and brand studio. VibeShack Studios offers professional podcast, green screen, photo, video, photography, and white cyc production spaces in the Northern Waterfront. Open 24/7.",
+    "The San Francisco production arm of VibeShack, a media company and brand studio. VibeShack Studios offers professional podcast, green screen, photo, video, and white cyc production spaces in the Northern Waterfront. Open 24/7.",
   entityRelationship:
     'VibeShack is the media company and brand studio. VibeShack Studios is its San Francisco production arm at 950 Battery St, San Francisco, CA 94111.',
   email: 'founder@vibeshackstudios.com',
@@ -142,7 +142,25 @@ export const moneyPages = [
     href: '/podcast-studio-san-francisco/',
     label: 'Podcast Studio San Francisco',
     keyword: 'podcast studio san francisco',
-    description: 'Podcast rooms with broadcast microphones, 4K cameras, and crew options.',
+    description: 'Podcast sets with broadcast microphones, 4K cameras, and crew options.',
+  },
+  {
+    href: '/commercials/',
+    label: 'Commercial Video Production San Francisco',
+    keyword: 'commercial video production san francisco',
+    description: 'Launch ads, talking-head videos, product demos, founder videos, and campaign spots produced at VibeShack.',
+  },
+  {
+    href: '/editorials/',
+    label: 'Editorial Photoshoots San Francisco',
+    keyword: 'editorial photoshoot san francisco',
+    description: 'Fashion, beauty, portraits, lookbooks, cover art, campaign stills, and content-day photography.',
+  },
+  {
+    href: '/branding/',
+    label: 'Branding and Creative Direction',
+    keyword: 'branding creative direction san francisco',
+    description: 'Creative direction, launch systems, visual identity, content systems, and brand decks.',
   },
   {
     href: '/green-screen-studio-sf/',
@@ -155,12 +173,6 @@ export const moneyPages = [
     label: 'Photo Services San Francisco',
     keyword: 'photo services san francisco',
     description: 'Headshots, portraits, product photos, lookbooks, press images, and campaign stills produced at VibeShack.',
-  },
-  {
-    href: '/photography-studio-san-francisco/',
-    label: 'Photography Studio Rental San Francisco',
-    keyword: 'photography studio san francisco',
-    description: 'Room-only photography studio rental with lighting, backdrops, and hair and makeup room.',
   },
   {
     href: '/video-production/',
@@ -180,6 +192,12 @@ export const moneyPages = [
     keyword: 'studio rental san francisco',
     description: 'Hourly production spaces for clients bringing their own crew.',
   },
+  {
+    href: '/our-work/',
+    label: 'VibeShack Our Work',
+    keyword: 'vibeshack portfolio',
+    description: 'Portfolio proof for commercials, documentaries, editorials, podcasts, music videos, and branding.',
+  },
 ]
 
 type StudioOffer = {
@@ -193,8 +211,10 @@ type StudioOffer = {
 
 export const studioOffers: StudioOffer[] = [
   { name: 'Podcast Studio Rental', serviceType: 'Podcast Studio Rental', href: '/podcast-studio-san-francisco/', minPrice: '300', maxPrice: '400', unitText: 'hour' },
+  { name: 'Commercial Video Production', serviceType: 'Commercial Video Production', href: '/commercials/' },
+  { name: 'Editorial Photoshoots', serviceType: 'Editorial Photography Services', href: '/editorials/' },
+  { name: 'Branding and Creative Direction', serviceType: 'Branding and Creative Direction', href: '/branding/' },
   { name: 'Green Screen Studio Rental', serviceType: 'Green Screen Studio Rental', href: '/green-screen-studio-sf/', minPrice: '100', maxPrice: '100', unitText: 'hour' },
-  { name: 'Photography Studio Rental', serviceType: 'Photography Studio Rental', href: '/photography-studio-san-francisco/', minPrice: '100', maxPrice: '100', unitText: 'hour' },
   { name: 'Photo Services', serviceType: 'Photography Services', href: '/photo-services/' },
   { name: 'Video Production Services', serviceType: 'Video Production', href: '/video-production/' },
   { name: 'White Cyc Studio Rental', serviceType: 'White Cyc Studio Rental', href: '/canvas-rental/', minPrice: '100', maxPrice: '100', unitText: 'hour' },

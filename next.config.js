@@ -1,6 +1,7 @@
 const isVercelRuntime =
   (process.env.VERCEL === '1' || Boolean(process.env.VERCEL_ENV)) &&
   Boolean(process.env.VERCEL_URL)
+const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -10,9 +11,9 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com",
-  "connect-src 'self' https://api.stripe.com https://r.stripe.com https://m.stripe.network https://checkout.stripe.com https://*.stripe.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com",
-  "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://www.google.com",
+  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com`,
+  `connect-src 'self'${isDevelopment ? ' ws: http://localhost:* http://127.0.0.1:*' : ''} https://api.stripe.com https://r.stripe.com https://m.stripe.network https://checkout.stripe.com https://*.stripe.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com`,
+  "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://www.google.com https://www.youtube-nocookie.com",
   "form-action 'self'",
   isVercelRuntime ? 'upgrade-insecure-requests' : '',
 ].filter(Boolean).join('; ')
@@ -59,16 +60,79 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: false },
   poweredByHeader: false,
+  // Hide the floating Next.js dev-tools button; it overlapped page content
+  // during local review. Dev-only either way; production never shows it.
+  devIndicators: false,
   
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    qualities: [55, 58, 72, 75, 80, 85, 90, 100],
     minimumCacheTTL: 60 * 60 * 24 * 365,
   },
   // Redirects
   async redirects() {
     return [
+      {
+        source: '/contact-success',
+        destination: '/contact/',
+        permanent: true,
+      },
+      {
+        // Retired portfolio pieces. Send old links to the portfolio index
+        // rather than a dead end.
+        source: '/our-work/remote',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/remote/',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/unforgiven',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/unforgiven/',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/in-a-restless-moment',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        source: '/our-work/in-a-restless-moment/',
+        destination: '/our-work/',
+        permanent: true,
+      },
+      {
+        // The Photography Studio rental is retired. Canvas is the cyc room
+        // photo work happens in now, so inbound links land somewhere real.
+        source: '/photography-studio-san-francisco',
+        destination: '/canvas-rental/',
+        permanent: true,
+      },
+      {
+        source: '/photography-studio-san-francisco/',
+        destination: '/canvas-rental/',
+        permanent: true,
+      },
+      {
+        source: '/premier',
+        destination: '/find-your-studio/',
+        permanent: true,
+      },
+      {
+        source: '/premier/',
+        destination: '/find-your-studio/',
+        permanent: true,
+      },
       {
         source: '/sunset-room',
         destination: '/sunset-studio/',

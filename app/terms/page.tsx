@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
+import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | VibeShack Studios',
+  title: 'Terms of Service',
   description: 'Booking policies, cancellation, studio rules, and terms of use for VibeShack Studios.',
-  alternates: { canonical: 'https://www.vibeshackstudios.com/terms/' }
+  alternates: { canonical: `${siteUrl}/terms/` }
 }
 
 export default function TermsPage() {
@@ -12,10 +13,10 @@ export default function TermsPage() {
 
       {/* Hero */}
       <section className="pt-40 pb-24 px-6 sm:px-10 lg:px-16 max-w-4xl mx-auto">
-        <p className="text-gray-600 text-xs uppercase tracking-widest mb-8">Legal</p>
+        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">Legal</p>
         <h1
           className="font-black text-white leading-none mb-6"
-          style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: '-0.05em' }}
+          style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: 0 }}
         >
           Terms.
         </h1>
@@ -31,7 +32,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Bookings
             </h2>
@@ -41,7 +42,7 @@ export default function TermsPage() {
               Your session is confirmed the moment payment is processed. You&apos;ll receive a confirmation email with your booking details immediately after.
             </p>
             <p>
-              Sessions run on a fixed schedule. Your booked time is your time — it starts when it starts and ends when it ends. Late arrivals don&apos;t extend your session, and early departures aren&apos;t refunded.
+              Sessions run on a fixed schedule. Your booked time is your time: it starts when it starts and ends when it ends. Late arrivals don&apos;t extend your session, and early departures aren&apos;t refunded.
             </p>
           </div>
         </div>
@@ -53,7 +54,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Cancellation
             </h2>
@@ -88,7 +89,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Payment
             </h2>
@@ -110,14 +111,14 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Studio rules
             </h2>
           </div>
           <div className="lg:col-span-2 space-y-6 text-gray-400 text-lg leading-relaxed">
             <p>
-              You&apos;re responsible for the studio during your session — that includes your guests and any damage beyond normal wear and tear. Treat the equipment well. If something breaks, we&apos;ll document it and invoice you at repair or replacement cost.
+              You&apos;re responsible for the studio during your session. That includes your guests and any damage beyond normal wear and tear. Treat the equipment well. If something breaks, we&apos;ll document it and invoice you at repair or replacement cost.
             </p>
             <p>
               No smoking, vaping, or open flames inside the studio. No illegal activity. No content that violates any applicable law.
@@ -135,14 +136,14 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Your content
             </h2>
           </div>
           <div className="lg:col-span-2 space-y-6 text-gray-400 text-lg leading-relaxed">
             <p>
-              Everything you create in the studio is yours. We claim no rights over your creative work — photos, video, audio, or anything else produced during your session.
+              Everything you create in the studio is yours. We claim no rights over your creative work: photos, video, audio, or anything else produced during your session.
             </p>
             <p>
               We may photograph or film sessions for marketing purposes. If you&apos;d prefer we don&apos;t, let us know at the time of booking and we won&apos;t. No effect on your rate.
@@ -157,7 +158,7 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Liability
             </h2>
@@ -182,14 +183,14 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Governing law
             </h2>
           </div>
           <div className="lg:col-span-2 space-y-6 text-gray-400 text-lg leading-relaxed">
             <p>
-              These terms are governed by the laws of the State of California. Any disputes will be handled in San Francisco County. If something goes wrong, contact us first — we&apos;d rather resolve it directly.
+              These terms are governed by the laws of the State of California. Any disputes will be handled in San Francisco County. If something goes wrong, contact us first. We&apos;d rather resolve it directly.
             </p>
           </div>
         </div>
@@ -201,13 +202,13 @@ export default function TermsPage() {
           <div>
             <h2
               className="text-white font-bold text-2xl"
-              style={{ letterSpacing: '-0.03em' }}
+              style={{ letterSpacing: 0 }}
             >
               Contact
             </h2>
           </div>
           <div className="lg:col-span-2 space-y-4 text-gray-400 text-lg leading-relaxed">
-            <p>Questions about these terms — reach us directly.</p>
+            <p>For questions about these terms, reach us directly.</p>
             <p>
               <a
                 href="mailto:founder@vibeshackstudios.com"

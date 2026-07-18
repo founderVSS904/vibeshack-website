@@ -7,6 +7,7 @@ import {
 import { getStudioById } from '@/lib/booking/catalog'
 import { BOOKING_TIME_ZONE, formatDateForDisplay, formatTimeForDisplay } from '@/lib/booking/time'
 import { escapeHtml } from '@/lib/server/sanitize'
+import { siteUrl } from '@/lib/seo/site'
 
 export const dynamic = 'force-dynamic'
 
@@ -91,7 +92,7 @@ function buildReminderHtml(group: ReminderGroup) {
   <div style="display:none;max-height:0;overflow:hidden;color:#050505;">Your VibeShack Studios session is tomorrow.</div>
   <div style="max-width:660px;margin:0 auto;padding:36px 22px 48px;">
     <div style="margin:0 0 26px;">
-      <a href="https://www.vibeshackstudios.com" style="display:inline-block;color:#ef1100;text-decoration:none;font-size:20px;font-weight:950;letter-spacing:-0.055em;line-height:1;">VibeShack Studios</a>
+      <a href="${siteUrl}" style="display:inline-block;color:#ef1100;text-decoration:none;font-size:20px;font-weight:950;letter-spacing:-0.055em;line-height:1;">VibeShack Studios</a>
     </div>
     <div style="background:#0c0c0c;border:1px solid #1f1f1f;border-radius:28px;padding:32px;margin:0 0 18px;">
       <p style="display:inline-block;border:1px solid #333;color:#aeb6c5;font-size:11px;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;margin:0 0 18px;padding:8px 10px;">24-hour reminder</p>
