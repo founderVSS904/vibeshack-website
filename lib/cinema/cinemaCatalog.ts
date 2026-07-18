@@ -27,7 +27,8 @@ export type CinemaProject = {
   external: boolean
 }
 
-const fullCinemaSrc = (slug: string) => `/studio-videos/cinema/full-v017/${slug}.mp4`
+const CINEMA_MEDIA_ROOT = 'https://ufxqykf6ncbj7jav.public.blob.vercel-storage.com/cinema/full-v017'
+const fullCinemaSrc = (slug: string) => `${CINEMA_MEDIA_ROOT}/${slug}.mp4`
 
 const screenPresentation: Record<
   string,

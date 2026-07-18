@@ -9,6 +9,7 @@ const contentSecurityPolicy = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "img-src 'self' data: blob: https:",
+  "media-src 'self' https://ufxqykf6ncbj7jav.public.blob.vercel-storage.com",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com`,
