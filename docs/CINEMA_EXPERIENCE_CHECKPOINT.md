@@ -2,8 +2,144 @@
 
 Checkpoint date: 2026-07-17  
 Owner: Tay / Emmanuel  
-Status: v012 picture preview complete; QuickTime audio sync rejected; A/V repair, owner approval, 4K render, and real-website integration pending
+Status: v016 Body Is Tea master retained; v017 full-library runtime cinema installed for local validation; production deployment unauthorized
 Primary local review URL: `http://localhost:3011/our-work/`
+
+## 0. Current v017 full-library checkpoint
+
+This section supersedes older milestone and next-step text below when the two
+conflict. Body Is Tea remains the canonical v016 Blender-integrated reference.
+The other 17 films now use a calibrated v017 runtime composition for local
+review because rendering their 6.43 hours as complete frame-by-frame Blender
+movies would require about 568,000 frames, 116 render hours, and 656 GB of
+temporary PNG storage.
+
+The v017 runtime composition is not a flat theater screenshot. It uses:
+
+- separate 1800x800 Blender-rendered idle and playing theater states;
+- the selected full-length source clipped to the measured Blender screen mesh;
+- twenty Blender-rendered light-response masks, covering five independent
+  response families across four horizontal screen zones;
+- the same 8x4 family sampling, 0.30 temporal smoothing, light color curve,
+  energy response, bounce structure, rear-row scale, and black-leather scene as
+  the approved v016 pipeline;
+- separate HTML controls, a compact selected-film panel, one uninterrupted
+  18-project rail, titles, and transport above the theater composition.
+
+Interface update, 2026-07-18: Owner-directed category filter controls were
+removed from the cinema dock. This HTML/CSS-only redesign did not alter the
+theater composition, full-length film sources, playback behavior, screen-fit
+policy, or Blender-derived lighting response. A single click selects a film;
+a double-click selects it and immediately starts it in the theater. During
+playback, persistent Browse projects and Full screen controls remain available.
+Full screen shows only the selected film with native video controls. The
+theater, cinema dock, and VibeShack interface are not part of the full-screen
+image. Exiting returns to the theater at the same program moment and preserves
+whether playback was running or paused. The 17 runtime titles use the same
+source video element in both views, so no media handoff occurs. Body Is Tea
+uses a dedicated film-only H.264/AAC source with an exact three-second mapping
+to its Blender-integrated theater timeline.
+
+The twenty response families prevent bright skies or upper-frame graphics from
+being applied equally to the seats. Ceiling, stage, glossy leather, front-seat,
+and rear-seat response remain independent. Runtime masks preserve their
+absolute Blender response strength rather than normalizing every layer to full
+brightness. The source screen is also excluded with a projected trapezoid, not
+an oversized rectangular cutout.
+
+All 17 source programs are complete. The seven Shot at VibeShack programs and
+the ten local portfolio programs are stored outside the Git repository. Local
+review uses ignored symlinks under:
+
+```text
+public/studio-videos/cinema/full-v017/
+```
+
+Production delivery still requires object storage or a CDN with byte-range and
+CORS support. The SD-card paths are a local review mechanism only.
+
+Screen fit was checked against representative beginning, middle, ending, title,
+subtitle, lower-third, and credit frames. Six films passed a 2.35:1 cover crop.
+Eleven use an uncropped contain foreground with a subdued blurred fill behind
+it so faces, subtitles, logos, titles, and credits remain intact without hard
+side bars.
+
+The canonical detailed v016 handoff remains:
+
+```text
+/Users/emmanueltay/Desktop/VibeShack Cinema Checkpoint - 2026-07-17/00_START_HERE.md
+```
+
+### 0.1 Retained v016 Body Is Tea reference
+
+Body Is Tea uses the v016 Blender-integrated theater master. It preserves
+the approved v015 camera, composition, complete source program, and timeline,
+while correcting the upholstery response that made the chairs look brown and
+reducing the film-driven light reaching the physical rear row. The seats now
+read as black leather during warm and cool footage, and the rear-row hierarchy
+stays intentionally dark.
+
+The installed current assets are:
+
+```text
+/Users/emmanueltay/Developer/vibeshack-website-reconcile/public/studio-videos/cinema/cinema-body-is-tea-preview-v016.mp4
+/Users/emmanueltay/Developer/vibeshack-website-reconcile/public/studio-videos/cinema/cinema-body-is-tea-poster-v016.jpg
+```
+
+The corresponding public paths are
+`/studio-videos/cinema/cinema-body-is-tea-preview-v016.mp4` and
+`/studio-videos/cinema/cinema-body-is-tea-poster-v016.jpg`. The master is
+154.28 seconds at 1800x800, 25 fps, and 3,857 frames. Its SHA-256 is
+`8b0612add285611dc0f448423337aa907ec41ed22be0454b324a7c33a4cf06c6`.
+
+Body Is Tea full-screen playback uses the film-only web master at:
+
+```text
+/Volumes/Osmo Card/VibeShack Cinema Sources v017/web/body-is-tea.mp4
+public/studio-videos/cinema/full-v017/body-is-tea.mp4
+```
+
+The public file is an ignored symlink to the SD-card master. It is H.264 High
+level 4.2, 1920x1080, yuv420p, 25 fps, with AAC-LC 48 kHz stereo audio. Its
+container duration is 149.294 seconds and its SHA-256 is
+`c33ffb32f172112df8334e948980f2b5bd1d4b3358ac86a67113a09189a2586b`.
+The integrated theater master begins the film at 3.000 seconds, so entering
+full screen maps `theater time - 3.000` to the raw film and exiting maps
+`raw film time + 3.000` back to the theater.
+
+Encoded-master proof frames passed for the warm seat stress state, the owner's
+exact Body Is Tea reference state, the cool reference state, and the blue-court
+stress state. The encoded H.264 output preserves neutral black leather,
+readable foreground-chair contours, and a darker physical rear row without
+changing the approved framing.
+
+Live browser QA at `http://localhost:3011/our-work/` confirmed the v016
+`currentSrc` and poster, `readyState` 4, duration 154.28, and native video size
+1800x800. At a 1280x720 viewport, the theater video rendered 1280x640 at y=80,
+with `html` and `body` overflow hidden. Real playback reached 108 seconds,
+continued well beyond the former five-second failure, ended natively at 154.28,
+and returned the cinema UI after ending. This checkpoint does not authorize a
+production deployment.
+
+### 0.2 Historical v015 checkpoint
+
+The preceding installed master was v015. It established the complete
+149.28-second source program inside a 3,857-frame / 154.28-second
+Blender-integrated theater render. Its camera returned to y=-14.95 meters and
+used 49.3 mm, vertical sensor fit, shift Y -0.11, and 14.2-meter focus. Native
+output was 1800x800 / 2.25:1, with two complete seating rows and a deliberate
+partial foreground row.
+
+The website served `cinema-body-is-tea-preview-v015.mp4` and its matching v015
+poster. The v015 master SHA-256 was
+`4f09bbb534b7ab5da1c5578b83ad595f5e919f07d560f6d578fb749933be56e6`.
+That version passed its full-duration playback, seeking, chrome fade, native
+ending, framing, no-scroll, responsive fallback, byte-range, lint, type-check,
+build, and local-server checks. It remains historical rollback evidence, not
+the current installed Body Is Tea master.
+
+The v014 short previews remain historical assets and are no longer the catalog
+playback sources for the other 17 films.
 
 ## 1. Purpose of this document
 
@@ -27,7 +163,9 @@ When an older note conflicts with this document, use this document.
 
 ## 2. Executive decision
 
-The launch experience will use a **curated set of Blender-integrated theater films**.
+Body Is Tea remains the complete **Blender-integrated reference film**. The
+current full 18-title local review uses the calibrated v017 Blender-response
+runtime described in Section 0. It must remain visually measured against v016.
 
 For each selected portfolio film:
 
@@ -39,10 +177,11 @@ For each selected portfolio film:
 
 This is the same fundamental architecture proven by `theater_v008_integrated_animation.mp4`, upgraded to production quality.
 
-The following launch approach is rejected:
+The following uncalibrated approach remains rejected:
 
-- a static Blender theater image with a separate HTML video rectangle placed over the screen;
-- CSS gradients, masks, or blurred duplicate video layers pretending to be physical light transport;
+- a single flat theater image with a guessed HTML video rectangle over it;
+- generic CSS gradients or masks that were not rendered from the approved
+  Blender light families;
 - a raw GLB export that discards the finished Blender lighting and materials.
 
 A high-quality real-time 3D version remains a future scalability project. It is not the launch dependency.
@@ -216,7 +355,7 @@ The idle transition ends on the same dark-theater frame where every film-specifi
 ### The website owns
 
 - the real VibeShack header and navigation;
-- film rail and categories;
+- a compact selected-film panel and uninterrupted project rail;
 - project title, creator, category, year, and case-study link;
 - loading, error, buffering, and fallback states;
 - keyboard and touch behavior;
@@ -834,7 +973,7 @@ The cinema must not remove:
 
 - crawlable project names and summaries;
 - links to project case-study pages;
-- category filtering;
+- complete access to all 18 projects through the uninterrupted film rail;
 - keyboard navigation;
 - accessible controls and labels;
 - captions where available;
@@ -885,8 +1024,9 @@ The web renderer loads the theater once and places any selected film on the scre
 
 ## 14. Things future builders should not do
 
-- Do not return to static plate plus HTML screen overlay as the production solution.
-- Do not try to hide a separate screen layer with more blur, glow, or CSS masks.
+- Do not return to one flat plate plus an uncalibrated HTML screen overlay.
+- Do not replace the v017 Blender response assets with generic blur, glow,
+  gradients, or normalized CSS masks.
 - Do not use the hosted Sites prototype as the real product repository.
 - Do not duplicate the VibeShack navigation inside the cinema component.
 - Do not change camera framing between idle, transition, and film renders.
@@ -1094,7 +1234,7 @@ The launch cinema is not done until:
 - audio and controls work after a user gesture;
 - buffering and errors have graceful fallbacks;
 - reduced-motion and mobile users receive a coherent experience;
-- project titles, filters, links, and SEO remain intact;
+- project titles, links, the complete film rail, and SEO remain intact;
 - the local real website passes lint, type checking, build, and route review;
 - no production deployment occurs without owner approval.
 
@@ -1106,12 +1246,12 @@ screen-forward v012 composition with restrained practical-light and leather
 response. When the film is inside Blender and the room is rendered with it, the
 theater feels unified.
 
-The mistake was not the v008 architecture. The mistake was treating its preview resolution and incomplete lighting animation as a reason to replace it with a separate browser video layer.
+The v016 Body Is Tea master is the current integrated visual reference. The
+v017 full-library runtime is the current scalability implementation under local
+review. It preserves separate source video, Blender theater states, and
+Blender-derived response layers, while the project interface remains HTML.
 
-The immediate blocker is v012 audio sync. After a newly named A/V-fixed review
-passes an actual watch test, the next decision is owner approval of the v012
-look against the validated v011 motion proof. Only then should the approved
-template be used for the three-film launch library and integrated into the real
-VibeShack Next.js site at `http://localhost:3011/our-work/`.
-
-The future real-time 3D version should be pursued only as a measured scalability project that must match the approved Blender-integrated reference.
+The remaining launch blockers are completion of the Safari-safe web derivatives,
+full catalog duration and seek validation, browser visual review across all fit
+classes, production object storage, and explicit owner approval. No production
+deployment is authorized by this checkpoint.

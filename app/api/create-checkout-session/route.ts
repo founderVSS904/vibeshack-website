@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { assertCartSlotsAvailable, type BookingCartItem } from '@/lib/booking/calendar'
-import { calculateRecurringDiscountCents, getAddOnById, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
+import { calculateRecurringDiscountCents, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
 import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
 import { describeSlotRanges, formatDateForDisplay, isValidBookingDate } from '@/lib/booking/time'
 import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
@@ -72,17 +72,6 @@ function buildCanonicalCart(rawCart: unknown): BookingCartItem[] {
   }
 
   return cart
-}
-
-function buildCanonicalAddons(rawAddons: unknown) {
-  const ids = new Set<string>()
-  for (const rawAddon of toArray(rawAddons)) {
-    const id = typeof rawAddon === 'string'
-      ? stripControlChars(rawAddon, 80)
-      : stripControlChars((rawAddon as Record<string, unknown> | null)?.id, 80)
-    if (id) ids.add(id)
-  }
-  return Array.from(ids).map(getAddOnById).filter(Boolean) as NonNullable<ReturnType<typeof getAddOnById>>[]
 }
 
 function applyDiscountToSessionAmounts(amounts: number[], discountCents: number) {
@@ -185,12 +174,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error }, { status: availability.status })
     }
 
-    const addons = buildCanonicalAddons(body.addons)
     const baseSessionTotalCents = cart.reduce((sum, item) => sum + item.price * 100, 0)
-    const addonTotalCents = addons.reduce((sum, addon) => sum + addon.price * 100, 0)
     const discountCents = calculateRecurringDiscountCents(baseSessionTotalCents, recurringOption?.id)
     const discountedSessionAmounts = applyDiscountToSessionAmounts(cart.map((item) => item.price * 100), discountCents)
-    const computedTotalCents = discountedSessionAmounts.reduce((sum, amount) => sum + amount, 0) + addonTotalCents
+    const computedTotalCents = discountedSessionAmounts.reduce((sum, amount) => sum + amount, 0)
     const referralInfo = buildReferralInfo(referralSource, computedTotalCents)
 
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = cart.map((item, index) => ({
@@ -205,21 +192,6 @@ export async function POST(req: NextRequest) {
       },
       quantity: 1,
     }))
-
-    for (const addon of addons) {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `Add-on: ${addon.name}`,
-            description: addon.description || 'Optional add-on service',
-            images: [`${siteUrl}/og-image.jpg`],
-          },
-          unit_amount: addon.price * 100,
-        },
-        quantity: 1,
-      })
-    }
 
     const bookingRef = crypto.randomUUID()
     const attributionMetadata = readAttributionMetadata(req)
@@ -265,7 +237,6 @@ export async function POST(req: NextRequest) {
         computedTotalCents: String(computedTotalCents),
         recurring: recurringOption?.id || '',
         recurringDiscountCents: String(discountCents),
-        addons: addons.map((addon) => addon.id).join(',').slice(0, 500),
         teamEmails: JSON.stringify(teamEmails).slice(0, 500),
         referralSource: referralInfo?.source || '',
         referralPartner: referralInfo?.partnerName || '',

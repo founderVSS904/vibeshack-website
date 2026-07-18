@@ -11,12 +11,6 @@ export interface Studio {
   prep: string[]
 }
 
-export interface AddOn {
-  id: string
-  name: string
-  description: string
-  price: number
-}
 
 export interface RecurringOption {
   id: string
@@ -180,10 +174,6 @@ export const STUDIOS: Studio[] = [
   },
 ]
 
-export const ADDONS: AddOn[] = [
-  { id: 'teleprompter', name: 'Teleprompter', description: 'Scroll your script hands-free, eye-level with the lens.', price: 25 },
-]
-
 export const RECURRING_OPTIONS: RecurringOption[] = [
   { id: 'weekly', label: 'Every week', discount: 10 },
   { id: 'biweekly', label: 'Every 2 weeks', discount: 7 },
@@ -192,10 +182,6 @@ export const RECURRING_OPTIONS: RecurringOption[] = [
 
 export function getStudioById(id: string) {
   return STUDIOS.find((studio) => studio.id === id)
-}
-
-export function getAddOnById(id: string) {
-  return ADDONS.find((addon) => addon.id === id)
 }
 
 export function getRecurringOptionById(id: string | null | undefined) {

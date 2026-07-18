@@ -49,8 +49,6 @@ export enum GAEventType {
   VIEW_STUDIO_DETAILS = 'view_studio_details',
 
   // Add-ons & Options
-  SELECT_ADDON = 'select_addon',
-  DESELECT_ADDON = 'deselect_addon',
 
   // Guest Entry / Additional Fields
   ADD_GUEST = 'add_guest',

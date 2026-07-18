@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "pipelineVersion": "v017-runtime-plates",
+  "sourceBlend": "/Users/emmanueltay/Desktop/VibeShack Cinema Experience/blender/vibeshack_cinema_theater_v016_body_is_tea_black_leather_final.blend",
+  "resolution": [
+    1800,
+    800
+  ],
+  "samples": 8,
+  "screenVertexOrder": [
+    [
+      0.2713308334350586,
+      0.4210747182369232
+    ],
+    [
+      0.7286691665649414,
+      0.4210747182369232
+    ],
+    [
+      0.7304522395133972,
+      0.8606101870536804
+    ],
+    [
+      0.2695477604866028,
+      0.8606101870536804
+    ]
+  ],
+  "zoneCount": 4,
+  "responseFamilies": [
+    "diffuse",
+    "lower",
+    "stage",
+    "glossy",
+    "rear"
+  ],
+  "transportScales": {
+    "diffuse": 1.5,
+    "lower": 1.65,
+    "stage": 1.8,
+    "glossy": 1.22,
+    "rear": 0.55
+  },
+  "seatReadabilityEnergy": 400.0,
+  "viewTransform": "AgX",
+  "look": "AgX - Medium High Contrast",
+  "exposure": -0.029999999329447746,
+  "screenPixelPolygon": [
+    [
+      488,
+      463
+    ],
+    [
+      1312,
+      463
+    ],
+    [
+      1315,
+      112
+    ],
+    [
+      485,
+      112
+    ]
+  ],
+  "alphaEncoding": "absolute post-AgX luminance delta divided by 255",
+  "masks": [
+    {
+      "family": "diffuse",
+      "zone": 1,
+      "path": "theater_light_diffuse_zone_1.png",
+      "peakDelta": 41.14039993286133
+    },
+    {
+      "family": "diffuse",
+      "zone": 2,
+      "path": "theater_light_diffuse_zone_2.png",
+      "peakDelta": 39.21259689331055
+    },
+    {
+      "family": "diffuse",
+      "zone": 3,
+      "path": "theater_light_diffuse_zone_3.png",
+      "peakDelta": 39.21259689331055
+    },
+    {
+      "family": "diffuse",
+      "zone": 4,
+      "path": "theater_light_diffuse_zone_4.png",
+      "peakDelta": 41.14039993286133
+    },
+    {
+      "family": "lower",
+      "zone": 1,
+      "path": "theater_light_lower_zone_1.png",
+      "peakDelta": 8.927799224853516
+    },
+    {
+      "family": "lower",
+      "zone": 2,
+      "path": "theater_light_lower_zone_2.png",
+      "peakDelta": 8.0
+    },
+    {
+      "family": "lower",
+      "zone": 3,
+      "path": "theater_light_lower_zone_3.png",
+      "peakDelta": 8.0
+    },
+    {
+      "family": "lower",
+      "zone": 4,
+      "path": "theater_light_lower_zone_4.png",
+      "peakDelta": 8.212600708007812
+    },
+    {
+      "family": "stage",
+      "zone": 1,
+      "path": "theater_light_stage_zone_1.png",
+      "peakDelta": 2.0
+    },
+    {
+      "family": "stage",
+      "zone": 2,
+      "path": "theater_light_stage_zone_2.png",
+      "peakDelta": 3.0
+    },
+    {
+      "family": "stage",
+      "zone": 3,
+      "path": "theater_light_stage_zone_3.png",
+      "peakDelta": 3.0
+    },
+    {
+      "family": "stage",
+      "zone": 4,
+      "path": "theater_light_stage_zone_4.png",
+      "peakDelta": 2.0
+    },
+    {
+      "family": "glossy",
+      "zone": 1,
+      "path": "theater_light_glossy_zone_1.png",
+      "peakDelta": 1.0
+    },
+    {
+      "family": "glossy",
+      "zone": 2,
+      "path": "theater_light_glossy_zone_2.png",
+      "peakDelta": 1.0
+    },
+    {
+      "family": "glossy",
+      "zone": 3,
+      "path": "theater_light_glossy_zone_3.png",
+      "peakDelta": 1.0
+    },
+    {
+      "family": "glossy",
+      "zone": 4,
+      "path": "theater_light_glossy_zone_4.png",
+      "peakDelta": 1.0
+    },
+    {
+      "family": "rear",
+      "zone": 1,
+      "path": "theater_light_rear_zone_1.png",
+      "peakDelta": 3.787400007247925
+    },
+    {
+      "family": "rear",
+      "zone": 2,
+      "path": "theater_light_rear_zone_2.png",
+      "peakDelta": 5.787400245666504
+    },
+    {
+      "family": "rear",
+      "zone": 3,
+      "path": "theater_light_rear_zone_3.png",
+      "peakDelta": 5.85960054397583
+    },
+    {
+      "family": "rear",
+      "zone": 4,
+      "path": "theater_light_rear_zone_4.png",
+      "peakDelta": 3.787400007247925
+    }
+  ]
+}

@@ -4,11 +4,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import {
-  ADDONS as DEFAULT_ADDONS,
   RECURRING_OPTIONS,
   STUDIOS as DEFAULT_STUDIOS,
   calculateRecurringDiscountCents,
-  type AddOn,
   type Studio,
 } from '@/lib/booking/catalog'
 import {
@@ -162,16 +160,6 @@ function studioFromQuery(studios: Studio[]) {
   return id ? studios.find((s) => s.id === id) ?? null : null
 }
 
-// Pre-selects add-ons from a ?addon=id,id link, so the pricing page can send a
-// visitor straight into booking with the teleprompter already toggled.
-function addonsFromQuery(addons: AddOn[]) {
-  if (typeof window === 'undefined') return []
-  const raw = new URLSearchParams(window.location.search).get('addon')
-  if (!raw) return []
-  const ids = new Set(raw.split(',').map((value) => value.trim()))
-  return addons.filter((addon) => ids.has(addon.id))
-}
-
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 const iconProps = {
@@ -271,10 +259,9 @@ function Stepper({ step, onJump }: { step: Step; onJump: (s: Exclude<Step, 'paym
 
 interface BookPageInnerProps {
   studios: Studio[]
-  addons: AddOn[]
 }
 
-function BookPageInner({ studios, addons }: BookPageInnerProps) {
+function BookPageInner({ studios }: BookPageInnerProps) {
   // Room selection
   const [step, setStep] = useState<Step>(() => (studioFromQuery(studios) ? 'datetime' : 'room'))
   const [filter, setFilter] = useState<Filter>(() => {
@@ -299,7 +286,6 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
   const [monthOffset, setMonthOffset] = useState(0)
 
   // Extras
-  const [selectedAddons, setSelectedAddons] = useState<AddOn[]>(() => addonsFromQuery(addons))
   const [recurring, setRecurring] = useState<string | null>(null)
 
   // Contact
@@ -354,10 +340,9 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
     : ''
 
   const sessionSubtotal = selectedStudio ? selectedStudio.price * duration : 0
-  const addonTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0)
   const discountAmount = calculateRecurringDiscountCents(sessionSubtotal * 100, recurring) / 100
   const recurringDiscount = recurring ? RECURRING_OPTIONS.find((r) => r.id === recurring)?.discount || 0 : 0
-  const grandTotal = sessionSubtotal + addonTotal - discountAmount
+  const grandTotal = sessionSubtotal - discountAmount
 
   const durationLocked = step === 'extras' || step === 'review' || step === 'payment'
 
@@ -497,11 +482,6 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
     return true
   }
 
-  function toggleAddon(addon: AddOn) {
-    const active = selectedAddons.some((a) => a.id === addon.id)
-    sendGAEvent(active ? GAEventType.DESELECT_ADDON : GAEventType.SELECT_ADDON, { addon_id: addon.id, value: addon.price, currency: 'USD' })
-    setSelectedAddons((prev) => active ? prev.filter((a) => a.id !== addon.id) : [...prev, addon])
-  }
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault()
@@ -530,7 +510,6 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
             hours: duration,
             price: sessionSubtotal,
           }],
-          addons: selectedAddons,
           recurring,
           recurringDiscount: discountAmount,
           totalAmount: grandTotal,
@@ -977,40 +956,7 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
             {/* ── STEP 3: EXTRAS ── */}
             {step === 'extras' && (
               <div className="max-w-2xl">
-                <p className="mb-4 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Add-ons</p>
-                <div className="space-y-2">
-                  {addons.map((addon) => {
-                    const active = selectedAddons.some((a) => a.id === addon.id)
-                    return (
-                      <button
-                        key={addon.id}
-                        type="button"
-                        aria-pressed={active}
-                        onClick={() => toggleAddon(addon)}
-                        className={`flex w-full items-start justify-between gap-6 rounded-lg border px-5 py-5 text-left transition-colors ${
-                          active ? 'border-brand-red bg-brand-red/5' : 'border-white/10 hover:border-white/25'
-                        }`}
-                      >
-                        <div className="flex items-start gap-4">
-                          <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${active ? 'border-brand-red bg-brand-red' : 'border-white/30'}`}>
-                            {active && (
-                              <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
-                                <path d="M5 13l4 4L19 7" />
-                              </svg>
-                            )}
-                          </span>
-                          <span>
-                            <span className="block text-sm font-bold text-white">{addon.name}</span>
-                            <span className="mt-0.5 block text-xs leading-relaxed text-zinc-500">{addon.description}</span>
-                          </span>
-                        </div>
-                        <span className="shrink-0 font-mono text-sm font-bold text-white">+${addon.price}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-
-                <p className="mb-2 mt-12 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Make it a standing booking</p>
+                <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Make it a standing booking</p>
                 <p className="mb-5 text-sm text-zinc-500">Lock in this slot on a recurring schedule and save.</p>
                 <div className="space-y-2">
                   {RECURRING_OPTIONS.map((opt) => {
@@ -1069,20 +1015,12 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                   </div>
                 </div>
 
-                {(selectedAddons.length > 0 || recurring) && (
+                {recurring && (
                   <div className="border-b border-white/[0.08] py-5">
-                    {selectedAddons.map((a) => (
-                      <div key={a.id} className="flex items-center justify-between py-1">
-                        <p className="text-sm text-zinc-300">{a.name}</p>
-                        <p className="font-mono text-sm text-white">+${a.price}</p>
-                      </div>
-                    ))}
-                    {recurring && (
-                      <div className="flex items-center justify-between py-1">
-                        <p className="text-sm text-zinc-300">Recurring · {RECURRING_OPTIONS.find((r) => r.id === recurring)?.label}</p>
-                        <p className="font-mono text-sm font-semibold text-brand-red">−${discountAmount}</p>
-                      </div>
-                    )}
+                    <div className="flex items-center justify-between py-1">
+                      <p className="text-sm text-zinc-300">Recurring · {RECURRING_OPTIONS.find((r) => r.id === recurring)?.label}</p>
+                      <p className="font-mono text-sm font-semibold text-brand-red">−${discountAmount}</p>
+                    </div>
                     <button
                       type="button"
                       onClick={() => goToStep('extras')}
@@ -1303,16 +1241,11 @@ function BookPageInner({ studios, addons }: BookPageInnerProps) {
                 </div>
               </div>
 
-              {(addonTotal > 0 || discountAmount > 0) && (
+              {discountAmount > 0 && (
                 <div className="space-y-1 border-t border-white/[0.06] py-3">
                   <div className="flex justify-between text-xs text-zinc-500">
                     <span>Session</span><span>${sessionSubtotal}</span>
                   </div>
-                  {addonTotal > 0 && (
-                    <div className="flex justify-between text-xs text-zinc-500">
-                      <span>Add-ons</span><span>+${addonTotal}</span>
-                    </div>
-                  )}
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-xs">
                       <span className="text-zinc-500">Recurring ({recurringDiscount}%)</span>
@@ -1423,5 +1356,5 @@ const BookPageClient = dynamic(() => Promise.resolve(BookPageInner), {
 })
 
 export default function BookPage() {
-  return <BookPageClient studios={DEFAULT_STUDIOS} addons={DEFAULT_ADDONS} />
+  return <BookPageClient studios={DEFAULT_STUDIOS} />
 }
