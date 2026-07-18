@@ -112,18 +112,20 @@ export default function RentalStudiosPage() {
       />
 
       <section className="bg-black pt-20">
-        <div className="relative h-[calc(100svh-5rem)] min-h-[600px] max-h-[820px] overflow-hidden bg-[#050505]">
-          <Image
-            src="/studio-images/canvas-rental-hero-enhanced-4k-v20260718.jpg"
-            alt="Canvas white cyc rental studio at VibeShack Studios San Francisco"
-            fill
-            priority
-            quality={90}
-            sizes="(min-width: 768px) 72vw, 100vw"
-            className="object-cover md:left-auto md:w-[72%]"
-            style={{ objectPosition: 'center' }}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#050505_0%,rgba(5,5,5,0.99)_28%,rgba(5,5,5,0.72)_52%,rgba(5,5,5,0.08)_86%),linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.02)_42%,rgba(0,0,0,0.88)_100%)]" />
+        <div className="relative overflow-hidden bg-[#050505] md:h-[calc(100svh-5rem)] md:min-h-[600px] md:max-h-[820px]">
+          <div className="relative aspect-video w-full md:absolute md:inset-0 md:aspect-auto">
+            <Image
+              src="/studio-images/canvas-rental-hero-enhanced-4k-v20260718.jpg"
+              alt="Canvas white cyc rental studio at VibeShack Studios San Francisco"
+              fill
+              priority
+              quality={90}
+              sizes="(min-width: 768px) 72vw, 100vw"
+              className="object-cover md:left-auto md:w-[72%]"
+              style={{ objectPosition: 'center' }}
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_32%,rgba(0,0,0,0)_72%,rgba(0,0,0,0.4)_100%)] md:bg-[linear-gradient(90deg,#050505_0%,rgba(5,5,5,0.99)_28%,rgba(5,5,5,0.72)_52%,rgba(5,5,5,0.08)_86%),linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.02)_42%,rgba(0,0,0,0.88)_100%)]" />
+          </div>
 
           <div className="absolute inset-x-5 top-6 z-10 sm:inset-x-10 sm:top-9 lg:inset-x-16 xl:inset-x-24 2xl:inset-x-32">
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">
@@ -131,7 +133,7 @@ export default function RentalStudiosPage() {
             </p>
           </div>
 
-          <div className="absolute inset-x-5 bottom-10 z-10 max-w-3xl sm:inset-x-10 sm:bottom-12 lg:inset-x-16 lg:bottom-16 xl:inset-x-24 2xl:inset-x-32">
+          <div className="relative z-10 max-w-3xl px-5 pb-12 pt-8 sm:px-10 md:absolute md:inset-x-10 md:bottom-12 md:px-0 md:pb-0 md:pt-0 lg:inset-x-16 lg:bottom-16 xl:inset-x-24 2xl:inset-x-32">
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white/60">
               White cyc / Green screen / 24-hour access
             </p>

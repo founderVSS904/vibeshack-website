@@ -45,8 +45,6 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <StudioLocation heightClassName="h-[320px] sm:h-[380px]" />
-
       {/* Main Contact Layout */}
       <section className="py-24 bg-zinc-950 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
@@ -171,6 +169,8 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
+      <StudioLocation heightClassName="h-[320px] sm:h-[380px]" />
     </>
   )
 }

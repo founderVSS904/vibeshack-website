@@ -152,7 +152,16 @@ export function DynamicFrameHero() {
   // Play the hovered or spotlighted tile's loop; rewind the rest so the next
   // pass starts fresh.
   useEffect(() => {
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!canHover) {
+      // Phones and other touch-first devices use the still-image stack.
+      videoRefs.current.forEach((video) => {
+        video.pause()
+        video.currentTime = 0
+      })
+      return
+    }
     const playingFrame = activeFrame ?? spotlightFrame
     videoRefs.current.forEach((video, frameIndex) => {
       if (frameIndex === playingFrame && !reducedMotion) {
@@ -175,7 +184,7 @@ export function DynamicFrameHero() {
   return (
     <section ref={sectionRef} className="dynamic-frame-hero bg-black" aria-labelledby="dynamic-frame-title">
       <h1 id="dynamic-frame-title" className="sr-only">
-        VibeShack Studios production studios in San Francisco
+        VibeShack Studios podcast, video, and photo production studios in San Francisco
       </h1>
       <div
         className="dynamic-frame-grid"

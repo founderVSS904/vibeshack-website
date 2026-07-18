@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     description:
       'Music videos, series, sports films, and event coverage produced with VibeShack Studios in San Francisco.',
     url: `${siteUrl}/our-work/`,
-    images: ['/studio-images/work-body-is-tea-music-v20260708b.jpg'],
+    images: ['/og/home-og-body-is-tea.jpg'],
   },
 }
 

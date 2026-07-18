@@ -253,7 +253,18 @@ body .placeholder-gray-700::placeholder {
   opacity: 1;
 }
 
+/* Touch-first devices use the clean still-image stack. */
+@media (hover: none) {
+  .dynamic-frame-video,
+  .dynamic-frame-tile[data-state="active"] .dynamic-frame-video,
+  .dynamic-frame-tile[data-spotlight="true"] .dynamic-frame-video {
+    opacity: 0;
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .dynamic-frame-video,
   .dynamic-frame-tile[data-state="active"] .dynamic-frame-video,
   .dynamic-frame-tile[data-spotlight="true"] .dynamic-frame-video {
     opacity: 0;
@@ -406,32 +417,7 @@ body .placeholder-gray-700::placeholder {
     flex: initial;
   }
 
-  .dynamic-frame-grid[data-active="1"],
-  .dynamic-frame-grid[data-active="3"],
-  .dynamic-frame-grid[data-active="5"] {
-    grid-template-columns: minmax(0, 1.24fr) minmax(0, 0.86fr);
-  }
-
-  .dynamic-frame-grid[data-active="2"],
-  .dynamic-frame-grid[data-active="4"],
-  .dynamic-frame-grid[data-active="6"] {
-    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.24fr);
-  }
-
-  .dynamic-frame-grid[data-active="1"],
-  .dynamic-frame-grid[data-active="2"] {
-    grid-template-rows: minmax(260px, 1.18fr) minmax(220px, 0.91fr) minmax(220px, 0.91fr);
-  }
-
-  .dynamic-frame-grid[data-active="3"],
-  .dynamic-frame-grid[data-active="4"] {
-    grid-template-rows: minmax(220px, 0.91fr) minmax(260px, 1.18fr) minmax(220px, 0.91fr);
-  }
-
-  .dynamic-frame-grid[data-active="5"],
-  .dynamic-frame-grid[data-active="6"] {
-    grid-template-rows: minmax(220px, 0.91fr) minmax(220px, 0.91fr) minmax(260px, 1.18fr);
-  }
+  /* No dynamic resizing below desktop: taps navigate, the grid stays put. */
 
   .dynamic-frame-tile:nth-child(3n) {
     border-right: 0;
@@ -1447,6 +1433,30 @@ body:has(.cinema-experience-root) > footer {
 
 .cinema-runtime-source-video[data-screen-fit='cover'] {
   object-fit: cover;
+}
+
+@media (max-width: 767px) {
+  .cinema-runtime-stage {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    transform: none;
+  }
+
+  .cinema-runtime-plate,
+  .cinema-runtime-light-stack,
+  .cinema-runtime-screen-fill {
+    display: none;
+  }
+
+  .cinema-runtime-screen {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    clip-path: none;
+  }
 }
 
 .cinema-runtime-light-stack {
