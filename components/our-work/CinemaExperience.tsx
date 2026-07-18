@@ -80,6 +80,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const [fullscreenSourceDuration, setFullscreenSourceDuration] = useState(0)
   const [fullscreenSourceReady, setFullscreenSourceReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isMobileViewport, setIsMobileViewport] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const fullscreenVideoRef = useRef<HTMLVideoElement>(null)
   const fullscreenSessionRef = useRef<FullscreenSession | null>(null)
@@ -91,9 +92,14 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const pendingFilmPlayRef = useRef(false)
 
   const selected = projects[selectedIndex]
+  const useCleanMobileSource = isMobileViewport && !showingPreShow && selected.cinemaMode === 'integrated'
   const activeMediaKey = showingPreShow ? 'vibeshack-pre-show' : selected.slug
-  const activeCinemaMode = showingPreShow ? 'runtime' : selected.cinemaMode
-  const activeCinemaSrc = showingPreShow ? PRE_SHOW_SRC : selected.cinemaSrc
+  const activeCinemaMode = showingPreShow || useCleanMobileSource ? 'runtime' : selected.cinemaMode
+  const activeCinemaSrc = showingPreShow
+    ? PRE_SHOW_SRC
+    : useCleanMobileSource
+      ? selected.fullscreenSrc
+      : selected.cinemaSrc
   const activeCinemaPoster = showingPreShow ? PRE_SHOW_POSTER : selected.cinemaPoster
   const activeTitle = showingPreShow ? PRE_SHOW_TITLE : selected.title
   const activeScreenFit = showingPreShow ? 'cover' : (selected.screenFit ?? 'contain')
@@ -101,17 +107,17 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     ? { x: 0.5, y: 0.5 }
     : (selected.screenPosition ?? { x: 0.5, y: 0.5 })
   const activeScreenBackdrop = showingPreShow ? 'ambient' : (selected.screenBackdrop ?? 'black')
-  const usesSeparateFullscreenSource = !showingPreShow && selected.fullscreenSrc !== selected.cinemaSrc
-  const fullscreenOffsetSeconds = selected.fullscreenOffsetSeconds ?? 0
-  const fullscreenWindowEnd = fullscreenOffsetSeconds + fullscreenSourceDuration
-  const fullscreenAvailable = !showingPreShow && ready && (
-    !usesSeparateFullscreenSource
-    || (
-      fullscreenSourceReady
-      && currentTime >= fullscreenOffsetSeconds
-      && currentTime < fullscreenWindowEnd - 0.04
-    )
-  )
+  const usesSeparateFullscreenSource = !showingPreShow && selected.fullscreenSrc !== activeCinemaSrc
+  const fullscreenOffsetSeconds = useCleanMobileSource ? 0 : (selected.fullscreenOffsetSeconds ?? 0)
+  const fullscreenAvailable = !showingPreShow && ready
+
+  useEffect(() => {
+    const viewportQuery = window.matchMedia('(max-width: 767px)')
+    const syncViewport = () => setIsMobileViewport(viewportQuery.matches)
+    syncViewport()
+    viewportQuery.addEventListener('change', syncViewport)
+    return () => viewportQuery.removeEventListener('change', syncViewport)
+  }, [])
 
   useEffect(() => {
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -537,16 +543,20 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     }
 
     const theater = videoRef.current
-    const target = (
-      usesSeparateFullscreenSource ? fullscreenVideoRef.current : theater
-    ) as WebkitFullscreenVideo | null
-    if (!theater || !target) return
-    const targetWindowAvailable = !usesSeparateFullscreenSource || (
-      target.readyState >= HTMLMediaElement.HAVE_METADATA
+    if (!theater) return
+    const separateVideo = fullscreenVideoRef.current
+    const separateSourceUsable = Boolean(
+      usesSeparateFullscreenSource
+      && separateVideo
+      && separateVideo.readyState >= HTMLMediaElement.HAVE_METADATA
       && theater.currentTime >= fullscreenOffsetSeconds
-      && theater.currentTime < fullscreenOffsetSeconds + target.duration - 0.04
+      && theater.currentTime < fullscreenOffsetSeconds + separateVideo.duration - 0.04,
     )
-    if (!ready || !targetWindowAvailable) {
+    const target = (
+      separateSourceUsable ? separateVideo : theater
+    ) as WebkitFullscreenVideo | null
+    if (!target) return
+    if (!ready) {
       setError('Full screen is available while the selected film is on screen.')
       return
     }
@@ -555,7 +565,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     const session: FullscreenSession = {
       target,
       theater,
-      separateSource: usesSeparateFullscreenSource,
+      separateSource: separateSourceUsable,
       theaterOffsetSeconds: fullscreenOffsetSeconds,
       theaterWasPlaying,
       screeningWasActive: screeningActive,

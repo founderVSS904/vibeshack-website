@@ -18,12 +18,15 @@ export const metadata: Metadata = {
     url: `${siteUrl}/`,
     images: [
       {
-        url: `${siteUrl}/studio-images/work-body-is-tea-music-v20260708b.jpg`,
-        width: 3840,
-        height: 2160,
+        url: `${siteUrl}/og/home-og-body-is-tea.jpg`,
+        width: 1200,
+        height: 630,
         alt: 'Body Is Tea music video by Varii, presented by VibeShack Studios',
       },
     ],
+  },
+  twitter: {
+    images: [`${siteUrl}/og/home-og-body-is-tea.jpg`],
   },
 }
 

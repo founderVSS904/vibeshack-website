@@ -141,7 +141,7 @@ export default function PhotoServicesHero() {
   const hoveredRef = useRef<number | null>(null)
   const overRef = useRef(false)
   const pinnedRef = useRef(false)
-  const dragRef = useRef<{ id: number; startX: number; startPos: number; moved: boolean; lastX: number; lastT: number; v: number } | null>(null)
+  const dragRef = useRef<{ id: number; startX: number; startY: number; startPos: number; moved: boolean; lastX: number; lastT: number; v: number } | null>(null)
   const movedRef = useRef(false)
   const rafRef = useRef(0)
   const lastTsRef = useRef(0)
@@ -289,6 +289,28 @@ export default function PhotoServicesHero() {
     return () => clearInterval(interval)
   }, [ensureLoop])
 
+  // On touch devices the browser claims mostly-horizontal swipes for page
+  // scroll and fires pointercancel, killing the drag. A non-passive
+  // touchmove listener preventDefaults once the gesture reads as horizontal
+  // so the swipe stays with the deck; vertical swipes still scroll the page.
+  useEffect(() => {
+    const el = stageRef.current
+    if (!el) return
+    const onTouchMove = (e: TouchEvent) => {
+      const drag = dragRef.current
+      if (!drag) return
+      const touch = e.touches[0]
+      if (!touch) return
+      const dx = touch.clientX - drag.startX
+      const dy = touch.clientY - drag.startY
+      if (drag.moved || (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy))) {
+        if (e.cancelable) e.preventDefault()
+      }
+    }
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => el.removeEventListener('touchmove', onTouchMove)
+  }, [])
+
   return (
     <>
       {/* ── Hero ── */}
@@ -335,7 +357,7 @@ export default function PhotoServicesHero() {
           }}
           onPointerDown={(e) => {
             if (e.button !== 0 || dragRef.current) return
-            dragRef.current = { id: e.pointerId, startX: e.clientX, startPos: posRef.current, moved: false, lastX: e.clientX, lastT: performance.now(), v: 0 }
+            dragRef.current = { id: e.pointerId, startX: e.clientX, startY: e.clientY, startPos: posRef.current, moved: false, lastX: e.clientX, lastT: performance.now(), v: 0 }
             movedRef.current = false
             leanRef.current = 0
             edgeRef.current = 0
@@ -347,7 +369,8 @@ export default function PhotoServicesHero() {
             if (drag) {
               if (e.pointerId !== drag.id) return
               const delta = e.clientX - drag.startX
-              if (!drag.moved && Math.abs(delta) > 10) {
+              const threshold = e.pointerType === 'touch' ? 6 : 10
+              if (!drag.moved && Math.abs(delta) > threshold && (e.pointerType !== 'touch' || Math.abs(delta) > Math.abs(e.clientY - drag.startY))) {
                 drag.moved = true
                 movedRef.current = true
                 // Capture only once the drag is real, so plain clicks keep
