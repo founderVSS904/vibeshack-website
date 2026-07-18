@@ -17,9 +17,6 @@ https://www.vibeshackstudios.com. A San Francisco studio-booking business
 
 ## Hard safety rules
 
-- Do NOT deploy.
-- Do NOT push to `main`, and do not push anything without explicit approval from
-  the owner (Tay / Emmanuel).
 - Do NOT trigger real Stripe charges, create real paid bookings, or submit live
   contact/tour forms.
 - Do NOT commit secrets, `.env*`, `.next/`, `node_modules/`, logs, or local
@@ -30,6 +27,35 @@ https://www.vibeshackstudios.com. A San Francisco studio-booking business
   reintroduce it anywhere in frontend or backend (booking catalog, pages,
   images, sitemaps, schemas, llms.txt). Canvas Rental is the photo room.
   Photo Services, which sells the shoot rather than the room, stays.
+
+## Deployment authorization
+
+- Tay gives deployment approval by explicitly saying `deploy`, `publish`,
+  `launch`, `ship`, or an equally clear instruction in the current task. That
+  instruction authorizes the complete release workflow without additional
+  confirmation prompts.
+- After that instruction, the agent may create and push a feature branch to
+  `founderVSS904/vibeshack-website`, open or update a pull request, wait for the
+  required checks, merge the pull request, allow Vercel to deploy `main`, and
+  verify `https://www.vibeshackstudios.com`.
+- The agent must not push directly to `main`. Production changes must reach
+  `main` through a pull request.
+- Before merging, `npm run lint`, `npx tsc --noEmit`, `npm run build`, and all
+  required GitHub and Vercel checks must pass. Do not deploy a known failing
+  build.
+- Never force-push, bypass required checks, disable branch protection, expose
+  secrets, or weaken repository security to complete a deployment.
+- After deployment, run production smoke tests on the changed pages and key
+  navigation paths. If the new release causes a critical production failure,
+  the agent may immediately revert that release or roll Vercel back to the last
+  healthy deployment, then verify the recovery. Report the rollback to Tay.
+- Routine feature-branch pushes, pull-request creation, merging after checks,
+  Vercel production deployment, live verification, and emergency rollback do
+  not require another approval after Tay has explicitly authorized deployment
+  in the current task.
+- Real Stripe charges, paid bookings, and live contact or tour form submissions
+  remain prohibited unless Tay separately gives explicit approval for that
+  exact real-world action.
 
 ## Running it
 
