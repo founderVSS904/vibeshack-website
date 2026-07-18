@@ -585,7 +585,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                   type="button"
                   aria-pressed={filter === f.id}
                   onClick={() => changeFilter(f.id)}
-                  className={`rounded-full border px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition-colors ${
+                  className={`rounded-sm border px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition-colors ${
                     filter === f.id
                       ? 'border-brand-red text-brand-red'
                       : 'border-white/15 text-zinc-400 hover:border-white/35 hover:text-white'
@@ -1069,7 +1069,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                     <p className="mb-5 text-xs text-zinc-500">Guests, co-hosts, crew, clients. Everyone gets a copy of the confirmation.</p>
                     <div className="flex min-h-[44px] flex-wrap items-center gap-2 border-b border-white/20 pb-3">
                       {teamEmails.map((em, i) => (
-                        <span key={i} className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs text-white">
+                        <span key={i} className="inline-flex items-center gap-1.5 rounded-sm bg-white/10 px-3 py-1.5 text-xs text-white">
                           {em}
                           <button
                             type="button"

@@ -159,28 +159,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* The Space */}
-      <section className="py-32 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <span className="number-label mb-12 block">The Space</span>
-          <h2 className="font-black text-white leading-tight mb-16" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0 }}>
-            950 Battery St<br />
-            <span className="text-brand-red">Northern Waterfront.</span>
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <div className="relative col-span-2 row-span-2 h-[360px] overflow-hidden rounded-lg sm:h-[480px]">
-              <Image src="/studio-images/horizon-wide-v20260509.jpg" alt="Horizon podcast set at VibeShack Studios" fill sizes="(min-width: 768px) 66vw, 100vw" className="object-cover" />
-            </div>
-            <div className="relative h-[174px] overflow-hidden rounded-lg sm:h-[234px]">
-              <Image src="/studio-images/parlor-side-v20260509.jpg" alt="Parlor lounge production set at VibeShack Studios" fill sizes="(min-width: 768px) 33vw, 50vw" className="object-cover" />
-            </div>
-            <div className="relative h-[174px] overflow-hidden rounded-lg sm:h-[234px]">
-              <Image src="/studio-images/inside-canvas-cyc-v20260509.jpg" alt="Canvas white cyc set at VibeShack Studios" fill sizes="(min-width: 768px) 33vw, 50vw" className="object-cover" />
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="py-0 bg-black border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-20">
           <span className="number-label mb-4 block">Location</span>

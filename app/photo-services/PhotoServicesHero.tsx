@@ -3,62 +3,85 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 
-type PhotoCategory = {
-  label: string
-  title: string
-  body: string
+type GalleryPhoto = {
   image: string
   alt: string
   position?: string
 }
 
-const CATEGORIES: PhotoCategory[] = [
+const GALLERY_IMAGES: GalleryPhoto[] = [
   {
-    label: 'Product',
-    title: 'Product photography',
-    body: 'Clean product stills, launch images, ecommerce crops, detail shots, campaign frames, and social assets.',
-    image: '/studio-images/photo-product-puremagic-v20260716.jpg',
-    alt: 'Product photography of a styled cosmetics jar at VibeShack Studios',
+    image: '/studio-images/photo-gallery-white-cyc-glam-portrait-v20260520.jpg',
+    alt: 'White cyc glam portrait photographed at VibeShack Studios San Francisco',
   },
   {
-    label: 'People',
-    title: 'Headshots and portraits',
-    body: 'Founder portraits, team headshots, press photos, artist portraits, executive profiles, and brand images.',
-    image: '/studio-images/photo-gallery-black-white-sunglasses-v20260716.jpg',
-    alt: 'Black and white sunglasses portrait photographed at VibeShack Studios San Francisco',
-    position: 'center 25%',
+    image: '/studio-images/photo-gallery-black-white-cap-portrait-v20260520.jpg',
+    alt: 'Black and white editorial portrait photographed at VibeShack Studios San Francisco',
+    position: 'center 34%',
   },
   {
-    label: 'Food',
-    title: 'Food and beverage',
-    body: 'Menu images, packaged goods, drink launches, tabletop scenes, delivery-app crops, and social content.',
-    image: '/studio-images/photo-food-editorial-v20260716.jpg',
-    alt: 'Dark editorial food photography with a plated dish and cocktail',
+    image: '/studio-images/photo-gallery-editorial-makeup-closeup-v20260520.jpg',
+    alt: 'Editorial makeup close-up photographed at VibeShack Studios San Francisco',
+    position: 'center 38%',
   },
   {
-    label: 'Fashion',
-    title: 'Editorials and lookbooks',
-    body: 'Lookbook images, wardrobe stories, model tests, beauty crops, campaign stills, and full-body frames.',
-    image: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
-    alt: 'Fashion editorial photographed on the cyc at VibeShack Studios',
-    position: '42% center',
+    image: '/studio-images/photo-gallery-red-blue-sunglasses-v20260520.jpg',
+    alt: 'Red and blue gel portrait photographed at VibeShack Studios San Francisco',
   },
   {
-    label: 'Events',
-    title: 'Wedding and event content',
-    body: 'Engagement portraits, editorial wedding details, announcement images, event portraits, and polished recap stills.',
-    image: '/studio-images/photo-events-editorial-v20260716.jpg',
-    alt: 'Editorial event photograph of a couple at an evening celebration',
-    position: 'center 30%',
+    image: '/studio-images/photo-gallery-pole-form-white-cyc-v20260520.jpg',
+    alt: 'White cyc movement portrait photographed at VibeShack Studios San Francisco',
   },
   {
-    label: 'Content Days',
-    title: 'Content days',
-    body: 'A planned photo day for the images a brand needs across website, ads, social, decks, and launch material.',
-    image: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
-    alt: 'Crew setting lights during a content day at VibeShack Studios',
+    image: '/studio-images/photo-gallery-beauty-jewelry-closeup-v20260520.jpg',
+    alt: 'Beauty jewelry close-up photographed at VibeShack Studios San Francisco',
+  },
+  {
+    image: '/studio-images/photo-gallery-beauty-expression-closeup-v20260520.jpg',
+    alt: 'Beauty portrait close-up photographed at VibeShack Studios San Francisco',
+  },
+  {
+    image: '/studio-images/photo-gallery-red-sunglasses-portrait-v20260520.jpg',
+    alt: 'Red backdrop sunglasses portrait photographed at VibeShack Studios San Francisco',
+    position: 'center 34%',
+  },
+  {
+    image: '/studio-images/photo-gallery-direct-beauty-portrait-v20260520.jpg',
+    alt: 'Direct beauty portrait photographed at VibeShack Studios San Francisco',
+    position: 'center 34%',
+  },
+  {
+    image: '/studio-images/photo-gallery-pink-profile-v20260520.jpg',
+    alt: 'Pink profile portrait photographed at VibeShack Studios San Francisco',
+  },
+  {
+    image: '/studio-images/photo-gallery-side-beauty-black-bg-v20260520.jpg',
+    alt: 'Side-profile beauty portrait photographed at VibeShack Studios San Francisco',
+    position: 'center 42%',
+  },
+  {
+    image: '/studio-images/photo-gallery-black-red-afro-portrait-v20260520.jpg',
+    alt: 'Black and red studio portrait photographed at VibeShack Studios San Francisco',
+    position: 'center 38%',
+  },
+  {
+    image: '/studio-images/photo-gallery-mens-shadow-portrait-v20260520.jpg',
+    alt: "Men's shadow portrait photographed at VibeShack Studios San Francisco",
+    position: 'center 40%',
+  },
+  {
+    image: '/studio-images/photo-gallery-pink-studio-portrait-v20260520.jpg',
+    alt: 'Pink studio portrait photographed at VibeShack Studios San Francisco',
+    position: 'center 34%',
+  },
+  {
+    image: '/studio-images/photo-gallery-gesture-portrait-v20260520.jpg',
+    alt: 'Gesture portrait photographed at VibeShack Studios San Francisco',
+    position: 'center 38%',
   },
 ]
+
+const PHOTO_COUNT = GALLERY_IMAGES.length
 
 // Deck geometry anchors by absolute distance from center; values between
 // anchors are interpolated so the deck can rest at any fractional position.
@@ -99,8 +122,8 @@ function slotAt(rel: number) {
 }
 
 function relativeTo(index: number, position: number) {
-  const rel = (((index - position) % 6) + 6) % 6
-  return rel > 3 ? rel - 6 : rel
+  const rel = (((index - position) % PHOTO_COUNT) + PHOTO_COUNT) % PHOTO_COUNT
+  return rel > PHOTO_COUNT / 2 ? rel - PHOTO_COUNT : rel
 }
 
 export default function PhotoServicesHero() {
@@ -166,7 +189,7 @@ export default function PhotoServicesHero() {
 
       applyStyles(posRef.current)
 
-      const snapped = ((Math.round(posRef.current) % 6) + 6) % 6
+      const snapped = ((Math.round(posRef.current) % PHOTO_COUNT) + PHOTO_COUNT) % PHOTO_COUNT
       if (snapped !== activeRef.current) {
         activeRef.current = snapped
         setActive(snapped)
@@ -201,7 +224,7 @@ export default function PhotoServicesHero() {
   // active card so keyboard users never lose their focus ring.
   const chaseFocus = useCallback((target: number) => {
     const focusedAt = nodesRef.current.findIndex((n) => n === document.activeElement)
-    if (focusedAt >= 0 && relativeTo(focusedAt, target) === 3) {
+    if (focusedAt >= 0 && Math.abs(relativeTo(focusedAt, target)) >= 3) {
       nodesRef.current[target]?.focus({ preventScroll: true })
     }
   }, [])
@@ -211,8 +234,8 @@ export default function PhotoServicesHero() {
       if (dragRef.current) return
       pinnedRef.current = true
       const from = Math.round(baseRef.current)
-      let delta = (((index - from) % 6) + 6) % 6
-      if (delta > 3) delta -= 6
+      let delta = (((index - from) % PHOTO_COUNT) + PHOTO_COUNT) % PHOTO_COUNT
+      if (delta > PHOTO_COUNT / 2) delta -= PHOTO_COUNT
       baseRef.current = from + delta
       leanRef.current = 0
       edgeRef.current = 0
@@ -231,7 +254,7 @@ export default function PhotoServicesHero() {
       baseRef.current = Math.round(baseRef.current) + dir
       leanRef.current = 0
       edgeRef.current = 0
-      chaseFocus(((Math.round(baseRef.current) % 6) + 6) % 6)
+      chaseFocus(((Math.round(baseRef.current) % PHOTO_COUNT) + PHOTO_COUNT) % PHOTO_COUNT)
       ensureLoop()
     },
     [chaseFocus, ensureLoop],
@@ -266,8 +289,6 @@ export default function PhotoServicesHero() {
     return () => clearInterval(interval)
   }, [ensureLoop])
 
-  const activeCategory = CATEGORIES[active]
-
   return (
     <>
       {/* ── Hero ── */}
@@ -291,12 +312,6 @@ export default function PhotoServicesHero() {
             >
               Plan your shoot
             </Link>
-            <Link
-              href="/our-work/"
-              className="rounded-lg border border-white/20 px-7 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-white/50"
-            >
-              Explore the work
-            </Link>
           </div>
         </div>
 
@@ -304,7 +319,7 @@ export default function PhotoServicesHero() {
         <div
           ref={stageRef}
           role="radiogroup"
-          aria-label="Photography categories"
+          aria-label="Photography gallery"
           className={`relative mx-auto mt-12 h-[480px] max-w-[1680px] touch-pan-y select-none sm:h-[560px] lg:h-[660px] ${
             dragging ? 'cursor-grabbing' : 'cursor-grab'
           }`}
@@ -413,7 +428,7 @@ export default function PhotoServicesHero() {
           <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[155px]">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
           </div>
-          {CATEGORIES.map((category, i) => {
+          {GALLERY_IMAGES.map((photo, i) => {
             const isHovered = hovered === i && !dragging
             // The spans permanently occupy the wide box; hovering animates a
             // clip-path reveal, which composites in Safari instead of
@@ -422,13 +437,13 @@ export default function PhotoServicesHero() {
             const frameTransition = 'clip-path 500ms cubic-bezier(0.32, 0.72, 0, 1), -webkit-clip-path 500ms cubic-bezier(0.32, 0.72, 0, 1)'
             return (
               <button
-                key={category.label}
+                key={photo.image}
                 ref={(el) => {
                   nodesRef.current[i] = el
                 }}
                 type="button"
                 role="radio"
-                aria-label={`Show ${category.label}`}
+                aria-label={`View photograph ${i + 1} of ${PHOTO_COUNT}`}
                 aria-checked={i === active}
                 tabIndex={relativeTo(i, active) === 3 ? -1 : 0}
                 onPointerEnter={(e) => {
@@ -460,23 +475,16 @@ export default function PhotoServicesHero() {
                   style={{ left: '-13%', right: '-13%', clipPath: clip, WebkitClipPath: clip, transition: frameTransition }}
                 >
                   <Image
-                    src={category.image}
-                    alt={category.alt}
+                    src={photo.image}
+                    alt={photo.alt}
                     fill
                     quality={80}
                     sizes="(min-width: 1024px) 530px, (min-width: 640px) 405px, 305px"
                     className="object-cover"
-                    style={{ objectPosition: category.position || 'center', WebkitUserDrag: 'none' } as CSSProperties}
+                    style={{ objectPosition: photo.position || 'center', WebkitUserDrag: 'none' } as CSSProperties}
                     draggable={false}
-                    priority={i === 0 || i === 1 || i === 5}
+                    priority={i < 3}
                   />
-                  <span className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" aria-hidden />
-                  <span
-                    className="absolute bottom-4 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white"
-                    style={{ left: 'calc(10.3175% + 1.25rem)' }}
-                  >
-                    {category.label}
-                  </span>
                   <span data-dim aria-hidden="true" className="pointer-events-none absolute inset-0 bg-black" style={{ opacity: 0 }} />
                 </span>
                 <span
@@ -494,22 +502,15 @@ export default function PhotoServicesHero() {
                   }}
                 >
                   <Image
-                    src={category.image}
+                    src={photo.image}
                     alt=""
                     fill
                     quality={80}
                     sizes="(min-width: 1024px) 530px, (min-width: 640px) 405px, 305px"
                     className="object-cover"
-                    style={{ objectPosition: category.position || 'center', WebkitUserDrag: 'none' } as CSSProperties}
+                    style={{ objectPosition: photo.position || 'center', WebkitUserDrag: 'none' } as CSSProperties}
                     draggable={false}
                   />
-                  <span className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
-                  <span
-                    className="absolute bottom-4 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white"
-                    style={{ left: 'calc(10.3175% + 1.25rem)' }}
-                  >
-                    {category.label}
-                  </span>
                   <span data-dim aria-hidden="true" className="pointer-events-none absolute inset-0 bg-black" style={{ opacity: 0 }} />
                 </span>
               </button>
@@ -520,21 +521,21 @@ export default function PhotoServicesHero() {
         {/* ── Pager ── */}
         <div className="mx-auto mt-8 flex max-w-[1680px] items-center gap-6 px-6 sm:px-10 lg:px-16">
           <p className="shrink-0 font-mono text-[12px] font-bold tracking-[0.14em] text-zinc-400">
-            <span className="text-brand-red">{String(active + 1).padStart(2, '0')}</span> / 06
+            <span className="text-brand-red">{String(active + 1).padStart(2, '0')}</span> / {String(PHOTO_COUNT).padStart(2, '0')}
             <span className="sr-only" role="status" aria-live="polite">
-              {activeCategory.title}, {active + 1} of 6
+              Photograph {active + 1} of {PHOTO_COUNT}
             </span>
           </p>
           <div className="relative h-px min-w-0 flex-1 bg-white/15">
             <span
               className="absolute inset-0 origin-left bg-brand-red transition-transform duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{ transform: `scaleX(${(active + 1) / 6})` }}
+              style={{ transform: `scaleX(${(active + 1) / PHOTO_COUNT})` }}
             />
           </div>
           <div className="flex shrink-0 items-center gap-2.5">
             <button
               type="button"
-              aria-label="Previous category"
+              aria-label="Previous photograph"
               onClick={() => goStep(-1)}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white"
             >
@@ -544,7 +545,7 @@ export default function PhotoServicesHero() {
             </button>
             <button
               type="button"
-              aria-label="Next category"
+              aria-label="Next photograph"
               onClick={() => goStep(1)}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white"
             >
@@ -556,54 +557,6 @@ export default function PhotoServicesHero() {
         </div>
       </section>
 
-      {/* ── Six ways to shoot ── */}
-      <section className="border-b border-white/[0.08] bg-black py-16">
-        <div className="mx-auto max-w-[1680px] px-6 sm:px-10 lg:px-16">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-baseline lg:justify-between">
-            <h2 className="shrink-0 text-white" style={{ fontSize: 'clamp(2rem, 2.8vw, 3rem)' }}>
-              Six ways to shoot<span className="text-brand-red">.</span>
-            </h2>
-            <div role="radiogroup" aria-label="Six ways to shoot" className="scrollbar-hide flex gap-8 overflow-x-auto">
-              {CATEGORIES.map((category, i) => (
-                <button
-                  key={category.label}
-                  type="button"
-                  role="radio"
-                  aria-checked={i === active}
-                  onClick={() => go(i)}
-                  className={`relative shrink-0 pb-3 pt-3 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
-                    i === active ? 'text-white' : 'text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  {category.label}
-                  {i === active && <span className="absolute inset-x-0 bottom-0 h-[2px] bg-brand-red" />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-10 grid grid-cols-1 gap-8 border-t border-white/[0.08] pt-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-            <p className="text-2xl font-bold leading-snug text-white">{activeCategory.title}</p>
-            <div>
-              <p className="max-w-2xl text-base leading-relaxed text-zinc-400">{activeCategory.body}</p>
-              <div className="mt-6 flex flex-wrap items-center gap-6">
-                <Link
-                  href="/contact/?service=photo-services"
-                  className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors hover:text-red-400"
-                >
-                  Plan this shoot <span aria-hidden>→</span>
-                </Link>
-                <Link
-                  href="/canvas-rental/"
-                  className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:text-white"
-                >
-                  Need the room only? Rent Canvas
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   )
 }

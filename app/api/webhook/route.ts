@@ -407,7 +407,7 @@ async function sendConfirmationEmail(
     <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;margin:28px 0;color:#111;">
       <p style="font-size:12px;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;margin:0 0 8px;">Stripe receipt</p>
       <p style="font-size:14px;line-height:1.6;color:#334155;margin:0 0 18px;">Stripe will also send the official payment receipt to ${escapeHtml(customer.email)}. You can view it anytime here:</p>
-      <a href="${escapeHtml(receiptUrl)}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;border-radius:999px;padding:12px 18px;font-size:13px;font-weight:800;">View Stripe receipt</a>
+      <a href="${escapeHtml(receiptUrl)}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;border-radius:2px;padding:12px 18px;font-size:13px;font-weight:800;">View Stripe receipt</a>
     </div>` : `
     <div style="background:#0a0a0a;border:1px solid #222;border-radius:14px;padding:18px;margin:28px 0;color:#fff;">
       <p style="font-size:13px;line-height:1.7;color:#999;margin:0;">Stripe will also send the official payment receipt to ${escapeHtml(customer.email)}.</p>

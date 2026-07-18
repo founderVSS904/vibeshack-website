@@ -3,7 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { CSSProperties, KeyboardEvent, WheelEvent } from 'react'
+import type { CSSProperties, KeyboardEvent, SyntheticEvent, WheelEvent } from 'react'
+import { flushSync } from 'react-dom'
 import type { CinemaProject } from '@/lib/cinema/cinemaCatalog'
 import { CinemaRuntimeTheater } from './CinemaRuntimeTheater'
 
@@ -21,6 +22,7 @@ type WebkitFullscreenVideo = HTMLVideoElement & {
   webkitEnterFullscreen?: () => void
   webkitExitFullscreen?: () => void
   webkitDisplayingFullscreen?: boolean
+  webkitSupportsFullscreen?: boolean
 }
 
 type FullscreenSession = {
@@ -40,6 +42,15 @@ type FullscreenSession = {
 
 const CHROME_FADE_OUT_SECONDS = 0.45
 const LIGHTS_UP_SECONDS = 2.002
+const PRE_SHOW_SRC = '/studio-videos/cinema/our-work-preshow-v018.mp4'
+const PRE_SHOW_POSTER = '/studio-videos/cinema/our-work-preshow-v018.jpg'
+const PRE_SHOW_TITLE = 'VibeShack Pre-Show'
+
+type NavigatorWithSaveData = Navigator & {
+  connection?: {
+    saveData?: boolean
+  }
+}
 
 function getFullscreenElement() {
   return document.fullscreenElement
@@ -54,17 +65,10 @@ function clampMediaTime(video: HTMLVideoElement, seconds: number) {
     : safeSeconds
 }
 
-function formatTime(seconds: number) {
-  if (!Number.isFinite(seconds)) return '00:00'
-  const whole = Math.max(0, Math.floor(seconds))
-  const hours = Math.floor(whole / 3600)
-  const minutes = Math.floor((whole % 3600) / 60)
-  const clock = `${String(minutes).padStart(2, '0')}:${String(whole % 60).padStart(2, '0')}`
-  return hours > 0 ? `${String(hours).padStart(2, '0')}:${clock}` : clock
-}
-
 export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [showingPreShow, setShowingPreShow] = useState(true)
+  const [preShowAutoplayAllowed, setPreShowAutoplayAllowed] = useState(false)
   const [ready, setReady] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [screeningActive, setScreeningActive] = useState(false)
@@ -73,7 +77,8 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [muted, setMuted] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
+  const [fullscreenSourceDuration, setFullscreenSourceDuration] = useState(0)
+  const [fullscreenSourceReady, setFullscreenSourceReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const fullscreenVideoRef = useRef<HTMLVideoElement>(null)
@@ -83,10 +88,42 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const playButtonRef = useRef<HTMLButtonElement>(null)
   const browseReturnRef = useRef<HTMLButtonElement>(null)
   const cardRefs = useRef(new Map<string, HTMLButtonElement>())
+  const pendingFilmPlayRef = useRef(false)
 
   const selected = projects[selectedIndex]
-  const usesSeparateFullscreenSource = selected.fullscreenSrc !== selected.cinemaSrc
-  const showSelectedClient = selected.client.trim().toLowerCase() !== selected.title.trim().toLowerCase()
+  const activeMediaKey = showingPreShow ? 'vibeshack-pre-show' : selected.slug
+  const activeCinemaMode = showingPreShow ? 'runtime' : selected.cinemaMode
+  const activeCinemaSrc = showingPreShow ? PRE_SHOW_SRC : selected.cinemaSrc
+  const activeCinemaPoster = showingPreShow ? PRE_SHOW_POSTER : selected.cinemaPoster
+  const activeTitle = showingPreShow ? PRE_SHOW_TITLE : selected.title
+  const activeScreenFit = showingPreShow ? 'cover' : (selected.screenFit ?? 'contain')
+  const activeScreenPosition = showingPreShow
+    ? { x: 0.5, y: 0.5 }
+    : (selected.screenPosition ?? { x: 0.5, y: 0.5 })
+  const activeScreenBackdrop = showingPreShow ? 'ambient' : (selected.screenBackdrop ?? 'black')
+  const usesSeparateFullscreenSource = !showingPreShow && selected.fullscreenSrc !== selected.cinemaSrc
+  const fullscreenOffsetSeconds = selected.fullscreenOffsetSeconds ?? 0
+  const fullscreenWindowEnd = fullscreenOffsetSeconds + fullscreenSourceDuration
+  const fullscreenAvailable = !showingPreShow && ready && (
+    !usesSeparateFullscreenSource
+    || (
+      fullscreenSourceReady
+      && currentTime >= fullscreenOffsetSeconds
+      && currentTime < fullscreenWindowEnd - 0.04
+    )
+  )
+
+  useEffect(() => {
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const saveData = (navigator as NavigatorWithSaveData).connection?.saveData === true
+    const syncPreShowPreference = () => {
+      setPreShowAutoplayAllowed(!motionQuery.matches && !saveData)
+    }
+
+    syncPreShowPreference()
+    motionQuery.addEventListener('change', syncPreShowPreference)
+    return () => motionQuery.removeEventListener('change', syncPreShowPreference)
+  }, [])
 
   const finishFullscreenSession = useCallback(() => {
     const session = fullscreenSessionRef.current
@@ -113,7 +150,6 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       theater.volume = target.volume
       theater.playbackRate = target.playbackRate
       setCurrentTime(nextTime)
-      setDuration(nextDuration)
       setEnding(nextDuration > 0 && nextTime >= lightsUpBegins)
       setScreeningActive(session.screeningWasActive || nextTime > 0 || shouldResume)
       setChromeHidden(
@@ -141,6 +177,39 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     window.setTimeout(() => {
       if (launcher?.isConnected) launcher.focus({ preventScroll: true })
     }, 0)
+  }, [])
+
+  const cancelFullscreenSession = useCallback((message: string) => {
+    const session = fullscreenSessionRef.current
+    if (!session) return
+    if (session.separateSource) {
+      session.target.pause()
+      session.target.setAttribute('aria-hidden', 'true')
+      if (session.theaterWasPlaying) {
+        void session.theater.play().catch(() => {
+          setPlaying(false)
+          setChromeHidden(false)
+        })
+      }
+    }
+    session.target.controls = false
+    fullscreenSessionRef.current = null
+    setIsFullscreen(false)
+    setError(message)
+  }, [])
+
+  const returnToPreShow = useCallback(() => {
+    pendingFilmPlayRef.current = false
+    setReady(false)
+    setPlaying(false)
+    setScreeningActive(false)
+    setEnding(false)
+    setChromeHidden(false)
+    setCurrentTime(0)
+    setFullscreenSourceDuration(0)
+    setFullscreenSourceReady(false)
+    setError(null)
+    setShowingPreShow(true)
   }, [])
 
   useEffect(() => {
@@ -182,14 +251,20 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       }
       if (session.entered) finishFullscreenSession()
     }
+    const handleFullscreenError = () => {
+      if (!fullscreenSessionRef.current) return
+      cancelFullscreenSession('Full screen is not available in this browser.')
+    }
 
     document.addEventListener('fullscreenchange', syncFullscreenState)
     document.addEventListener('webkitfullscreenchange', syncFullscreenState)
+    document.addEventListener('fullscreenerror', handleFullscreenError)
     return () => {
       document.removeEventListener('fullscreenchange', syncFullscreenState)
       document.removeEventListener('webkitfullscreenchange', syncFullscreenState)
+      document.removeEventListener('fullscreenerror', handleFullscreenError)
     }
-  }, [finishFullscreenSession])
+  }, [cancelFullscreenSession, finishFullscreenSession])
 
   useEffect(() => {
     const candidates = [videoRef.current, fullscreenVideoRef.current].filter(
@@ -207,36 +282,90 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       if (!session || event.currentTarget !== session.target) return
       finishFullscreenSession()
     }
+    const handleFullscreenError = (event: Event) => {
+      const session = fullscreenSessionRef.current
+      if (!session || event.currentTarget !== session.target) return
+      cancelFullscreenSession('Full screen is not available in this browser.')
+    }
 
     for (const video of candidates) {
       video.addEventListener('webkitbeginfullscreen', handleBeginFullscreen)
       video.addEventListener('webkitendfullscreen', handleEndFullscreen)
+      video.addEventListener('webkitfullscreenerror', handleFullscreenError)
     }
     return () => {
       for (const video of candidates) {
         video.removeEventListener('webkitbeginfullscreen', handleBeginFullscreen)
         video.removeEventListener('webkitendfullscreen', handleEndFullscreen)
+        video.removeEventListener('webkitfullscreenerror', handleFullscreenError)
       }
     }
-  }, [finishFullscreenSession, selected.slug])
+  }, [activeMediaKey, cancelFullscreenSession, finishFullscreenSession])
 
   useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
+    let video: HTMLVideoElement | null = null
+    let animationFrameId: number | null = null
 
     const syncMediaReadiness = () => {
-      if (Number.isFinite(video.duration)) setDuration(video.duration)
+      video = videoRef.current
+      if (!video) {
+        animationFrameId = window.requestAnimationFrame(syncMediaReadiness)
+        return
+      }
       if (video.readyState >= HTMLMediaElement.HAVE_METADATA) setReady(true)
+      video.addEventListener('loadedmetadata', handleMediaReadiness)
+      video.addEventListener('canplay', handleMediaReadiness)
+    }
+
+    const handleMediaReadiness = () => {
+      if (video && video.readyState >= HTMLMediaElement.HAVE_METADATA) setReady(true)
     }
 
     syncMediaReadiness()
-    video.addEventListener('loadedmetadata', syncMediaReadiness)
-    video.addEventListener('canplay', syncMediaReadiness)
     return () => {
-      video.removeEventListener('loadedmetadata', syncMediaReadiness)
-      video.removeEventListener('canplay', syncMediaReadiness)
+      if (animationFrameId !== null) window.cancelAnimationFrame(animationFrameId)
+      video?.removeEventListener('loadedmetadata', handleMediaReadiness)
+      video?.removeEventListener('canplay', handleMediaReadiness)
     }
-  }, [selected.slug])
+  }, [activeMediaKey])
+
+  useEffect(() => {
+    if (!showingPreShow) return
+    const video = videoRef.current
+    if (!video) return
+
+    video.muted = true
+    if (!preShowAutoplayAllowed) {
+      video.pause()
+      video.currentTime = 0
+      return
+    }
+
+    void video.play().catch(() => {
+      // The branded first frame remains visible when autoplay is blocked.
+      setPlaying(false)
+      setChromeHidden(false)
+    })
+  }, [activeMediaKey, preShowAutoplayAllowed, showingPreShow])
+
+  useEffect(() => {
+    const video = fullscreenVideoRef.current
+    if (!usesSeparateFullscreenSource || !video) return
+
+    const syncFullscreenMediaReadiness = () => {
+      if (video.readyState < HTMLMediaElement.HAVE_METADATA) return
+      if (Number.isFinite(video.duration)) setFullscreenSourceDuration(video.duration)
+      setFullscreenSourceReady(true)
+    }
+
+    syncFullscreenMediaReadiness()
+    video.addEventListener('loadedmetadata', syncFullscreenMediaReadiness)
+    video.addEventListener('canplay', syncFullscreenMediaReadiness)
+    return () => {
+      video.removeEventListener('loadedmetadata', syncFullscreenMediaReadiness)
+      video.removeEventListener('canplay', syncFullscreenMediaReadiness)
+    }
+  }, [activeMediaKey, usesSeparateFullscreenSource])
 
   const play = async () => {
     const video = videoRef.current
@@ -272,24 +401,57 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     setChromeHidden(false)
   }
 
-  const selectProject = (project: CinemaProject) => {
-    const nextIndex = projects.findIndex((candidate) => candidate.slug === project.slug)
-    if (nextIndex < 0) return
-    if (nextIndex === selectedIndex) {
-      setError(null)
+  const togglePreShow = async () => {
+    const video = videoRef.current
+    if (!video) return
+    video.muted = true
+    setError(null)
+    if (!video.paused) {
+      video.pause()
       return
     }
-    videoRef.current?.pause()
-    setReady(false)
-    setPlaying(false)
-    setScreeningActive(false)
-    setEnding(false)
-    setChromeHidden(false)
-    setCurrentTime(0)
-    setDuration(0)
-    setError(null)
-    setSelectedIndex(nextIndex)
+    try {
+      await video.play()
+    } catch {
+      setPlaying(false)
+      setChromeHidden(false)
+    }
   }
+
+  const launchProject = (project: CinemaProject) => {
+    const nextIndex = projects.findIndex((candidate) => candidate.slug === project.slug)
+    if (nextIndex < 0) return
+    videoRef.current?.pause()
+    pendingFilmPlayRef.current = false
+
+    flushSync(() => {
+      setReady(false)
+      setPlaying(false)
+      setScreeningActive(false)
+      setEnding(false)
+      setChromeHidden(false)
+      setCurrentTime(0)
+      setFullscreenSourceDuration(0)
+      setFullscreenSourceReady(false)
+      setError(null)
+      setSelectedIndex(nextIndex)
+      setShowingPreShow(false)
+    })
+
+    const film = videoRef.current
+    if (!film) {
+      pendingFilmPlayRef.current = true
+      return
+    }
+    film.currentTime = 0
+    void play()
+  }
+
+  useEffect(() => {
+    if (showingPreShow || !pendingFilmPlayRef.current || !ready) return
+    pendingFilmPlayRef.current = false
+    void play()
+  }, [activeMediaKey, ready, showingPreShow])
 
   const handleTimeUpdate = () => {
     const video = videoRef.current
@@ -297,8 +459,12 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     const nextTime = video.currentTime
     const nextDuration = Number.isFinite(video.duration) ? video.duration : 0
     setCurrentTime(nextTime)
-    setDuration(nextDuration)
     if (video.paused) return
+    if (showingPreShow) {
+      setEnding(false)
+      setChromeHidden(false)
+      return
+    }
     const lightsUpBegins = Math.max(0, nextDuration - LIGHTS_UP_SECONDS)
     setEnding(nextDuration > 0 && nextTime >= lightsUpBegins)
     setChromeHidden(nextTime >= CHROME_FADE_OUT_SECONDS && nextTime < lightsUpBegins)
@@ -317,15 +483,6 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const handleRailWheel = (event: WheelEvent<HTMLUListElement>) => {
     if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return
     event.currentTarget.scrollLeft += event.deltaY
-  }
-
-  const seek = (nextTime: number) => {
-    const video = videoRef.current
-    if (!video || !Number.isFinite(nextTime)) return
-    video.currentTime = nextTime
-    setCurrentTime(nextTime)
-    const nextDuration = Number.isFinite(video.duration) ? video.duration : 0
-    setEnding(nextDuration > 0 && nextTime >= Math.max(0, nextDuration - LIGHTS_UP_SECONDS))
   }
 
   const exitFilmFullscreen = async () => {
@@ -367,6 +524,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   }
 
   const toggleFullscreen = async () => {
+    if (showingPreShow) return
     const activeSession = fullscreenSessionRef.current
     if (activeSession) {
       if (!activeSession.entered) return
@@ -383,13 +541,22 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       usesSeparateFullscreenSource ? fullscreenVideoRef.current : theater
     ) as WebkitFullscreenVideo | null
     if (!theater || !target) return
+    const targetWindowAvailable = !usesSeparateFullscreenSource || (
+      target.readyState >= HTMLMediaElement.HAVE_METADATA
+      && theater.currentTime >= fullscreenOffsetSeconds
+      && theater.currentTime < fullscreenOffsetSeconds + target.duration - 0.04
+    )
+    if (!ready || !targetWindowAvailable) {
+      setError('Full screen is available while the selected film is on screen.')
+      return
+    }
 
     const theaterWasPlaying = !theater.paused && !theater.ended
     const session: FullscreenSession = {
       target,
       theater,
       separateSource: usesSeparateFullscreenSource,
-      theaterOffsetSeconds: selected.fullscreenOffsetSeconds ?? 0,
+      theaterOffsetSeconds: fullscreenOffsetSeconds,
       theaterWasPlaying,
       screeningWasActive: screeningActive,
       playbackShouldContinue: theaterWasPlaying,
@@ -400,15 +567,11 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       launcher: document.activeElement instanceof HTMLElement ? document.activeElement : null,
     }
 
-    const restoreAfterFailedEntry = () => {
-      if (session.separateSource) target.pause()
-      target.controls = false
-      if (session.separateSource) target.setAttribute('aria-hidden', 'true')
-      fullscreenSessionRef.current = null
-      setIsFullscreen(false)
-      if (session.separateSource && session.theaterWasPlaying) {
-        void theater.play()
-      }
+    const continueSeparatePlayback = () => {
+      if (!session.separateSource || !session.theaterWasPlaying) return
+      void target.play().catch(() => {
+        session.playbackShouldContinue = false
+      })
     }
 
     try {
@@ -433,10 +596,13 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       } else if (target.webkitRequestFullscreen) {
         fullscreenRequest = target.webkitRequestFullscreen()
       } else if (target.webkitEnterFullscreen) {
+        if (target.webkitSupportsFullscreen === false) {
+          throw new Error('Native video fullscreen unavailable')
+        }
         session.nativeVideoFullscreen = true
         if (session.separateSource) {
           theater.pause()
-          if (session.theaterWasPlaying) void target.play()
+          continueSeparatePlayback()
         }
         target.webkitEnterFullscreen()
         session.entered = true
@@ -448,70 +614,86 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
 
       if (session.separateSource) {
         theater.pause()
-        if (session.theaterWasPlaying) void target.play()
+        continueSeparatePlayback()
       }
 
       await fullscreenRequest
       session.entered = true
       setIsFullscreen(true)
     } catch {
-      restoreAfterFailedEntry()
-      setError('Full screen is not available in this browser.')
+      cancelFullscreenSession('Full screen is not available in this browser.')
     }
   }
 
-  const progress = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0
+  const handleTheaterEnded = (event: SyntheticEvent<HTMLVideoElement>) => {
+    if (showingPreShow) return
+    setCurrentTime(event.currentTarget.duration)
+
+    const session = fullscreenSessionRef.current
+    if (session?.target === event.currentTarget) {
+      session.playbackShouldContinue = false
+      session.resumeTheaterAfterFilmEnd = false
+      void exitFilmFullscreen()
+        .catch(finishFullscreenSession)
+        .finally(returnToPreShow)
+      return
+    }
+
+    returnToPreShow()
+  }
 
   return (
     <div
-      className={`cinema-experience-root ${playing ? 'is-playing' : ''} ${screeningActive ? 'is-screening-active' : ''} ${ending ? 'is-ending' : ''} ${chromeHidden ? 'is-chrome-hidden' : ''}`}
+      className={`cinema-experience-root ${playing ? 'is-playing' : ''} ${showingPreShow || screeningActive ? 'is-screening-active' : ''} ${ending ? 'is-ending' : ''} ${chromeHidden ? 'is-chrome-hidden' : ''}`}
       aria-label="VibeShack Cinema"
     >
       <div className="cinema-media-layer">
-        {selected.cinemaMode === 'runtime' ? (
+        {activeCinemaMode === 'runtime' ? (
           <CinemaRuntimeTheater
-            key={selected.slug}
+            key={activeMediaKey}
             ref={videoRef}
-            src={selected.cinemaSrc}
-            title={selected.title}
-            muted={muted}
-            screenFit={selected.screenFit ?? 'contain'}
-            screenPosition={selected.screenPosition ?? { x: 0.5, y: 0.5 }}
-            screeningActive={screeningActive}
-            ending={ending}
+            src={activeCinemaSrc}
+            title={activeTitle}
+            muted={showingPreShow ? true : muted}
+            autoPlay={showingPreShow && preShowAutoplayAllowed}
+            loop={showingPreShow}
+            poster={activeCinemaPoster}
+            preload={showingPreShow ? 'auto' : 'metadata'}
+            screenFit={activeScreenFit}
+            screenPosition={activeScreenPosition}
+            screenBackdrop={activeScreenBackdrop}
+            screeningActive={showingPreShow || screeningActive}
+            ending={!showingPreShow && ending}
+            filmFullscreen={isFullscreen && !usesSeparateFullscreenSource}
             onCanPlay={() => setReady(true)}
-            onLoadedMetadata={(event) => {
-              setDuration(event.currentTarget.duration)
-              setReady(true)
-            }}
-            onPlay={() => {
+            onLoadedMetadata={() => setReady(true)}
+            onPlay={(event) => {
+              if (event.currentTarget !== videoRef.current) return
               setPlaying(true)
               setScreeningActive(true)
+              if (showingPreShow) setChromeHidden(false)
             }}
-            onPause={() => {
+            onPause={(event) => {
+              if (event.currentTarget !== videoRef.current) return
               setPlaying(false)
               setChromeHidden(false)
             }}
             onTimeUpdate={handleTimeUpdate}
-            onEnded={(event) => {
-              setPlaying(false)
-              setScreeningActive(false)
-              setEnding(false)
-              setChromeHidden(false)
-              setCurrentTime(event.currentTarget.duration)
-            }}
-            onError={() => {
+            onEnded={handleTheaterEnded}
+            onError={(event) => {
+              if (event.currentTarget !== videoRef.current) return
               setReady(false)
               setPlaying(false)
               setScreeningActive(false)
               setEnding(false)
               setChromeHidden(false)
+              if (showingPreShow) return
               setError('This full-length cinema source is temporarily unavailable.')
             }}
           />
         ) : (
           <video
-            key={selected.slug}
+            key={activeMediaKey}
             ref={videoRef}
             className="cinema-theater-video"
             data-display-fit={selected.displayFit ?? 'contain'}
@@ -524,27 +706,21 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
             playsInline
             muted={muted}
             onCanPlay={() => setReady(true)}
-            onLoadedMetadata={(event) => {
-              setDuration(event.currentTarget.duration)
-              setReady(true)
-            }}
-            onPlay={() => {
+            onLoadedMetadata={() => setReady(true)}
+            onPlay={(event) => {
+              if (event.currentTarget !== videoRef.current) return
               setPlaying(true)
               setScreeningActive(true)
             }}
-            onPause={() => {
+            onPause={(event) => {
+              if (event.currentTarget !== videoRef.current) return
               setPlaying(false)
               setChromeHidden(false)
             }}
             onTimeUpdate={handleTimeUpdate}
-            onEnded={(event) => {
-              setPlaying(false)
-              setScreeningActive(false)
-              setEnding(false)
-              setChromeHidden(false)
-              setCurrentTime(event.currentTarget.duration)
-            }}
-            onError={() => {
+            onEnded={handleTheaterEnded}
+            onError={(event) => {
+              if (event.currentTarget !== videoRef.current) return
               setReady(false)
               setPlaying(false)
               setScreeningActive(false)
@@ -552,14 +728,23 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
               setChromeHidden(false)
               setError('This integrated theater preview is temporarily unavailable.')
             }}
-            aria-label={`${selected.title} playing inside the VibeShack theater`}
+            aria-label={`${activeTitle} playing inside the VibeShack theater`}
           />
         )}
         <button
           type="button"
           className="cinema-theater-hit-target"
-          onClick={() => (playing ? pauseAndBrowse() : play())}
-          aria-label={playing ? 'Pause and show cinema projects' : `Play ${selected.title} in the theater`}
+          onClick={() => {
+            if (showingPreShow) {
+              void togglePreShow()
+              return
+            }
+            if (playing) pauseAndBrowse()
+            else void play()
+          }}
+          aria-label={showingPreShow
+            ? (playing ? 'Pause VibeShack pre-show' : 'Play VibeShack pre-show')
+            : (playing ? 'Pause and show cinema projects' : `Play ${selected.title} in the theater`)}
         />
       </div>
 
@@ -569,10 +754,16 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
           ref={fullscreenVideoRef}
           className="cinema-fullscreen-source"
           src={selected.fullscreenSrc}
-          preload="auto"
+          preload="metadata"
           playsInline
           tabIndex={-1}
           aria-hidden="true"
+          aria-label={`${selected.title} film in full screen`}
+          onLoadedMetadata={(event) => {
+            setFullscreenSourceDuration(event.currentTarget.duration)
+            setFullscreenSourceReady(true)
+          }}
+          onCanPlay={() => setFullscreenSourceReady(true)}
           onPlay={(event) => {
             const session = fullscreenSessionRef.current
             if (session?.target === event.currentTarget) {
@@ -597,13 +788,14 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
             if (session?.target !== event.currentTarget) return
             session.resumeTheaterAfterFilmEnd = true
             session.playbackShouldContinue = true
-            void exitFilmFullscreen()
+            void exitFilmFullscreen().catch(finishFullscreenSession)
           }}
           onError={(event) => {
+            setFullscreenSourceReady(false)
             const session = fullscreenSessionRef.current
             if (session?.target !== event.currentTarget) return
             setError('The film-only full-screen source is temporarily unavailable.')
-            void exitFilmFullscreen()
+            void exitFilmFullscreen().catch(finishFullscreenSession)
           }}
         />
       )}
@@ -615,41 +807,66 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
         <div className="cinema-title-lockup">
           <p>VibeShack Cinema</p>
           <h1>Our<br />Work</h1>
-          <div className="cinema-now-screening">
-            <span>Now screening</span>
-            <i aria-hidden="true" />
-            <span>{String(selectedIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}</span>
-          </div>
         </div>
 
         <div className="cinema-dock">
           <div className="cinema-selected-project">
-            <p className="cinema-eyebrow">
-              <span aria-hidden="true" />
-              Now playing
-              <b>{String(selectedIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}</b>
-            </p>
-            <h2>{selected.title}</h2>
-            {showSelectedClient && <p>{selected.client}</p>}
-            <div className="cinema-selected-actions">
-              <button
-                ref={playButtonRef}
-                type="button"
-                onClick={playing ? pauseAndBrowse : play}
-                disabled={!ready}
-                className="cinema-play-button"
-              >
-                <span aria-hidden="true">{playing ? 'Ⅱ' : '▶'}</span>
-                {ready ? (playing ? 'Pause screening' : 'Play in theater') : 'Loading theater'}
-              </button>
+            {showingPreShow ? (
+              <div className="cinema-selected-heading">
+                <h2>{PRE_SHOW_TITLE}</h2>
+              </div>
+            ) : (
               <Link
                 href={selected.href}
                 target={selected.external ? '_blank' : undefined}
                 rel={selected.external ? 'noopener noreferrer' : undefined}
-                className="cinema-project-link"
+                className="cinema-selected-title-link"
               >
-                {selected.external ? 'Watch project' : 'Project details'} <span aria-hidden="true">↗</span>
+                <h2>{selected.title}</h2>
               </Link>
+            )}
+            {!showingPreShow ? <p className="cinema-credit-line">{selected.creditLabel}</p> : null}
+            <div className="cinema-selected-actions">
+              <button
+                ref={playButtonRef}
+                type="button"
+                onClick={() => {
+                  if (showingPreShow) {
+                    void togglePreShow()
+                    return
+                  }
+                  if (playing) pauseAndBrowse()
+                  else void play()
+                }}
+                disabled={!ready}
+                className="cinema-play-button"
+              >
+                <span aria-hidden="true">{playing ? 'Ⅱ' : '▶'}</span>
+                {ready
+                  ? showingPreShow
+                    ? (playing ? 'Pause pre-show' : 'Play pre-show')
+                    : (playing ? 'Pause screening' : 'Play in theater')
+                  : showingPreShow
+                    ? 'Loading pre-show'
+                    : 'Loading theater'}
+              </button>
+              {!showingPreShow && (
+                <button
+                  type="button"
+                  className="cinema-sound-button"
+                  onClick={() => setMuted((value) => !value)}
+                  aria-label={muted ? 'Turn cinema sound on' : 'Mute cinema'}
+                >
+                  <svg aria-hidden="true" viewBox="0 0 18 18">
+                    <path d="M2 7h3l4-3v10l-4-3H2V7Z" fill="currentColor" />
+                    {muted ? (
+                      <path d="m12 6 4 6m0-6-4 6" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+                    ) : (
+                      <path d="M12 6.2c1.4 1.4 1.4 4.2 0 5.6m2-7.6c2.5 2.5 2.5 7.1 0 9.6" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
+                    )}
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
 
@@ -664,14 +881,10 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
                     }}
                     type="button"
                     className="cinema-film-card"
-                    aria-pressed={project.slug === selected.slug}
+                    aria-pressed={!showingPreShow && project.slug === selected.slug}
                     aria-describedby={`cinema-summary-${project.slug}`}
-                    onClick={() => selectProject(project)}
-                    onDoubleClick={() => {
-                      void play()
-                    }}
+                    onClick={() => launchProject(project)}
                     onKeyDown={(event) => handleRailKeyDown(event, index)}
-                    title={`Double-click ${project.title} to play it in the theater`}
                   >
                     <span className="cinema-film-thumb">
                       <Image
@@ -686,35 +899,11 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
                     <span className="cinema-film-title">{project.title}</span>
                   </button>
                   <span id={`cinema-summary-${project.slug}`} className="sr-only">
-                    {project.summary}
+                    {project.creditLabel}. {project.summary}
                   </span>
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div className="cinema-transport" aria-label="Cinema controls">
-            <span>{formatTime(currentTime)}</span>
-            <input
-              className="cinema-progress"
-              type="range"
-              min="0"
-              max={duration || 0}
-              step="0.01"
-              value={Math.min(currentTime, duration || 0)}
-              onChange={(event) => seek(Number(event.currentTarget.value))}
-              onInput={(event) => seek(Number(event.currentTarget.value))}
-              disabled={!ready}
-              aria-label={`Seek ${selected.title}`}
-              style={{ '--cinema-progress': `${progress}%` } as CSSProperties}
-            />
-            <span>{formatTime(duration)}</span>
-            <button type="button" onClick={() => setMuted((value) => !value)} aria-label={muted ? 'Unmute cinema' : 'Mute cinema'}>
-              {muted ? 'Muted' : 'Sound'}
-            </button>
-            <button type="button" onClick={toggleFullscreen}>
-              {isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-            </button>
           </div>
         </div>
       </div>
@@ -738,8 +927,10 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
           type="button"
           className="cinema-fullscreen-return"
           onClick={toggleFullscreen}
+          disabled={!fullscreenAvailable}
           tabIndex={chromeHidden ? 0 : -1}
           aria-label={isFullscreen ? 'Exit full screen' : 'Full screen'}
+          title={fullscreenAvailable ? 'Watch the film full screen' : 'Available while the film is on screen'}
         >
           <span aria-hidden="true">{isFullscreen ? '↙' : '⛶'}</span>
           {isFullscreen ? 'Exit full screen' : 'Full screen'}
@@ -747,7 +938,9 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       </div>
 
       <p className="sr-only" aria-live="polite">
-        {error || (playing ? `${selected.title} is playing` : `${selected.title} is selected`)}
+        {error || (showingPreShow
+          ? (playing ? 'Silent VibeShack pre-show is playing' : 'VibeShack pre-show is ready')
+          : (playing ? `${selected.title} is playing` : `${selected.title} is selected`))}
       </p>
       {error && <p className="cinema-error" role="alert">{error}</p>}
     </div>

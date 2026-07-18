@@ -20,10 +20,16 @@ type CinemaRuntimeTheaterProps = {
   src: string
   title: string
   muted: boolean
+  autoPlay?: boolean
+  loop?: boolean
+  poster?: string
+  preload?: VideoHTMLAttributes<HTMLVideoElement>['preload']
   screenFit: 'contain' | 'cover'
   screenPosition: { x: number; y: number }
+  screenBackdrop: 'ambient' | 'black'
   screeningActive: boolean
   ending: boolean
+  filmFullscreen: boolean
   onCanPlay: NonNullable<VideoHTMLAttributes<HTMLVideoElement>['onCanPlay']>
   onLoadedMetadata: NonNullable<VideoHTMLAttributes<HTMLVideoElement>['onLoadedMetadata']>
   onPlay: NonNullable<VideoHTMLAttributes<HTMLVideoElement>['onPlay']>
@@ -136,10 +142,16 @@ export const CinemaRuntimeTheater = forwardRef<HTMLVideoElement, CinemaRuntimeTh
       src,
       title,
       muted,
+      autoPlay = false,
+      loop = false,
+      poster,
+      preload = 'metadata',
       screenFit,
       screenPosition,
+      screenBackdrop,
       screeningActive,
       ending,
+      filmFullscreen,
       onCanPlay,
       onLoadedMetadata,
       onPlay,
@@ -182,7 +194,11 @@ export const CinemaRuntimeTheater = forwardRef<HTMLVideoElement, CinemaRuntimeTh
       const sampleFrame = () => {
         if (!screeningActive || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return
         try {
-          drawPresentedVideo(fillContext, video, 'cover', screenPosition)
+          if (screenBackdrop === 'ambient') {
+            drawPresentedVideo(fillContext, video, 'cover', screenPosition)
+          } else {
+            fillContext.clearRect(0, 0, fillCanvas.width, fillCanvas.height)
+          }
           if (!drawPresentedVideo(sampleContext, video, screenFit, screenPosition)) return
           const pixels = sampleContext.getImageData(
             0,
@@ -254,7 +270,7 @@ export const CinemaRuntimeTheater = forwardRef<HTMLVideoElement, CinemaRuntimeTh
         }
         if (animationFrameId !== null) cancelAnimationFrame(animationFrameId)
       }
-    }, [screenFit, screenPosition, screeningActive, src])
+    }, [screenBackdrop, screenFit, screenPosition, screeningActive, src])
 
     const positionStyle = {
       '--cinema-screen-position': `${screenPosition.x * 100}% ${screenPosition.y * 100}%`,
@@ -263,7 +279,7 @@ export const CinemaRuntimeTheater = forwardRef<HTMLVideoElement, CinemaRuntimeTh
     return (
       <div
         className={`cinema-runtime-stage ${screeningActive ? 'is-screening-active' : ''} ${ending ? 'is-ending' : ''}`}
-        aria-hidden="true"
+        aria-hidden={filmFullscreen ? undefined : true}
       >
         <Image
           className="cinema-runtime-plate cinema-runtime-idle"
@@ -287,7 +303,7 @@ export const CinemaRuntimeTheater = forwardRef<HTMLVideoElement, CinemaRuntimeTh
           <div className="cinema-runtime-screen" style={positionStyle}>
             <canvas
               ref={fillCanvasRef}
-              className={`cinema-runtime-screen-fill ${screenFit === 'contain' ? 'is-visible' : ''}`}
+              className={`cinema-runtime-screen-fill ${screenFit === 'contain' && screenBackdrop === 'ambient' ? 'is-visible' : ''}`}
               width="840"
               height="352"
             />
@@ -297,7 +313,10 @@ export const CinemaRuntimeTheater = forwardRef<HTMLVideoElement, CinemaRuntimeTh
               data-screen-fit={screenFit}
               crossOrigin="anonymous"
               src={src}
-              preload="metadata"
+              autoPlay={autoPlay}
+              loop={loop}
+              poster={poster}
+              preload={preload}
               playsInline
               muted={muted}
               onCanPlay={onCanPlay}

@@ -155,7 +155,7 @@ const STUDIO_GROUPS = [
 function getQuestionText(currentQ: number, answers: Record<string, string>) {
   if (currentQ === 1 && answers.format === 'podcast') return 'How many people on camera?'
   if (currentQ === 1 && (answers.format === 'photo' || answers.format === 'greenscreen')) return 'How large is your production?'
-  if (currentQ === 2 && answers.format === 'podcast') return 'Do you want VibeShack to run the recording?'
+  if (currentQ === 2 && answers.format === 'podcast') return 'Are you bringing your own crew?'
   if (currentQ === 2 && answers.format === 'photo') return 'Are you bringing your own photographer or crew?'
   if (currentQ === 2 && answers.format === 'greenscreen') return 'Are you bringing your own production crew?'
   return QUESTIONS[currentQ].question

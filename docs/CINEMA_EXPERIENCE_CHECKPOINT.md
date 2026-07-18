@@ -38,7 +38,8 @@ image. Exiting returns to the theater at the same program moment and preserves
 whether playback was running or paused. The 17 runtime titles use the same
 source video element in both views, so no media handoff occurs. Body Is Tea
 uses a dedicated film-only H.264/AAC source with an exact three-second mapping
-to its Blender-integrated theater timeline.
+to its Blender-integrated theater timeline. Playback failures use a quiet,
+borderless status message rather than a red outlined alert box.
 
 The twenty response families prevent bright skies or upper-frame graphics from
 being applied equally to the seats. Ceiling, stage, glossy leather, front-seat,
@@ -54,6 +55,15 @@ review uses ignored symlinks under:
 ```text
 public/studio-videos/cinema/full-v017/
 ```
+
+The Client local review source now begins at the first actual film frame. The
+yellow 48 Hour Film Competition slate ended at source time 4.963 seconds, and
+the film begins on the I-frame at 5.005 seconds. The original 307.029-second
+master remains unchanged. A stream-copy derivative was created at
+`/Volumes/Osmo Card/VibeShack Cinema Sources v017/web/the-client-no-slate-v018.mp4`,
+and the ignored `full-v017/the-client.mp4` symlink targets that 302.037-second
+derivative for both theater and film-only full-screen playback. Its SHA-256 is
+`d01ca3116d4d320d343d16f370961eafef3e3068f10ac7344c87afc292377d11`.
 
 Production delivery still requires object storage or a CDN with byte-range and
 CORS support. The SD-card paths are a local review mechanism only.

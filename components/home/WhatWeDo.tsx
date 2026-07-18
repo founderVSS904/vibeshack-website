@@ -33,7 +33,7 @@ const offerings: Offering[] = [
   {
     number: '04',
     title: 'Studio Rentals',
-    body: 'Ten rooms from $100/hr, open 24/7.',
+    body: 'Nine rooms from $100/hr, open 24/7.',
     href: '/rental-studios/',
     cta: 'See rental rates',
   },

@@ -49,6 +49,11 @@ export default async function WorkProjectPage({ params }: PageProps) {
 
   const relatedProjects = allWorkProjects.filter((item) => item.slug !== project.slug).slice(0, 3)
   const watchUrl = project.youtubeId ? `https://www.youtube.com/watch?v=${project.youtubeId}` : null
+  const associatedPartyLabel = project.relationship === 'original'
+    ? 'Artist / Subject'
+    : project.relationship === 'collaboration'
+      ? 'Collaborator'
+      : 'Client'
   const breadcrumbs = breadcrumbSchema([
     { name: 'VibeShack Studios', url: absoluteUrl('/') },
     { name: 'Our Work', url: absoluteUrl('/our-work/') },
@@ -144,7 +149,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
         <section className="border-y border-white/10">
           <div className="mx-auto grid max-w-[1680px] grid-cols-1 divide-y divide-white/10 px-6 sm:px-10 md:grid-cols-3 md:divide-x md:divide-y-0 lg:px-16">
             {[
-              ['Client', project.client],
+              [associatedPartyLabel, project.client],
               ['Format', project.categoryLabel],
               ['Year', project.year],
             ].map(([label, value]) => (

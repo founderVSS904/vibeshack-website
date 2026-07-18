@@ -30,7 +30,7 @@ const studios: PodcastSet[] = [
     thumb: '/studio-images/the-executive-hero.jpg',
     series: 'Walnut Series',
     category: 'podcast',
-    line: 'A walnut boardroom table, balanced sightlines, and a composed frame for founder interviews and branded conversations.',
+    line: 'A walnut boardroom set for founder interviews and branded shows.',
     bestFor: 'Founder interviews, executive conversations, and branded shows with a composed editorial look.',
     price: '$300/hr',
     specs: ['Boardroom table', 'Wood slat wall', '3-camera ready'],
@@ -46,7 +46,7 @@ const studios: PodcastSet[] = [
     thumb: '/studio-images/the-wing-hero.jpg',
     series: 'Walnut Series',
     category: 'podcast',
-    line: 'Warm leather, close eyelines, and a tighter frame for two-person shows that should feel personal.',
+    line: 'Warm leather and close eyelines for personal two-person shows.',
     bestFor: 'Two-person podcasts, close interviews, and conversations that should feel warm and direct.',
     price: '$300/hr',
     specs: ['Two-person set', 'Warm leather seating', 'Broadcast audio'],
@@ -62,7 +62,7 @@ const studios: PodcastSet[] = [
     thumb: '/studio-images/encore-thumbnail-v1775092451.jpg',
     series: 'Vault Series',
     category: 'podcast',
-    line: 'A clean white backdrop inside a fully treated studio, with simple sightlines that keep attention on the conversation.',
+    line: 'A clean white backdrop that keeps focus on the conversation.',
     bestFor: 'Clean interviews, direct-to-camera episodes, and shows that need a neutral visual system.',
     price: '$300/hr',
     specs: ['Acoustic treatment', 'Clean white backdrop', 'Direct interview angles'],
@@ -74,11 +74,11 @@ const studios: PodcastSet[] = [
     fullName: 'Sunset',
     href: '/sunset-studio/',
     bookHref: '/book/?studio=sunset',
-    img: '/studio-images/sunset-studio-thumbnail.jpg',
-    thumb: '/studio-images/sunset-studio-thumbnail.jpg',
+    img: '/studio-images/sunset-studio-enhanced-4k-v20260718.jpg',
+    thumb: '/studio-images/sunset-thumbnail-angle-v20260718.jpg',
     series: 'Creative Series',
     category: 'podcast',
-    line: 'Programmable color turns the backdrop into part of the show, from restrained brand tones to saturated creator looks.',
+    line: 'Programmable color for creators and brands with a bold visual identity.',
     bestFor: 'Creator shows, social-first episodes, and formats with a strong color identity.',
     price: '$300/hr',
     specs: ['Programmable color', 'Creator set', 'Short-form friendly'],
@@ -94,7 +94,7 @@ const studios: PodcastSet[] = [
     thumb: '/studio-images/parlor-hero.jpg',
     series: 'Signature Series',
     category: 'signature',
-    line: 'Chesterfield seating and a relaxed lounge layout give longer conversations space to breathe.',
+    line: 'A relaxed Chesterfield lounge built for longer conversations.',
     bestFor: 'Long-form guest interviews, relaxed panels, and conversations with a more intimate pace.',
     price: '$400/hr',
     specs: ['Chesterfield seating', 'Signature lounge look', 'Crew options'],
@@ -110,7 +110,7 @@ const studios: PodcastSet[] = [
     thumb: '/studio-images/horizon-hero.jpg',
     series: 'Signature Series',
     category: 'signature',
-    line: 'A warm panoramic background and wide seating plan for conversations that need scale without losing intimacy.',
+    line: 'A panoramic set for wider, multi-person conversations.',
     bestFor: 'Premium guest shows, editorial conversations, and wider multi-person compositions.',
     price: '$400/hr',
     specs: ['Immersive wall', 'Warm sunset palette', 'Wide conversation setup'],
@@ -126,7 +126,7 @@ const studios: PodcastSet[] = [
     thumb: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg',
     series: 'Signature Series',
     category: 'signature',
-    line: 'Our largest podcast set, with a custom LED backdrop, cinema lighting, and space for full art direction.',
+    line: 'Our largest podcast set, ready for full art direction.',
     bestFor: 'Custom visual podcasts, larger productions, and shows that need a fully directed environment.',
     price: '$400/hr',
     specs: ['Custom LED backdrop', 'Cinema lighting', 'Large-format set'],
@@ -142,7 +142,7 @@ const studios: PodcastSet[] = [
     thumb: '/studio-images/canvas-rental-space-v20260509.jpg',
     series: 'Rental Studio',
     category: 'rental',
-    line: 'A white cyc and open production floor for photo work, product, music videos, interviews, and custom builds.',
+    line: 'A white cyc and open floor for photo, product, and video.',
     bestFor: 'Headshots, portraits, product, campaigns, custom sets, music videos, and days that need an open floor.',
     price: '$100/hr',
     specs: ['White cyc stage', 'Open production floor', 'Lighting available', 'Crew available'],
@@ -158,7 +158,7 @@ const studios: PodcastSet[] = [
     thumb: '/studio-images/inside-green-screen-v20260509.jpg',
     series: 'Rental Studio',
     category: 'rental',
-    line: 'A full green wall and floor for clean keying, virtual environments, product demos, and effects work.',
+    line: 'A full green wall and floor for virtual sets and effects.',
     bestFor: 'Compositing, virtual backgrounds, explainers, effects plates, and product demonstrations.',
     price: '$100/hr',
     specs: ['Full green wall', 'Green floor coverage', 'Lighting available', 'Crew available'],
@@ -168,28 +168,24 @@ const studios: PodcastSet[] = [
 
 const productionStack = [
   {
-    title: 'Three angles without the setup day.',
-    eyebrow: '3 Cameras',
-    body: 'Host, guest, and wide coverage are blocked before you arrive, giving the edit a natural rhythm from take one.',
-    img: '/studio-images/instagram-podcast-studio-cameras.jpg',
+    title: 'Three angles, already framed.',
+    eyebrow: 'Multi-camera',
+    body: 'Host, guest, and wide angles are set before the first take.',
   },
   {
-    title: 'Audio that stays close and clear.',
-    eyebrow: 'Broadcast Audio',
-    body: 'Broadcast microphones, clean routing, and treated acoustics keep every voice consistent from the first minute to the last.',
-    img: '/studio-images/enhanced-executive-podcast-guest-closeup-v20260510.jpg',
+    title: 'Clear sound from minute one.',
+    eyebrow: 'Broadcast audio',
+    body: 'Broadcast microphones and routing keep every voice consistent.',
   },
   {
-    title: 'Lighting matched to the set.',
-    eyebrow: 'Look',
-    body: 'Every set has a lighting plan tuned for skin tone, background separation, and a look you can repeat next episode.',
-    img: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
+    title: 'A look that repeats.',
+    eyebrow: 'Set lighting',
+    body: 'Every set is lit for skin tone, depth, and repeatable episodes.',
   },
   {
-    title: 'Crew when the show needs hands.',
-    eyebrow: 'Crew Optional',
-    body: 'Run it yourself or add an operator for cameras, audio checks, and keeping the session moving.',
-    img: '/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg',
+    title: 'Crew when you need it.',
+    eyebrow: 'Operator optional',
+    body: 'Add an operator when you want cameras, sound, and timing handled.',
   },
 ]
 
@@ -305,42 +301,57 @@ export default function PodcastStudiosPage() {
           </div>
         </section>
 
-        <section className="px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
+        <section className="overflow-hidden px-6 py-24 sm:px-10 sm:py-32 lg:px-16">
           <div className="mx-auto max-w-7xl">
-            <div data-podcast-reveal className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(380px,0.9fr)] lg:items-start lg:gap-16">
-              <div className="lg:sticky lg:top-28">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg sm:aspect-[16/10]">
-                  <Image
-                    src="/studio-images/enhanced-vibeshack-bts-cyc-lighting-v20260510.jpg"
-                    alt="VibeShack production crew preparing a studio set"
-                    fill
-                    loading="lazy"
-                    quality={90}
-                    className="podcast-production-image object-cover"
-                    sizes="(min-width: 1024px) 56vw, 100vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-                </div>
-              </div>
-
+            <div data-podcast-reveal className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-end lg:gap-20">
               <div>
                 <p className="number-label mb-6">Production built in</p>
-                <h2 className="brand-sans text-4xl font-semibold leading-tight text-white sm:text-6xl">
-                  Walk in ready to record.
+                <h2 className="brand-sans max-w-2xl text-4xl font-semibold leading-tight text-white sm:text-6xl">
+                  Arrive. Sit down. Record.
                 </h2>
-                <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/55">
-                  The camera positions, audio path, and lighting logic are already part of the room. Add an operator when the session needs hands.
-                </p>
-                <div className="mt-10 divide-y divide-white/10 border-y border-white/10">
-                  {productionStack.map((item, index) => (
-                    <div key={item.title} data-podcast-reveal data-delay={String(index * 70)} className="py-7">
-                      <p className="text-xs font-semibold text-brand-red">{item.eyebrow}</p>
-                      <h3 className="brand-sans mt-3 text-2xl font-semibold leading-tight text-white">{item.title}</h3>
-                      <p className="mt-3 text-sm leading-relaxed text-white/45 sm:text-base">{item.body}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
+              <div className="lg:pb-2">
+                <p className="max-w-xl text-base leading-relaxed text-white/55 sm:text-lg">
+                  Every podcast set is pre-lit, wired, and ready for a multi-camera session. Choose the room, bring the conversation, and start on time.
+                </p>
+                <Link href="/book/?service=podcast" prefetch={false} className="mt-7 inline-flex min-h-12 items-center justify-center rounded-lg bg-brand-red px-6 font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-white transition-colors hover:bg-red-700">
+                  Book a podcast session
+                </Link>
+              </div>
+            </div>
+
+            <div data-podcast-reveal className="relative mt-14 aspect-[4/3] overflow-hidden rounded-lg sm:aspect-[16/9] lg:mt-16 lg:aspect-[16/7]">
+              <Image
+                src="/studio-images/enhanced-canvas-podcast-warm-panel-wide-v20260510.jpg"
+                alt="Three guests recording a podcast in a warm VibeShack studio set"
+                fill
+                loading="lazy"
+                quality={90}
+                className="podcast-production-image object-cover"
+                style={{ objectPosition: 'center 50%' }}
+                sizes="(min-width: 1280px) 1152px, 100vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/5" />
+              <p className="absolute bottom-5 left-5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-white/70 sm:bottom-7 sm:left-7 sm:text-[10px]">
+                Live podcast setup / Canvas
+              </p>
+            </div>
+
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4">
+              {productionStack.map((item, index) => (
+                <div
+                  key={item.title}
+                  data-podcast-reveal
+                  data-delay={String(index * 70)}
+                  className="border-t border-white/10 py-7 sm:pr-8 lg:px-7 lg:first:pl-0 lg:last:pr-0"
+                >
+                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-brand-red">
+                    {String(index + 1).padStart(2, '0')} / {item.eyebrow}
+                  </p>
+                  <h3 className="brand-sans mt-4 text-xl font-semibold leading-tight text-white">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-white/45">{item.body}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

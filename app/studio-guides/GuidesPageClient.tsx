@@ -113,7 +113,7 @@ export default function GuidesPageClient() {
           {/* The one object. The 40px above it is what makes it the focal point. */}
           <form
             role="search"
-            className="mx-auto mt-10 flex max-w-[560px] items-center gap-3 rounded-full border border-white/15 bg-white/[0.04] py-2 pl-6 pr-2 transition-colors duration-200 hover:border-white/25 focus-within:border-brand-red/60 focus-within:ring-2 focus-within:ring-brand-red/50"
+            className="mx-auto mt-10 flex max-w-[560px] items-center gap-3 rounded-sm border border-white/15 bg-white/[0.04] py-2 pl-6 pr-2 transition-colors duration-200 hover:border-white/25 focus-within:border-brand-red/60 focus-within:ring-2 focus-within:ring-brand-red/50"
             onSubmit={(e) => {
               e.preventDefault()
               goToLibrary()
@@ -125,7 +125,7 @@ export default function GuidesPageClient() {
             </svg>
             <label htmlFor="guide-search" className="sr-only">Search the guides</label>
             {/* focus:shadow-none beats the global input:focus red glow, which would
-                otherwise paint a rectangle inside the pill. appearance-none stops
+                otherwise paint a rectangle inside the field. appearance-none stops
                 Safari's search field forcing a min width that blows out the row. */}
             <input
               id="guide-search"
@@ -159,7 +159,7 @@ export default function GuidesPageClient() {
                   setTab(chip.tab)
                   goToLibrary()
                 }}
-                className="rounded-full border border-white/10 px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors duration-200 hover:border-white/40 hover:text-white"
+                className="rounded-sm border border-white/10 px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors duration-200 hover:border-white/40 hover:text-white"
               >
                 {chip.label}
               </button>

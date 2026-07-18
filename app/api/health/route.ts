@@ -5,13 +5,18 @@ export const dynamic = 'force-dynamic'
 const REQUIRED_ENV_VARS = [
   'STRIPE_SECRET_KEY',
   'STRIPE_WEBHOOK_SECRET',
-  'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY',
   'GMAIL_APP_PASSWORD',
   'CRON_SECRET',
 ]
 
 function missingEnvVars() {
   const missing = REQUIRED_ENV_VARS.filter((name) => !process.env[name])
+  const hasStripePublishableKey = Boolean(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY,
+  )
+  if (!hasStripePublishableKey) {
+    missing.push('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY|STRIPE_PUBLISHABLE_KEY')
+  }
   const hasCalendarToken = Boolean(
     process.env.GCAL_TOKEN_JSON || process.env.GCAL_TOKEN_B64 || process.env.GCAL_TOKEN_PATH,
   )

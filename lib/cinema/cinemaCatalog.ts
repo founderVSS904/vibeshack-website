@@ -1,4 +1,5 @@
 import { allWorkProjects, shotAtVibeshack } from '@/lib/seo/workProjects'
+import type { WorkRelationship } from '@/lib/seo/workProjects'
 
 export type CinemaProject = {
   slug: string
@@ -6,6 +7,8 @@ export type CinemaProject = {
   client: string
   category: string
   categoryLabel: string
+  relationship: WorkRelationship
+  creditLabel: string
   summary: string
   image: string
   alt: string
@@ -19,6 +22,7 @@ export type CinemaProject = {
   displayPosition?: 'center' | 'center bottom'
   screenFit?: 'contain' | 'cover'
   screenPosition?: { x: number; y: number }
+  screenBackdrop?: 'ambient' | 'black'
   href: string
   external: boolean
 }
@@ -27,18 +31,26 @@ const fullCinemaSrc = (slug: string) => `/studio-videos/cinema/full-v017/${slug}
 
 const screenPresentation: Record<
   string,
-  Pick<CinemaProject, 'screenFit' | 'screenPosition'>
+  Pick<CinemaProject, 'screenFit' | 'screenPosition'> & Pick<CinemaProject, 'screenBackdrop'>
 > = {
-  'the-buzzer': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
+  'the-buzzer': {
+    screenFit: 'contain',
+    screenPosition: { x: 0.5, y: 0.5 },
+    screenBackdrop: 'black',
+  },
   'wing-battle': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
-  'damian-stone': { screenFit: 'cover', screenPosition: { x: 0.5, y: 0.5 } },
-  'damian-stone-feature': { screenFit: 'cover', screenPosition: { x: 0.5, y: 0.45 } },
-  'evil-eye': { screenFit: 'cover', screenPosition: { x: 0.5, y: 0.5 } },
+  'damian-stone': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
+  'damian-stone-feature': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
+  'evil-eye': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
   chilled: { screenFit: 'cover', screenPosition: { x: 0.5, y: 0.5 } },
-  'the-client': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
-  'note-to-self': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
+  'the-client': {
+    screenFit: 'contain',
+    screenPosition: { x: 0.5, y: 0.5 },
+    screenBackdrop: 'black',
+  },
+  'note-to-self': { screenFit: 'cover', screenPosition: { x: 0.5, y: 0.5 } },
   'the-giver': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
-  betrayed: { screenFit: 'cover', screenPosition: { x: 0.5, y: 0.5 } },
+  betrayed: { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
   unpaused: { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
   'second-nature': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
   'vegas-veteran-voices': { screenFit: 'contain', screenPosition: { x: 0.5, y: 0.5 } },
@@ -63,6 +75,7 @@ const cinemaPresentationOverrides: Partial<
         | 'displayPosition'
         | 'screenFit'
         | 'screenPosition'
+        | 'screenBackdrop'
       >
     >
   >
@@ -84,6 +97,8 @@ const portfolioProjects: CinemaProject[] = allWorkProjects.map((project) => ({
   client: project.client,
   category: project.category,
   categoryLabel: project.categoryLabel,
+  relationship: project.relationship,
+  creditLabel: project.creditLabel,
   summary: project.summary,
   image: project.image,
   alt: project.alt,
@@ -117,8 +132,10 @@ const studioProjects: CinemaProject[] = shotAtVibeshack.map((project) => {
     slug: identity.slug,
     title: project.title,
     client: identity.client,
-    category: 'shot-at-vibeshack',
-    categoryLabel: 'Shot at VibeShack',
+    category: project.relationship === 'collaboration' ? 'collaboration' : 'shot-at-vibeshack',
+    categoryLabel: project.relationship === 'collaboration' ? 'Production Collaboration' : 'Shot at VibeShack',
+    relationship: project.relationship,
+    creditLabel: project.creditLabel,
     summary: project.detail,
     image: project.image,
     alt: project.alt,
@@ -136,7 +153,41 @@ const studioProjects: CinemaProject[] = shotAtVibeshack.map((project) => {
   }
 })
 
+const cinemaProjectOrder = [
+  'body-is-tea',
+  'damian-stone',
+  'damian-stone-feature',
+  'evil-eye',
+  'chilled',
+  'the-client',
+  'note-to-self',
+  'the-giver',
+  'betrayed',
+  'gavriella',
+  'the-buzzer',
+  'wing-battle',
+  'unpaused',
+  'second-nature',
+  'vegas-veteran-voices',
+  'scott-stephenson-ai-show',
+  'jason-tartick',
+  'varii-ballin-out',
+] as const
+
+const cinemaProjectRank = new Map<string, number>(
+  cinemaProjectOrder.map((slug, index) => [slug, index]),
+)
+
 export const cinemaProjects: CinemaProject[] = [...portfolioProjects, ...studioProjects]
+  .sort((left, right) => (
+    (cinemaProjectRank.get(left.slug) ?? Number.MAX_SAFE_INTEGER)
+    - (cinemaProjectRank.get(right.slug) ?? Number.MAX_SAFE_INTEGER)
+  ))
+
+const unorderedCinemaProject = cinemaProjects.find((project) => !cinemaProjectRank.has(project.slug))
+if (unorderedCinemaProject || cinemaProjectOrder.length !== cinemaProjects.length) {
+  throw new Error(`Cinema project order is incomplete${unorderedCinemaProject ? `: ${unorderedCinemaProject.slug}` : ''}`)
+}
 
 const uniqueSlugs = new Set(cinemaProjects.map((project) => project.slug))
 if (uniqueSlugs.size !== cinemaProjects.length) {

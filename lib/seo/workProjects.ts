@@ -5,11 +5,15 @@ export type WorkCategorySlug =
   | 'sports'
   | 'events'
 
+export type WorkRelationship = 'original' | 'collaboration' | 'client'
+
 export type WorkProject = {
   slug: string
   title: string
   category: WorkCategorySlug
   categoryLabel: string
+  relationship: WorkRelationship
+  creditLabel: string
   client: string
   image: string
   // Sized-down variant for the native <video poster> attribute.
@@ -31,6 +35,8 @@ export type WorkProject = {
 export type ShotAtVibeshackItem = {
   title: string
   detail: string
+  relationship: WorkRelationship
+  creditLabel: string
   youtubeId: string
   image: string
   alt: string
@@ -43,6 +49,8 @@ export const featuredWorkProject: WorkProject = {
   title: 'Body Is Tea',
   category: 'music-videos',
   categoryLabel: 'Music Video',
+  relationship: 'original',
+  creditLabel: 'VibeShack Original',
   client: 'Varii x Josh Sidhu',
   image: '/studio-images/work-body-is-tea-dancers-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-body-is-tea-v20260716.mp4',
@@ -53,7 +61,7 @@ export const featuredWorkProject: WorkProject = {
   serviceHref: '/video-production/',
   summary:
     'A summer-soaked music video for Varii and Josh Sidhu: lowriders, dancers, and golden-hour driveways, presented by VibeShack Studios.',
-  credits: ['Presented by VibeShack Studios', 'Directed by Gill'],
+  credits: ['A VibeShack Original', 'Directed by Gill'],
 }
 
 export const workProjects: WorkProject[] = [
@@ -62,6 +70,8 @@ export const workProjects: WorkProject[] = [
     title: 'The Buzzer',
     category: 'series',
     categoryLabel: 'Series',
+    relationship: 'client',
+    creditLabel: 'Filmed by VibeShack',
     client: 'Silicon Mania',
     image: '/studio-images/work-the-buzzer-set-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-the-buzzer-v20260716.mp4',
@@ -71,13 +81,15 @@ export const workProjects: WorkProject[] = [
     serviceHref: '/video-production/',
       summary:
       'A pitch show where founders pitch real investors, and the investors hold a buzzer that can end the meeting. Shot on a clean white set at VibeShack.',
-    credits: ['A Silicon Mania production', 'Shot at VibeShack Studios'],
+    credits: ['A Silicon Mania production', 'Filmed by VibeShack Studios'],
   },
   {
     slug: 'wing-battle',
     title: 'Wing Battle',
     category: 'events',
     categoryLabel: 'Event Film',
+    relationship: 'client',
+    creditLabel: 'Post-production by VibeShack',
     client: "Melinda's Foods",
     image: '/studio-images/work-wing-battle-toast-v20260717.jpg',
     hoverClip: '/studio-videos/work-hover-wing-battle-v20260717.mp4',
@@ -85,15 +97,17 @@ export const workProjects: WorkProject[] = [
     year: '2025',
     youtubeId: 'tX5nk9EEBHs',
     serviceHref: '/video-production/',
-      summary:
-      "Event coverage of Melinda's Hot Sauce Wing Battle in Hayward, CA: pit smoke, hot sauce, competitors, and the crown.",
-    credits: ["A Melinda's Hot Sauce event", 'Filmed in Hayward, CA'],
+    summary:
+      "Post-production for Melinda's Hot Sauce Wing Battle in Hayward, CA, shaping pit smoke, hot sauce, competitors, and the crown into the final event film.",
+    credits: ['Post-production by VibeShack Studios', "A Melinda's Hot Sauce event"],
   },
   {
     slug: 'damian-stone',
     title: 'Damian Stone',
     category: 'sports',
     categoryLabel: 'Sports Film',
+    relationship: 'original',
+    creditLabel: 'VibeShack Original',
     client: 'Oakland Ballers',
     image: '/studio-images/work-damian-stone-gloves-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-damian-stone-v20260716.mp4',
@@ -103,13 +117,15 @@ export const workProjects: WorkProject[] = [
     serviceHref: '/video-production/',
       summary:
       'A hype film for Oakland Ballers pitcher Damian Stone: pre-game ritual and locker-room texture, shot for game-day focus.',
-    credits: ['For the Oakland Ballers'],
+    credits: ['A VibeShack Original', 'Featuring Damian Stone of the Oakland Ballers'],
   },
   {
     slug: 'damian-stone-feature',
     title: 'Damian Stone: Player Feature',
     category: 'sports',
     categoryLabel: 'Player Feature',
+    relationship: 'original',
+    creditLabel: 'VibeShack Original',
     client: 'Oakland Ballers',
     image: '/studio-images/work-damian-stone-feature-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-damian-stone-feature-v20260716.mp4',
@@ -119,13 +135,15 @@ export const workProjects: WorkProject[] = [
     serviceHref: '/video-production/',
       summary:
       'A sit-down player feature with Oakland Ballers pitcher Damian Stone, cut between the interview chair and the ballpark.',
-    credits: ['Directed by Akar', 'For the Oakland Ballers'],
+    credits: ['A VibeShack Original', 'Directed by Akar', 'Featuring Damian Stone of the Oakland Ballers'],
   },
   {
     slug: 'evil-eye',
     title: 'Evil Eye',
     category: 'music-videos',
     categoryLabel: 'Music Video',
+    relationship: 'original',
+    creditLabel: 'VibeShack Original',
     client: 'Varii',
     image: '/studio-images/work-evil-eye-hummer-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-evil-eye-v20260716.mp4',
@@ -135,13 +153,15 @@ export const workProjects: WorkProject[] = [
     serviceHref: '/video-production/',
       summary:
       'Varii at night: a white Hummer under hard light, with red typography cut over the San Francisco skyline.',
-    credits: ['Presented by VibeShack', 'Night exteriors across San Francisco'],
+    credits: ['A VibeShack Original', 'Night exteriors across San Francisco'],
   },
   {
     slug: 'chilled',
     title: 'Chilled',
     category: 'music-videos',
     categoryLabel: 'Music Video',
+    relationship: 'original',
+    creditLabel: 'VibeShack Original',
     client: 'TeYo',
     image: '/studio-images/work-chilled-teyo-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-chilled-v20260716.mp4',
@@ -151,13 +171,15 @@ export const workProjects: WorkProject[] = [
     serviceHref: '/video-production/',
     summary:
       'A night-drifting music video for TeYo: rooftop couches above a foggy skyline, empty streets, and a city cooling down after dark.',
-    credits: ['A VibeShack Studios production with Opale and Zen Studios', 'Directed by Eden Moshe'],
+    credits: ['A VibeShack Original', 'Produced with Opale and Zen Studios', 'Directed by Eden Moshe'],
   },
   {
     slug: 'the-client',
     title: 'The Client',
     category: 'films',
     categoryLabel: 'Short Film',
+    relationship: 'original',
+    creditLabel: 'VibeShack Original',
     client: 'The Babysitters',
     image: '/studio-images/work-the-client-bar-v20260716.jpg',
     poster: '/studio-images/poster-work-the-client-bar-v20260716.jpg',
@@ -169,13 +191,15 @@ export const workProjects: WorkProject[] = [
     serviceHref: '/video-production/',
     summary:
       'An action short made for the SF 48 Hour Film Competition: a client, a fixer, and a card reading in a neon-lit bar. Part of The Babysitters.',
-    credits: ['A VibeShack Studios film', 'Directed by Tay and Victor Li', 'Cinematography by Kylan Philipina and Breton'],
+    credits: ['A VibeShack Original', 'Directed by Tay and Victor Li', 'Cinematography by Kylan Philipina and Breton'],
   },
   {
     slug: 'note-to-self',
     title: 'Note To Self',
     category: 'music-videos',
     categoryLabel: 'Visualizer',
+    relationship: 'original',
+    creditLabel: 'VibeShack Original',
     client: '97Shadd',
     image: '/studio-images/work-note-to-self-desk-v20260716.jpg',
     alt: '97Shadd at a desk under green and red neon in the Note To Self video',
@@ -185,13 +209,15 @@ export const workProjects: WorkProject[] = [
     serviceHref: '/video-production/',
     summary:
       "A neon studio session for 97Shadd's Note To Self: one desk, one late night, and the route out written across the frame.",
-    credits: ['Directed and shot by Tay', 'Creative agency: VibeShack Studios', 'Edited by Erevnaa'],
+    credits: ['A VibeShack Original', 'Directed and shot by Tay', 'Edited by Erevnaa'],
   },
   {
     slug: 'the-giver',
     title: 'The Giver',
     category: 'music-videos',
     categoryLabel: 'Music Video',
+    relationship: 'original',
+    creditLabel: 'VibeShack Original',
     client: '97Shadd',
     image: '/studio-images/work-the-giver-portrait-v20260716.jpg',
     poster: '/studio-images/poster-work-the-giver-portrait-v20260716.jpg',
@@ -202,13 +228,15 @@ export const workProjects: WorkProject[] = [
     serviceHref: '/video-production/',
     summary:
       'A music video for the Note To Self outro: a lone figure on a projected stage, planes on the runway, and the words carrying the weight.',
-    credits: ['A VibeShack Studios production', 'Music video for the Note To Self EP'],
+    credits: ['A VibeShack Original', 'Music video for the Note To Self EP'],
   },
   {
     slug: 'betrayed',
     title: 'Betrayed',
     category: 'music-videos',
     categoryLabel: 'Visualizer',
+    relationship: 'original',
+    creditLabel: 'VibeShack Original',
     client: 'Varii',
     image: '/studio-images/work-betrayed-rider-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-betrayed-v20260716.mp4',
@@ -218,7 +246,7 @@ export const workProjects: WorkProject[] = [
     serviceHref: '/video-production/',
       summary:
       'A moody motorcycle visualizer for Varii, shot at night on San Francisco streets in teal and sodium light.',
-    credits: ['Directed by Gill'],
+    credits: ['A VibeShack Original', 'Directed by Gill'],
   },
 ]
 
@@ -228,11 +256,13 @@ export function getWorkProject(slug: string) {
   return allWorkProjects.find((project) => project.slug === slug)
 }
 
-// Client shows and sessions filmed at VibeShack, linked straight to YouTube.
+// Additional client productions and collaborations, linked straight to YouTube.
 export const shotAtVibeshack: ShotAtVibeshackItem[] = [
   {
     title: 'unPAUSED',
     detail: 'Toxins, stress, and your hormones',
+    relationship: 'client',
+    creditLabel: 'Filmed by VibeShack',
     youtubeId: 'ReIQcS8L6Hs',
     image: '/studio-images/work-unpaused-haver-podcast-v20260708.jpg',
     hoverClip: '/studio-videos/work-hover-unpaused-v20260716.mp4',
@@ -242,6 +272,8 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
   {
     title: 'Second Nature',
     detail: 'The AI world has a human problem',
+    relationship: 'client',
+    creditLabel: 'Filmed by VibeShack',
     youtubeId: 'QMXrpJteBXA',
     image: '/studio-images/work-second-nature-set-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-second-nature-v20260716.mp4',
@@ -250,6 +282,8 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
   {
     title: 'Vegas Veteran Voices',
     detail: 'The man behind Terminal Lance',
+    relationship: 'client',
+    creditLabel: 'Filmed by VibeShack',
     youtubeId: 'E893IZTGmrQ',
     image: '/studio-images/work-vegas-veteran-voices-v20260709.jpg',
     hoverClip: '/studio-videos/work-hover-vegas-veteran-v20260716.mp4',
@@ -258,6 +292,8 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
   {
     title: 'Scott Stephenson AI Show',
     detail: 'Protecting your IP from AI training',
+    relationship: 'client',
+    creditLabel: 'Filmed by VibeShack',
     youtubeId: 'dKY24SpeYKo',
     image: '/studio-images/work-ai-show-host-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-ai-show-v20260716.mp4',
@@ -266,6 +302,8 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
   {
     title: 'Jason Tartick',
     detail: 'Ross Pomerantz, the BTS of Corporate Bro',
+    relationship: 'client',
+    creditLabel: 'Filmed by VibeShack',
     youtubeId: '4zd17_NxABw',
     image: '/studio-images/work-tartick-corporate-bro-v20260709.jpg',
     hoverClip: '/studio-videos/work-hover-jason-tartick-v20260716.mp4',
@@ -274,6 +312,8 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
   {
     title: 'Gavriella',
     detail: 'Supernova, official music video',
+    relationship: 'collaboration',
+    creditLabel: 'Co-produced by VibeShack',
     youtubeId: 'J4ZKUYv4JqY',
     image: '/studio-images/work-gavriella-tableau-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-gavriella-v20260716.mp4',
@@ -282,6 +322,8 @@ export const shotAtVibeshack: ShotAtVibeshackItem[] = [
   {
     title: 'Varii',
     detail: 'Ballin Out, official video',
+    relationship: 'client',
+    creditLabel: 'Filmed by VibeShack',
     youtubeId: '2nJD5lCXbuo',
     image: '/studio-images/work-ballin-out-court-v20260716.jpg',
     hoverClip: '/studio-videos/work-hover-ballin-out-v20260716.mp4',
