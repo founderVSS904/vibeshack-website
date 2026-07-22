@@ -45,9 +45,9 @@ export default function ContactPage() {
         <div className="relative mx-auto flex min-h-[720px] max-w-[1480px] flex-col justify-between px-6 pb-8 pt-36 sm:min-h-[780px] sm:px-10 sm:pb-10 sm:pt-40 lg:px-16">
           <div className="max-w-3xl pt-[8vh] sm:pt-[10vh]">
             <span className="mb-7 flex w-fit font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white/70">Contact / 950 Battery St</span>
-            <h1 className="max-w-4xl text-[clamp(3.6rem,8.7vw,8.6rem)] font-black leading-[0.84] tracking-[-0.055em] text-white">
+            <h1 className="max-w-4xl text-[clamp(2.9rem,6.1vw,6.4rem)] font-black leading-[0.92] tracking-[-0.045em] text-white">
               Tell us what<br />
-              <span className="text-brand-red">you&apos;re making.</span>
+              you&apos;re <span className="text-brand-red">making.</span>
             </h1>
             <p className="mt-7 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
               Studio bookings, tours, production questions, and project briefs.
