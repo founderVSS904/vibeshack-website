@@ -71,13 +71,13 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="grid max-w-3xl grid-cols-1 border-t border-white/20 sm:grid-cols-3">
+          <div className="mt-10 grid max-w-3xl grid-cols-1 border-t border-white/20 sm:mt-14 sm:grid-cols-3">
             {[
               ['Response', 'Same day'],
               ['Access', 'Studios open 24/7'],
               ['Location', '950 Battery St'],
             ].map(([label, value]) => (
-              <div key={label} className="border-b border-white/10 py-4 last:border-b-0 sm:border-b-0 sm:border-r sm:px-5 sm:first:pl-0 sm:last:border-r-0">
+              <div key={label} className="border-b border-white/10 py-5 last:border-b-0 sm:border-b-0 sm:border-r sm:px-7 sm:first:pl-0 sm:last:border-r-0">
                 <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-white/45">{label}</p>
                 <p className="mt-1 text-sm font-semibold text-white">{value}</p>
               </div>
