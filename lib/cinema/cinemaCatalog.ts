@@ -13,8 +13,11 @@ export type CinemaProject = {
   image: string
   alt: string
   objectPosition?: string
-  cinemaSrc: string
-  fullscreenSrc: string
+  cinemaSrc?: string
+  fullscreenSrc?: string
+  youtubeId?: string
+  playback: 'hosted' | 'youtube'
+  collection: 'podcasts' | 'creative-productions'
   fullscreenOffsetSeconds?: number
   cinemaPoster?: string
   cinemaMode: 'integrated' | 'runtime'
@@ -106,6 +109,8 @@ const portfolioProjects: CinemaProject[] = allWorkProjects.map((project) => ({
   objectPosition: project.objectPosition,
   cinemaSrc: fullCinemaSrc(project.slug),
   fullscreenSrc: fullCinemaSrc(project.slug),
+  playback: 'hosted',
+  collection: 'creative-productions',
   cinemaMode: 'runtime',
   ...(screenPresentation[project.slug] ?? {
     screenFit: 'contain' as const,
@@ -116,23 +121,12 @@ const portfolioProjects: CinemaProject[] = allWorkProjects.map((project) => ({
   ...(cinemaPresentationOverrides[project.slug] ?? {}),
 }))
 
-const shotAtIdentity: Record<string, { slug: string; client: string }> = {
-  ReIQcS8L6Hs: { slug: 'unpaused', client: 'unPAUSED' },
-  QMXrpJteBXA: { slug: 'second-nature', client: 'Second Nature' },
-  E893IZTGmrQ: { slug: 'vegas-veteran-voices', client: 'Vegas Veteran Voices' },
-  dKY24SpeYKo: { slug: 'scott-stephenson-ai-show', client: 'Scott Stephenson' },
-  '4zd17_NxABw': { slug: 'jason-tartick', client: 'Jason Tartick' },
-  J4ZKUYv4JqY: { slug: 'gavriella', client: 'Gavriella' },
-  '2nJD5lCXbuo': { slug: 'varii-ballin-out', client: 'Varii' },
-}
-
 const studioProjects: CinemaProject[] = shotAtVibeshack.map((project) => {
-  const identity = shotAtIdentity[project.youtubeId]
-  if (!identity) throw new Error(`Missing cinema identity for YouTube ${project.youtubeId}`)
+  const hosted = project.playback === 'hosted'
   return {
-    slug: identity.slug,
+    slug: project.slug,
     title: project.title,
-    client: identity.client,
+    client: project.client,
     category: project.relationship === 'collaboration' ? 'collaboration' : 'shot-at-vibeshack',
     categoryLabel: project.relationship === 'collaboration' ? 'Production Collaboration' : 'Shot at VibeShack',
     relationship: project.relationship,
@@ -141,16 +135,19 @@ const studioProjects: CinemaProject[] = shotAtVibeshack.map((project) => {
     image: project.image,
     alt: project.alt,
     objectPosition: project.objectPosition,
-    cinemaSrc: fullCinemaSrc(identity.slug),
-    fullscreenSrc: fullCinemaSrc(identity.slug),
+    cinemaSrc: hosted ? fullCinemaSrc(project.slug) : undefined,
+    fullscreenSrc: hosted ? fullCinemaSrc(project.slug) : undefined,
+    youtubeId: hosted ? undefined : project.youtubeId,
+    playback: project.playback,
+    collection: project.collection,
     cinemaMode: 'runtime',
-    ...(screenPresentation[identity.slug] ?? {
+    ...(screenPresentation[project.slug] ?? {
       screenFit: 'contain' as const,
       screenPosition: { x: 0.5, y: 0.5 },
     }),
     href: `https://www.youtube.com/watch?v=${project.youtubeId}`,
     external: true,
-    ...(cinemaPresentationOverrides[identity.slug] ?? {}),
+    ...(cinemaPresentationOverrides[project.slug] ?? {}),
   }
 })
 
@@ -167,6 +164,22 @@ const cinemaProjectOrder = [
   'gavriella',
   'the-buzzer',
   'wing-battle',
+  'pearl-sitdown-matt-cross',
+  'how-i-invest-trillion-company',
+  'beyond-tomorrow-agi-control',
+  'how-i-invest-future-venture-capital',
+  'due-diligence-open-source-ai',
+  'due-diligence-ai-agents',
+  'beyond-tomorrow-longevity-emergency',
+  'due-diligence-openai-data',
+  'unpaused-infertility-crisis',
+  'powerlaw-investor-roadshow',
+  'beyond-tomorrow-aging-disease',
+  'due-diligence-checks-on-vibes',
+  'beyond-tomorrow-death-engineering',
+  'beyond-tomorrow-cuba',
+  'second-nature-ai-conservation',
+  'second-nature-carbon-accounting',
   'unpaused',
   'second-nature',
   'vegas-veteran-voices',

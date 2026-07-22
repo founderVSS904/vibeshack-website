@@ -1,7 +1,48 @@
 export const BOOKING_TIME_ZONE = 'America/Los_Angeles'
-export const SLOT_DURATION_HOURS = 1
+export const SLOT_DURATION_MINUTES = 30
+export const SLOT_DURATION_HOURS = SLOT_DURATION_MINUTES / 60
+export const SLOT_DURATION_MS = SLOT_DURATION_MINUTES * 60 * 1000
+export const MIN_BOOKING_SLOTS = 2
+export const MAX_BOOKING_SLOTS = 16
 export const START_HOUR = 0
 export const END_HOUR = 24
+
+export function bookingHoursForSlotCount(slotCount: number) {
+  return slotCount * SLOT_DURATION_HOURS
+}
+
+export function bookingPriceCents(hourlyRate: number, slotCount: number) {
+  return Math.round(hourlyRate * bookingHoursForSlotCount(slotCount) * 100)
+}
+
+export function formatBookingDuration(slotCount: number) {
+  const totalMinutes = slotCount * SLOT_DURATION_MINUTES
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  const hourLabel = hours ? `${hours} hour${hours === 1 ? '' : 's'}` : ''
+  const minuteLabel = minutes ? `${minutes} minutes` : ''
+  return [hourLabel, minuteLabel].filter(Boolean).join(' ')
+}
+
+export function hasValidBookingSlotCount(slots: string[], minimumSlots = MIN_BOOKING_SLOTS) {
+  return slots.length >= minimumSlots && slots.length <= MAX_BOOKING_SLOTS
+}
+
+export function hasConsecutiveBookingSlots(slots: string[], minimumSlots = MIN_BOOKING_SLOTS) {
+  if (!hasValidBookingSlotCount(slots, minimumSlots)) return false
+  const sorted = [...slots].sort((a, b) => Date.parse(a) - Date.parse(b))
+  return sorted.every((slot, index) => (
+    index === 0 || Date.parse(slot) - Date.parse(sorted[index - 1]) === SLOT_DURATION_MS
+  ))
+}
+
+export function expandLegacyHourlySlots(slots: string[]) {
+  return Array.from(new Set(slots.flatMap((slot) => {
+    const start = new Date(slot)
+    if (Number.isNaN(start.getTime())) return []
+    return [start.toISOString(), addMinutes(start, SLOT_DURATION_MINUTES).toISOString()]
+  }))).sort((a, b) => Date.parse(a) - Date.parse(b))
+}
 
 export function isValidBookingDate(date: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false
@@ -72,7 +113,7 @@ export function getTimeSlotsForDay(date: string) {
   // Step in real UTC time from local midnight to the next local midnight.
   // Mapping wall-clock hours instead duplicates an instant on spring-forward
   // days and leaves a two-hour gap on fall-back days.
-  const slotMs = SLOT_DURATION_HOURS * 60 * 60 * 1000
+  const slotMs = SLOT_DURATION_MS
   const dayStart = zonedDateHourToUtc(date, START_HOUR).getTime()
   const dayEnd = zonedDateHourToUtc(nextDateString(date), START_HOUR).getTime()
   const slots: { start: Date; end: Date }[] = []
@@ -125,7 +166,7 @@ export function groupConsecutiveSlotIsos(slots: string[]) {
     }
 
     const previous = current[current.length - 1]
-    const consecutive = Date.parse(slot) - Date.parse(previous) === SLOT_DURATION_HOURS * 60 * 60 * 1000
+    const consecutive = Date.parse(slot) - Date.parse(previous) === SLOT_DURATION_MS
     if (consecutive) current.push(slot)
     else {
       groups.push(current)
@@ -141,7 +182,7 @@ export function describeSlotRanges(slots: string[]) {
   return groupConsecutiveSlotIsos(slots)
     .map((group) => {
       const start = new Date(group[0])
-      const end = addHours(new Date(group[group.length - 1]), 1)
+      const end = addMinutes(new Date(group[group.length - 1]), SLOT_DURATION_MINUTES)
       return `${formatTimeForDisplay(start)}-${formatTimeForDisplay(end)}`
     })
     .join(', ')

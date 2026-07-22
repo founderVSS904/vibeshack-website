@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 import { assertCartSlotsAvailable, type BookingCartItem } from '@/lib/booking/calendar'
 import { calculateRecurringDiscountCents, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
 import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
-import { describeSlotRanges, formatDateForDisplay, isValidBookingDate } from '@/lib/booking/time'
+import { SLOT_DURATION_MINUTES, SLOT_DURATION_MS, bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate } from '@/lib/booking/time'
 import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
 import { isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
@@ -57,7 +57,7 @@ function buildCanonicalCart(rawCart: unknown): BookingCartItem[] {
     const date = stripControlChars(item.date, 20)
     const slots = normalizeSlots(item.slots)
 
-    if (!studio || !isValidBookingDate(date) || slots.length === 0 || slots.length > 24) {
+    if (!studio || !isValidBookingDate(date) || !hasConsecutiveBookingSlots(slots)) {
       throw new Error('Invalid cart item')
     }
 
@@ -66,8 +66,8 @@ function buildCanonicalCart(rawCart: unknown): BookingCartItem[] {
       studioName: studio.name,
       date,
       slots,
-      hours: slots.length,
-      price: studio.price * slots.length,
+      hours: bookingHoursForSlotCount(slots.length),
+      price: bookingPriceCents(studio.price, slots.length) / 100,
     })
   }
 
@@ -174,9 +174,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error }, { status: availability.status })
     }
 
-    const baseSessionTotalCents = cart.reduce((sum, item) => sum + item.price * 100, 0)
+    const baseSessionTotalCents = cart.reduce((sum, item) => sum + Math.round(item.price * 100), 0)
     const discountCents = calculateRecurringDiscountCents(baseSessionTotalCents, recurringOption?.id)
-    const discountedSessionAmounts = applyDiscountToSessionAmounts(cart.map((item) => item.price * 100), discountCents)
+    const discountedSessionAmounts = applyDiscountToSessionAmounts(cart.map((item) => Math.round(item.price * 100)), discountCents)
     const computedTotalCents = discountedSessionAmounts.reduce((sum, amount) => sum + amount, 0)
     const referralInfo = buildReferralInfo(referralSource, computedTotalCents)
 
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
         currency: 'usd',
         product_data: {
           name: `${item.studioName} - VibeShack Studios`,
-          description: `${formatDateForDisplay(item.date)} - ${describeSlotRanges(item.slots)} - ${item.hours}hr${discountCents ? ' - recurring discount applied' : ''}`,
+          description: `${formatDateForDisplay(item.date)} - ${describeSlotRanges(item.slots)} - ${formatBookingDuration(item.slots.length)}${discountCents ? ' - recurring discount applied' : ''}`,
           images: [`${siteUrl}/og-image.jpg`],
         },
         unit_amount: discountedSessionAmounts[index],
@@ -197,17 +197,16 @@ export async function POST(req: NextRequest) {
     const attributionMetadata = readAttributionMetadata(req)
     const cartMetadata: Record<string, string> = {}
     cart.forEach((item, index) => {
-      // Stripe caps metadata values at 500 chars. Full ISO slot arrays overflow
-      // that for 16+ hour sessions and truncate into unparseable JSON, so slots
-      // are stored as the first slot plus hour offsets (slots arrive sorted from
-      // normalizeSlots). The webhook reconstructs and re-validates every slot,
-      // and derives name/hours/price from the catalog.
+      // Stripe caps metadata values at 500 chars, so store the first slot plus
+      // offsets in the current 30-minute booking unit. The unit marker lets the
+      // webhook distinguish these sessions from legacy hourly metadata.
       const firstSlotMs = Date.parse(item.slots[0])
       cartMetadata[`cart_${index}`] = JSON.stringify({
         id: item.studioId,
         d: item.date,
         t0: item.slots[0],
-        off: item.slots.map((slot) => Math.round((Date.parse(slot) - firstSlotMs) / 3600000)),
+        u: SLOT_DURATION_MINUTES,
+        off: item.slots.map((slot) => Math.round((Date.parse(slot) - firstSlotMs) / SLOT_DURATION_MS)),
       })
     })
 

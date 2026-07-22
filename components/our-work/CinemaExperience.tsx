@@ -7,10 +7,19 @@ import type { CSSProperties, KeyboardEvent, SyntheticEvent, WheelEvent } from 'r
 import { flushSync } from 'react-dom'
 import type { CinemaProject } from '@/lib/cinema/cinemaCatalog'
 import { CinemaRuntimeTheater } from './CinemaRuntimeTheater'
+import { CinemaYouTubeTheater } from './CinemaYouTubeTheater'
 
 type CinemaExperienceProps = {
   projects: CinemaProject[]
 }
+
+type CinemaCollectionFilter = 'all' | CinemaProject['collection']
+
+const collectionFilters: Array<{ value: CinemaCollectionFilter; label: string }> = [
+  { value: 'all', label: 'All' },
+  { value: 'podcasts', label: 'Podcasts' },
+  { value: 'creative-productions', label: 'Creative Productions' },
+]
 
 type WebkitFullscreenDocument = Document & {
   webkitExitFullscreen?: () => Promise<void> | void
@@ -81,6 +90,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const [fullscreenSourceReady, setFullscreenSourceReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isMobileViewport, setIsMobileViewport] = useState(false)
+  const [activeCollection, setActiveCollection] = useState<CinemaCollectionFilter>('all')
   const videoRef = useRef<HTMLVideoElement>(null)
   const fullscreenVideoRef = useRef<HTMLVideoElement>(null)
   const fullscreenSessionRef = useRef<FullscreenSession | null>(null)
@@ -88,28 +98,41 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const playbackActionsRef = useRef<HTMLDivElement>(null)
   const playButtonRef = useRef<HTMLButtonElement>(null)
   const browseReturnRef = useRef<HTMLButtonElement>(null)
+  const railRef = useRef<HTMLUListElement>(null)
   const cardRefs = useRef(new Map<string, HTMLButtonElement>())
   const pendingFilmPlayRef = useRef(false)
 
   const selected = projects[selectedIndex]
-  const useCleanMobileSource = isMobileViewport && !showingPreShow && selected.cinemaMode === 'integrated'
+  const filteredProjects = activeCollection === 'all'
+    ? projects
+    : projects.filter((project) => project.collection === activeCollection)
+  const usesYouTubePlayback = !showingPreShow && selected.playback === 'youtube'
+  const useCleanMobileSource = isMobileViewport
+    && !showingPreShow
+    && selected.playback === 'hosted'
+    && selected.cinemaMode === 'integrated'
   const activeMediaKey = showingPreShow ? 'vibeshack-pre-show' : selected.slug
   const activeCinemaMode = showingPreShow || useCleanMobileSource ? 'runtime' : selected.cinemaMode
   const activeCinemaSrc = showingPreShow
     ? PRE_SHOW_SRC
     : useCleanMobileSource
-      ? selected.fullscreenSrc
-      : selected.cinemaSrc
+      ? (selected.fullscreenSrc ?? '')
+      : (selected.cinemaSrc ?? '')
   const activeCinemaPoster = showingPreShow ? PRE_SHOW_POSTER : selected.cinemaPoster
   const activeTitle = showingPreShow ? PRE_SHOW_TITLE : selected.title
-  const activeScreenFit = showingPreShow ? 'cover' : (selected.screenFit ?? 'contain')
+  const activeScreenFit = showingPreShow
+    ? (isMobileViewport ? 'contain' : 'cover')
+    : (selected.screenFit ?? 'contain')
   const activeScreenPosition = showingPreShow
     ? { x: 0.5, y: 0.5 }
     : (selected.screenPosition ?? { x: 0.5, y: 0.5 })
   const activeScreenBackdrop = showingPreShow ? 'ambient' : (selected.screenBackdrop ?? 'black')
-  const usesSeparateFullscreenSource = !showingPreShow && selected.fullscreenSrc !== activeCinemaSrc
+  const usesSeparateFullscreenSource = !showingPreShow
+    && !usesYouTubePlayback
+    && Boolean(selected.fullscreenSrc)
+    && selected.fullscreenSrc !== activeCinemaSrc
   const fullscreenOffsetSeconds = useCleanMobileSource ? 0 : (selected.fullscreenOffsetSeconds ?? 0)
-  const fullscreenAvailable = !showingPreShow && ready
+  const fullscreenAvailable = !showingPreShow && !usesYouTubePlayback && ready
 
   useEffect(() => {
     const viewportQuery = window.matchMedia('(max-width: 767px)')
@@ -309,6 +332,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   }, [activeMediaKey, cancelFullscreenSession, finishFullscreenSession])
 
   useEffect(() => {
+    if (usesYouTubePlayback) return
     let video: HTMLVideoElement | null = null
     let animationFrameId: number | null = null
 
@@ -333,7 +357,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       video?.removeEventListener('loadedmetadata', handleMediaReadiness)
       video?.removeEventListener('canplay', handleMediaReadiness)
     }
-  }, [activeMediaKey])
+  }, [activeMediaKey, usesYouTubePlayback])
 
   useEffect(() => {
     if (!showingPreShow) return
@@ -427,13 +451,14 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const launchProject = (project: CinemaProject) => {
     const nextIndex = projects.findIndex((candidate) => candidate.slug === project.slug)
     if (nextIndex < 0) return
+    const launchesYouTube = project.playback === 'youtube'
     videoRef.current?.pause()
     pendingFilmPlayRef.current = false
 
     flushSync(() => {
       setReady(false)
       setPlaying(false)
-      setScreeningActive(false)
+      setScreeningActive(launchesYouTube)
       setEnding(false)
       setChromeHidden(false)
       setCurrentTime(0)
@@ -443,6 +468,8 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       setSelectedIndex(nextIndex)
       setShowingPreShow(false)
     })
+
+    if (launchesYouTube) return
 
     const film = videoRef.current
     if (!film) {
@@ -480,10 +507,17 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
     event.preventDefault()
     const offset = event.key === 'ArrowRight' ? 1 : -1
-    const next = (index + offset + projects.length) % projects.length
-    const project = projects[next]
+    const next = (index + offset + filteredProjects.length) % filteredProjects.length
+    const project = filteredProjects[next]
     cardRefs.current.get(project.slug)?.focus()
     cardRefs.current.get(project.slug)?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+  }
+
+  const filterCollection = (collection: CinemaCollectionFilter) => {
+    setActiveCollection(collection)
+    window.requestAnimationFrame(() => {
+      railRef.current?.scrollTo({ left: 0, behavior: 'smooth' })
+    })
   }
 
   const handleRailWheel = (event: WheelEvent<HTMLUListElement>) => {
@@ -658,7 +692,14 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       aria-label="VibeShack Cinema"
     >
       <div className="cinema-media-layer">
-        {activeCinemaMode === 'runtime' ? (
+        {usesYouTubePlayback && selected.youtubeId ? (
+          <CinemaYouTubeTheater
+            key={activeMediaKey}
+            videoId={selected.youtubeId}
+            title={selected.title}
+            onLoad={() => setReady(true)}
+          />
+        ) : activeCinemaMode === 'runtime' ? (
           <CinemaRuntimeTheater
             key={activeMediaKey}
             ref={videoRef}
@@ -741,21 +782,23 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
             aria-label={`${activeTitle} playing inside the VibeShack theater`}
           />
         )}
-        <button
-          type="button"
-          className="cinema-theater-hit-target"
-          onClick={() => {
-            if (showingPreShow) {
-              void togglePreShow()
-              return
-            }
-            if (playing) pauseAndBrowse()
-            else void play()
-          }}
-          aria-label={showingPreShow
-            ? (playing ? 'Pause VibeShack pre-show' : 'Play VibeShack pre-show')
-            : (playing ? 'Pause and show cinema projects' : `Play ${selected.title} in the theater`)}
-        />
+        {!usesYouTubePlayback && (
+          <button
+            type="button"
+            className="cinema-theater-hit-target"
+            onClick={() => {
+              if (showingPreShow) {
+                void togglePreShow()
+                return
+              }
+              if (playing) pauseAndBrowse()
+              else void play()
+            }}
+            aria-label={showingPreShow
+              ? (playing ? 'Pause VibeShack pre-show' : 'Play VibeShack pre-show')
+              : (playing ? 'Pause and show cinema projects' : `Play ${selected.title} in the theater`)}
+          />
+        )}
       </div>
 
       {usesSeparateFullscreenSource && (
@@ -837,52 +880,84 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
             )}
             {!showingPreShow ? <p className="cinema-credit-line">{selected.creditLabel}</p> : null}
             <div className="cinema-selected-actions">
-              <button
-                ref={playButtonRef}
-                type="button"
-                onClick={() => {
-                  if (showingPreShow) {
-                    void togglePreShow()
-                    return
-                  }
-                  if (playing) pauseAndBrowse()
-                  else void play()
-                }}
-                disabled={!ready}
-                className="cinema-play-button"
-              >
-                <span aria-hidden="true">{playing ? 'Ⅱ' : '▶'}</span>
-                {ready
-                  ? showingPreShow
-                    ? (playing ? 'Pause pre-show' : 'Play pre-show')
-                    : (playing ? 'Pause screening' : 'Play in theater')
-                  : showingPreShow
-                    ? 'Loading pre-show'
-                    : 'Loading theater'}
-              </button>
-              {!showingPreShow && (
-                <button
-                  type="button"
-                  className="cinema-sound-button"
-                  onClick={() => setMuted((value) => !value)}
-                  aria-label={muted ? 'Turn cinema sound on' : 'Mute cinema'}
+              {usesYouTubePlayback ? (
+                <Link
+                  href={selected.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cinema-play-button"
+                  aria-label={`Watch ${selected.title} on YouTube`}
                 >
-                  <svg aria-hidden="true" viewBox="0 0 18 18">
-                    <path d="M2 7h3l4-3v10l-4-3H2V7Z" fill="currentColor" />
-                    {muted ? (
-                      <path d="m12 6 4 6m0-6-4 6" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
-                    ) : (
-                      <path d="M12 6.2c1.4 1.4 1.4 4.2 0 5.6m2-7.6c2.5 2.5 2.5 7.1 0 9.6" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
-                    )}
-                  </svg>
-                </button>
+                  <span aria-hidden="true">↗</span>
+                  Watch on YouTube
+                </Link>
+              ) : (
+                <>
+                  <button
+                    ref={playButtonRef}
+                    type="button"
+                    onClick={() => {
+                      if (showingPreShow) {
+                        void togglePreShow()
+                        return
+                      }
+                      if (playing) pauseAndBrowse()
+                      else void play()
+                    }}
+                    disabled={!ready}
+                    className="cinema-play-button"
+                  >
+                    <span aria-hidden="true">{playing ? 'Ⅱ' : '▶'}</span>
+                    {ready
+                      ? showingPreShow
+                        ? (playing ? 'Pause pre-show' : 'Play pre-show')
+                        : (playing ? 'Pause screening' : 'Play in theater')
+                      : showingPreShow
+                        ? 'Loading pre-show'
+                        : 'Loading theater'}
+                  </button>
+                  {!showingPreShow && (
+                    <button
+                      type="button"
+                      className="cinema-sound-button"
+                      onClick={() => setMuted((value) => !value)}
+                      aria-label={muted ? 'Turn cinema sound on' : 'Mute cinema'}
+                    >
+                      <svg aria-hidden="true" viewBox="0 0 18 18">
+                        <path d="M2 7h3l4-3v10l-4-3H2V7Z" fill="currentColor" />
+                        {muted ? (
+                          <path d="m12 6 4 6m0-6-4 6" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+                        ) : (
+                          <path d="M12 6.2c1.4 1.4 1.4 4.2 0 5.6m2-7.6c2.5 2.5 2.5 7.1 0 9.6" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
+                        )}
+                      </svg>
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
 
           <div className="cinema-library">
-            <ul className="cinema-film-rail" aria-label="All cinema projects" onWheel={handleRailWheel}>
-              {projects.map((project, index) => (
+            <div className="cinema-collection-filters" role="group" aria-label="Filter cinema projects">
+              {collectionFilters.map((filter) => (
+                <button
+                  key={filter.value}
+                  type="button"
+                  aria-pressed={activeCollection === filter.value}
+                  onClick={() => filterCollection(filter.value)}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+            <ul
+              ref={railRef}
+              className="cinema-film-rail"
+              aria-label={`${collectionFilters.find((filter) => filter.value === activeCollection)?.label ?? 'All'} cinema projects`}
+              onWheel={handleRailWheel}
+            >
+              {filteredProjects.map((project, index) => (
                 <li key={project.slug}>
                   <button
                     ref={(node) => {

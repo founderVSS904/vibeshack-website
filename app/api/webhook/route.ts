@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 import { addBookingEvents, assertCartSlotsAvailable, hasBookingEventsForRef, type BookingCartItem } from '@/lib/booking/calendar'
 import { getStudioById } from '@/lib/booking/catalog'
 import { buildReferralInfo, formatMoneyFromCents, type ReferralInfo } from '@/lib/booking/referrals'
-import { addHours, describeSlotRanges, formatDateForDisplay, isValidBookingDate, slotIsoSetForDate } from '@/lib/booking/time'
+import { SLOT_DURATION_MINUTES, addMinutes, bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, expandLegacyHourlySlots, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate } from '@/lib/booking/time'
 import { escapeHtml, isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
 
@@ -23,21 +23,22 @@ function parseCartItems(metadata: Record<string, string>) {
     if (!raw) break
     try {
       const compact = JSON.parse(raw)
-      // Current format stores the first slot plus hour offsets so long sessions
-      // fit in Stripe's 500-char metadata cap; older sessions carry full slot
-      // arrays. Every reconstructed slot is re-validated against the booking
-      // date in validateCompletedSession.
+      // Current metadata declares 30-minute units. Metadata without a unit is
+      // from the legacy hourly booking flow; expand each old hour into two
+      // canonical half-hour slots so already-open checkouts remain valid.
       let slots: string[] = []
+      const unitMinutes = compact.u === SLOT_DURATION_MINUTES ? SLOT_DURATION_MINUTES : 60
       if (typeof compact.t0 === 'string' && Array.isArray(compact.off)) {
         const baseMs = Date.parse(compact.t0)
         if (Number.isFinite(baseMs)) {
           slots = compact.off
-            .filter((offset: unknown): offset is number => Number.isInteger(offset) && (offset as number) >= 0 && (offset as number) < 48)
-            .map((offset: number) => new Date(baseMs + offset * 3600000).toISOString())
+            .filter((offset: unknown): offset is number => Number.isInteger(offset) && (offset as number) >= 0 && (offset as number) < 96)
+            .map((offset: number) => new Date(baseMs + offset * unitMinutes * 60 * 1000).toISOString())
         }
       } else if (Array.isArray(compact.s ?? compact.slots)) {
         slots = compact.s ?? compact.slots
       }
+      if (unitMinutes === 60) slots = expandLegacyHourlySlots(slots)
 
       const studioId = stripControlChars(compact.id ?? compact.studioId, 80)
       items.push({
@@ -62,7 +63,7 @@ function parseCartItems(metadata: Record<string, string>) {
             studioId: stripControlChars(item.studioId, 80),
             studioName: stripControlChars(item.studioName, 120),
             date: stripControlChars(item.date, 20),
-            slots: Array.isArray(item.slots) ? item.slots.map((slot: unknown) => stripControlChars(slot, 40)).filter(Boolean) : [],
+            slots: expandLegacyHourlySlots(Array.isArray(item.slots) ? item.slots.map((slot: unknown) => stripControlChars(slot, 40)).filter(Boolean) : []),
             hours: Number(item.hours || item.slots?.length || 1),
             price: Number(item.price || 0),
           })
@@ -121,7 +122,7 @@ function validateCompletedSession(
     const studio = getStudioById(item.studioId)
     if (!studio) return { ok: false, status: 400, error: 'Checkout session contains an invalid studio' }
     if (!isValidBookingDate(item.date)) return { ok: false, status: 400, error: 'Checkout session contains an invalid date' }
-    if (!Array.isArray(item.slots) || item.slots.length < 1 || item.slots.length > 24) {
+    if (!Array.isArray(item.slots) || !hasConsecutiveBookingSlots(item.slots)) {
       return { ok: false, status: 400, error: 'Checkout session contains invalid slot count' }
     }
 
@@ -139,8 +140,8 @@ function validateCompletedSession(
     }
 
     item.studioName = studio.name
-    item.hours = item.slots.length
-    item.price = studio.price * item.slots.length
+    item.hours = bookingHoursForSlotCount(item.slots.length)
+    item.price = bookingPriceCents(studio.price, item.slots.length) / 100
   }
 
   return { ok: true, status: 200, error: '' }
@@ -251,7 +252,7 @@ function buildPrepEmailHtml(cartItems: BookingCartItem[], customer: { name: stri
           <p style="color:#4b5563;font-size:14px;line-height:1.65;margin:0;">${escapeHtml(dateStr)}<br>${escapeHtml(slotRanges)} PT</p>
         </td>
         <td align="right" style="padding:18px 0;border-top:1px solid #e5e7eb;color:#111827;font-size:14px;font-weight:800;vertical-align:top;white-space:nowrap;">
-          ${escapeHtml(String(item.hours))} hr${item.hours === 1 ? '' : 's'}
+          ${escapeHtml(formatBookingDuration(item.slots.length))}
         </td>
       </tr>`
   }).join('')
@@ -437,7 +438,7 @@ async function sendConfirmationEmail(
         <div style="border-top:1px solid #222;padding-top:12px;">
           <p style="color:#fff;font-size:13px;font-weight:600;margin:0 0 8px;">${escapeHtml(dateStr)}</p>
           <p style="color:#999;font-size:13px;margin:0 0 8px;">${escapeHtml(slotRanges)} PT</p>
-          <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(item.hours)} hour${item.hours === 1 ? '' : 's'}</p>
+          <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(formatBookingDuration(item.slots.length))}</p>
         </div>
       </div>`
   }).join('')
@@ -451,7 +452,7 @@ async function sendConfirmationEmail(
         <div style="border-top:1px solid #222;padding-top:12px;">
           <p style="color:#fff;font-size:13px;font-weight:600;margin:0 0 8px;">${escapeHtml(dateStr)}</p>
           <p style="color:#999;font-size:13px;margin:0 0 8px;">${escapeHtml(slotRanges)} PT</p>
-          <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(item.hours)} hour${item.hours === 1 ? '' : 's'}</p>
+          <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(formatBookingDuration(item.slots.length))}</p>
         </div>
       </div>`
   }).join('')
@@ -490,7 +491,7 @@ async function sendConfirmationEmail(
   const internalHtml = cartItems.map((item) => {
     const dateStr = formatDateForDisplay(item.date)
     const start = new Date(item.slots[0])
-    const end = addHours(new Date(item.slots[item.slots.length - 1]), 1)
+    const end = addMinutes(new Date(item.slots[item.slots.length - 1]), SLOT_DURATION_MINUTES)
     return `<li><strong>${escapeHtml(item.studioName)}</strong> - ${escapeHtml(dateStr)} - ${escapeHtml(start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))}-${escapeHtml(end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))} PT - $${escapeHtml(item.price)}</li>`
   }).join('')
   const prepEmailHtml = buildPrepEmailHtml(cartItems, customer)
