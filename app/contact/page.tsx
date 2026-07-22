@@ -87,7 +87,6 @@ export default function ContactPage() {
       </section>
 
       <section id="project-inquiry" className="relative border-b border-white/10 bg-[#070707] py-20 sm:py-28">
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[780px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(229,0,0,0.08),transparent_66%)]" />
         <div className="relative mx-auto max-w-[1480px] px-6 sm:px-10 lg:px-16">
           <div className="mb-10 max-w-3xl sm:mb-14">
             <span className="number-label mb-5 flex w-fit">Project inquiry</span>
