@@ -2,7 +2,7 @@ import fs from 'fs'
 import { google, type calendar_v3 } from 'googleapis'
 import { getStudioById, STUDIOS } from './catalog'
 import { formatMoneyFromCents, type ReferralInfo } from './referrals'
-import { BOOKING_TIME_ZONE, addHours, addMinutes, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
+import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
 
 export interface BookingCartItem {
   studioId: string
@@ -560,7 +560,10 @@ export async function assertCartSlotsAvailable(cartItems: BookingCartItem[]) {
     if (!isValidBookingDate(item.date)) {
       return { ok: false, status: 400, error: 'Invalid booking date' }
     }
-    if (!Array.isArray(item.slots) || item.slots.length < 1 || item.slots.length > 24) {
+    // A post-payment overlap check can contain only the still-future tail of a
+    // valid booking, so availability accepts a one-slot sequence. Checkout and
+    // webhook validation enforce the one-hour (two-slot) booking minimum.
+    if (!Array.isArray(item.slots) || !hasConsecutiveBookingSlots(item.slots, 1)) {
       return { ok: false, status: 400, error: 'Invalid booking slots' }
     }
 
@@ -655,7 +658,7 @@ export async function addBookingEvents(
 
     for (const group of groups) {
       const startTime = new Date(group[0])
-      const endTime = addHours(new Date(group[group.length - 1]), 1)
+      const endTime = addMinutes(new Date(group[group.length - 1]), SLOT_DURATION_MINUTES)
 
       await config.client.events.insert({
         calendarId: config.calendarId,
@@ -668,7 +671,7 @@ export async function addBookingEvents(
             `Email: ${customer.email}`,
             `Phone: ${customer.phone || 'N/A'}`,
             `Date: ${dateStr}`,
-            `Duration: ${group.length}hr`,
+            `Duration: ${formatBookingDuration(group.length)}`,
             `Amount: $${item.price}`,
             ...(referralInfo ? [
               '',

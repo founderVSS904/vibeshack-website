@@ -15,6 +15,14 @@ import {
   REFERRAL_MAX_AGE_SECONDS,
   REFERRAL_STORAGE_KEY,
 } from '@/lib/booking/referrals'
+import {
+  MAX_BOOKING_SLOTS,
+  MIN_BOOKING_SLOTS,
+  SLOT_DURATION_MS,
+  bookingHoursForSlotCount,
+  bookingPriceCents,
+  formatBookingDuration,
+} from '@/lib/booking/time'
 import { GAEventType, sendGAEvent, trackBookingStep } from '@/lib/analytics'
 
 const StripeEmbeddedCheckout = dynamic(() => import('@/components/StripeEmbeddedCheckout'), {
@@ -40,8 +48,10 @@ const STEP_LABELS: Record<Exclude<Step, 'payment'>, string> = {
   extras: 'Extras',
   review: 'Review',
 }
-const DURATION_OPTIONS = [1, 2, 3, 4, 5, 6, 8]
-const SLOT_MS = 60 * 60 * 1000
+const DURATION_SLOT_OPTIONS = Array.from(
+  { length: MAX_BOOKING_SLOTS - MIN_BOOKING_SLOTS + 1 },
+  (_, index) => MIN_BOOKING_SLOTS + index,
+)
 
 const FILTERS: { id: Filter; label: string }[] = [
   { id: 'podcast', label: 'Podcast' },
@@ -79,8 +89,8 @@ function formatDate(d: Date) {
 function fmtTime(iso: string) {
   return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' })
 }
-function fmtEnd(iso: string, hrs: number) {
-  const d = new Date(Date.parse(iso) + hrs * SLOT_MS)
+function fmtEnd(iso: string) {
+  const d = new Date(Date.parse(iso) + SLOT_DURATION_MS)
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' })
 }
 function fmtDateFull(ds: string) {
@@ -277,7 +287,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
   const [photoIndex, setPhotoIndex] = useState(0)
 
   // Date & time
-  const [duration, setDuration] = useState(1)
+  const [durationSlots, setDurationSlots] = useState(MIN_BOOKING_SLOTS)
   const [date, setDate] = useState('')
   const [startSlot, setStartSlot] = useState('')
   const [slots, setSlots] = useState<Slot[]>([])
@@ -334,31 +344,33 @@ function BookPageInner({ studios }: BookPageInnerProps) {
   })
 
   const startIndex = startSlot ? slots.findIndex((s) => s.time === startSlot) : -1
-  const blockSlots = startIndex >= 0 ? slots.slice(startIndex, startIndex + duration).map((s) => s.time) : []
-  const timeRange = blockSlots.length === duration && duration > 0
-    ? `${fmtTime(blockSlots[0])} to ${fmtEnd(blockSlots[blockSlots.length - 1], 1)}`
+  const durationHours = bookingHoursForSlotCount(durationSlots)
+  const durationLabel = formatBookingDuration(durationSlots)
+  const blockSlots = startIndex >= 0 ? slots.slice(startIndex, startIndex + durationSlots).map((s) => s.time) : []
+  const timeRange = blockSlots.length === durationSlots
+    ? `${fmtTime(blockSlots[0])} to ${fmtEnd(blockSlots[blockSlots.length - 1])}`
     : ''
 
-  const sessionSubtotal = selectedStudio ? selectedStudio.price * duration : 0
+  const sessionSubtotal = selectedStudio ? bookingPriceCents(selectedStudio.price, durationSlots) / 100 : 0
   const discountAmount = calculateRecurringDiscountCents(sessionSubtotal * 100, recurring) / 100
   const recurringDiscount = recurring ? RECURRING_OPTIONS.find((r) => r.id === recurring)?.discount || 0 : 0
   const grandTotal = sessionSubtotal - discountAmount
 
   const durationLocked = step === 'extras' || step === 'review' || step === 'payment'
 
-  // A start slot works when every hour in the block is open and consecutive.
-  const blockFits = (fromIndex: number, hours: number) => {
-    for (let k = 0; k < hours; k++) {
+  // A start slot works when every half-hour in the block is open and consecutive.
+  const blockFits = (fromIndex: number, slotCount: number) => {
+    for (let k = 0; k < slotCount; k++) {
       const slot = slots[fromIndex + k]
       if (!slot || !slot.available) return false
-      if (k > 0 && Date.parse(slot.time) - Date.parse(slots[fromIndex + k - 1].time) !== SLOT_MS) return false
+      if (k > 0 && Date.parse(slot.time) - Date.parse(slots[fromIndex + k - 1].time) !== SLOT_DURATION_MS) return false
     }
     return true
   }
 
-  const blockValid = startIndex >= 0 && blockSlots.length === duration && blockFits(startIndex, duration)
+  const blockValid = startIndex >= 0 && blockSlots.length === durationSlots && blockFits(startIndex, durationSlots)
   const anyAvailable = slots.some((s) => s.available)
-  const anyStartable = slots.some((_, i) => blockFits(i, duration))
+  const anyStartable = slots.some((_, i) => blockFits(i, durationSlots))
 
   const continueReady =
     step === 'room' ? Boolean(selectedId)
@@ -418,13 +430,13 @@ function BookPageInner({ studios }: BookPageInnerProps) {
 
   function pickStart(index: number) {
     const slot = slots[index]
-    if (!slot || !blockFits(index, duration)) return
+    if (!slot || !blockFits(index, durationSlots)) return
     setStartSlot(slot.time)
-    trackBookingStep('time_select', { studio_id: selectedId, booking_date: date, slot_time: slot.time, hours: duration })
+    trackBookingStep('time_select', { studio_id: selectedId, booking_date: date, slot_time: slot.time, hours: durationHours })
   }
 
   function changeDuration(next: number) {
-    setDuration(next)
+    setDurationSlots(next)
     if (startSlot) {
       const idx = slots.findIndex((s) => s.time === startSlot)
       if (idx < 0 || !blockFits(idx, next)) setStartSlot('')
@@ -451,7 +463,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
         studio_id: selectedStudio.id,
         studio_name: selectedStudio.name,
         booking_date: date,
-        hours: duration,
+        hours: durationHours,
         value: sessionSubtotal,
         currency: 'USD',
       })
@@ -507,7 +519,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
             studioName: selectedStudio.name,
             date,
             slots: blockSlots,
-            hours: duration,
+            hours: durationHours,
             price: sessionSubtotal,
           }],
           recurring,
@@ -855,13 +867,13 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                       </p>
                       <span className="relative lg:hidden">
                         <select
-                          value={duration}
+                          value={durationSlots}
                           onChange={(e) => changeDuration(Number(e.target.value))}
                           aria-label="Session duration"
                           className="cursor-pointer appearance-none bg-transparent pr-4 text-right font-mono text-[11px] uppercase tracking-[0.14em] text-white focus:outline-none [&>option]:bg-black"
                         >
-                          {DURATION_OPTIONS.map((n) => (
-                            <option key={n} value={n}>{n} hour{n > 1 ? 's' : ''}</option>
+                          {DURATION_SLOT_OPTIONS.map((slotCount) => (
+                            <option key={slotCount} value={slotCount}>{formatBookingDuration(slotCount)}</option>
                           ))}
                         </select>
                         <svg className="pointer-events-none absolute right-0 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
@@ -869,7 +881,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                         </svg>
                       </span>
                       <p className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500 lg:block">
-                        {duration} hour{duration > 1 ? 's' : ''}
+                        {durationLabel}
                       </p>
                     </div>
                     {!date && (
@@ -896,27 +908,27 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                         )}
                         {availabilityVerified && anyAvailable && !anyStartable && (
                           <p className="mb-4 text-xs text-zinc-400" role="status">
-                            No {duration}-hour openings on this day. Shorten the session or try another date.
+                            No {durationLabel.toLowerCase()} openings on this day. Shorten the session or try another date.
                           </p>
                         )}
                         {anyStartable && (
                           <p className="mb-4 text-xs text-zinc-500">
-                            Pick when you want to start. Your {duration}-hour block is held from there.
+                            Pick any available half-hour start. Your {durationLabel.toLowerCase()} session is held from there.
                           </p>
                         )}
                         <div className="max-h-[300px] overflow-y-auto pr-1">
                           <div className="grid grid-cols-3 gap-1.5">
                             {slots.map((slot, i) => {
-                              const inBlock = startIndex >= 0 && i >= startIndex && i < startIndex + duration
+                              const inBlock = startIndex >= 0 && i >= startIndex && i < startIndex + durationSlots
                               const isStart = slot.time === startSlot
-                              const fits = slot.available && blockFits(i, duration)
+                              const fits = slot.available && blockFits(i, durationSlots)
                               return (
                                 <button
                                   key={slot.time}
                                   type="button"
                                   disabled={!fits}
                                   aria-pressed={isStart}
-                                  aria-label={`${slot.label}${!slot.available ? ', booked' : !fits ? `, does not fit a ${duration}-hour block` : ''}`}
+                                  aria-label={`${slot.label}${!slot.available ? ', booked' : !fits ? `, does not fit a ${durationLabel.toLowerCase()} session` : ''}`}
                                   onClick={() => pickStart(i)}
                                   className={`rounded-lg border py-3 font-mono text-xs transition-colors ${
                                     isStart
@@ -945,7 +957,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                   <div className="mt-8 flex items-center justify-between border-t border-white/[0.08] pt-6">
                     <div>
                       <p className="text-lg font-bold text-white">{timeRange}</p>
-                      <p className="mt-1 text-sm text-zinc-500">{fmtDateFull(date)} · {duration} hour{duration > 1 ? 's' : ''}</p>
+                      <p className="mt-1 text-sm text-zinc-500">{fmtDateFull(date)} · {durationLabel}</p>
                     </div>
                     <p className="font-black text-white" style={{ fontSize: '1.75rem' }}>${sessionSubtotal}</p>
                   </div>
@@ -1001,7 +1013,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                   <div className="min-w-0 flex-1">
                     <p className="text-[15px] font-bold text-white">{selectedStudio.name}</p>
                     <p className="mt-0.5 text-sm text-zinc-500">{fmtDateFull(date)}</p>
-                    <p className="text-sm text-zinc-400">{timeRange} · {duration} hour{duration > 1 ? 's' : ''}</p>
+                    <p className="text-sm text-zinc-400">{timeRange} · {durationLabel}</p>
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="font-mono text-sm font-bold text-white">${sessionSubtotal}</p>
@@ -1220,17 +1232,17 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                   <DurationIcon />
                   <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Duration</span>
                   {durationLocked ? (
-                    <span className="ml-auto text-right text-[13px] text-white">{duration} hour{duration > 1 ? 's' : ''}</span>
+                    <span className="ml-auto text-right text-[13px] text-white">{durationLabel}</span>
                   ) : (
                     <span className="relative ml-auto">
                       <select
-                        value={duration}
+                        value={durationSlots}
                         onChange={(e) => changeDuration(Number(e.target.value))}
                         aria-label="Session duration"
                         className="cursor-pointer appearance-none bg-transparent pr-5 text-right text-[13px] text-white focus:outline-none [&>option]:bg-black"
                       >
-                        {DURATION_OPTIONS.map((n) => (
-                          <option key={n} value={n}>{n} hour{n > 1 ? 's' : ''}</option>
+                        {DURATION_SLOT_OPTIONS.map((slotCount) => (
+                          <option key={slotCount} value={slotCount}>{formatBookingDuration(slotCount)}</option>
                         ))}
                       </select>
                       <svg className="pointer-events-none absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
