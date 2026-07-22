@@ -679,6 +679,39 @@ p {
   color: rgba(255,255,255,0.25);
 }
 
+/* Contact inquiry fields */
+.contact-input {
+  width: 100%;
+  min-height: 3.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.375rem;
+  outline: none;
+  background: #0a0a0a;
+  padding: 0.9rem 1rem;
+  color: #fff;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.contact-input:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.contact-input:focus {
+  border-color: rgba(229, 0, 0, 0.8);
+  background: #0d0d0d;
+}
+
+.contact-input::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+select.contact-input option {
+  background: #111;
+  color: #fff;
+}
+
 /* "Transparent" word — literal visual pun */
 .transparent-word {
   color: var(--vibeshack-red);
