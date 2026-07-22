@@ -41,29 +41,28 @@ export default function ContactPage() {
           className="object-cover object-[58%_center] sm:object-center"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.94)_0%,rgba(0,0,0,0.68)_42%,rgba(0,0,0,0.08)_78%),linear-gradient(0deg,rgba(0,0,0,0.92)_0%,transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_60%,rgba(229,0,0,0.18),transparent_31%)]" />
 
         <div className="relative mx-auto flex min-h-[720px] max-w-[1480px] flex-col justify-between px-6 pb-8 pt-36 sm:min-h-[780px] sm:px-10 sm:pb-10 sm:pt-40 lg:px-16">
           <div className="max-w-3xl pt-[8vh] sm:pt-[10vh]">
-            <span className="number-label mb-7 flex w-fit">Contact VibeShack / San Francisco</span>
+            <span className="number-label mb-7 flex w-fit">Contact / 950 Battery St</span>
             <h1 className="max-w-4xl text-[clamp(3.6rem,8.7vw,8.6rem)] font-black leading-[0.84] tracking-[-0.055em] text-white">
-              Let&apos;s make<br />
-              <span className="text-brand-red">something real.</span>
+              Tell us what<br />
+              <span className="text-brand-red">you&apos;re making.</span>
             </h1>
             <p className="mt-7 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
-              Tell us what you are building. We will shape the right room, crew, and production plan around it.
+              Studio bookings, tours, production questions, and project briefs.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <a
                 href="#project-inquiry"
-                className="group inline-flex items-center justify-center gap-3 rounded-xl bg-brand-red px-7 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-all hover:bg-red-700 sm:justify-start"
+                className="group inline-flex items-center justify-center gap-3 rounded-md bg-brand-red px-7 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-red-700 sm:justify-start"
               >
-                Start a project
+                Send a brief
                 <span className="transition-transform group-hover:translate-x-1" aria-hidden="true">↓</span>
               </a>
               <Link
                 href="/book/"
-                className="group inline-flex items-center justify-center gap-3 rounded-xl border border-white/25 bg-black/25 px-7 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-white/60 hover:bg-white/10 sm:justify-start"
+                className="group inline-flex items-center justify-center gap-3 rounded-md border border-white/25 bg-black/25 px-7 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-white/60 hover:bg-white/10 sm:justify-start"
               >
                 Book a studio
                 <span className="transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
@@ -71,86 +70,77 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="mt-10 grid max-w-3xl grid-cols-1 border-t border-white/20 sm:mt-14 sm:grid-cols-3">
-            {[
-              ['Response', 'Same day'],
-              ['Access', 'Studios open 24/7'],
-              ['Location', '950 Battery St'],
-            ].map(([label, value]) => (
-              <div key={label} className="border-b border-white/10 py-5 last:border-b-0 sm:border-b-0 sm:border-r sm:px-7 sm:first:pl-0 sm:last:border-r-0">
-                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-white/45">{label}</p>
-                <p className="mt-1 text-sm font-semibold text-white">{value}</p>
-              </div>
+          <div className="mt-10 flex max-w-3xl flex-col gap-2 border-t border-white/20 pt-5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white/60 sm:mt-14 sm:flex-row sm:items-center sm:gap-0">
+            {['Same-day replies', 'Open 24/7 by appointment', 'San Francisco'].map((item, index) => (
+              <span key={item}>
+                {index > 0 && <span className="mx-4 hidden text-white/25 sm:inline" aria-hidden="true">/</span>}
+                {item}
+              </span>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="project-inquiry" className="relative border-b border-white/10 bg-[#070707] py-20 sm:py-28">
-        <div className="relative mx-auto max-w-[1480px] px-6 sm:px-10 lg:px-16">
+      <section id="project-inquiry" className="border-b border-white/10 bg-[#070707] py-20 sm:py-28">
+        <div className="mx-auto max-w-[1480px] px-6 sm:px-10 lg:px-16">
           <div className="mb-10 max-w-3xl sm:mb-14">
             <span className="number-label mb-5 flex w-fit">Project inquiry</span>
             <h2 className="text-4xl font-black leading-[0.96] tracking-[-0.04em] text-white sm:text-6xl">
-              Tell us what has to ship.
+              Send the brief.
             </h2>
             <p className="mt-5 max-w-2xl text-base text-white/55 sm:text-lg">
-              Share the goal, audience, timing, and deliverables. We will come back with the clearest next step.
+              A few lines is enough. Include your date, crew size, and what you need to make.
             </p>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,0.65fr)] lg:items-start">
-            <div className="rounded-[24px] border border-white/10 bg-white/[0.035] p-5 shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-sm sm:p-8 lg:p-10">
+          <div className="grid gap-14 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.55fr)] lg:items-start lg:gap-20">
+            <div className="border-t border-white/15 pt-8">
               <ContactForm />
             </div>
 
-            <aside className="grid gap-6 lg:sticky lg:top-28">
-              <div className="relative overflow-hidden rounded-[24px] bg-brand-red p-7 sm:p-9">
-                <div className="absolute -right-10 -top-16 h-48 w-48 rounded-full border-[36px] border-white/10" aria-hidden="true" />
-                <p className="relative font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-white/70">Fast track</p>
-                <h3 className="relative mt-4 max-w-sm text-3xl font-black leading-[0.96] tracking-[-0.035em] text-white sm:text-4xl">
-                  Know your room and date?
+            <aside className="border-t border-white/15 lg:sticky lg:top-28">
+              <div className="py-8">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-white/45">Studio booking</p>
+                <h3 className="mt-4 max-w-sm text-2xl font-bold leading-tight tracking-[-0.025em] text-white sm:text-3xl">
+                  Already know the room and time?
                 </h3>
-                <p className="relative mt-4 max-w-sm text-sm text-white/80">
-                  Skip the inquiry. Pick a studio, choose a time, and confirm your session instantly.
+                <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/55">
+                  Go straight to availability and reserve the studio online.
                 </p>
                 <Link
                   href="/book/"
-                  className="group relative mt-7 inline-flex items-center gap-3 rounded-xl bg-white px-6 py-4 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-black transition-transform hover:-translate-y-0.5"
+                  className="group mt-7 inline-flex items-center gap-3 rounded-md bg-brand-red px-6 py-4 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-red-700"
                 >
-                  Book your session
+                  View availability
                   <span className="transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
                 </Link>
               </div>
 
-              <div className="rounded-[24px] border border-white/10 bg-black p-7 sm:p-9">
-                <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-1">
-                  <div>
-                    <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-white/40">Call or text</p>
-                    <a href={`tel:${business.phone.replace(/[^\d+]/g, '')}`} className="mt-2 block text-sm font-semibold text-white transition-colors hover:text-brand-red">
+              <div className="border-t border-white/15 py-8">
+                <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-white/45">Direct contact</p>
+                <div>
+                  <div className="grid grid-cols-[86px_minmax(0,1fr)] gap-4 border-b border-white/10 py-4">
+                    <p className="text-xs text-white/35">Phone</p>
+                    <a href={`tel:${business.phone.replace(/[^\d+]/g, '')}`} className="text-sm font-medium text-white transition-colors hover:text-brand-red">
                       {business.phone}
                     </a>
                   </div>
-                  <div>
-                    <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-white/40">Email</p>
-                    <a href="mailto:founder@vibeshackstudios.com" className="mt-2 block break-words text-sm font-semibold text-white transition-colors hover:text-brand-red">
+                  <div className="grid grid-cols-[86px_minmax(0,1fr)] gap-4 border-b border-white/10 py-4">
+                    <p className="text-xs text-white/35">Email</p>
+                    <a href="mailto:founder@vibeshackstudios.com" className="break-words text-sm font-medium text-white transition-colors hover:text-brand-red">
                       founder@vibeshackstudios.com
                     </a>
                   </div>
-                  <div>
-                    <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-white/40">Visit</p>
-                    <address className="mt-2 not-italic text-sm text-white">
-                      950 Battery St<br />
-                      <span className="text-white/50">San Francisco, CA 94111</span>
+                  <div className="grid grid-cols-[86px_minmax(0,1fr)] gap-4 py-4">
+                    <p className="text-xs text-white/35">Studio</p>
+                    <address className="not-italic text-sm text-white">
+                      950 Battery St, San Francisco
+                      <span className="mt-1 block text-xs text-white/40">Open 24/7 by confirmed booking</span>
                     </address>
-                  </div>
-                  <div>
-                    <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-white/40">Studio access</p>
-                    <p className="mt-2 text-sm font-semibold text-white">24 hours / 7 days</p>
-                    <p className="mt-1 text-xs text-white/45">By confirmed booking</p>
                   </div>
                 </div>
 
-                <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6 font-mono text-[9px] font-bold uppercase tracking-[0.16em]">
+                <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 font-mono text-[9px] font-bold uppercase tracking-[0.16em]">
                   <Link href="/tour/" className="text-brand-red transition-colors hover:text-white">Book a tour →</Link>
                   <a href={peerspaceUrl} target="_blank" rel="noopener noreferrer" className="text-white/45 transition-colors hover:text-white">Peerspace →</a>
                   <a href="https://instagram.com/vibeshackhq/" target="_blank" rel="noopener noreferrer" className="text-white/45 transition-colors hover:text-white">Instagram →</a>

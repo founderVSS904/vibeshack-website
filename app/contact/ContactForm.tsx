@@ -69,14 +69,9 @@ export default function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="py-20 text-center">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-brand-red/30 bg-brand-red/10">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <path d="M8 16l6 6 10-12" stroke="#E50000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-        <h3 className="mb-3 text-3xl font-black text-white">Message sent.</h3>
-        <p className="text-white/50">We will be in touch the same day.</p>
+      <div className="border-l-2 border-brand-red py-4 pl-6">
+        <h3 className="text-3xl font-black text-white">Message sent.</h3>
+        <p className="mt-3 text-white/50">We will be in touch the same day.</p>
       </div>
     )
   }
@@ -86,7 +81,7 @@ export default function ContactForm() {
       <input type="text" name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
       <input type="hidden" name="startedAt" value={startedAt} />
       {status === 'error' && (
-        <div className="col-span-full rounded-xl border border-red-800 bg-red-950/40 p-4">
+        <div className="col-span-full border-l-2 border-brand-red py-2 pl-4">
           <p className="text-sm text-red-300">
             Something went wrong. Email us at{' '}
             <a href="mailto:founder@vibeshackstudios.com" className="underline hover:text-white transition-colors">
@@ -190,7 +185,7 @@ export default function ContactForm() {
           name="message"
           required
           rows={5}
-          placeholder="What are you making? Include the goal, timeline, and deliverables."
+          placeholder="What are you shooting, when is it happening, and what do you need from us?"
           className="contact-input min-h-36 resize-none"
         />
       </div>
@@ -201,7 +196,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="group inline-flex items-center justify-center gap-2.5 rounded-xl bg-brand-red px-7 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="group inline-flex items-center justify-center gap-2.5 rounded-md bg-brand-red px-7 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {status === 'sending' && (
             <svg className="mr-2 inline h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
