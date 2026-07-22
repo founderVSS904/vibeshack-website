@@ -1719,31 +1719,36 @@ body:has(.cinema-experience-root) > footer {
 .cinema-collection-filters {
   display: flex;
   flex: 0 0 auto;
-  align-items: center;
-  gap: 0.2rem;
-  padding: 0 0.85rem 0.35rem;
+  width: max-content;
+  max-width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.22rem;
+  margin-top: clamp(1.25rem, 2.2vh, 1.85rem);
 }
 
 .cinema-collection-filters button {
-  min-height: 1.75rem;
+  min-height: 2rem;
   border: 0;
-  border-bottom: 1px solid transparent;
-  background: transparent;
-  padding: 0.32rem 0.48rem 0.26rem;
-  color: rgba(255, 255, 255, 0.42);
+  border-left: 2px solid transparent;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.52), transparent);
+  padding: 0.46rem 0.8rem 0.4rem 0.72rem;
+  color: rgba(255, 255, 255, 0.64);
   font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
-  font-size: 0.52rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
+  font-size: clamp(0.64rem, 0.72vw, 0.76rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
   line-height: 1;
+  text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
-  transition: color 160ms ease, border-color 160ms ease;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
 .cinema-collection-filters button:hover,
 .cinema-collection-filters button:focus-visible {
-  color: rgba(255, 255, 255, 0.8);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.09), transparent);
+  color: #fff;
 }
 
 .cinema-collection-filters button:focus-visible {
@@ -1753,6 +1758,7 @@ body:has(.cinema-experience-root) > footer {
 
 .cinema-collection-filters button[aria-pressed='true'] {
   border-color: #ec0000;
+  background: linear-gradient(90deg, rgba(236, 0, 0, 0.3), transparent);
   color: #fff;
 }
 
@@ -2036,20 +2042,14 @@ body:has(.cinema-experience-root) > footer {
   }
 
   .cinema-collection-filters {
-    gap: 0.1rem;
-    overflow-x: auto;
-    padding: 0 0.65rem 0.3rem;
-    scrollbar-width: none;
-  }
-
-  .cinema-collection-filters::-webkit-scrollbar {
-    display: none;
+    gap: 0.12rem;
+    margin-top: 0.9rem;
   }
 
   .cinema-collection-filters button {
-    min-height: 1.65rem;
-    padding-inline: 0.4rem;
-    font-size: 0.48rem;
+    min-height: 1.85rem;
+    padding: 0.42rem 0.65rem 0.36rem;
+    font-size: 0.58rem;
   }
 
   .cinema-film-rail li {

@@ -860,6 +860,18 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
         <div className="cinema-title-lockup">
           <p>VibeShack Cinema</p>
           <h1>Our<br />Work</h1>
+          <div className="cinema-collection-filters" role="group" aria-label="Filter cinema projects">
+            {collectionFilters.map((filter) => (
+              <button
+                key={filter.value}
+                type="button"
+                aria-pressed={activeCollection === filter.value}
+                onClick={() => filterCollection(filter.value)}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="cinema-dock">
@@ -939,18 +951,6 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
           </div>
 
           <div className="cinema-library">
-            <div className="cinema-collection-filters" role="group" aria-label="Filter cinema projects">
-              {collectionFilters.map((filter) => (
-                <button
-                  key={filter.value}
-                  type="button"
-                  aria-pressed={activeCollection === filter.value}
-                  onClick={() => filterCollection(filter.value)}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
             <ul
               ref={railRef}
               className="cinema-film-rail"
