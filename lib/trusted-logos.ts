@@ -80,6 +80,15 @@ export const trustedLogos = [
     height: 333,
   },
   {
+    name: 'OpusClip',
+    src: '/brand/trusted-by/clean/opusclip.svg',
+    width: 1030,
+    height: 240,
+    stripSrc: '/brand/trusted-by/strip/opusclip.svg',
+    stripWidth: 1030,
+    stripHeight: 240,
+  },
+  {
     name: "Melinda's Hot Sauce",
     src: '/brand/trusted-by/clean/melindas-hot-sauce.png',
     width: 573,
