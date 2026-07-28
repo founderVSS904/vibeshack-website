@@ -447,8 +447,8 @@ function BookPageInner({ studios }: BookPageInnerProps) {
     setError('')
     setStep(next)
     if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
       requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: 'auto' })
         document.getElementById('booking-step-headline')?.focus({ preventScroll: true })
       })
     }
@@ -884,6 +884,16 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                         {durationLabel}
                       </p>
                     </div>
+                    {selectedStudio.type === 'podcast' && (
+                      <div className="mb-5 border-l-2 border-brand-red bg-white/[0.03] px-4 py-3.5">
+                        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white">
+                          One podcast session at a time
+                        </p>
+                        <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
+                          All podcast rooms share our three-camera package. The times below reflect availability across every podcast studio.
+                        </p>
+                      </div>
+                    )}
                     {!date && (
                       <div className="flex h-44 items-center justify-center rounded-lg border border-dashed border-white/10">
                         <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Select a date first</p>

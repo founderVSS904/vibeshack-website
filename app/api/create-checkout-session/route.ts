@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { assertCartSlotsAvailable, type BookingCartItem } from '@/lib/booking/calendar'
+import { acquireBookingHolds, assertCartSlotsAvailable, releaseBookingHolds, type BookingCartItem } from '@/lib/booking/calendar'
 import { calculateRecurringDiscountCents, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
 import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
 import { SLOT_DURATION_MINUTES, SLOT_DURATION_MS, bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate } from '@/lib/booking/time'
@@ -11,6 +11,8 @@ import { siteUrl } from '@/lib/seo/site'
 const ATTRIBUTION_COOKIE = 'vbs_attribution'
 const CHECKOUT_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
 const CHECKOUT_RATE_LIMIT_MAX = 12
+const CHECKOUT_SESSION_MINUTES = 35
+const CHECKOUT_HOLD_GRACE_MINUTES = 15
 const MAX_BODY_BYTES = 32 * 1024
 
 function getStripe() {
@@ -134,6 +136,14 @@ function readAttributionMetadata(req: NextRequest) {
   return Object.fromEntries(Object.entries(metadata).filter(([, value]) => value))
 }
 
+function checkoutAvailabilityError(status: number, error: string) {
+  if (status !== 409) return error
+  if (error.startsWith('Selected sessions overlap')) {
+    return 'Those rooms share the same studio resources at that time. Please choose a different room group or another open slot.'
+  }
+  return 'This slot is not available. Please choose another open time.'
+}
+
 export async function POST(req: NextRequest) {
   try {
     const limited = rateLimit(req, {
@@ -166,11 +176,7 @@ export async function POST(req: NextRequest) {
 
     const availability = await assertCartSlotsAvailable(cart)
     if (!availability.ok) {
-      const error = availability.status === 409
-        ? availability.error.startsWith('Selected sessions overlap')
-          ? 'Those rooms share the same studio resources at that time. Please choose a different room group or another open slot.'
-          : 'This slot is not available. Please choose another open time.'
-        : availability.error
+      const error = checkoutAvailabilityError(availability.status, availability.error)
       return NextResponse.json({ error }, { status: availability.status })
     }
 
@@ -194,6 +200,8 @@ export async function POST(req: NextRequest) {
     }))
 
     const bookingRef = crypto.randomUUID()
+    const checkoutExpiresAt = Math.floor(Date.now() / 1000) + CHECKOUT_SESSION_MINUTES * 60
+    const holdExpiresAt = new Date((checkoutExpiresAt + CHECKOUT_HOLD_GRACE_MINUTES * 60) * 1000)
     const attributionMetadata = readAttributionMetadata(req)
     const cartMetadata: Record<string, string> = {}
     cart.forEach((item, index) => {
@@ -211,50 +219,75 @@ export async function POST(req: NextRequest) {
     })
 
     const baseUrl = getBaseUrl(req)
-    const session = await getStripe().checkout.sessions.create({
-      ui_mode: 'embedded',
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      mode: 'payment',
-      customer_email: email,
-      payment_intent_data: {
-        receipt_email: email,
-        metadata: {
-          bookingRef,
-          customerEmail: email.slice(0, 500),
-          customerName: name.slice(0, 500),
-        },
-      },
-      metadata: {
-        bookingRef,
-        customerName: name.slice(0, 500),
-        customerEmail: email.slice(0, 500),
-        customerPhone: phone.slice(0, 500),
-        studioName: cart[0].studioName.slice(0, 500),
-        totalSessions: String(cart.length),
-        totalAmount: String(computedTotalCents / 100),
-        computedTotalCents: String(computedTotalCents),
-        recurring: recurringOption?.id || '',
-        recurringDiscountCents: String(discountCents),
-        teamEmails: JSON.stringify(teamEmails).slice(0, 500),
-        referralSource: referralInfo?.source || '',
-        referralPartner: referralInfo?.partnerName || '',
-        referralCommissionRate: referralInfo ? String(referralInfo.commissionRate) : '',
-        referralCommissionCents: referralInfo ? String(referralInfo.commissionCents) : '0',
-        ...attributionMetadata,
-        ...cartMetadata,
-      },
-      return_url: `${baseUrl}/book/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-    })
-
-    if (!session.client_secret) {
-      throw new Error('Stripe embedded checkout did not return a client secret')
+    const publishableKey = getStripePublishableKey()
+    const hold = await acquireBookingHolds(cart, bookingRef, holdExpiresAt)
+    if (!hold.ok) {
+      return NextResponse.json({ error: hold.error }, { status: hold.status })
     }
 
-    return NextResponse.json({
-      clientSecret: session.client_secret,
-      publishableKey: getStripePublishableKey(),
-    })
+    try {
+      const finalAvailability = await assertCartSlotsAvailable(cart, bookingRef)
+      if (!finalAvailability.ok) {
+        await releaseBookingHolds(cart, bookingRef)
+        const error = checkoutAvailabilityError(finalAvailability.status, finalAvailability.error)
+        return NextResponse.json({ error }, { status: finalAvailability.status })
+      }
+
+      const session = await getStripe().checkout.sessions.create({
+        ui_mode: 'embedded',
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        mode: 'payment',
+        customer_email: email,
+        expires_at: checkoutExpiresAt,
+        payment_intent_data: {
+          receipt_email: email,
+          metadata: {
+            bookingRef,
+            customerEmail: email.slice(0, 500),
+            customerName: name.slice(0, 500),
+          },
+        },
+        metadata: {
+          bookingRef,
+          customerName: name.slice(0, 500),
+          customerEmail: email.slice(0, 500),
+          customerPhone: phone.slice(0, 500),
+          studioName: cart[0].studioName.slice(0, 500),
+          totalSessions: String(cart.length),
+          totalAmount: String(computedTotalCents / 100),
+          computedTotalCents: String(computedTotalCents),
+          recurring: recurringOption?.id || '',
+          recurringDiscountCents: String(discountCents),
+          teamEmails: JSON.stringify(teamEmails).slice(0, 500),
+          referralSource: referralInfo?.source || '',
+          referralPartner: referralInfo?.partnerName || '',
+          referralCommissionRate: referralInfo ? String(referralInfo.commissionRate) : '',
+          referralCommissionCents: referralInfo ? String(referralInfo.commissionCents) : '0',
+          bookingHoldVersion: '1',
+          bookingHoldExpiresAt: holdExpiresAt.toISOString(),
+          ...attributionMetadata,
+          ...cartMetadata,
+        },
+        return_url: `${baseUrl}/book/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      })
+
+      if (!session.client_secret) {
+        throw new Error('Stripe embedded checkout did not return a client secret')
+      }
+
+      return NextResponse.json({
+        clientSecret: session.client_secret,
+        publishableKey,
+      })
+    } catch (error) {
+      try {
+        await releaseBookingHolds(cart, bookingRef)
+      } catch (cleanupError) {
+        console.error('Booking hold cleanup failed after checkout error:', cleanupError)
+      }
+      throw error
+    }
   } catch (err) {
     const bodyError = jsonBodyErrorResponse(err)
     if (bodyError) return bodyError
