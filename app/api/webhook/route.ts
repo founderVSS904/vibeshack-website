@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { addBookingEvents, assertCartSlotsAvailable, hasBookingEventsForRef, type BookingCartItem } from '@/lib/booking/calendar'
+import { acquireBookingHolds, addBookingEvents, assertCartSlotsAvailable, hasBookingEventsForRef, releaseBookingHolds, type BookingCartItem } from '@/lib/booking/calendar'
 import { getStudioById } from '@/lib/booking/catalog'
 import { buildReferralInfo, formatMoneyFromCents, type ReferralInfo } from '@/lib/booking/referrals'
 import { SLOT_DURATION_MINUTES, addMinutes, bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, expandLegacyHourlySlots, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate } from '@/lib/booking/time'
 import { escapeHtml, isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
+
+const PAID_BOOKING_HOLD_RECOVERY_MS = 7 * 24 * 60 * 60 * 1000
 
 function getStripe() {
   const secret = process.env.STRIPE_SECRET_KEY
@@ -145,6 +147,14 @@ function validateCompletedSession(
   }
 
   return { ok: true, status: 200, error: '' }
+}
+
+function paidBookingHoldExpiresAt(cartItems: BookingCartItem[]) {
+  const latestSlotStart = Math.max(
+    ...cartItems.flatMap((item) => item.slots.map((slot) => Date.parse(slot))),
+  )
+  const sessionEnd = addMinutes(new Date(latestSlotStart), SLOT_DURATION_MINUTES).getTime()
+  return new Date(Math.max(Date.now() + PAID_BOOKING_HOLD_RECOVERY_MS, sessionEnd + 24 * 60 * 60 * 1000))
 }
 
 function attributionHtml(metadata: Record<string, string>) {
@@ -584,6 +594,38 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Webhook signature failed' }, { status: 400 })
   }
 
+  if (event.type === 'checkout.session.expired') {
+    const session = event.data.object as Stripe.Checkout.Session
+    const metadata = (session.metadata || {}) as Record<string, string>
+    const bookingRef = metadata.bookingRef || ''
+
+    if (bookingRef && metadata.bookingHoldVersion === '1') {
+      const cartItems = parseCartItems(metadata)
+      const expectedSessions = Number.parseInt(metadata.totalSessions || '0', 10)
+      if (
+        !cartItems.length
+        || (Number.isFinite(expectedSessions) && expectedSessions > 0 && cartItems.length !== expectedSessions)
+      ) {
+        console.error('Expired checkout hold has incomplete cart metadata', {
+          sessionId: session.id,
+          bookingRef,
+          parsedItems: cartItems.length,
+          expectedSessions,
+        })
+        return NextResponse.json({ error: 'Expired checkout hold metadata is incomplete' }, { status: 500 })
+      }
+
+      try {
+        await releaseBookingHolds(cartItems, bookingRef)
+      } catch (error) {
+        console.error('Expired checkout hold cleanup failed:', error)
+        return NextResponse.json({ error: 'Expired checkout hold cleanup failed' }, { status: 500 })
+      }
+    }
+
+    return NextResponse.json({ received: true })
+  }
+
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
     const metadata = (session.metadata || {}) as Record<string, string>
@@ -643,6 +685,26 @@ export async function POST(req: NextRequest) {
     const receiptUrl = await getStripeReceiptUrl(session)
     const currentMetadata = await getCurrentSessionMetadata(session)
     const bookingRef = metadata.bookingRef || session.id
+    let holdRenewalError = ''
+    if (metadata.bookingHoldVersion === '1' && !currentMetadata.vbsCalendarSyncedAt) {
+      try {
+        const renewedHold = await acquireBookingHolds(
+          cartItems,
+          bookingRef,
+          paidBookingHoldExpiresAt(cartItems),
+        )
+        if (!renewedHold.ok) {
+          holdRenewalError = renewedHold.error
+          console.error('Paid booking hold could not be renewed:', {
+            bookingRef,
+            error: renewedHold.error,
+          })
+        }
+      } catch (error) {
+        holdRenewalError = 'The paid booking resource hold could not be renewed.'
+        console.error('Paid booking hold renewal failed:', error)
+      }
+    }
     const fulfillmentErrors: string[] = []
 
     if (!currentMetadata.vbsCalendarSyncedAt) {
@@ -654,14 +716,17 @@ export async function POST(req: NextRequest) {
       // failure would see them as conflicts), and only re-check slots that have
       // not started yet (getAvailabilityForDate marks past-start slots
       // unavailable even when nothing is booked).
-      let conflictReason = ''
+      let conflictReason = holdRenewalError
       try {
-        const alreadyInserted = await hasBookingEventsForRef(bookingRef, cartItems.map((item) => item.studioId))
+        const alreadyInserted = await hasBookingEventsForRef(bookingRef, cartItems)
         const futureCart = cartItems
           .map((item) => ({ ...item, slots: item.slots.filter((slot) => Date.parse(slot) > Date.now()) }))
           .filter((item) => item.slots.length)
         if (!alreadyInserted && futureCart.length) {
-          const availability = await assertCartSlotsAvailable(futureCart)
+          const availability = await assertCartSlotsAvailable(
+            futureCart,
+            metadata.bookingHoldVersion === '1' ? bookingRef : undefined,
+          )
           if (!availability.ok && availability.status === 409) {
             conflictReason = availability.error
             console.error('Possible double booking detected after payment:', {
@@ -676,13 +741,25 @@ export async function POST(req: NextRequest) {
       }
 
       let calendarInserted = false
+      let calendarSynced = false
       try {
         await addBookingEvents(cartItems, customer, teamEmails, referralInfo, bookingRef, event.id)
         calendarInserted = true
         await markSessionFulfillmentStep(session.id, 'vbsCalendarSyncedAt')
+        calendarSynced = true
       } catch (error) {
         console.error('Calendar event creation failed:', error)
         fulfillmentErrors.push('calendar')
+      }
+
+      if (calendarSynced && metadata.bookingHoldVersion === '1') {
+        try {
+          await releaseBookingHolds(cartItems, bookingRef)
+          await markSessionFulfillmentStep(session.id, 'vbsBookingHoldReleasedAt')
+        } catch (error) {
+          console.error('Confirmed checkout hold cleanup failed:', error)
+          fulfillmentErrors.push('booking hold cleanup')
+        }
       }
 
       if (conflictReason && !currentMetadata.vbsDoubleBookingAlertedAt) {
@@ -692,6 +769,14 @@ export async function POST(req: NextRequest) {
         } catch (alertError) {
           console.error('Double booking alert email failed:', alertError)
         }
+      }
+    } else if (metadata.bookingHoldVersion === '1' && !currentMetadata.vbsBookingHoldReleasedAt) {
+      try {
+        await releaseBookingHolds(cartItems, bookingRef)
+        await markSessionFulfillmentStep(session.id, 'vbsBookingHoldReleasedAt')
+      } catch (error) {
+        console.error('Confirmed checkout hold retry cleanup failed:', error)
+        fulfillmentErrors.push('booking hold cleanup')
       }
     }
 

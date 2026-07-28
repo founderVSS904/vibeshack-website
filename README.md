@@ -86,7 +86,7 @@ npm run build
 
 ## Booking Calendar Configuration
 
-The paid booking flow stays on `vibeshackstudios.com/book/`, checks Google Calendar before creating Stripe Embedded Checkout, and creates Google Calendar events only after Stripe confirms payment.
+The paid booking flow stays on `vibeshackstudios.com/book/`, checks Google Calendar before creating Stripe Embedded Checkout, and creates confirmed Google Calendar events only after Stripe confirms payment. Checkout takes a temporary hold for each selected half-hour so two customers cannot pay for the same shared resource at once. Active holds are stored in private, transparent ledger events split by resource and booking date. ETag preconditions serialize competing checkout attempts without letting the ledger grow indefinitely. Each active hold is also shown as a private, tentative busy block at the requested time so staff can see that a customer is checking out. The hold is released when checkout expires or after the confirmed booking event is created.
 
 Required production env vars:
 
@@ -95,7 +95,16 @@ Required production env vars:
 - `GCAL_CALENDAR_ID` plus one Google Calendar credential source: `GCAL_TOKEN_B64`, `GCAL_TOKEN_JSON`, or `GCAL_TOKEN_PATH`
 - `CRON_SECRET` for the protected `/api/cron/booking-reminders/` route
 
-Stripe Checkout receives the customer's email as `receipt_email`, and the webhook sends both the customer confirmation/prep emails and the internal founder booking notification after payment. The Vercel cron job checks website-created Google Calendar events every hour and sends the customer 24-hour reminder once per booking.
+Stripe Checkout receives the customer's email as `receipt_email`, and the webhook sends both the customer confirmation/prep emails and the internal founder booking notification after payment. Subscribe the Stripe webhook to both `checkout.session.completed` and `checkout.session.expired`; expired-session delivery removes abandoned checkout holds promptly. Holds also carry their own expiration time, so an abandoned hold never blocks availability if webhook delivery is delayed. After payment, the webhook renews the hold through the booking date until the confirmed Calendar event is safely written. The Vercel cron job checks website-created Google Calendar events every hour and sends the customer 24-hour reminder once per booking.
+
+The booking calendar enforces two independent shared resources:
+
+- Every podcast studio shares the `podcast-production` resource because all podcast sessions use the same three-camera production package.
+- The Wing, Parlor, Horizon, Canvas Podcast, Green Screen, and Canvas Rental also share the physical `shared-stage` resource.
+
+Every room also locks its own `studio:<id>` resource. This allows an unrelated rental to run beside a podcast when the rooms do not share the physical stage.
+
+By default, temporary checkout holds are written to `GCAL_CALENDAR_ID`. Set `GCAL_HOLD_CALENDAR_ID` only if you prefer a dedicated private calendar for checkout holds.
 
 By default, the site uses `GCAL_CALENDAR_ID` as a shared booking calendar. To support parallel room bookings, configure per-studio calendar IDs with one JSON env var:
 
