@@ -41,6 +41,27 @@ type Filter = 'podcast' | 'photo' | 'rental' | 'all'
 
 interface Slot { time: string; label: string; available: boolean }
 
+interface PendingCheckoutState {
+  version: 1
+  clientSecret: string
+  publishableKey: string
+  sessionId: string
+  managementToken: string
+  expiresAt: string
+  selectedId: string
+  durationSlots: number
+  date: string
+  startSlot: string
+  slots: Slot[]
+  recurring: string | null
+  name: string
+  email: string
+  phone: string
+  teamEmails: string[]
+}
+
+const PENDING_CHECKOUT_STORAGE_KEY = 'vbs_pending_checkout_v1'
+
 const STEP_ORDER: Exclude<Step, 'payment'>[] = ['room', 'datetime', 'extras', 'review']
 const STEP_LABELS: Record<Exclude<Step, 'payment'>, string> = {
   room: 'Studio',
@@ -110,6 +131,63 @@ function checkoutErrorMessage(message: unknown) {
     return 'This slot is not available. Please choose another open time.'
   }
   return message
+}
+
+function readPendingCheckout() {
+  if (typeof window === 'undefined') return null
+
+  try {
+    const parsed = JSON.parse(
+      window.sessionStorage.getItem(PENDING_CHECKOUT_STORAGE_KEY) || '',
+    ) as Partial<PendingCheckoutState>
+    if (
+      !parsed
+      || typeof parsed !== 'object'
+      || parsed.version !== 1
+      || typeof parsed.clientSecret !== 'string'
+      || typeof parsed.publishableKey !== 'string'
+      || typeof parsed.sessionId !== 'string'
+      || typeof parsed.managementToken !== 'string'
+      || typeof parsed.expiresAt !== 'string'
+      || typeof parsed.selectedId !== 'string'
+      || typeof parsed.durationSlots !== 'number'
+      || typeof parsed.date !== 'string'
+      || typeof parsed.startSlot !== 'string'
+      || !Array.isArray(parsed.slots)
+      || !parsed.slots.every((slot) => (
+        slot
+        && typeof slot.time === 'string'
+        && typeof slot.label === 'string'
+        && typeof slot.available === 'boolean'
+      ))
+      || (parsed.recurring !== null && typeof parsed.recurring !== 'string')
+      || typeof parsed.name !== 'string'
+      || typeof parsed.email !== 'string'
+      || typeof parsed.phone !== 'string'
+      || !Array.isArray(parsed.teamEmails)
+      || !parsed.teamEmails.every((item) => typeof item === 'string')
+    ) {
+      return null
+    }
+
+    return parsed as PendingCheckoutState
+  } catch {
+    return null
+  }
+}
+
+function writePendingCheckout(checkout: PendingCheckoutState) {
+  if (typeof window === 'undefined') return
+  try {
+    window.sessionStorage.setItem(PENDING_CHECKOUT_STORAGE_KEY, JSON.stringify(checkout))
+  } catch {}
+}
+
+function clearPendingCheckout() {
+  if (typeof window === 'undefined') return
+  try {
+    window.sessionStorage.removeItem(PENDING_CHECKOUT_STORAGE_KEY)
+  } catch {}
 }
 
 function readCookie(name: string) {
@@ -312,6 +390,9 @@ function BookPageInner({ studios }: BookPageInnerProps) {
   const [error, setError] = useState('')
   const [checkoutPublishableKey, setCheckoutPublishableKey] = useState('')
   const [checkoutClientSecret, setCheckoutClientSecret] = useState('')
+  const [checkoutSessionId, setCheckoutSessionId] = useState('')
+  const [checkoutManagementToken, setCheckoutManagementToken] = useState('')
+  const [checkoutCancelling, setCheckoutCancelling] = useState(false)
 
   const railRef = useRef<HTMLDivElement>(null)
   const availabilityReqRef = useRef(0)
@@ -322,6 +403,35 @@ function BookPageInner({ studios }: BookPageInnerProps) {
     setReferralSource(source)
     persistReferralSource(source)
   }, [])
+
+  useEffect(() => {
+    const pending = readPendingCheckout()
+    if (!pending) return
+
+    const studio = studios.find((item) => item.id === pending.selectedId)
+    if (!studio) {
+      clearPendingCheckout()
+      return
+    }
+
+    setSelectedId(studio.id)
+    setPreviewId(studio.id)
+    setFilter(filterForStudio(studio))
+    setDurationSlots(pending.durationSlots)
+    setDate(pending.date)
+    setStartSlot(pending.startSlot)
+    setSlots(pending.slots)
+    setRecurring(pending.recurring)
+    setName(pending.name)
+    setEmail(pending.email)
+    setPhone(pending.phone)
+    setTeamEmails(pending.teamEmails)
+    setCheckoutPublishableKey(pending.publishableKey)
+    setCheckoutClientSecret(pending.clientSecret)
+    setCheckoutSessionId(pending.sessionId)
+    setCheckoutManagementToken(pending.managementToken)
+    setStep('payment')
+  }, [studios])
 
   // The global html/body overflow-x:hidden kills position:sticky; clip keeps
   // the same clipping without breaking the session sidebar.
@@ -502,7 +612,13 @@ function BookPageInner({ studios }: BookPageInnerProps) {
       return
     }
     if (!name || !email) { setError('Name and email are required.'); return }
-    setError(''); setSubmitting(true); setCheckoutClientSecret(''); setCheckoutPublishableKey('')
+    setError('')
+    setSubmitting(true)
+    setCheckoutClientSecret('')
+    setCheckoutPublishableKey('')
+    setCheckoutSessionId('')
+    setCheckoutManagementToken('')
+    clearPendingCheckout()
     trackBookingStep('checkout_start', {
       sessions: 1,
       value: grandTotal,
@@ -543,9 +659,29 @@ function BookPageInner({ studios }: BookPageInnerProps) {
         setSubmitting(false)
         return
       }
-      if (data.clientSecret && data.publishableKey) {
+      if (data.clientSecret && data.publishableKey && data.sessionId && data.managementToken && data.expiresAt) {
         setCheckoutPublishableKey(data.publishableKey)
         setCheckoutClientSecret(data.clientSecret)
+        setCheckoutSessionId(data.sessionId)
+        setCheckoutManagementToken(data.managementToken)
+        writePendingCheckout({
+          version: 1,
+          clientSecret: data.clientSecret,
+          publishableKey: data.publishableKey,
+          sessionId: data.sessionId,
+          managementToken: data.managementToken,
+          expiresAt: data.expiresAt,
+          selectedId: selectedStudio.id,
+          durationSlots,
+          date,
+          startSlot,
+          slots,
+          recurring,
+          name,
+          email,
+          phone,
+          teamEmails,
+        })
         trackBookingStep('payment_attempt', {
           sessions: 1,
           value: grandTotal,
@@ -558,6 +694,48 @@ function BookPageInner({ studios }: BookPageInnerProps) {
       }
       else { setError('Payment could not be started. Please try again.'); setSubmitting(false) }
     } catch { setError('Connection error. Try again.'); setSubmitting(false) }
+  }
+
+  async function changeCheckoutDetails() {
+    if (!checkoutSessionId || !checkoutManagementToken || checkoutCancelling) return
+
+    setCheckoutCancelling(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/cancel-checkout-session/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: checkoutSessionId,
+          managementToken: checkoutManagementToken,
+        }),
+      })
+      const data = await res.json()
+
+      if (data.code === 'booking_completed' && data.confirmationUrl) {
+        clearPendingCheckout()
+        window.location.assign(data.confirmationUrl)
+        return
+      }
+
+      if (!res.ok || !data.released) {
+        setError(data.error || 'We could not reopen this time yet. Please try again.')
+        return
+      }
+
+      setCheckoutClientSecret('')
+      setCheckoutPublishableKey('')
+      setCheckoutSessionId('')
+      setCheckoutManagementToken('')
+      clearPendingCheckout()
+      goToStep('datetime')
+      if (date) await selectDate(date)
+    } catch {
+      setError('Connection error. Your current checkout is still protected. Please try again.')
+    } finally {
+      setCheckoutCancelling(false)
+    }
   }
 
   const headline =
@@ -1179,16 +1357,19 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                     <p className="animate-pulse text-sm text-zinc-500" role="status">Preparing secure checkout…</p>
                   </div>
                 )}
+                <p className="mt-5 max-w-lg text-sm leading-relaxed text-zinc-500">
+                  Need a different room or time? Release this checkout first, then update your booking.
+                </p>
+                {error && (
+                  <p className="mt-3 text-sm text-brand-red" role="alert">{error}</p>
+                )}
                 <button
                   type="button"
-                  onClick={() => {
-                    setCheckoutClientSecret('')
-                    setCheckoutPublishableKey('')
-                    goToStep('review')
-                  }}
-                  className="mt-5 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500 transition-colors hover:text-white"
+                  onClick={() => void changeCheckoutDetails()}
+                  disabled={checkoutCancelling || !checkoutSessionId || !checkoutManagementToken}
+                  className="mt-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:text-white disabled:cursor-wait disabled:opacity-50"
                 >
-                  ← Back to review
+                  {checkoutCancelling ? 'Releasing checkout…' : '← Change booking details'}
                 </button>
               </div>
             )}

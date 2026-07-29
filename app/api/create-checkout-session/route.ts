@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { acquireBookingHolds, assertCartSlotsAvailable, releaseBookingHolds, type BookingCartItem } from '@/lib/booking/calendar'
 import { calculateRecurringDiscountCents, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
+import { createCheckoutManagementToken } from '@/lib/booking/checkout-management'
 import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
+import { getStripeClient } from '@/lib/booking/stripe'
 import { SLOT_DURATION_MINUTES, SLOT_DURATION_MS, bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate } from '@/lib/booking/time'
 import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
 import { isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
@@ -14,12 +16,6 @@ const CHECKOUT_RATE_LIMIT_MAX = 12
 const CHECKOUT_SESSION_MINUTES = 35
 const CHECKOUT_HOLD_GRACE_MINUTES = 15
 const MAX_BODY_BYTES = 32 * 1024
-
-function getStripe() {
-  const secret = process.env.STRIPE_SECRET_KEY
-  if (!secret) throw new Error('STRIPE_SECRET_KEY is not configured')
-  return new Stripe(secret, { apiVersion: '2026-02-25.clover' })
-}
 
 function getStripePublishableKey() {
   const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY
@@ -233,7 +229,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error }, { status: finalAvailability.status })
       }
 
-      const session = await getStripe().checkout.sessions.create({
+      const session = await getStripeClient().checkout.sessions.create({
         ui_mode: 'embedded',
         payment_method_types: ['card'],
         line_items: lineItems,
@@ -279,6 +275,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         clientSecret: session.client_secret,
         publishableKey,
+        sessionId: session.id,
+        managementToken: createCheckoutManagementToken(session.id, bookingRef),
+        expiresAt: new Date(checkoutExpiresAt * 1000).toISOString(),
       })
     } catch (error) {
       try {

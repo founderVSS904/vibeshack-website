@@ -97,6 +97,8 @@ Required production env vars:
 
 Stripe Checkout receives the customer's email as `receipt_email`, and the webhook sends both the customer confirmation/prep emails and the internal founder booking notification after payment. Subscribe the Stripe webhook to both `checkout.session.completed` and `checkout.session.expired`; expired-session delivery removes abandoned checkout holds promptly. Holds also carry their own expiration time, so an abandoned hold never blocks availability if webhook delivery is delayed. After payment, the webhook renews the hold through the booking date until the confirmed Calendar event is safely written. The Vercel cron job checks website-created Google Calendar events every hour and sends the customer 24-hour reminder once per booking.
 
+If a customer chooses **Change booking details** from embedded checkout, the site expires that unpaid Stripe session before releasing its Calendar hold and reopening the date picker. The cancellation request is signed for that exact Checkout Session, uses Stripe metadata as the canonical cart, and never releases a completed or paid session.
+
 The booking calendar enforces two independent shared resources:
 
 - Every podcast studio shares the `podcast-production` resource because all podcast sessions use the same three-camera production package.

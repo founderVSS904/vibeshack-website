@@ -1,11 +1,24 @@
 'use client'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
+
+const PENDING_CHECKOUT_STORAGE_KEY = 'vbs_pending_checkout_v1'
 
 function ConfirmationContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
+
+  useEffect(() => {
+    if (!sessionId) return
+    try {
+      const raw = window.sessionStorage.getItem(PENDING_CHECKOUT_STORAGE_KEY)
+      const pending = raw ? JSON.parse(raw) as { sessionId?: unknown } : null
+      if (pending?.sessionId === sessionId) {
+        window.sessionStorage.removeItem(PENDING_CHECKOUT_STORAGE_KEY)
+      }
+    } catch {}
+  }, [sessionId])
 
   if (!sessionId) {
     return (
