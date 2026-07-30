@@ -2,6 +2,13 @@ import fs from 'fs'
 import { createHash } from 'node:crypto'
 import { google, type calendar_v3 } from 'googleapis'
 import { getStudioById, STUDIOS } from './catalog'
+import { bookingHoldIsActive } from './checkout-lifecycle'
+import {
+  bookingHoldCleanupError,
+  collectBookingHoldCleanupFailures,
+  deleteBookingHoldArtifact,
+  runOptimisticBookingHoldCleanup,
+} from './hold-cleanup'
 import { formatMoneyFromCents, type ReferralInfo } from './referrals'
 import { primaryStudioResourceGroup, studioIdsThatAffectAvailability, studioResourceGroups, studiosShareResources } from './resources'
 import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
@@ -284,6 +291,10 @@ function googleApiStatus(error: unknown) {
   return candidate.response?.status || candidate.code || 0
 }
 
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error)
+}
+
 function bookingHoldLedgerRequestBody(
   target: BookingHoldLedgerTarget,
   ledger: BookingHoldLedger,
@@ -349,8 +360,7 @@ function activeBookingHoldLedger(
   const holds = Object.fromEntries(
     Object.entries(ledger.holds).filter(([, hold]) => (
       hold
-      && Number.isFinite(Date.parse(hold.expiresAt))
-      && Date.parse(hold.expiresAt) > now
+      && bookingHoldIsActive(hold.expiresAt, now)
       && Array.isArray(hold.slots)
     )),
   )
@@ -553,18 +563,25 @@ async function deleteBookingHoldBusyEvents(
   cartItems: BookingCartItem[],
   bookingRef: string,
 ) {
-  for (const target of bookingHoldBusyEventTargets(cartItems, bookingRef)) {
-    try {
-      await client.events.delete({
-        calendarId,
-        eventId: target.eventId,
-        sendUpdates: 'none',
-      })
-    } catch (error) {
-      const status = googleApiStatus(error)
-      if (status !== 404 && status !== 410) throw error
-    }
-  }
+  const targets = bookingHoldBusyEventTargets(cartItems, bookingRef)
+  return collectBookingHoldCleanupFailures(
+    targets,
+    (target) => `busy event ${target.eventId}`,
+    async (target) => {
+      await deleteBookingHoldArtifact(
+        () => client.events.delete({
+          calendarId,
+          eventId: target.eventId,
+          sendUpdates: 'none',
+        }),
+        () => client.events.get({
+          calendarId,
+          eventId: target.eventId,
+        }),
+        googleApiStatus,
+      )
+    },
+  )
 }
 
 function holdSlotsConflict(first: string[], second: string[]) {
@@ -578,30 +595,56 @@ async function releaseBookingHoldsForTargets(
   targets: BookingHoldLedgerTarget[],
   bookingRef: string,
 ) {
-  for (const target of targets) {
-    for (let attempt = 0; attempt < BOOKING_HOLD_UPDATE_ATTEMPTS; attempt++) {
-      const currentEvent = await getExistingBookingHoldLedger(client, calendarId, target)
-      if (!currentEvent) break
+  return collectBookingHoldCleanupFailures(
+    targets,
+    (target) => `ledger ${target.resourceGroup} on ${target.date} (${target.eventId})`,
+    async (target) => {
+      await runOptimisticBookingHoldCleanup({
+        attempts: BOOKING_HOLD_UPDATE_ATTEMPTS,
+        load: () => getExistingBookingHoldLedger(client, calendarId, target),
+        isReleased: (currentEvent) => (
+          !currentEvent
+          || !activeBookingHoldLedger(currentEvent, target).holds[bookingRef]
+        ),
+        update: async (currentEvent) => {
+          if (!currentEvent) return
+          const ledger = activeBookingHoldLedger(currentEvent, target)
+          const nextHolds = { ...ledger.holds }
+          delete nextHolds[bookingRef]
+          await updateBookingHoldLedger(client, calendarId, target, currentEvent, {
+            ...ledger,
+            holds: nextHolds,
+          })
+        },
+        verifyReleased: async () => {
+          const verifiedEvent = await getExistingBookingHoldLedger(client, calendarId, target)
+          return (
+            !verifiedEvent
+            || !activeBookingHoldLedger(verifiedEvent, target).holds[bookingRef]
+          )
+        },
+        statusOf: googleApiStatus,
+        concurrentFailureMessage: 'Booking hold could not be released after repeated calendar changes.',
+      })
+    },
+  )
+}
 
-      const ledger = activeBookingHoldLedger(currentEvent, target)
-      if (!ledger.holds[bookingRef]) break
+async function releaseBookingHoldArtifacts(
+  client: ReturnType<typeof google.calendar>,
+  calendarId: string,
+  targets: BookingHoldLedgerTarget[],
+  cartItems: BookingCartItem[],
+  bookingRef: string,
+) {
+  const [busyEventFailures, ledgerFailures] = await Promise.all([
+    deleteBookingHoldBusyEvents(client, calendarId, cartItems, bookingRef),
+    releaseBookingHoldsForTargets(client, calendarId, targets, bookingRef),
+  ])
+  const failures = [...busyEventFailures, ...ledgerFailures]
 
-      const nextHolds = { ...ledger.holds }
-      delete nextHolds[bookingRef]
-
-      try {
-        await updateBookingHoldLedger(client, calendarId, target, currentEvent, {
-          ...ledger,
-          holds: nextHolds,
-        })
-        break
-      } catch (error) {
-        if (googleApiStatus(error) !== 412) throw error
-        if (attempt === BOOKING_HOLD_UPDATE_ATTEMPTS - 1) {
-          throw new Error('Booking hold could not be released after repeated calendar changes.')
-        }
-      }
-    }
+  if (failures.length) {
+    throw bookingHoldCleanupError(bookingRef, failures)
   }
 }
 
@@ -649,8 +692,13 @@ async function releaseAcquiredBookingHolds(
   if (!acquiredTargets.length) return
 
   try {
-    await deleteBookingHoldBusyEvents(client, calendarId, cartItems, bookingRef)
-    await releaseBookingHoldsForTargets(client, calendarId, acquiredTargets, bookingRef)
+    await releaseBookingHoldArtifacts(
+      client,
+      calendarId,
+      acquiredTargets,
+      cartItems,
+      bookingRef,
+    )
   } catch (error) {
     console.error('Partial booking hold cleanup failed:', error)
   }
@@ -713,10 +761,14 @@ export async function acquireBookingHolds(
 
   const calendarId = getHoldCalendarId()
   const targets = bookingHoldTargets(cartItems)
-  const acquiredTargets: BookingHoldLedgerTarget[] = []
+  const attemptedTargets: BookingHoldLedgerTarget[] = []
 
   try {
     for (const target of targets) {
+      // Include the current target before the update. Google may commit a
+      // ledger write and then time out, so relying only on successful client
+      // responses can omit a hold that still needs rollback.
+      attemptedTargets.push(target)
       const result = await acquireBookingHoldTarget(
         config.client,
         calendarId,
@@ -726,17 +778,15 @@ export async function acquireBookingHolds(
       )
 
       if (!result.ok) {
-        await releaseAcquiredBookingHolds(config.client, calendarId, acquiredTargets, cartItems, bookingRef)
+        await releaseAcquiredBookingHolds(config.client, calendarId, attemptedTargets, cartItems, bookingRef)
         return result
       }
-
-      acquiredTargets.push(target)
     }
 
     await upsertBookingHoldBusyEvents(config.client, calendarId, cartItems, bookingRef, expiresAt)
     return { ok: true, status: 200, error: '' }
   } catch (error) {
-    await releaseAcquiredBookingHolds(config.client, calendarId, acquiredTargets, cartItems, bookingRef)
+    await releaseAcquiredBookingHolds(config.client, calendarId, attemptedTargets, cartItems, bookingRef)
     throw error
   }
 }
@@ -751,16 +801,11 @@ export async function releaseBookingHolds(
   if (!config) throw new Error('Calendar credentials are not configured')
 
   const targets = bookingHoldTargets(cartItems)
-  await deleteBookingHoldBusyEvents(
-    config.client,
-    getHoldCalendarId(),
-    cartItems,
-    bookingRef,
-  )
-  await releaseBookingHoldsForTargets(
+  await releaseBookingHoldArtifacts(
     config.client,
     getHoldCalendarId(),
     targets,
+    cartItems,
     bookingRef,
   )
 }
@@ -811,7 +856,7 @@ async function cleanupExpiredBookingHoldBusyEvents(
     expiredEventIds.push(...(response.data.items || [])
       .filter((event) => {
         const expiresAt = event.extendedProperties?.private?.expiresAt || ''
-        return !Number.isFinite(Date.parse(expiresAt)) || Date.parse(expiresAt) <= Date.now()
+        return !bookingHoldIsActive(expiresAt)
       })
       .map((event) => event.id)
       .filter((eventId): eventId is string => Boolean(eventId)))
@@ -819,17 +864,30 @@ async function cleanupExpiredBookingHoldBusyEvents(
     pageToken = response.data.nextPageToken || undefined
   } while (pageToken)
 
-  for (const eventId of expiredEventIds) {
-    try {
-      await client.events.delete({
-        calendarId,
-        eventId,
-        sendUpdates: 'none',
-      })
-    } catch (error) {
-      const status = googleApiStatus(error)
-      if (status !== 404 && status !== 410) throw error
-    }
+  const failures = await collectBookingHoldCleanupFailures(
+    expiredEventIds,
+    (eventId) => `expired busy event ${eventId}`,
+    async (eventId) => {
+      try {
+        await client.events.delete({
+          calendarId,
+          eventId,
+          sendUpdates: 'none',
+        })
+      } catch (error) {
+        const status = googleApiStatus(error)
+        if (status !== 404 && status !== 410) throw error
+      }
+    },
+  )
+
+  if (failures.length) {
+    throw new AggregateError(
+      failures.map(({ error }) => error),
+      `Expired booking hold housekeeping was incomplete. ${failures
+        .map(({ target, error }) => `${target}: ${errorMessage(error)}`)
+        .join('; ')}`,
+    )
   }
 }
 
@@ -838,12 +896,15 @@ async function getBusyTimesForRange(start: Date, end: Date, calendarIds: string[
   if (!config) return null
 
   const ids = Array.from(new Set(calendarIds.filter(Boolean)))
-  await cleanupExpiredBookingHoldBusyEvents(
-    config.client,
-    getHoldCalendarId(),
-    start,
-    end,
-  )
+  const holdCalendarId = getHoldCalendarId()
+  if (ids.includes(holdCalendarId)) {
+    await cleanupExpiredBookingHoldBusyEvents(
+      config.client,
+      holdCalendarId,
+      start,
+      end,
+    )
+  }
   const response = await config.client.freebusy.query({
     requestBody: {
       timeMin: start.toISOString(),
@@ -937,10 +998,7 @@ function eventBlocksStudio(
 
   if (
     privateProperties.source === 'vibeshack-booking-checkout-hold'
-    && (
-      !Number.isFinite(Date.parse(privateProperties.expiresAt || ''))
-      || Date.parse(privateProperties.expiresAt || '') <= Date.now()
-    )
+    && !bookingHoldIsActive(privateProperties.expiresAt)
   ) {
     return false
   }
@@ -1053,12 +1111,19 @@ export async function getBusyTimesForDate(
   const daySlots = getTimeSlotsForDay(date)
   const timeMin = daySlots[0].start.toISOString()
   const timeMax = daySlots[daySlots.length - 1].end.toISOString()
-  await cleanupExpiredBookingHoldBusyEvents(
-    config.client,
-    getHoldCalendarId(),
-    new Date(timeMin),
-    new Date(timeMax),
-  )
+  try {
+    await cleanupExpiredBookingHoldBusyEvents(
+      config.client,
+      getHoldCalendarId(),
+      new Date(timeMin),
+      new Date(timeMax),
+    )
+  } catch (error) {
+    // Availability below reads full event metadata and ignores expired hold
+    // events itself. Cleanup is helpful housekeeping, but a failed deletion
+    // must not make every otherwise-open booking time disappear.
+    console.error('Expired booking hold housekeeping failed:', error)
+  }
   const calendarContexts = new Map<string, {
     calendarId: string
     isStudioSpecificCalendar: boolean

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { acquireBookingHolds, assertCartSlotsAvailable, releaseBookingHolds, type BookingCartItem } from '@/lib/booking/calendar'
 import { calculateRecurringDiscountCents, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
+import { bookingCheckoutExpirations } from '@/lib/booking/checkout-lifecycle'
 import { createCheckoutManagementToken } from '@/lib/booking/checkout-management'
 import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
 import { getStripeClient } from '@/lib/booking/stripe'
@@ -13,8 +14,6 @@ import { siteUrl } from '@/lib/seo/site'
 const ATTRIBUTION_COOKIE = 'vbs_attribution'
 const CHECKOUT_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
 const CHECKOUT_RATE_LIMIT_MAX = 12
-const CHECKOUT_SESSION_MINUTES = 35
-const CHECKOUT_HOLD_GRACE_MINUTES = 15
 const MAX_BODY_BYTES = 32 * 1024
 
 function getStripePublishableKey() {
@@ -196,8 +195,7 @@ export async function POST(req: NextRequest) {
     }))
 
     const bookingRef = crypto.randomUUID()
-    const checkoutExpiresAt = Math.floor(Date.now() / 1000) + CHECKOUT_SESSION_MINUTES * 60
-    const holdExpiresAt = new Date((checkoutExpiresAt + CHECKOUT_HOLD_GRACE_MINUTES * 60) * 1000)
+    const { checkoutExpiresAt, holdExpiresAt } = bookingCheckoutExpirations()
     const attributionMetadata = readAttributionMetadata(req)
     const cartMetadata: Record<string, string> = {}
     cart.forEach((item, index) => {
