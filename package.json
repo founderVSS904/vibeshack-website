@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
+    "build": "npm test && NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
     "start": "NODE_OPTIONS=\"--max-old-space-size=2048\" next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern .next --ignore-pattern node_modules",
+    "test": "tsx --test tests/**/*.test.ts",
     "seo:audit": "node scripts/seo-audit.mjs"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "eslint-config-next": "^15.5.18",
     "postcss": "^8.5.14",
     "tailwindcss": "^3.4.6",
+    "tsx": "4.21.0",
     "typescript": "^5.5.3"
   },
   "overrides": {

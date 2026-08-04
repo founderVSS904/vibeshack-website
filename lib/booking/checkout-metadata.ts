@@ -4,6 +4,9 @@ import {
   SLOT_DURATION_MINUTES,
   addMinutes,
   expandLegacyHourlySlots,
+  hasConsecutiveBookingSlots,
+  isValidBookingDate,
+  slotIsoSetForDate,
 } from './time'
 import { stripControlChars } from '@/lib/server/sanitize'
 
@@ -76,6 +79,51 @@ export function hasCompleteBookingCartMetadata(
   cartItems: BookingCartItem[],
 ) {
   const expectedSessions = Number.parseInt(metadata.totalSessions || '0', 10)
+  const managedHold = metadata.bookingHoldVersion === '1'
+  const declaredCountMatches = managedHold
+    ? metadata.totalSessions === String(expectedSessions)
+      && expectedSessions > 0
+      && expectedSessions <= 20
+      && cartItems.length === expectedSessions
+    : !Number.isFinite(expectedSessions)
+      || expectedSessions <= 0
+      || cartItems.length === expectedSessions
+
+  const managedCartMatches = !managedHold || cartItems.every((item, index) => {
+    try {
+      const compact = JSON.parse(metadata[`cart_${index}`] || '')
+      if (
+        !compact
+        || typeof compact !== 'object'
+        || compact.id !== item.studioId
+        || compact.d !== item.date
+        || compact.t0 !== item.slots[0]
+        || compact.u !== SLOT_DURATION_MINUTES
+        || !Array.isArray(compact.off)
+        || compact.off.length !== item.slots.length
+        || !compact.off.every((offset: unknown, offsetIndex: number) => (
+          Number.isInteger(offset) && offset === offsetIndex
+        ))
+      ) {
+        return false
+      }
+    } catch {
+      return false
+    }
+
+    return true
+  })
+
   return cartItems.length > 0
-    && (!Number.isFinite(expectedSessions) || expectedSessions <= 0 || cartItems.length === expectedSessions)
+    && declaredCountMatches
+    && managedCartMatches
+    && cartItems.every((item) => {
+      const studio = getStudioById(item.studioId)
+      if (!studio || !isValidBookingDate(item.date) || !hasConsecutiveBookingSlots(item.slots)) {
+        return false
+      }
+
+      const canonicalSlots = slotIsoSetForDate(item.date)
+      return item.slots.every((slot) => canonicalSlots.has(slot))
+    })
 }

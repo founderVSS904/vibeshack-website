@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { releaseBookingHolds } from '@/lib/booking/calendar'
+import { checkoutHoldReleaseAction } from '@/lib/booking/checkout-lifecycle'
 import { verifyCheckoutManagementToken } from '@/lib/booking/checkout-management'
 import {
   hasCompleteBookingCartMetadata,
@@ -62,25 +63,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Checkout details could not be verified' }, { status: 500 })
     }
 
-    if (session.payment_status === 'paid' || session.status === 'complete') {
+    let releaseAction = checkoutHoldReleaseAction(session)
+    if (releaseAction === 'completed') {
       return completedResponse(sessionId)
     }
 
-    if (session.status === 'open') {
+    if (releaseAction === 'expire') {
       try {
         session = await stripe.checkout.sessions.expire(sessionId)
       } catch (error) {
         // Payment and cancellation can race. Re-read Stripe before deciding
         // whether the hold may be released.
         session = await stripe.checkout.sessions.retrieve(sessionId)
-        if (session.payment_status === 'paid' || session.status === 'complete') {
+        releaseAction = checkoutHoldReleaseAction(session)
+        if (releaseAction === 'completed') {
           return completedResponse(sessionId)
         }
-        if (session.status !== 'expired') throw error
+        if (releaseAction !== 'release') throw error
       }
     }
 
-    if (session.status !== 'expired' || session.payment_status === 'paid') {
+    releaseAction = checkoutHoldReleaseAction(session)
+    if (releaseAction === 'completed') {
+      return completedResponse(sessionId)
+    }
+    if (releaseAction !== 'release') {
       return NextResponse.json({
         error: 'Checkout is still active. Please wait a moment and try again.',
       }, { status: 409 })

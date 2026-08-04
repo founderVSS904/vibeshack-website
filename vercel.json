@@ -1,9 +1,13 @@
 {
-  "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
+  "buildCommand": "npm test && NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
   "devCommand": "next dev",
   "installCommand": "npm install",
   "framework": "nextjs",
   "crons": [
+    {
+      "path": "/api/cron/booking-hold-watchdog/",
+      "schedule": "*/10 * * * *"
+    },
     {
       "path": "/api/cron/booking-reminders/",
       "schedule": "0 * * * *"
