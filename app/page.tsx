@@ -4,6 +4,7 @@ import { FeaturedOriginals } from '@/components/home/FeaturedOriginals'
 import { TrustedStrip } from '@/components/home/TrustedStrip'
 import { WhatWeDo } from '@/components/home/WhatWeDo'
 import { StudioSpaces } from '@/components/home/StudioSpaces'
+import { HomeIdleScreensaver } from '@/components/home/HomeIdleScreensaver'
 import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default function HomePage() {
       <TrustedStrip />
       <StudioSpaces />
       <WhatWeDo />
+      <HomeIdleScreensaver />
     </div>
   )
 }

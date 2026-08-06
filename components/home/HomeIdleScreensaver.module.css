@@ -1,0 +1,67 @@
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  background: #050505;
+  cursor: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 440ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 440ms;
+}
+
+.stage[data-active='true'] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.stage[data-shielding='true'] {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mark {
+  --idle-mark-color: #ec0000;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: clamp(10rem, 13vw, 13.75rem);
+  aspect-ratio: 3317 / 1472;
+  background: var(--idle-mark-color);
+  -webkit-mask: url('/brand/vibeshack/idle-vs-monogram-mask.png') center / contain no-repeat;
+  mask: url('/brand/vibeshack/idle-vs-monogram-mask.png') center / contain no-repeat;
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  transition:
+    background-color 160ms linear,
+    opacity 240ms ease;
+  will-change: transform;
+}
+
+.stage[data-active='true'] .mark {
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  .mark {
+    width: clamp(6.75rem, 31vw, 9rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage {
+    display: none;
+  }
+}
