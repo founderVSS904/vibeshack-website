@@ -165,7 +165,7 @@ export const STUDIOS: Studio[] = [
     description: 'Seamless white cyc wall. Overhead lighting grid.',
     heroImage: '/studio-images/inside-canvas-cyc-v20260509.jpg',
     photos: ['/studio-images/inside-canvas-cyc-v20260509.jpg', '/studio-images/enhanced-canvas-podcast-white-cyc-duo-v20260510.jpg', '/studio-images/canvas-rental-space-v20260509.jpg'],
-    includes: ['White cyc wall', 'Overhead lighting grid', 'Black floor mats', 'All equipment included'],
+    includes: ['White cyc wall', 'Overhead lighting grid', 'Black floor mats'],
     type: 'photo',
     prep: [
       'White backdrop works with almost any outfit. Avoid all-white.',

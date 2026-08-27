@@ -13,6 +13,7 @@ import { metadata as sunsetMetadata } from '../app/sunset-studio/layout'
 import PricingPage from '../app/pricing/page'
 import SupportPage from '../app/support/page'
 import GreenScreenPage from '../app/green-screen-studio-sf/page'
+import { STUDIOS } from '../lib/booking/catalog'
 import {
   PODCAST_CAMERA_LABEL,
   PODCAST_CREW_LABEL,
@@ -96,5 +97,13 @@ describe('approved public podcast packages', () => {
     const html = renderToStaticMarkup(React.createElement(GreenScreenPage))
     assert.match(html, /available by arrangement/i)
     assert.doesNotMatch(html, /Camera Operator for \$50|streaming add-on is available for \$100/)
+  })
+
+  test('included-equipment lists do not promise every optional add-on', () => {
+    for (const studio of STUDIOS) {
+      assert.doesNotMatch(studio.includes.join(' '), /all equipment included|teleprompter included/i)
+    }
+    assert.deepEqual(STUDIOS.find((studio) => studio.id === 'canvas-rental')?.includes,
+      ['White cyc wall', 'Overhead lighting grid', 'Black floor mats'])
   })
 })

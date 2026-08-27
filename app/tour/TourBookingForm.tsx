@@ -235,7 +235,7 @@ export default function TourBookingForm() {
                       type="button"
                       disabled={!slot.available}
                       aria-pressed={selected}
-                      aria-label={`${slot.label}${!slot.available ? (availabilityVerified ? ', booked' : ', unavailable') : ''}`}
+                      aria-label={`${slot.label}${!slot.available ? ', unavailable' : ''}`}
                       onClick={() => slot.available && setSelectedSlot(slot.time)}
                       className={`rounded-lg py-3 text-sm font-semibold transition-colors ${
                         !slot.available ? 'cursor-not-allowed text-gray-800 line-through'

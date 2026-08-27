@@ -28,6 +28,7 @@ import { GAEventType, sendGAEvent, trackBookingStep } from '@/lib/analytics'
 import { TELEPROMPTER, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/booking/add-ons'
 import { PENDING_CHECKOUT_STORAGE_KEY } from '@/lib/booking/confirmation-state'
 import { parsePendingCheckout, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
+import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 
 const StripeEmbeddedCheckout = dynamic(() => import('@/components/StripeEmbeddedCheckout'), {
   ssr: false,
@@ -1022,7 +1023,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                           One podcast session at a time
                         </p>
                         <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
-                          All podcast rooms share our three-camera package. The times below reflect availability across every podcast studio.
+                          {PODCAST_PACKAGE_SUMMARY} The times below reflect shared equipment availability across every podcast studio.
                         </p>
                       </div>
                     )}
@@ -1046,7 +1047,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                           </div>
                         )}
                         {availabilityVerified && slots.length > 0 && !anyAvailable && (
-                          <p className="mb-4 text-xs text-zinc-400" role="status">This day is fully booked. Try another date.</p>
+                          <p className="mb-4 text-xs text-zinc-400" role="status">No times remain available on this day. Try another date.</p>
                         )}
                         {availabilityVerified && anyAvailable && !anyStartable && (
                           <p className="mb-4 text-xs text-zinc-400" role="status">
@@ -1070,7 +1071,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                                   type="button"
                                   disabled={!fits}
                                   aria-pressed={isStart}
-                                  aria-label={`${slot.label}${!slot.available ? ', booked' : !fits ? `, does not fit a ${durationLabel.toLowerCase()} session` : ''}`}
+                                  aria-label={`${slot.label}${!slot.available ? ', unavailable' : !fits ? `, does not fit a ${durationLabel.toLowerCase()} session` : ''}`}
                                   onClick={() => pickStart(i)}
                                   className={`rounded-lg border py-3 font-mono text-xs transition-colors ${
                                     isStart
