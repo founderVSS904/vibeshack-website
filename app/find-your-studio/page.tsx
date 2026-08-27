@@ -75,7 +75,9 @@ export default function FindYourStudioPage() {
   const interactedRef = useRef(false)
 
   useEffect(() => {
-    if (interactedRef.current) headingRef.current?.focus({ preventScroll: true })
+    if (!interactedRef.current) return
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    headingRef.current?.focus({ preventScroll: true })
   }, [currentQuestion, done])
 
   function chooseFormat(value: StudioFinderFormat) {
@@ -221,7 +223,7 @@ export default function FindYourStudioPage() {
               <div className="flex flex-col gap-4 bg-white/[0.025] p-6 sm:flex-row sm:items-start sm:justify-between sm:p-8">
                 <div>
                   <p className="font-semibold text-white">Verified for up to {VERIFIED_ON_CAMERA_CAPACITY[primary.id]} people on camera.</p>
-                  <p className="mt-2 text-sm leading-relaxed text-white/65">{PODCAST_PACKAGE_SUMMARY}</p>
+                  {primary.type === 'podcast' && <p className="mt-2 text-sm leading-relaxed text-white/65">{PODCAST_PACKAGE_SUMMARY}</p>}
                   <p className="mt-2 text-xs leading-relaxed text-white/50">For extra off-camera crew, equipment, or a custom layout, confirm the full setup with us first.</p>
                 </div>
                 <p className="shrink-0 text-2xl font-black text-white">${primary.price}<span className="text-sm font-normal text-white/60">/hr</span></p>
