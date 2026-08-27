@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY, PODCAST_RATE_SUMMARY } from '@/lib/booking/podcast-package'
+import PricingFaqs from './PricingFaqs'
 
 export const metadata: Metadata = {
   title: 'Studio Pricing',
@@ -53,15 +54,15 @@ const productionServices = [
 ]
 
 const pricingFaqs = [
-  { question: 'Are there hourly minimums?', answer: 'Bookings start at one hour. From there, book as many hours as the shoot needs, up to a full day.' },
-  { question: 'What does the rate include?', answer: `${PODCAST_PACKAGE_SUMMARY} Rental rates include the space and the equipment listed on each studio page.` },
-  { question: 'How are photo and video services priced?', answer: 'Photo and video services are quoted after the brief, shot list, deliverables, crew needs, usage, and timeline are clear.' },
-  { question: 'How do I book?', answer: 'Book directly on the website. Choose your studio, pick a date and time, add any options, and confirm online.' },
-  { question: 'Can I book multiple studios in one day?', answer: 'Yes. You can book multiple studios for the same day, such as a podcast set plus Canvas Rental time.' },
-  { question: 'Is there a cancellation policy?', answer: 'Cancel at least 48 hours before your session for a full refund. Within 48 hours, sessions are non-refundable.' },
-  { question: 'Do you offer monthly rates?', answer: 'Yes. Contact us for recurring bookings or blocks of hours with priority access to the calendar.' },
-  { question: 'Is parking available?', answer: 'Street parking is available on Battery St. The studio is also about a 10-minute walk from the Ferry Building.' },
-  { question: 'Can I bring my own equipment?', answer: 'Yes. You can bring your own gear and use our studios as your production space.' },
+  { id: 'faq-hourly-minimums', question: 'Are there hourly minimums?', answer: 'Bookings start at one hour. From there, book as many hours as the shoot needs, up to a full day.' },
+  { id: 'faq-rate-inclusions', question: 'What does the rate include?', answer: `${PODCAST_PACKAGE_SUMMARY} Rental rates include the space and the equipment listed on each studio page.` },
+  { id: 'faq-photo-video-pricing', question: 'How are photo and video services priced?', answer: 'Photo and video services are quoted after the brief, shot list, deliverables, crew needs, usage, and timeline are clear.' },
+  { id: 'faq-booking', question: 'How do I book?', answer: 'Book directly on the website. Choose your studio, pick a date and time, add any options, and confirm online.' },
+  { id: 'faq-multiple-studios', question: 'Can I book multiple studios in one day?', answer: 'Yes. You can book multiple studios for the same day, such as a podcast set plus Canvas Rental time.' },
+  { id: 'faq-cancellation', question: 'Is there a cancellation policy?', answer: 'Cancel at least 48 hours before your session for a full refund. Within 48 hours, sessions are non-refundable.' },
+  { id: 'faq-monthly-rates', question: 'Do you offer monthly rates?', answer: 'Yes. Contact us for recurring bookings or blocks of hours with priority access to the calendar.' },
+  { id: 'faq-parking', question: 'Is parking available?', answer: 'Street parking is available on Battery St. The studio is also about a 10-minute walk from the Ferry Building.' },
+  { id: 'faq-own-equipment', question: 'Can I bring my own equipment?', answer: 'Yes. You can bring your own gear and use our studios as your production space.' },
 ]
 
 const hourlyOffer = (name: string, price: string) => ({
@@ -230,14 +231,7 @@ export default function PricingPage() {
             </h2>
             <span className="number-label">FAQ</span>
           </div>
-          <div className="divide-y divide-white/10">
-            {pricingFaqs.map(({ question, answer }) => (
-              <div key={question} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-16 py-8">
-                <p className="text-white font-semibold text-base">{question}</p>
-                <p className="text-gray-500 text-sm leading-relaxed">{answer}</p>
-              </div>
-            ))}
-          </div>
+          <PricingFaqs faqs={pricingFaqs} />
         </div>
       </section>
 
