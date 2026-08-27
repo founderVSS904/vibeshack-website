@@ -1,5 +1,6 @@
 import { allWorkProjects, shotAtVibeshack } from '@/lib/seo/workProjects'
 import type { WorkRelationship } from '@/lib/seo/workProjects'
+import { getWorkProjectInquiryHref } from '@/lib/contact/inquiry'
 
 export type CinemaProject = {
   slug: string
@@ -27,6 +28,7 @@ export type CinemaProject = {
   screenPosition?: { x: number; y: number }
   screenBackdrop?: 'ambient' | 'black'
   href: string
+  inquiryHref: string
   external: boolean
 }
 
@@ -117,6 +119,7 @@ const portfolioProjects: CinemaProject[] = allWorkProjects.map((project) => ({
     screenPosition: { x: 0.5, y: 0.5 },
   }),
   href: `/our-work/${project.slug}/`,
+  inquiryHref: getWorkProjectInquiryHref(project.slug),
   external: false,
   ...(cinemaPresentationOverrides[project.slug] ?? {}),
 }))
@@ -146,6 +149,7 @@ const studioProjects: CinemaProject[] = shotAtVibeshack.map((project) => {
       screenPosition: { x: 0.5, y: 0.5 },
     }),
     href: `https://www.youtube.com/watch?v=${project.youtubeId}`,
+    inquiryHref: getWorkProjectInquiryHref(project.slug),
     external: true,
     ...(cinemaPresentationOverrides[project.slug] ?? {}),
   }

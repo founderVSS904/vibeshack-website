@@ -1740,6 +1740,44 @@ body:has(.cinema-experience-root) > footer {
   height: 1rem;
 }
 
+.cinema-inquiry-link {
+  display: inline-flex;
+  min-height: 2rem;
+  max-width: 100%;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-underline-offset: 0.2em;
+}
+
+.cinema-inquiry-link:hover,
+.cinema-inquiry-link:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.cinema-inquiry-link:focus-visible {
+  outline: 2px solid #ec0000;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cinema-inquiry-link span {
+    transition: transform 180ms ease;
+  }
+
+  .cinema-inquiry-link:hover span,
+  .cinema-inquiry-link:focus-visible span {
+    transform: translateX(3px);
+  }
+}
+
 .cinema-library {
   display: flex;
   min-width: 0;
@@ -2061,6 +2099,11 @@ body:has(.cinema-experience-root) > footer {
     grid-row: 1 / 3;
     align-self: center;
     margin: 0 0 0 0.6rem;
+  }
+
+  .cinema-inquiry-link {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
 
   .cinema-play-button {

@@ -948,6 +948,15 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
                 </>
               )}
             </div>
+            {!showingPreShow && (
+              <Link
+                href={selected.inquiryHref}
+                className="cinema-inquiry-link"
+                aria-label={`Start a similar project to ${selected.title}`}
+              >
+                Start a similar project <span aria-hidden="true">→</span>
+              </Link>
+            )}
           </div>
 
           <div className="cinema-library">

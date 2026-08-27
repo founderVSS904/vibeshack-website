@@ -2,7 +2,7 @@ import { getStudioFinderInquiry } from '../booking/studio-finder'
 import { getStudioById } from '../booking/catalog'
 import { getStudioSetup, getStudioSetups } from '../booking/studio-setups'
 import { absoluteUrl } from '../seo/site'
-import { getWorkProject, type WorkCategorySlug } from '../seo/workProjects'
+import { getWorkProject, shotAtVibeshack, type WorkCategorySlug } from '../seo/workProjects'
 
 type ContactInquiry = {
   projectType: string
@@ -31,8 +31,28 @@ const projectTypeByWorkCategory: Record<WorkCategorySlug, string> = {
   events: 'other',
 }
 
-export function getWorkProjectInquiryHref(slug: string): string {
+function getProjectInquiry(slug: string): (ContactInquiry & { slug: string }) | null {
   const project = getWorkProject(slug)
+  if (project) {
+    return {
+      slug: project.slug,
+      projectType: projectTypeByWorkCategory[project.category],
+      message: `I'd like to discuss a project similar to ${project.title} (${project.categoryLabel}).\nReference: ${absoluteUrl(`/our-work/${project.slug}/`)}`,
+    }
+  }
+
+  const studioProject = shotAtVibeshack.find((item) => item.slug === slug)
+  if (!studioProject) return null
+
+  return {
+    slug: studioProject.slug,
+    projectType: studioProject.collection === 'podcasts' ? 'podcast' : 'other',
+    message: `I'd like to discuss a project similar to ${studioProject.title} (${studioProject.client}).\nReference: https://www.youtube.com/watch?v=${encodeURIComponent(studioProject.youtubeId)}`,
+  }
+}
+
+export function getWorkProjectInquiryHref(slug: string): string {
+  const project = getProjectInquiry(slug)
   const searchParams = new URLSearchParams({ service: 'portfolio-inquiry' })
   if (project) searchParams.set('project', project.slug)
   return `/contact/?${searchParams.toString()}#project-inquiry`
@@ -59,11 +79,11 @@ export function getContactInquiry(searchParams: URLSearchParams): ContactInquiry
   }
 
   if (service === 'portfolio-inquiry') {
-    const project = getWorkProject(searchParams.get('project') || '')
+    const project = getProjectInquiry(searchParams.get('project') || '')
     if (project) {
       return {
-        projectType: projectTypeByWorkCategory[project.category],
-        message: `I'd like to discuss a project similar to ${project.title} (${project.categoryLabel}).\nReference: ${absoluteUrl(`/our-work/${project.slug}/`)}`,
+        projectType: project.projectType,
+        message: project.message,
       }
     }
   }
