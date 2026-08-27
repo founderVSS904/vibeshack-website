@@ -7,6 +7,27 @@ export const MAX_BOOKING_SLOTS = 16
 export const START_HOUR = 0
 export const END_HOUR = 24
 
+export function bookingDateInPacific(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: BOOKING_TIME_ZONE,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  }).formatToParts(now)
+  const value = (type: string) => parts.find((part) => part.type === type)?.value
+  return `${value('year')}-${value('month')}-${value('day')}`
+}
+
+// Civil dates, not 24-hour intervals: DST must not omit or repeat a day.
+export function bookingDateRange(count: number, now = new Date()) {
+  const [year, month, day] = bookingDateInPacific(now).split('-').map(Number)
+  return Array.from({ length: count }, (_, index) => (
+    new Date(Date.UTC(year, month - 1, day + index, 12)).toISOString().slice(0, 10)
+  ))
+}
+
+export function bookingStartIsInFuture(start: Date, now = new Date(), leadMinutes = 0) {
+  return Number.isFinite(start.getTime()) && start.getTime() > now.getTime() + leadMinutes * 60_000
+}
+
 export function bookingHoursForSlotCount(slotCount: number) {
   return slotCount * SLOT_DURATION_HOURS
 }

@@ -1,3 +1,5 @@
+import { PODCAST_PACKAGE_SUMMARY } from '../booking/podcast-package'
+
 import { absoluteUrl } from './site'
 
 export const studioGuides = [
@@ -62,7 +64,7 @@ export const studioGuides = [
       {
         question: 'Do I need to bring microphones or cameras?',
         answer:
-          'No. VibeShack podcast sets include professional studio gear, and podcast packages include crew options so you can focus on the conversation.',
+          `No. ${PODCAST_PACKAGE_SUMMARY} Professional studio audio and lighting are also included so you can focus on the conversation.`,
       },
     ],
   },

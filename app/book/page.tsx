@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getStudioById } from '@/lib/booking/catalog'
+import { getStudioSetup } from '@/lib/booking/studio-setups'
 import BookPageClient from './BookPageClient'
 
 type SearchParams = Record<string, string | string[] | undefined>
@@ -41,5 +42,16 @@ export default async function BookPage({ searchParams }: BookPageProps) {
     redirect(query ? `/book/?${query}` : '/book/')
   }
 
-  return <BookPageClient />
+  const initialStudioId = hasValidSingleStudio ? studioValues[0] : ''
+  const initialSetupId = typeof params.setup === 'string'
+    ? getStudioSetup(initialStudioId, params.setup)?.id
+    : undefined
+
+  return (
+    <BookPageClient
+      initialStudioId={initialStudioId}
+      initialSetupId={initialSetupId}
+      hasSetupRequest={params.setup !== undefined}
+    />
+  )
 }

@@ -2,14 +2,18 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
+
+const hourlyRate = PODCAST_HOURLY_RATES['parlor']
+const pageDescription = `Chesterfield interview set in San Francisco. ${PODCAST_CREW_LABEL}. ${PODCAST_CAMERA_LABEL}. $${hourlyRate}/hr. Open 24/7.`
 
 export const metadata: Metadata = {
   title: 'Parlor Interview Studio',
-  description: 'Chesterfield seating. Full 4K production. Cameraman included. Premium interview studio in San Francisco. $400/hr. Open 24/7.',
+  description: pageDescription,
   alternates: { canonical: `${siteUrl}/parlor/` },
   openGraph: {
     title: 'Parlor | VibeShack Studios SF',
-    description: 'Premium interview studio with Chesterfield seating and full 4K production. Cameraman included. $400/hr in San Francisco.',
+    description: pageDescription,
     url: `${siteUrl}/parlor`,
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/parlor-hero.jpg', width: 1200, height: 630, alt: 'Parlor at VibeShack Studios SF' }],
@@ -18,17 +22,17 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Parlor | VibeShack Studios SF',
-    description: 'Premium interview studio with Chesterfield seating and full 4K production. Cameraman included. $400/hr in San Francisco.',
+    description: pageDescription,
     images: ['/studio-images/parlor-hero.jpg'],
   },
 }
 
 const parlorServiceSchema = studioServiceSchema({
   name: 'Parlor Interview Studio Rental in San Francisco',
-  description: 'Premium interview studio in San Francisco with Chesterfield seating, 4K production, broadcast audio, and crew included.',
+  description: pageDescription,
   url: `${siteUrl}/parlor/`,
   image: `${siteUrl}/studio-images/parlor-hero.jpg`,
-  price: '400',
+  price: String(hourlyRate),
   serviceType: 'Interview Studio Rental',
 })
 
@@ -51,7 +55,7 @@ export default function ParlorPage() {
             Parlor<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8">
-            Premium interview setup. Chesterfield seating. Full crew included.
+            Premium interview setup. Chesterfield seating. {PODCAST_CREW_LABEL}.
           </p>
           <a href="/book/?studio=parlor" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book This Studio
@@ -72,8 +76,8 @@ export default function ParlorPage() {
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {[
                   'Custom setup, tailored to your production',
-                  'Full 4K production framed for interviews',
-                  'Cameraman + producer included',
+                  PODCAST_CAMERA_LABEL,
+                  PODCAST_CREW_LABEL,
                   'Chesterfield seating framed for camera',
                   'Broadcast mics on host and guest',
                   'Treated acoustics, clean dialogue',
@@ -99,7 +103,7 @@ export default function ParlorPage() {
           <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0}}>
             A documentary-style<br/><span className="text-brand-red">interview set.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-20 max-w-2xl">Chesterfield seating, warm directional light, broadcast microphones, and full crew support give interviews a finished documentary frame.</p>
+          <p className="text-gray-500 text-lg mb-20 max-w-2xl">Chesterfield seating, warm directional light, broadcast microphones, and two studio operators give interviews a finished documentary frame.</p>
 
           <div className="space-y-24">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
@@ -115,8 +119,8 @@ export default function ParlorPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1">
-                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Full Crew. No Coordination Required.</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">Your cameraman and producer are already here. You walk in, get mic'd up, and record. The Parlor team handles the angles, the audio levels, the lighting adjustments.</p>
+                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>{PODCAST_CREW_LABEL}</h3>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">Your two studio operators are already here. You walk in, get mic'd up, and record. The Parlor team handles the angles, the audio levels, the lighting adjustments.</p>
                 <p className="text-gray-400 text-lg leading-relaxed">You focus on the conversation. We focus on capturing it.</p>
               </div>
               <div className="order-1 md:order-2">
@@ -131,14 +135,14 @@ export default function ParlorPage() {
       <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
-          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>$400</div>
+          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>${hourlyRate}</div>
           <p className="text-gray-500 text-lg mb-1">per hour</p>
-          <p className="text-white font-semibold mb-12">Cameraman + producer included. 1 hour minimum. Open 24/7.</p>
+          <p className="text-white font-semibold mb-12">{PODCAST_PACKAGE_SUMMARY} 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
-              { label: '2 Hours', price: '$800' },
-              { label: '4 Hours', price: '$1,600' },
-              { label: '8 Hours', price: '$3,200' },
+              { label: '2 Hours', price: `$${(hourlyRate * 2).toLocaleString('en-US')}` },
+              { label: '4 Hours', price: `$${(hourlyRate * 4).toLocaleString('en-US')}` },
+              { label: '8 Hours', price: `$${(hourlyRate * 8).toLocaleString('en-US')}` },
             ].map(({ label, price }) => (
               <div key={label} className="flex items-center justify-between py-4">
                 <span className="text-gray-400 text-sm">{label}</span>
@@ -160,7 +164,7 @@ export default function ParlorPage() {
           <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0 }}>
             Ready to <span className="text-brand-red">Record?</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10">$400/hr. Cameraman + producer included. Instant confirmation.</p>
+          <p className="text-gray-500 text-lg mb-10">${hourlyRate}/hr. {PODCAST_CREW_LABEL}. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="/book/?studio=parlor" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session

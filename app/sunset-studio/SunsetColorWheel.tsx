@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES } from '@/lib/booking/podcast-package'
 
 export type WheelSegment = {
   offset: number
@@ -124,7 +125,7 @@ export default function SunsetColorWheel({ segments }: { segments: WheelSegment[
             <h3 className="text-white font-black leading-none mb-8" style={{fontSize: 'clamp(2rem, 4vw, 3rem)', letterSpacing: 0, color: activeWheelColor.color}}>
               {activeWheelColor.label}. We'll handle the rest.
             </h3>
-            <p className="text-gray-400 text-base mb-12">$300/hr · Cameraman included · Open 24/7</p>
+            <p className="text-gray-400 text-base mb-12">${PODCAST_HOURLY_RATES.sunset}/hr · {PODCAST_CREW_LABEL} · Open 24/7</p>
             <a href="/book/?studio=sunset" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Sunset
               <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>

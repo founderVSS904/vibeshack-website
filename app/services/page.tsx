@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { absoluteUrl, siteUrl } from '@/lib/seo/site'
 import { breadcrumbSchema } from '@/lib/schemas'
+import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 
 export const metadata: Metadata = {
   title: 'Production Services San Francisco',
@@ -26,7 +27,7 @@ const services = [
     image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
     alt: 'Podcast production at VibeShack Studios San Francisco',
     body:
-      'For video podcasts, interview series, internal shows, creator episodes, and branded conversations that need clean sound, cameras, lighting, and a repeatable setup.',
+      `For video podcasts, interview series, internal shows, creator episodes, and branded conversations. ${PODCAST_PACKAGE_SUMMARY}`,
     price: '$300-$400/hr',
     fit: 'Direct booking',
   },

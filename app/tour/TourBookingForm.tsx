@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { STUDIOS } from '@/lib/booking/catalog'
+import { bookingDateRange } from '@/lib/booking/time'
 
 type TourSlot = { time: string; label: string; available: boolean }
 
@@ -14,11 +15,7 @@ function formatDate(d: Date) {
 }
 
 function getNext45Days() {
-  return Array.from({ length: 45 }, (_, index) => {
-    const date = new Date()
-    date.setDate(date.getDate() + index + 1)
-    return date
-  })
+  return bookingDateRange(45).map((date) => new Date(`${date}T12:00:00`))
 }
 
 function fmtDateFull(date: string) {
@@ -238,7 +235,7 @@ export default function TourBookingForm() {
                       type="button"
                       disabled={!slot.available}
                       aria-pressed={selected}
-                      aria-label={`${slot.label}${!slot.available ? (availabilityVerified ? ', booked' : ', unavailable') : ''}`}
+                      aria-label={`${slot.label}${!slot.available ? ', unavailable' : ''}`}
                       onClick={() => slot.available && setSelectedSlot(slot.time)}
                       className={`rounded-lg py-3 text-sm font-semibold transition-colors ${
                         !slot.available ? 'cursor-not-allowed text-gray-800 line-through'

@@ -3,6 +3,9 @@ import { createHash } from 'node:crypto'
 import { google, type calendar_v3 } from 'googleapis'
 import { getStudioById, STUDIOS } from './catalog'
 import { bookingHoldIsActive } from './checkout-lifecycle'
+import { bookingAddOnDescription, bookingAddOnTotalCents, type BookingAddOn } from './add-ons'
+import { getStudioSetup, type StudioSetupId } from './studio-setups'
+import { bookingSetupCalendarFields } from './setup-communication'
 import {
   bookingHoldCleanupError,
   collectBookingHoldCleanupFailures,
@@ -11,7 +14,7 @@ import {
 } from './hold-cleanup'
 import { formatMoneyFromCents, type ReferralInfo } from './referrals'
 import { primaryStudioResourceGroup, studioIdsThatAffectAvailability, studioResourceGroups, studiosShareResources } from './resources'
-import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
+import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
 
 export interface BookingCartItem {
   studioId: string
@@ -20,6 +23,8 @@ export interface BookingCartItem {
   slots: string[]
   hours: number
   price: number
+  addOns?: BookingAddOn[]
+  setupId?: StudioSetupId
 }
 
 export interface CalendarConfig {
@@ -27,6 +32,16 @@ export interface CalendarConfig {
   client: ReturnType<typeof google.calendar>
   studioId?: string
   isStudioSpecificCalendar: boolean
+}
+
+export interface BookingCalendarDependencies {
+  getConfig: (studioId?: string) => Promise<CalendarConfig | null>
+  calendarIds: () => string[]
+}
+
+const defaultBookingCalendarDependencies: BookingCalendarDependencies = {
+  getConfig: getCalendarConfig,
+  calendarIds: configuredCalendarIds,
 }
 
 export interface TourBookingDetails {
@@ -46,6 +61,7 @@ export interface BookingReminderEvent {
   bookingRef: string
   studioId: string
   studioName: string
+  setupId?: StudioSetupId
   customerName: string
   customerEmail: string
   start: string
@@ -85,6 +101,7 @@ interface BookingHoldBusyEventTarget {
   eventId: string
   studioId: string
   studioName: string
+  setupId?: StudioSetupId
   resourceGroups: string[]
   date: string
   start: string
@@ -271,6 +288,7 @@ function bookingHoldBusyEventTargets(
         eventId: `vbhb${digest}`,
         studioId: item.studioId,
         studioName: item.studioName,
+        setupId: getStudioSetup(item.studioId, item.setupId)?.id,
         resourceGroups: studioResourceGroups(item.studioId),
         date: item.date,
         start,
@@ -456,10 +474,14 @@ function bookingHoldBusyEventRequestBody(
   expiresAt: Date,
   includeId = false,
 ) {
+  const setupFields = bookingSetupCalendarFields(target.studioId, target.setupId)
   return {
     ...(includeId ? { id: target.eventId } : {}),
     summary: `Temporary checkout hold: ${target.studioName}`,
-    description: `A customer is completing checkout for this time. The temporary hold expires at ${expiresAt.toISOString()}.`,
+    description: [
+      `A customer is completing checkout for this time. The temporary hold expires at ${expiresAt.toISOString()}.`,
+      setupFields.description,
+    ].filter(Boolean).join('\n'),
     status: 'tentative',
     transparency: 'opaque',
     visibility: 'private',
@@ -477,6 +499,7 @@ function bookingHoldBusyEventRequestBody(
         bookingRef,
         studioId: target.studioId,
         studioName: target.studioName,
+        ...setupFields.privateProperties,
         resourceGroup: primaryStudioResourceGroup(target.studioId),
         resourceGroups: target.resourceGroups.join(','),
         bookingDate: target.date,
@@ -1086,6 +1109,7 @@ function eventToBookingReminder(calendarId: string, event: calendar_v3.Schema$Ev
     bookingRef: privateProperties.bookingRef || event.id,
     studioId,
     studioName,
+    setupId: getStudioSetup(studioId, privateProperties.setupId)?.id,
     customerName,
     customerEmail,
     start: new Date(start).toISOString(),
@@ -1220,7 +1244,7 @@ export async function getTourAvailabilityForDate(date: string) {
   }
 
   const allSlots = getTourSlotsForDay(date)
-  const cutoff = addMinutes(new Date(), TOUR_MIN_LEAD_MINUTES)
+  const now = new Date()
   const timeMin = allSlots[0].start
   const timeMax = allSlots[allSlots.length - 1].end
 
@@ -1257,7 +1281,7 @@ export async function getTourAvailabilityForDate(date: string) {
         return {
           time: start.toISOString(),
           label: formatTimeForDisplay(start),
-          available: !busy && start > cutoff,
+          available: !busy && bookingStartIsInFuture(start, now, TOUR_MIN_LEAD_MINUTES),
         }
       }),
     }
@@ -1341,7 +1365,7 @@ export async function getAvailabilityForDate(
         return {
           time: start.toISOString(),
           label: start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: BOOKING_TIME_ZONE }),
-          available: !busy && start > now,
+          available: !busy && bookingStartIsInFuture(start, now),
         }
       }),
     }
@@ -1521,11 +1545,12 @@ export async function addBookingEvents(
   referralInfo: ReferralInfo | null = null,
   bookingRef = '',
   stripeEventId = '',
+  dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
 ) {
   const existingKeysByCalendar = new Map<string, Set<string>>()
 
   for (const item of cartItems) {
-    const config = await getCalendarConfig(item.studioId)
+    const config = await dependencies.getConfig(item.studioId)
     if (!config) throw new Error('Calendar credentials are not configured')
     if (bookingRef && !existingKeysByCalendar.has(config.calendarId)) {
       existingKeysByCalendar.set(
@@ -1535,6 +1560,7 @@ export async function addBookingEvents(
     }
 
     const dateStr = formatDateForDisplay(item.date)
+    const setupFields = bookingSetupCalendarFields(item.studioId, item.setupId)
     const groups = groupConsecutiveSlotIsos(item.slots)
 
     for (const group of groups) {
@@ -1574,12 +1600,14 @@ export async function addBookingEvents(
             description: [
               `Studio: ${item.studioName}`,
               `Studio ID: ${item.studioId}`,
+              ...(setupFields.description ? [setupFields.description] : []),
               `Client: ${customer.name}`,
               `Email: ${customer.email}`,
               `Phone: ${customer.phone || 'N/A'}`,
               `Date: ${dateStr}`,
               `Duration: ${formatBookingDuration(group.length)}`,
-              `Amount: $${item.price}`,
+              `Studio amount before recurring discount: $${item.price}`,
+              ...(item.addOns || []).map((addOn) => `Add-on: ${bookingAddOnDescription(addOn)}`),
               ...(referralInfo ? [
                 '',
                 `Referral partner: ${referralInfo.partnerName}`,
@@ -1598,6 +1626,9 @@ export async function addBookingEvents(
                 stripeEventId,
                 studioId: item.studioId,
                 studioName: item.studioName,
+                ...setupFields.privateProperties,
+                addOnIds: (item.addOns || []).map((addOn) => addOn.id).join(','),
+                addOnTotalCents: String(bookingAddOnTotalCents(item.addOns)),
                 resourceGroup: primaryStudioResourceGroup(item.studioId),
                 resourceGroups: studioResourceGroups(item.studioId).join(','),
               },
@@ -1627,15 +1658,15 @@ export async function addBookingEvents(
   }
 }
 
-export async function listBookingEventsForReminderWindow(now = new Date(), startHours = 23, endHours = 25) {
-  const config = await getCalendarConfig()
+export async function listBookingEventsForReminderWindow(now = new Date(), startHours = 23, endHours = 25, dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies) {
+  const config = await dependencies.getConfig()
   if (!config) return null
 
   const timeMin = addHours(now, startHours).toISOString()
   const timeMax = addHours(now, endHours).toISOString()
   const reminderEvents: BookingReminderEvent[] = []
 
-  for (const calendarId of configuredCalendarIds()) {
+  for (const calendarId of dependencies.calendarIds()) {
     const response = await config.client.events.list({
       calendarId,
       timeMin,
@@ -1656,8 +1687,8 @@ export async function listBookingEventsForReminderWindow(now = new Date(), start
   return reminderEvents
 }
 
-export async function markBookingReminderSent(events: BookingReminderEvent[], sentAt = new Date().toISOString()) {
-  const config = await getCalendarConfig()
+export async function markBookingReminderSent(events: BookingReminderEvent[], sentAt = new Date().toISOString(), dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies) {
+  const config = await dependencies.getConfig()
   if (!config) throw new Error('Calendar credentials are not configured')
 
   for (const event of events) {

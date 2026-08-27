@@ -58,7 +58,7 @@ const specs = [
   { label: 'Load-in', detail: 'Ground-level, street parking + loading zone' },
   { label: 'Rigging Points', detail: 'Available for hanging elements' },
   { label: 'On-site Support', detail: 'Available on request' },
-  { label: 'Live Streaming', detail: 'Add-on available, $100/hr' },
+  { label: 'Live Streaming', detail: 'Available by arrangement' },
 ]
 
 const faqs = [
@@ -75,7 +75,7 @@ const faqs = [
   {
     question: 'Do I need to bring my own camera?',
     answer:
-      'You can bring your own, or add a Camera Operator for $50/hr. We also offer a Ready-to-Shoot package with everything pre-configured.',
+      'Bring your own camera package, or contact us before booking to arrange camera operation and a ready-to-shoot setup. These services are available by arrangement.',
   },
   {
     question: 'What is the load-in process?',
@@ -85,7 +85,7 @@ const faqs = [
   {
     question: 'Can I use the green screen for live streaming?',
     answer:
-      'Yes. Live switching and streaming add-on is available for $100/hr. We handle the technical switching so you focus on your content.',
+      'Yes. Live switching and streaming are available by arrangement. Contact us before booking to confirm the setup and production support.',
   },
 ]
 
