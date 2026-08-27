@@ -267,6 +267,7 @@ export function FeaturedOriginals() {
                         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
                         if (!getFeaturedVideoEmbedUrl(slide.primaryCta.href)) return
                         event.preventDefault()
+                        event.currentTarget.focus({ preventScroll: true })
                         setVideoIndex(i)
                       }}
                       className="inline-flex items-center gap-2.5 rounded-md bg-brand-red px-6 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
@@ -354,7 +355,7 @@ export function FeaturedOriginals() {
                 referrerPolicy="strict-origin-when-cross-origin"
               />
             </div>
-            <p className="mt-4 text-sm text-white/70">
+            <p className="px-5 py-4 text-sm text-white/70">
               Trouble playing?{' '}
               <a
                 href={activeVideo.primaryCta.href}

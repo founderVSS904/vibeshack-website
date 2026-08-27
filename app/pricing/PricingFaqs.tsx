@@ -54,7 +54,7 @@ export default function PricingFaqs({ faqs }: { faqs: readonly PricingFaq[] }) {
               </svg>
             </span>
           </summary>
-          <div id={`${id}-answer`} className="max-w-3xl pb-7 pr-2 sm:pr-14">
+          <div id={`${id}-answer`} className="max-w-3xl pb-7 pr-2 pt-2 sm:pr-14">
             <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
             <a
               href={`#${id}`}

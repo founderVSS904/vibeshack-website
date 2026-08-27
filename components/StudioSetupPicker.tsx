@@ -2,6 +2,8 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import PhotoLightbox from '@/components/media/PhotoLightbox'
 import { getStudioSetup, getStudioSetups, getStudioSetupCollection, type StudioSetupId } from '@/lib/booking/studio-setups'
 
 interface StudioSetupPickerProps {
@@ -13,6 +15,8 @@ interface StudioSetupPickerProps {
 }
 
 export default function StudioSetupPicker({ id, studioId, value, onChange, wide = false }: StudioSetupPickerProps) {
+  const [preview, setPreview] = useState<{ studioId: string; index: number } | null>(null)
+  useEffect(() => { setPreview(null) }, [studioId])
   const options = getStudioSetups(studioId)
   const selected = getStudioSetup(studioId, value)
   const collection = getStudioSetupCollection(studioId)
@@ -30,8 +34,9 @@ export default function StudioSetupPicker({ id, studioId, value, onChange, wide 
           {collection.intro} A selection is required before checkout.
         </p>
         <div className={`grid grid-cols-1 gap-4 min-[400px]:grid-cols-2 ${wide ? (options.length === 3 ? 'md:grid-cols-3' : 'xl:grid-cols-4') : ''}`}>
-          {options.map((option) => (
-            <label key={option.id} className="relative block cursor-pointer">
+          {options.map((option, index) => (
+            <div key={option.id} className="relative">
+            <label className="block h-full cursor-pointer">
               <input
                 type="radio"
                 name={`${id}-setup`}
@@ -62,6 +67,20 @@ export default function StudioSetupPicker({ id, studioId, value, onChange, wide 
                 </span>
               </span>
             </label>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.currentTarget.focus({ preventScroll: true })
+                setPreview({ studioId, index })
+              }}
+              aria-label={`View larger: ${option.label}`}
+              aria-haspopup="dialog"
+              className="absolute right-2 top-2 inline-flex min-h-11 items-center gap-2 rounded-md border border-white/30 bg-black/80 px-3 text-xs font-medium text-white backdrop-blur-sm transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" /></svg>
+              View larger
+            </button>
+            </div>
           ))}
         </div>
       </fieldset>
@@ -75,6 +94,14 @@ export default function StudioSetupPicker({ id, studioId, value, onChange, wide 
           {' '}before booking so we can plan it together.
         </p>
       </div>
+      <PhotoLightbox
+        photos={options.map((option) => ({ src: option.image, alt: option.alt, title: option.label, width: option.width, height: option.height }))}
+        index={preview?.studioId === studioId ? preview.index : null}
+        onIndexChange={(index) => setPreview({ studioId, index })}
+        onClose={() => setPreview(null)}
+        title={`${collection.studioName} setups`}
+        description={`${collection.studioName}. Viewing photos does not change your setup choice.`}
+      />
     </div>
   )
 }

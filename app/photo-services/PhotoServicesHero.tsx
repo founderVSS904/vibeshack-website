@@ -2,6 +2,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
+import PhotoLightbox from '@/components/media/PhotoLightbox'
 
 type GalleryPhoto = {
   image: string
@@ -130,6 +131,7 @@ export default function PhotoServicesHero() {
   const [active, setActive] = useState(0)
   const [dragging, setDragging] = useState(false)
   const [hovered, setHovered] = useState<number | null>(null)
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null)
 
   const stageRef = useRef<HTMLDivElement>(null)
   const inViewRef = useRef(true)
@@ -578,8 +580,36 @@ export default function PhotoServicesHero() {
             </button>
           </div>
         </div>
+        <div className="mt-6 flex justify-center px-6">
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true })
+              pinnedRef.current = true
+              edgeRef.current = 0
+              leanRef.current = 0
+              baseRef.current = Math.round(posRef.current)
+              setPreviewIndex(activeRef.current)
+            }}
+            className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/25 px-5 text-sm text-white transition-colors hover:border-white/60 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" /></svg>
+            View larger
+          </button>
+        </div>
       </section>
-
+      <PhotoLightbox
+        photos={GALLERY_IMAGES.map((photo) => ({ src: photo.image, alt: photo.alt }))}
+        index={previewIndex}
+        onIndexChange={setPreviewIndex}
+        onClose={() => {
+          if (previewIndex !== null) go(previewIndex)
+          setPreviewIndex(null)
+        }}
+        title="Photography at VibeShack"
+        description="Full-frame photographs. Use the arrows or swipe to explore."
+      />
     </>
   )
 }

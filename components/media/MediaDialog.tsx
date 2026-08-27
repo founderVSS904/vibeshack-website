@@ -8,7 +8,7 @@ interface MediaDialogProps {
   onClose: () => void
   title: string
   description?: string
-  children: ReactNode
+  children?: ReactNode
   className?: string
   onKeyDown?: (event: KeyboardEvent<HTMLDialogElement>) => void
 }
@@ -56,10 +56,17 @@ export default function MediaDialog({ open, onClose, title, description, childre
         event.preventDefault()
         onClose()
       }}
-      onClose={() => {
-        if (open) onClose()
+      onClose={(event) => {
+        if (open && !event.currentTarget.open) onClose()
       }}
-      onKeyDown={onKeyDown}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault()
+          onClose()
+        } else {
+          onKeyDown?.(event)
+        }
+      }}
       onClick={(event) => {
         if (event.target !== event.currentTarget) return
         const rect = event.currentTarget.getBoundingClientRect()
