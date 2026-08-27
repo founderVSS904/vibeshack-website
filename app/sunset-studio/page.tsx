@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 import SunsetColorCarousel from './SunsetColorCarousel'
 import SunsetColorWheel, { type WheelSegment } from './SunsetColorWheel'
@@ -145,7 +146,7 @@ export default function SunsetPage() {
             </div>
             {/* Right: Photo */}
             <div>
-              <Image src="/studio-images/sunset-hero-v20260509.jpg" alt="Sunset studio setup" width={800} height={600} className="w-full h-auto rounded-lg" />
+              <ZoomableImage src="/studio-images/sunset-hero-v20260509.jpg" alt="Sunset studio setup" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -164,7 +165,7 @@ export default function SunsetPage() {
             {/* Detail 1 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/sunset-detail-02.jpg" alt="Sunset warm orange tones" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/sunset-detail-02.jpg" alt="Sunset warm orange tones" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Warm Tones Make People Look Human</h3>
@@ -181,7 +182,7 @@ export default function SunsetPage() {
                 <p className="text-gray-500 text-sm">Music videos and comedy specials book this room for exactly this.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/sunset-detail-01.jpg" alt="Sunset bold red colors" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/sunset-detail-01.jpg" alt="Sunset bold red colors" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
             </div>
           </div>

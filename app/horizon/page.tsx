@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import { studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
@@ -90,7 +91,7 @@ export default function HorizonPage() {
             </div>
             {/* Right: Photo */}
             <div>
-              <Image src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg" alt="Horizon warm sunset podcast setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg" />
+              <ZoomableImage src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg" alt="Horizon warm sunset podcast setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -108,7 +109,7 @@ export default function HorizonPage() {
           <div className="space-y-24">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/enhanced-horizon-orange-guest-closeup-v20260510.jpg" alt="Warm sunset backdrop and microphones in Horizon at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/enhanced-horizon-orange-guest-closeup-v20260510.jpg" alt="Warm sunset backdrop and microphones in Horizon at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Warm Color Without Compositing</h3>
@@ -124,7 +125,7 @@ export default function HorizonPage() {
                 <p className="text-gray-400 text-lg leading-relaxed">The crew monitors framing and sound while the interview or performance is underway.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/enhanced-horizon-warm-guest-closeup-v20260510.jpg" alt="Horizon warm production setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/enhanced-horizon-warm-guest-closeup-v20260510.jpg" alt="Horizon warm production setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
             </div>
           </div>

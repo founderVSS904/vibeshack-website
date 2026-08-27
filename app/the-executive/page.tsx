@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import StudioSetupSelector from '@/components/StudioSetupSelector'
 import { siteUrl } from '@/lib/seo/site'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_MINIMUM_CAMERAS, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
@@ -79,7 +80,7 @@ export default function TheExecutivePage() {
             </div>
             {/* Right: Full Room Photo */}
             <div>
-              <Image src="/studio-setups/the-executive/three-black-armchairs.webp" alt="Three black armchairs without a desk in The Executive at VibeShack Studios San Francisco" width={1688} height={932} className="w-full h-auto rounded-lg" />
+              <ZoomableImage src="/studio-setups/the-executive/three-black-armchairs.webp" alt="Three black armchairs without a desk in The Executive at VibeShack Studios San Francisco" width={1688} height={932} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -98,7 +99,7 @@ export default function TheExecutivePage() {
             {/* Detail 1: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-setups/the-executive/one-office-chair-desk.webp" alt="One black office chair with a walnut desk in The Executive at VibeShack Studios San Francisco" width={1672} height={941} className="w-full h-auto rounded-lg object-contain" />
+                <ZoomableImage src="/studio-setups/the-executive/one-office-chair-desk.webp" alt="One black office chair with a walnut desk in The Executive at VibeShack Studios San Francisco" width={1672} height={941} className="w-full h-auto rounded-lg object-contain" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Your Setup. Clear Dialogue.</h3>
@@ -115,14 +116,14 @@ export default function TheExecutivePage() {
                 <p className="text-gray-400 text-lg leading-relaxed">Have a particular shot list or a different arrangement in mind? Contact us before booking so we can plan it together.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-setups/the-executive/two-office-chairs-desk.webp" alt="Two black office chairs with a desk in The Executive at VibeShack Studios San Francisco" width={1673} height={879} className="w-full h-auto rounded-lg object-contain" />
+                <ZoomableImage src="/studio-setups/the-executive/two-office-chairs-desk.webp" alt="Two black office chairs with a desk in The Executive at VibeShack Studios San Francisco" width={1673} height={879} className="w-full h-auto rounded-lg object-contain" />
               </div>
             </div>
 
             {/* Detail 3: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/the-executive-detail-03.jpg" alt="Wood and leather in The Executive at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/the-executive-detail-03.jpg" alt="Wood and leather in The Executive at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Walnut Slats and Leather Seating</h3>
@@ -173,18 +174,18 @@ export default function TheExecutivePage() {
             </div>
           </div>
           <div className="mb-3">
-            <Image src="/studio-images/executive-made-3.jpg" alt="Portfolio Players Front Office Sports production, The Executive, VibeShack Studios San Francisco"
+            <ZoomableImage src="/studio-images/executive-made-3.jpg" alt="Portfolio Players Front Office Sports production, The Executive, VibeShack Studios San Francisco"
                 width={1200} height={800} className="w-full h-auto rounded-lg" />
             <p className="text-gray-600 text-xs mt-2">Portfolio Players · <span className="text-gray-500">Front Office Sports</span></p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <Image src="/studio-images/executive-made-1.jpg" alt="Live broadcast production setup, The Executive, VibeShack Studios San Francisco"
+              <ZoomableImage src="/studio-images/executive-made-1.jpg" alt="Live broadcast production setup, The Executive, VibeShack Studios San Francisco"
                   width={600} height={400} className="w-full h-auto rounded-lg" />
               <p className="text-gray-600 text-xs mt-2">Live broadcast setup · The Executive</p>
             </div>
             <div>
-              <Image src="/studio-images/executive-made-4.jpg" alt="Multi-camera production monitors, The Executive, VibeShack Studios San Francisco"
+              <ZoomableImage src="/studio-images/executive-made-4.jpg" alt="Multi-camera production monitors, The Executive, VibeShack Studios San Francisco"
                   width={600} height={400} className="w-full h-auto rounded-lg" />
               <p className="text-gray-600 text-xs mt-2">Multi-camera production · The Executive</p>
             </div>

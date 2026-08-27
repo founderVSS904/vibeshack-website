@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import WingSetupSelector from './WingSetupSelector'
 import { siteUrl } from '@/lib/seo/site'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_MINIMUM_CAMERAS, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
@@ -79,7 +80,7 @@ export default function TheWingPage() {
             </div>
             {/* Right: Full Room Photo */}
             <div>
-              <Image src="/studio-setups/the-wing/two-black-chairs.webp" alt="Two black chairs in The Wing at VibeShack Studios San Francisco" width={1448} height={1086} className="w-full h-auto rounded-lg" />
+              <ZoomableImage src="/studio-setups/the-wing/two-black-chairs.webp" alt="Two black chairs in The Wing at VibeShack Studios San Francisco" width={1448} height={1086} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -98,7 +99,7 @@ export default function TheWingPage() {
             {/* Detail 1: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-setups/the-wing/one-brown-chair.webp" alt="One brown chair in The Wing, VibeShack Studios San Francisco" width={1448} height={1086} className="w-full h-auto rounded-lg" />
+                <ZoomableImage src="/studio-setups/the-wing/one-brown-chair.webp" alt="One brown chair in The Wing, VibeShack Studios San Francisco" width={1448} height={1086} className="w-full h-auto rounded-lg" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Black or Brown. One or Two.</h3>
@@ -115,14 +116,14 @@ export default function TheWingPage() {
                 <p className="text-gray-400 text-lg leading-relaxed">The baseline look is set before arrival and can be adjusted for wardrobe or skin tone.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/the-wing-detail-02.jpg" alt="Lighting in The Wing studio at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/the-wing-detail-02.jpg" alt="Lighting in The Wing studio at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
             </div>
 
             {/* Detail 3: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/the-wing-detail-03.jpg" alt="Walnut walls in The Wing studio at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/the-wing-detail-03.jpg" alt="Walnut walls in The Wing studio at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Walnut Slat Acoustics</h3>

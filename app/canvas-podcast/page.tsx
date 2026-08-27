@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import { studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
@@ -201,7 +202,7 @@ export default function CanvasPodcastPage() {
           {/* Feature 1: Image Left */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
             <div className="relative overflow-hidden rounded-lg bg-black aspect-video">
-              <Image
+              <ZoomableImage
                 src="/studio-images/enhanced-canvas-podcast-red-set-wide-v20260510.jpg"
                 alt="Customizable lighting moods"
                 fill sizes="100vw"
@@ -241,7 +242,7 @@ export default function CanvasPodcastPage() {
               </p>
             </div>
             <div className="relative overflow-hidden rounded-lg bg-black aspect-video">
-              <Image
+              <ZoomableImage
                 src="/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg"
                 alt="Cinema-grade lighting setup"
                 fill sizes="100vw"
@@ -253,7 +254,7 @@ export default function CanvasPodcastPage() {
           {/* Feature 3: Image Left */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
             <div className="relative overflow-hidden rounded-lg bg-black aspect-video">
-              <Image
+              <ZoomableImage
                 src="/studio-images/enhanced-canvas-podcast-white-studio-closeup-v20260510.jpg"
                 alt="Guest seating and set design in the white studio"
                 fill sizes="100vw"

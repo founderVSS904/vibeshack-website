@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import { siteUrl } from '@/lib/seo/site'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_MINIMUM_CAMERAS, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 
@@ -76,7 +77,7 @@ export default function EncorePage() {
             </div>
             {/* Right: Full Room Photo */}
             <div>
-              <Image src="/studio-images/encore-production.jpg" alt="Encore studio in full production mode, VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg" />
+              <ZoomableImage src="/studio-images/encore-production.jpg" alt="Encore studio in full production mode, VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -95,7 +96,7 @@ export default function EncorePage() {
             {/* Detail 1: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/enhanced-encore-podcast-wide-v20260510.jpg" alt="Encore studio wide view with cinema lighting" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/enhanced-encore-podcast-wide-v20260510.jpg" alt="Encore studio wide view with cinema lighting" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Two Stages, One Shoot</h3>
@@ -112,7 +113,7 @@ export default function EncorePage() {
                 <p className="text-gray-400 text-lg leading-relaxed">No gels, no filters, no guessing. What you see on set is what you get in post. The crew knows how to light for your show's style, but if you want to direct the lights yourself, you can.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/encore-close.jpg" alt="Encore studio detail, professional lighting and production equipment" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/encore-close.jpg" alt="Encore studio detail, professional lighting and production equipment" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
 
@@ -231,12 +232,12 @@ export default function GreenScreenPage() {
               { src: '/studio-images/greenscreen-empty.jpg',   alt: 'Green screen studio empty stage ready for production, VibeShack Studios San Francisco' },
             ].map(({ src, alt }) => (
               <div key={src} className="overflow-hidden rounded-lg relative" style={{height: '220px'}}>
-                <Image src={src} alt={alt} fill sizes="100vw" className="object-cover" />
+                <ZoomableImage src={src} alt={alt} fill sizes="100vw" className="object-cover" />
               </div>
             ))}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-            <Image
+            <ZoomableImage
                 src="/studio-images/greenscreen-wide.jpg"
                 alt="Green Screen Studio with professional overhead lighting grid, VibeShack Studios San Francisco"
                 width={800}
