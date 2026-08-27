@@ -1,13 +1,16 @@
 import type { Metadata } from 'next'
 import { siteUrl } from '@/lib/seo/site'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES } from '@/lib/booking/podcast-package'
+
+const pageDescription = `Color-backdrop podcast set in San Francisco. ${PODCAST_CREW_LABEL}. ${PODCAST_CAMERA_LABEL}. $${PODCAST_HOURLY_RATES.sunset}/hr. Open 24/7.`
 
 export const metadata: Metadata = {
   title: 'Sunset Color Backdrop Studio',
-  description: 'Programmable LED color backdrop. 3-camera 4K. Cameraman included. Immersive podcast studio in San Francisco. $300/hr. Northern Waterfront. Open 24/7.',
+  description: pageDescription,
   alternates: { canonical: `${siteUrl}/sunset-studio/` },
   openGraph: {
     title: 'Sunset Studio | VibeShack Studios SF',
-    description: 'Programmable LED color backdrop studio with 12 colors, 4K cameras, and cameraman included. $300/hr in San Francisco.',
+    description: pageDescription,
     url: `${siteUrl}/sunset-studio`,
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/sunset-hero-v20260509.jpg', width: 1200, height: 630, alt: 'Sunset Studio at VibeShack Studios SF' }],
@@ -16,7 +19,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Sunset Studio | VibeShack Studios SF',
-    description: 'Programmable LED color backdrop studio with 12 colors, 4K cameras, and cameraman included. $300/hr in San Francisco.',
+    description: pageDescription,
     images: ['/studio-images/sunset-hero-v20260509.jpg'],
   },
 }

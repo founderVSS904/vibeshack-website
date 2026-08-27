@@ -1,28 +1,21 @@
 'use client'
 
 import { useEffect, useState, FormEvent } from 'react'
+import { getContactInquiry } from '@/lib/contact/inquiry'
 
 export default function ContactForm() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const [validationError, setValidationError] = useState('')
   const [startedAt] = useState(() => Date.now())
   const [projectType, setProjectType] = useState('')
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
-    const service = new URLSearchParams(window.location.search).get('service')
-    const serviceMap: Record<string, string> = {
-      branding: 'branding',
-      commercials: 'brand-commercial',
-      documentary: 'documentary',
-      editorials: 'editorial',
-      'photo-services': 'photo-services',
-      'portfolio-inquiry': 'other',
-      'video-production': 'video-interview',
-    }
+    const inquiry = getContactInquiry(new URLSearchParams(window.location.search))
+    if (!inquiry) return
 
-    if (service && serviceMap[service]) {
-      setProjectType(serviceMap[service])
-    }
+    setProjectType((current) => current || inquiry.projectType)
+    setMessage((current) => current || inquiry.message)
   }, [])
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -183,6 +176,8 @@ export default function ContactForm() {
         <textarea
           id="message"
           name="message"
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
           required
           rows={5}
           placeholder="What are you shooting, when is it happening, and what do you need from us?"

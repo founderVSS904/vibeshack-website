@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 import Link from 'next/link'
 import { breadcrumbSchema } from '@/lib/schemas'
 import { absoluteUrl, business, parentBrand, peerspaceListings, siteUrl } from '@/lib/seo/site'
@@ -60,7 +61,7 @@ export default function PressReleasePage() {
             {parentBrand.name} operates as a media company and brand studio for teams that need content, campaigns, and production support. VibeShack Studios is the physical production arm, bringing multiple production environments together at one address: podcast sets, green screen, photo services, video, and white cyc rental spaces. The studio is designed for teams that need professional infrastructure without losing time to fragmented vendors, uncertain availability, or gear-heavy setup days.
           </p>
           <p>
-            The facility supports hourly bookings, 24/7 availability, professional lighting, broadcast audio, camera-ready sets, and crew options. Use cases include podcast interviews, founder videos, social media campaigns, product photography, green screen explainers, music videos, commercials, and brand content days.
+            The facility supports hourly bookings, 24/7 availability, professional lighting, broadcast audio, and camera-ready sets. {PODCAST_PACKAGE_SUMMARY} Use cases include podcast interviews, founder videos, social media campaigns, product photography, green screen explainers, music videos, commercials, and brand content days.
           </p>
           <p>
             The public studio address is {business.address.streetAddress}, {business.address.addressLocality}, {business.address.addressRegion} {business.address.postalCode}. Bookings are available directly through the VibeShack website, with additional marketplace visibility through Peerspace.

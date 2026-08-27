@@ -2,15 +2,19 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
+
+const hourlyRate = PODCAST_HOURLY_RATES['canvas-podcast']
+const pageDescription = `LED-backdrop podcast set in San Francisco. ${PODCAST_CREW_LABEL}. ${PODCAST_CAMERA_LABEL}. $${hourlyRate}/hr. Same-day footage delivery.`
 
 export const metadata: Metadata = {
   title: 'Canvas Podcast Studio',
-  description: 'Customizable LED backdrop podcast studio in San Francisco. Programmable lighting, cinema-grade equipment, same-day footage delivery. $400/hr with crew included.',
+  description: pageDescription,
   keywords: 'podcast studio san francisco, professional podcast recording, customizable backgrounds, LED backdrop studio, podcast production sf',
   alternates: { canonical: `${siteUrl}/canvas-podcast/` },
   openGraph: {
     title: 'Canvas Podcast Studio | VibeShack Studios',
-    description: 'Professional podcast production with customizable LED backgrounds and cinema-grade lighting.',
+    description: pageDescription,
     url: `${siteUrl}/canvas-podcast`,
     images: ['/studio-images/enhanced-canvas-podcast-red-set-wide-v20260510.jpg'],
   },
@@ -18,10 +22,10 @@ export const metadata: Metadata = {
 
 const canvasPodcastServiceSchema = studioServiceSchema({
   name: 'Canvas Podcast Studio Rental in San Francisco',
-  description: 'Podcast studio in San Francisco with customizable LED backgrounds, cinema-grade lighting, and full crew included.',
+  description: pageDescription,
   url: `${siteUrl}/canvas-podcast/`,
   image: `${siteUrl}/studio-images/enhanced-canvas-podcast-warm-panel-wide-v20260510.jpg`,
-  price: '400',
+  price: String(hourlyRate),
   serviceType: 'Podcast Studio Rental',
 })
 
@@ -60,7 +64,7 @@ export default function CanvasPodcastPage() {
             Canvas Podcast<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed mb-12">
-            Customizable LED backgrounds, cinema lighting, broadcast audio, and crew for large-format shows.
+            Customizable LED backgrounds, cinema lighting, and broadcast audio for large-format shows. {PODCAST_PACKAGE_SUMMARY}
           </p>
           <a
             href="/book/?studio=canvas-podcast"
@@ -107,7 +111,7 @@ export default function CanvasPodcastPage() {
                   <h3 className="text-white font-black text-3xl leading-tight">Parlor</h3>
                   <p className="text-gray-400 text-sm mt-1">Chesterfield seating under clean linear light.</p>
                 </div>
-                <span className="text-white font-black text-2xl">$400<span className="text-sm text-gray-400">/hr</span></span>
+                <span className="text-white font-black text-2xl">${PODCAST_HOURLY_RATES.parlor}<span className="text-sm text-gray-400">/hr</span></span>
               </div>
               <div className="divide-y divide-white/10 border-y border-white/10 mt-6 mb-8">
                 <div className="py-3 text-gray-400 text-sm">Linear white lights + Chesterfield seating</div>
@@ -140,7 +144,7 @@ export default function CanvasPodcastPage() {
                   <h3 className="text-white font-black text-3xl leading-tight">Horizon</h3>
                   <p className="text-gray-400 text-sm mt-1">Sage green seating on a warm, backlit set.</p>
                 </div>
-                <span className="text-white font-black text-2xl">$400<span className="text-sm text-gray-400">/hr</span></span>
+                <span className="text-white font-black text-2xl">${PODCAST_HOURLY_RATES.horizon}<span className="text-sm text-gray-400">/hr</span></span>
               </div>
               <div className="divide-y divide-white/10 border-y border-white/10 mt-6 mb-8">
                 <div className="py-3 text-gray-400 text-sm">Warm sunset backdrop and practical lighting</div>
@@ -280,8 +284,8 @@ export default function CanvasPodcastPage() {
                 <p className="text-gray-400 leading-relaxed">Host + guest perfectly isolated. Professional audio, zero compromise on comfort.</p>
               </div>
               <div>
-                <h3 className="text-white font-black text-2xl mb-3">Full Crew Included</h3>
-                <p className="text-gray-400 leading-relaxed">Sound engineer, lighting tech, everything. You focus on the show. We handle production.</p>
+                <h3 className="text-white font-black text-2xl mb-3">{PODCAST_CREW_LABEL}</h3>
+                <p className="text-gray-400 leading-relaxed">Your two studio operators handle the cameras, sound, and lighting. You focus on the show.</p>
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4">
@@ -290,8 +294,8 @@ export default function CanvasPodcastPage() {
                 <p className="text-gray-400 text-sm">Studio always ready. No setup delays.</p>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-lg p-8">
-                <div className="text-brand-red font-black text-3xl mb-2">$400/hr</div>
-                <p className="text-gray-400 text-sm">Crew, gear, space all included. No surprises.</p>
+                <div className="text-brand-red font-black text-3xl mb-2">${hourlyRate}/hr</div>
+                <p className="text-gray-400 text-sm">Studio, cameras, lighting, and audio included. Optional extras are priced separately.</p>
               </div>
             </div>
           </div>
@@ -310,7 +314,7 @@ export default function CanvasPodcastPage() {
               },
               {
                 title: 'Interview Series',
-                desc: 'High-profile guests on camera, with a sound engineer riding levels the whole session.',
+                desc: 'High-profile guests on camera, with two studio operators monitoring the session.',
               },
               {
                 title: 'Produced Shows',
@@ -349,18 +353,18 @@ export default function CanvasPodcastPage() {
               letterSpacing: 0,
             }}
           >
-            <span className="text-brand-red">$400</span> / hour
+            <span className="text-brand-red">${hourlyRate}</span> / hour
           </h2>
           <p className="text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
-            Everything included. Crew, lighting setup, background customization, dual-mic audio, the space itself.
+            {PODCAST_PACKAGE_SUMMARY} Lighting setup, background customization, dual-mic audio, and the space are included.
           </p>
 
           <div className="bg-black rounded-lg p-12 mb-12 border border-white/10">
             <h3 className="text-white font-bold text-xl mb-6">What's Included</h3>
             <div className="divide-y divide-white/10 border-y border-white/10 text-left">
               {[
-                'Sound Engineer on-site',
-                'Lighting Tech on-site',
+                PODCAST_CREW_LABEL,
+                PODCAST_CAMERA_LABEL,
                 'Customizable LED backdrop',
                 'Cinema-grade key lights',
                 'Dual professional microphones',

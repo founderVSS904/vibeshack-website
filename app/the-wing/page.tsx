@@ -1,14 +1,18 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { siteUrl } from '@/lib/seo/site'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_MINIMUM_CAMERAS, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
+
+const hourlyRate = PODCAST_HOURLY_RATES['the-wing']
+const pageDescription = `Intimate walnut podcast set in San Francisco. ${PODCAST_CREW_LABEL}. ${PODCAST_CAMERA_LABEL}. $${hourlyRate}/hr. Open 24/7.`
 
 export const metadata: Metadata = {
   title: 'The Wing Podcast Studio',
-  description: 'Walnut Series. Cozy 2-person setup with premium lighting and acoustics. $300/hr. Cameraman included. Open 24/7.',
+  description: pageDescription,
   alternates: { canonical: `${siteUrl}/the-wing/` },
   openGraph: {
     title: 'The Wing | VibeShack Studios SF',
-    description: 'Walnut Series intimate 2-person podcast studio with cognac leather, warm lighting, and premium acoustics. Cameraman included. $300/hr in San Francisco.',
+    description: pageDescription,
     url: `${siteUrl}/the-wing`,
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg', width: 1200, height: 630, alt: 'The Wing at VibeShack Studios SF' }],
@@ -17,7 +21,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'The Wing | VibeShack Studios SF',
-    description: 'Walnut Series intimate 2-person podcast studio with cognac leather, warm lighting, and premium acoustics. Cameraman included. $300/hr in San Francisco.',
+    description: pageDescription,
     images: ['/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg'],
   },
 }
@@ -37,7 +41,7 @@ export default function TheWingPage() {
             The Wing<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8">
-            A compact two-person set with warm lighting, broadcast audio, and two-camera coverage.
+            A compact two-person set with warm lighting, broadcast audio, and coverage from at least {PODCAST_MINIMUM_CAMERAS} cameras.
           </p>
           <a href="/book/?studio=the-wing" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book This Studio
@@ -57,9 +61,9 @@ export default function TheWingPage() {
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {[
-                  '2 cameras framed for close conversation',
+                  PODCAST_CAMERA_LABEL,
                   'Warm light tuned for two faces',
-                  'A cameraman with you, included',
+                  PODCAST_CREW_LABEL,
                   'One broadcast mic locked on each of you',
                   'Cognac leather chairs from Nod Design',
                   'Walnut slat acoustics, minimal echo',
@@ -131,14 +135,14 @@ export default function TheWingPage() {
       <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
-          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>$300</div>
+          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>${hourlyRate}</div>
           <p className="text-gray-500 text-lg mb-1">per hour</p>
-          <p className="text-white font-semibold mb-12">Cameraman included. 1 hour minimum. Open 24/7.</p>
+          <p className="text-white font-semibold mb-12">{PODCAST_PACKAGE_SUMMARY} 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
-              { label: '2 Hours', price: '$600' },
-              { label: '4 Hours', price: '$1,200' },
-              { label: '8 Hours', price: '$2,400' },
+              { label: '2 Hours', price: `$${(hourlyRate * 2).toLocaleString('en-US')}` },
+              { label: '4 Hours', price: `$${(hourlyRate * 4).toLocaleString('en-US')}` },
+              { label: '8 Hours', price: `$${(hourlyRate * 8).toLocaleString('en-US')}` },
             ].map(({ label, price }) => (
               <div key={label} className="flex items-center justify-between py-4">
                 <span className="text-gray-400 text-sm">{label}</span>
@@ -172,7 +176,7 @@ export default function TheWingPage() {
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-3 text-brand-red">Walnut Series</p>
               <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: 0}}>The Executive</h3>
               <p className="text-gray-300 text-lg max-w-md mb-6">Premium two-host set. Warm, cinematic atmosphere. Full production capability.</p>
-              <p className="text-gray-400 text-sm">$300/hr · Cameraman included</p>
+              <p className="text-gray-400 text-sm">${PODCAST_HOURLY_RATES['the-executive']}/hr · {PODCAST_CREW_LABEL}</p>
             </div>
           </a>
         </div>
@@ -184,7 +188,7 @@ export default function TheWingPage() {
           <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0 }}>
             Ready to <span className="text-brand-red">Record?</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10">$300/hr. Cameraman included. Instant confirmation.</p>
+          <p className="text-gray-500 text-lg mb-10">${hourlyRate}/hr. {PODCAST_CREW_LABEL}. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="/book/?studio=the-wing" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session

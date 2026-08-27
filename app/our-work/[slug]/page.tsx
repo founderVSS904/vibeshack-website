@@ -3,7 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { absoluteUrl, siteUrl } from '@/lib/seo/site'
-import { allWorkProjects, getWorkProject, workProjects } from '@/lib/seo/workProjects'
+import { allWorkProjects, getWorkProject } from '@/lib/seo/workProjects'
+import { getWorkProjectInquiryHref } from '@/lib/contact/inquiry'
 import { breadcrumbSchema } from '@/lib/schemas'
 
 type PageProps = {
@@ -47,6 +48,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
     notFound()
   }
 
+  const inquiryHref = getWorkProjectInquiryHref(project.slug)
   const relatedProjects = allWorkProjects.filter((item) => item.slug !== project.slug).slice(0, 3)
   const watchUrl = project.youtubeId ? `https://www.youtube.com/watch?v=${project.youtubeId}` : null
   const associatedPartyLabel = project.relationship === 'original'
@@ -105,7 +107,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
                     Watch on YouTube
                   </a>
                 )}
-                <Link href={project.serviceHref} className="text-sm font-semibold text-white/[0.48] transition-colors hover:text-white">
+                <Link href={inquiryHref} className="text-sm font-semibold text-white/[0.48] transition-colors hover:text-white">
                   Start a similar project
                 </Link>
               </div>
@@ -208,7 +210,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/50">
               Tell us what you are launching, documenting, recording, or selling. We will route the project to the right production path.
             </p>
-            <Link href={project.serviceHref} className="mt-9 inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+            <Link href={inquiryHref} className="mt-9 inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Start a similar project
             </Link>
           </div>

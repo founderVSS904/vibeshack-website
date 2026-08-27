@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useRef, useState, type KeyboardEvent } from 'react'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL } from '@/lib/booking/podcast-package'
 
 export type PodcastSetCategory = 'podcast' | 'signature' | 'rental'
 
@@ -76,7 +77,7 @@ export default function PodcastSetSelector({ sets }: PodcastSetSelectorProps) {
 
   const highlights = activeSet.category === 'rental'
     ? activeSet.specs.slice(0, 3)
-    : ['3-camera 4K', 'Broadcast audio', 'Open 24/7']
+    : [PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, 'Open 24/7']
 
   return (
     <section id="sets" className="scroll-mt-20 bg-black pt-20 text-white" aria-label="Explore VibeShack studio sets">

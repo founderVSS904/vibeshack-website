@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY, PODCAST_RATE_SUMMARY } from '@/lib/booking/podcast-package'
 
 export const metadata: Metadata = {
   title: 'Studio Pricing',
   description:
-    'Studio rentals from $100/hr, podcast sets from $300/hr, Canvas Podcast $400/hr. Production services quoted by request in San Francisco.',
+    `Studio rentals from $100/hr in San Francisco. ${PODCAST_RATE_SUMMARY} Production services quoted by request.`,
   alternates: {
     canonical: `${siteUrl}/pricing/`,
   },
@@ -32,13 +33,13 @@ export const metadata: Metadata = {
 }
 
 const studios = [
-  { name: 'The Executive', price: '$300', note: 'cameraman included · Walnut Series', href: '/the-executive/', category: 'Podcast' },
-  { name: 'The Wing', price: '$300', note: 'cameraman included · Walnut Series', href: '/the-wing/', category: 'Podcast' },
-  { name: 'Encore', price: '$300', note: 'cameraman included · Vault Series', href: '/encore/', category: 'Podcast' },
-  { name: 'Sunset', price: '$300', note: 'cameraman included · Creative Series', href: '/sunset-studio/', category: 'Podcast' },
-  { name: 'Parlor', price: '$400', note: 'full crew included · Signature Series', href: '/parlor/', category: 'Podcast' },
-  { name: 'Horizon', price: '$400', note: 'full crew included · Signature Series', href: '/horizon/', category: 'Podcast' },
-  { name: 'Canvas Podcast', price: '$400', note: 'LED backdrop · full crew included', href: '/canvas-podcast/', category: 'Podcast' },
+  { name: 'The Executive', price: `$${PODCAST_HOURLY_RATES['the-executive']}`, note: `${PODCAST_CREW_LABEL} · ${PODCAST_CAMERA_LABEL}`, href: '/the-executive/', category: 'Podcast' },
+  { name: 'The Wing', price: `$${PODCAST_HOURLY_RATES['the-wing']}`, note: `${PODCAST_CREW_LABEL} · ${PODCAST_CAMERA_LABEL}`, href: '/the-wing/', category: 'Podcast' },
+  { name: 'Encore', price: `$${PODCAST_HOURLY_RATES['encore']}`, note: `${PODCAST_CREW_LABEL} · ${PODCAST_CAMERA_LABEL}`, href: '/encore/', category: 'Podcast' },
+  { name: 'Sunset', price: `$${PODCAST_HOURLY_RATES['sunset']}`, note: `${PODCAST_CREW_LABEL} · ${PODCAST_CAMERA_LABEL}`, href: '/sunset-studio/', category: 'Podcast' },
+  { name: 'Parlor', price: `$${PODCAST_HOURLY_RATES['parlor']}`, note: `${PODCAST_CREW_LABEL} · ${PODCAST_CAMERA_LABEL}`, href: '/parlor/', category: 'Podcast' },
+  { name: 'Horizon', price: `$${PODCAST_HOURLY_RATES['horizon']}`, note: `${PODCAST_CREW_LABEL} · ${PODCAST_CAMERA_LABEL}`, href: '/horizon/', category: 'Podcast' },
+  { name: 'Canvas Podcast', price: `$${PODCAST_HOURLY_RATES['canvas-podcast']}`, note: `${PODCAST_CREW_LABEL} · ${PODCAST_CAMERA_LABEL}`, href: '/canvas-podcast/', category: 'Podcast' },
   { name: 'Green Screen', price: '$100', note: 'floor-to-ceiling · Creative Series', href: '/green-screen-studio-sf/', category: 'Rental' },
   { name: 'Canvas Rental', price: '$100', note: 'white backdrop · Creative Series', href: '/canvas-rental/', category: 'Rental' },
 ]
@@ -53,7 +54,7 @@ const productionServices = [
 
 const pricingFaqs = [
   { question: 'Are there hourly minimums?', answer: 'Bookings start at one hour. From there, book as many hours as the shoot needs, up to a full day.' },
-  { question: 'What does the rate include?', answer: 'The rate includes the studio and the equipment listed on each studio page. Podcast sets include crew options and production setup.' },
+  { question: 'What does the rate include?', answer: `${PODCAST_PACKAGE_SUMMARY} Rental rates include the space and the equipment listed on each studio page.` },
   { question: 'How are photo and video services priced?', answer: 'Photo and video services are quoted after the brief, shot list, deliverables, crew needs, usage, and timeline are clear.' },
   { question: 'How do I book?', answer: 'Book directly on the website. Choose your studio, pick a date and time, add any options, and confirm online.' },
   { question: 'Can I book multiple studios in one day?', answer: 'Yes. You can book multiple studios for the same day, such as a podcast set plus Canvas Rental time.' },
@@ -98,9 +99,7 @@ const pricingServiceSchema = {
     serviceType: 'Studio Rental Pricing',
   }),
   offers: [
-    hourlyOffer('Podcast Studios', '300'),
-    hourlyOffer('Canvas Podcast Studio', '400'),
-    hourlyOffer('Rental Studios (Green Screen, Canvas)', '100'),
+    ...studios.map((studio) => hourlyOffer(studio.name, studio.price.replace('$', ''))),
     quotedOffer('Photo Services', 'Contact VibeShack Studios for a scoped photo services quote.'),
     quotedOffer('Video Production Services', 'Contact VibeShack Studios for a scoped video production quote.'),
   ],
