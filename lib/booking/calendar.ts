@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import { google, type calendar_v3 } from 'googleapis'
 import { getStudioById, STUDIOS } from './catalog'
 import { bookingHoldIsActive } from './checkout-lifecycle'
+import { bookingAddOnDescription, bookingAddOnTotalCents, type BookingAddOn } from './add-ons'
 import {
   bookingHoldCleanupError,
   collectBookingHoldCleanupFailures,
@@ -11,7 +12,7 @@ import {
 } from './hold-cleanup'
 import { formatMoneyFromCents, type ReferralInfo } from './referrals'
 import { primaryStudioResourceGroup, studioIdsThatAffectAvailability, studioResourceGroups, studiosShareResources } from './resources'
-import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
+import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
 
 export interface BookingCartItem {
   studioId: string
@@ -20,6 +21,7 @@ export interface BookingCartItem {
   slots: string[]
   hours: number
   price: number
+  addOns?: BookingAddOn[]
 }
 
 export interface CalendarConfig {
@@ -1220,7 +1222,7 @@ export async function getTourAvailabilityForDate(date: string) {
   }
 
   const allSlots = getTourSlotsForDay(date)
-  const cutoff = addMinutes(new Date(), TOUR_MIN_LEAD_MINUTES)
+  const now = new Date()
   const timeMin = allSlots[0].start
   const timeMax = allSlots[allSlots.length - 1].end
 
@@ -1257,7 +1259,7 @@ export async function getTourAvailabilityForDate(date: string) {
         return {
           time: start.toISOString(),
           label: formatTimeForDisplay(start),
-          available: !busy && start > cutoff,
+          available: !busy && bookingStartIsInFuture(start, now, TOUR_MIN_LEAD_MINUTES),
         }
       }),
     }
@@ -1341,7 +1343,7 @@ export async function getAvailabilityForDate(
         return {
           time: start.toISOString(),
           label: start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: BOOKING_TIME_ZONE }),
-          available: !busy && start > now,
+          available: !busy && bookingStartIsInFuture(start, now),
         }
       }),
     }
@@ -1579,7 +1581,8 @@ export async function addBookingEvents(
               `Phone: ${customer.phone || 'N/A'}`,
               `Date: ${dateStr}`,
               `Duration: ${formatBookingDuration(group.length)}`,
-              `Amount: $${item.price}`,
+              `Studio amount before recurring discount: $${item.price}`,
+              ...(item.addOns || []).map((addOn) => `Add-on: ${bookingAddOnDescription(addOn)}`),
               ...(referralInfo ? [
                 '',
                 `Referral partner: ${referralInfo.partnerName}`,
@@ -1598,6 +1601,8 @@ export async function addBookingEvents(
                 stripeEventId,
                 studioId: item.studioId,
                 studioName: item.studioName,
+                addOnIds: (item.addOns || []).map((addOn) => addOn.id).join(','),
+                addOnTotalCents: String(bookingAddOnTotalCents(item.addOns)),
                 resourceGroup: primaryStudioResourceGroup(item.studioId),
                 resourceGroups: studioResourceGroups(item.studioId).join(','),
               },

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { STUDIOS } from '@/lib/booking/catalog'
+import { bookingDateRange } from '@/lib/booking/time'
 
 type TourSlot = { time: string; label: string; available: boolean }
 
@@ -14,11 +15,7 @@ function formatDate(d: Date) {
 }
 
 function getNext45Days() {
-  return Array.from({ length: 45 }, (_, index) => {
-    const date = new Date()
-    date.setDate(date.getDate() + index + 1)
-    return date
-  })
+  return bookingDateRange(45).map((date) => new Date(`${date}T12:00:00`))
 }
 
 function fmtDateFull(date: string) {
