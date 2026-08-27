@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { getStudioSetup, getStudioSetups, type StudioSetupId } from '@/lib/booking/studio-setups'
+import { getStudioSetup, getStudioSetups, getStudioSetupCollection, type StudioSetupId } from '@/lib/booking/studio-setups'
 
 interface StudioSetupPickerProps {
   id: string
@@ -15,20 +15,21 @@ interface StudioSetupPickerProps {
 export default function StudioSetupPicker({ id, studioId, value, onChange, wide = false }: StudioSetupPickerProps) {
   const options = getStudioSetups(studioId)
   const selected = getStudioSetup(studioId, value)
-  if (!options.length) return null
+  const collection = getStudioSetupCollection(studioId)
+  if (!collection || !options.length) return null
 
   const inquiryParams = new URLSearchParams({ service: 'studio-setup', studio: studioId })
   if (selected) inquiryParams.set('setup', selected.id)
-  const emailSubject = `Custom setup for The Wing${selected ? `: ${selected.label}` : ''}`
+  const emailSubject = `Custom setup for ${collection.studioName}${selected ? `: ${selected.label}` : ''}`
 
   return (
     <div>
       <fieldset aria-describedby={`${id}-hint`}>
-        <legend className="text-xl font-bold text-white sm:text-2xl">Choose your Wing setup</legend>
+        <legend className="text-xl font-bold text-white sm:text-2xl">Choose your {collection.shortName} setup</legend>
         <p id={`${id}-hint`} className="mb-6 mt-3 text-sm leading-relaxed text-zinc-300">
-          Four setups, one studio. Choose the chair color and layout for your session. A selection is required before checkout.
+          {collection.intro} A selection is required before checkout.
         </p>
-        <div className={`grid grid-cols-1 gap-4 min-[400px]:grid-cols-2 ${wide ? 'xl:grid-cols-4' : ''}`}>
+        <div className={`grid grid-cols-1 gap-4 min-[400px]:grid-cols-2 ${wide ? (options.length === 3 ? 'md:grid-cols-3' : 'xl:grid-cols-4') : ''}`}>
           {options.map((option) => (
             <label key={option.id} className="relative block cursor-pointer">
               <input
@@ -45,15 +46,15 @@ export default function StudioSetupPicker({ id, studioId, value, onChange, wide 
                 <Image
                   src={option.image}
                   alt={option.alt}
-                  width={1448}
-                  height={1086}
-                  sizes={wide ? '(min-width: 1280px) 25vw, (min-width: 400px) 50vw, 100vw' : '(min-width: 1024px) 30vw, (min-width: 400px) 50vw, 100vw'}
-                  className="aspect-[4/3] h-auto w-full object-contain"
+                  width={option.width}
+                  height={option.height}
+                  sizes={wide ? (options.length === 3 ? '(min-width: 768px) 33vw, (min-width: 400px) 50vw, 100vw' : '(min-width: 1280px) 25vw, (min-width: 400px) 50vw, 100vw') : '(min-width: 1024px) 30vw, (min-width: 400px) 50vw, 100vw'}
+                  className={`${collection.widePhotos ? 'aspect-video' : 'aspect-[4/3]'} h-auto w-full object-contain`}
                 />
                 <span className="block px-4 py-4">
                   <span className="block text-sm font-semibold text-white sm:text-base">{option.label}</span>
                   <span className="mt-2 flex items-center justify-between gap-2 text-xs text-zinc-300">
-                    <span>{option.chairs === 1 ? 'Solo recording' : 'Two-person conversation'}</span>
+                    <span>{option.chairs === 1 ? 'Solo recording' : option.chairs === 2 ? 'Two-person conversation' : 'Three-person conversation'}</span>
                     <span className={value === option.id ? 'font-semibold text-white' : 'text-zinc-400'} aria-hidden="true">
                       {value === option.id ? 'Selected ✓' : 'Select'}
                     </span>
@@ -67,7 +68,7 @@ export default function StudioSetupPicker({ id, studioId, value, onChange, wide 
       <div className="mt-6 rounded-lg border border-white/10 px-5 py-4 text-sm leading-relaxed text-zinc-300">
         <p className="font-semibold text-white">All of our sets are customizable.</p>
         <p className="mt-1">
-          These photos show a few options for The Wing. Have another layout or look in mind?{' '}
+          These photos show a few options for {collection.studioName}. Have another layout or look in mind?{' '}
           <a className="text-white underline underline-offset-4 hover:text-red-400" href={`mailto:founder@vibeshackstudios.com?subject=${encodeURIComponent(emailSubject)}`}>Email us</a>
           {' '}or{' '}
           <Link className="text-white underline underline-offset-4 hover:text-red-400" href={`/contact/?${inquiryParams.toString()}#project-inquiry`}>get in touch</Link>

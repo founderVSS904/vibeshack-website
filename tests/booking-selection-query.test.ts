@@ -3,26 +3,31 @@ import { describe, test } from 'node:test'
 import React from 'react'
 import BookPage from '../app/book/page'
 import BookPageClient from '../app/book/BookPageClient'
-import { WING_SETUPS } from '../lib/booking/studio-setups'
+import { WING_SETUPS, EXECUTIVE_SETUPS } from '../lib/booking/studio-setups'
 
 Object.assign(globalThis, { React })
 
 describe('server-to-client booking selection handoff', () => {
-  for (const setup of WING_SETUPS) {
+  for (const { studioId, setup } of [
+    ...WING_SETUPS.map((setup) => ({ studioId: 'the-wing', setup })),
+    ...EXECUTIVE_SETUPS.map((setup) => ({ studioId: 'the-executive', setup })),
+  ]) {
     test(`passes ${setup.id} without depending on window.location timing`, async () => {
-      const page = await BookPage({ searchParams: Promise.resolve({ studio: 'the-wing', setup: setup.id }) })
-      assert.equal(page.props.initialStudioId, 'the-wing')
+      const page = await BookPage({ searchParams: Promise.resolve({ studio: studioId, setup: setup.id }) })
+      assert.equal(page.props.initialStudioId, studioId)
       assert.equal(page.props.initialSetupId, setup.id)
       assert.equal(page.props.hasSetupRequest, true)
     })
   }
 
   test('does not guess a setup from missing, invalid, empty, or duplicated parameters', async () => {
-    for (const setup of [undefined, '', 'invalid', ['one-black-chair'], ['one-black-chair', 'two-black-chairs']]) {
-      const page = await BookPage({ searchParams: Promise.resolve({ studio: 'the-wing', setup }) })
-      assert.equal(page.props.initialStudioId, 'the-wing')
-      assert.equal(page.props.initialSetupId, undefined)
-      assert.equal(page.props.hasSetupRequest, setup !== undefined)
+    for (const studio of ['the-wing', 'the-executive']) {
+      for (const setup of [undefined, '', 'invalid', ['one-black-chair'], ['one-black-chair', 'two-black-chairs'], ['three-black-armchairs'], ['one-office-chair-desk', 'three-black-armchairs']]) {
+        const page = await BookPage({ searchParams: Promise.resolve({ studio, setup }) })
+        assert.equal(page.props.initialStudioId, studio)
+        assert.equal(page.props.initialSetupId, undefined)
+        assert.equal(page.props.hasSetupRequest, setup !== undefined)
+      }
     }
   })
 
@@ -46,8 +51,11 @@ describe('server-to-client booking selection handoff', () => {
   })
 
   test('remounts for each new requested selection while distinguishing absent and invalid setup requests', () => {
-    const keys = WING_SETUPS.map((setup) => BookPageClient({ initialStudioId: 'the-wing', initialSetupId: setup.id, hasSetupRequest: true }).key)
-    assert.equal(new Set(keys).size, 4)
+    const keys = [
+      ...WING_SETUPS.map((setup) => BookPageClient({ initialStudioId: 'the-wing', initialSetupId: setup.id, hasSetupRequest: true }).key),
+      ...EXECUTIVE_SETUPS.map((setup) => BookPageClient({ initialStudioId: 'the-executive', initialSetupId: setup.id, hasSetupRequest: true }).key),
+    ]
+    assert.equal(new Set(keys).size, 7)
     assert.notEqual(
       BookPageClient({ initialStudioId: 'the-wing' }).key,
       BookPageClient({ initialStudioId: 'the-wing', hasSetupRequest: true }).key,

@@ -178,7 +178,7 @@ export default function TheWingPage() {
             <div className="absolute bottom-0 left-0 right-0 p-12">
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-3 text-brand-red">Walnut Series</p>
               <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: 0}}>The Executive</h3>
-              <p className="text-gray-300 text-lg max-w-md mb-6">Premium two-host set. Warm, cinematic atmosphere. Full production capability.</p>
+              <p className="text-gray-300 text-lg max-w-md mb-6">A walnut set with desk layouts for one or two, or three armchairs without a desk.</p>
               <p className="text-gray-400 text-sm">${PODCAST_HOURLY_RATES['the-executive']}/hr · {PODCAST_CREW_LABEL}</p>
             </div>
           </a>

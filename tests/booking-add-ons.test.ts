@@ -90,7 +90,7 @@ describe('optional server-priced teleprompter', () => {
   })
 
   test('prices multiple cart items independently without discounting their add-ons', () => {
-    const cart = buildCanonicalBookingCart([rawItem(), { ...rawItem(4), studioId: 'the-executive' }])
+    const cart = buildCanonicalBookingCart([rawItem(), { ...rawItem(4), studioId: 'the-executive', setupId: 'two-office-chairs-desk' }])
     const pricing = calculateBookingCheckoutPricing(cart, 'weekly')
     assert.equal(pricing.baseSessionTotalCents, 75000)
     assert.equal(pricing.discountCents, 7500)
@@ -131,7 +131,7 @@ describe('checkout add-on metadata and fulfillment', () => {
   })
 
   test('round-trips multiple items and respects Stripe metadata value limits', () => {
-    const cart = buildCanonicalBookingCart([rawItem(16), { ...rawItem(3), studioId: 'the-executive' }])
+    const cart = buildCanonicalBookingCart([rawItem(16), { ...rawItem(3), studioId: 'the-executive', setupId: 'one-office-chair-desk' }])
     const metadata = { bookingHoldVersion: '1', totalSessions: '2', ...buildBookingCartMetadata(cart), addOnTotalCents: '47500' }
     for (const value of Object.values(metadata)) assert.ok(value.length <= 500)
     const parsed = parseBookingCartItems(metadata)

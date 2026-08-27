@@ -32,7 +32,7 @@ describe('explicit, non-priced Wing setup selection', () => {
     assert.deepEqual(WING_SETUPS.map(({ id }) => id), ['one-black-chair', 'one-brown-chair', 'two-brown-chairs', 'two-black-chairs'])
     assert.deepEqual(WING_SETUPS.map(({ chairs }) => chairs), [1, 1, 2, 2])
     assert.equal(new Set(WING_SETUPS.map(({ image }) => image)).size, 4)
-    assert.deepEqual(getStudioSetups('the-executive'), [])
+    assert.deepEqual(getStudioSetups('encore'), [])
     assert.deepEqual(getStudioSetups('__proto__'), [])
   })
 
@@ -49,10 +49,10 @@ describe('explicit, non-priced Wing setup selection', () => {
   })
 
   test('does not attach Wing configurations to another room', () => {
-    for (const absent of [undefined, null, '']) assert.equal(validateBookingSetup('the-executive', absent), undefined)
+    for (const absent of [undefined, null, '']) assert.equal(validateBookingSetup('encore', absent), undefined)
     assert.equal(getStudioSetup('the-executive', 'two-black-chairs'), undefined)
     assert.throws(() => buildCanonicalBookingCart([{ ...rawItem('two-black-chairs'), studioId: 'the-executive' }]), BookingSetupSelectionError)
-    assert.equal(buildCanonicalBookingCart([{ ...rawItem(undefined), studioId: 'the-executive' }])[0].price, 300)
+    assert.equal(buildCanonicalBookingCart([{ ...rawItem(undefined), studioId: 'encore' }])[0].price, 300)
   })
 
   test('keeps rate, discounts, and teleprompter charges identical for all four choices', () => {
@@ -164,7 +164,8 @@ describe('setup communication and customer privacy', () => {
         description: `Setup: ${setup.label}`, privateProperties: { setupId: setup.id },
       })
     }
-    assert.equal(bookingSetupEmailHtml('the-executive', 'two-black-chairs'), '')
+    assert.equal(bookingSetupEmailHtml('encore', 'two-black-chairs'), '')
+    assert.match(bookingSetupEmailHtml('the-executive', 'two-black-chairs'), /Setup not recorded/)
     assert.match(bookingSetupEmailHtml('the-wing', undefined), /Setup not recorded/)
     assert.doesNotMatch(bookingSetupEmailHtml('the-wing', '<img src=x onerror=alert(1)>'), /<img|onerror/)
   })

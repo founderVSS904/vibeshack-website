@@ -586,7 +586,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
     if (checkoutCreatingRef.current) return
     if (!setupReady) {
       goToStep('datetime')
-      setError('Choose a Wing setup before continuing.')
+      setError(`Choose a setup for ${selectedStudio?.name || 'this studio'} before continuing.`)
       return
     }
     if (!selectedStudio || !blockValid) {
@@ -752,7 +752,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
 
   const subline =
     step === 'room' ? 'Choose a studio, then select a date and time.'
-      : step === 'datetime' ? (requiresSetup ? 'Choose your chair layout, then find a time. All times Pacific.' : 'All times Pacific. Availability is checked live.')
+      : step === 'datetime' ? (requiresSetup ? 'Choose your setup, then find a time. All times Pacific.' : 'All times Pacific. Availability is checked live.')
       : step === 'extras' ? 'Optional equipment and recurring savings. Studio-only is always an option.'
           : step === 'review' ? 'Check the details, add your info, and lock it in.'
             : 'Card details are handled by Stripe. We never see them.'
@@ -1415,7 +1415,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                   </div>
                 ) : !setupReady ? (
                   <p className="rounded-lg border border-white/15 p-5 text-sm leading-relaxed text-zinc-300" role="status">
-                    This checkout was started without a setup choice. Use “Change booking details” below to choose your Wing setup before payment. We will safely release this checkout before creating the updated one.
+                    This checkout was started without a setup choice. Use “Change booking details” below to choose a setup for {selectedStudio?.name} before payment. We will safely release this checkout before creating the updated one.
                   </p>
                 ) : checkoutPublishableKey && checkoutClientSecret ? (
                   <div className="rounded-lg bg-white p-2 sm:p-4">

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import StudioSetupSelector from '@/components/StudioSetupSelector'
 import { siteUrl } from '@/lib/seo/site'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_MINIMUM_CAMERAS, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 
@@ -31,7 +32,7 @@ export default function TheExecutivePage() {
     <>
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-end bg-black overflow-hidden">
-        <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg"
+        <Image src="/studio-setups/the-executive/two-office-chairs-desk.webp"
           alt="The Executive podcast studio hero shot, VibeShack Studios San Francisco"
           fill sizes="100vw" className="object-cover opacity-80" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
@@ -41,14 +42,16 @@ export default function TheExecutivePage() {
             The Executive<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8">
-            Walnut slat walls, leather seating, broadcast audio, and 4K coverage from at least {PODCAST_MINIMUM_CAMERAS} cameras for two-person shows.
+            Desk layouts for one or two people, or three black armchairs without a desk. Walnut slat walls, broadcast audio, and coverage from at least {PODCAST_MINIMUM_CAMERAS} cameras.
           </p>
-          <a href="/book/?studio=the-executive" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
-            Book This Studio
+          <a href="#choose-setup" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+            Choose Your Setup
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
         </div>
       </section>
+
+      <StudioSetupSelector studioId="the-executive" />
 
       {/* Show up. Record - 2 Column: Features Left + Photo Right */}
       <section className="py-32 bg-zinc-950 border-t border-white/10">
@@ -57,16 +60,16 @@ export default function TheExecutivePage() {
             {/* Left: Features */}
             <div>
               <h2 className="text-white font-black leading-none mb-12" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', letterSpacing: 0}}>
-                Three angles.<br/><span className="text-brand-red">One set.</span>
+                Your layout.<br/><span className="text-brand-red">Ready to record.</span>
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {[
                   PODCAST_CAMERA_LABEL,
-                  'Warm, cinematic lighting pre-configured',
+                  'Warm lighting tuned to your selected layout',
                   PODCAST_CREW_LABEL,
-                  'Broadcast microphones for 2 people',
-                  'Leather seating, adjustable layout',
-                  'Acoustic walls, zero echo',
+                  'Broadcast audio configured for your selected setup',
+                  'Desk seating for 1 or 2, or 3 armchairs without a desk',
+                  'Acoustic treatment for clear dialogue',
                   'High-speed WiFi, streaming capable',
                   'On-site support',
                 ].map(item => (
@@ -76,7 +79,7 @@ export default function TheExecutivePage() {
             </div>
             {/* Right: Full Room Photo */}
             <div>
-              <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg" alt="The Executive full room with professional lighting and setup, VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg" />
+              <Image src="/studio-setups/the-executive/three-black-armchairs.webp" alt="Three black armchairs without a desk in The Executive at VibeShack Studios San Francisco" width={1688} height={932} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -87,19 +90,19 @@ export default function TheExecutivePage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">The Set</span>
           <h2 className="text-white font-black leading-none mb-4" style={{fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: 0}}>
-            A walnut set<br/>for <span className="text-brand-red">two voices.</span>
+            A walnut set.<br/><span className="text-brand-red">Three ways to record.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-20 max-w-2xl">A wide master and two singles cover both speakers. Walnut slats, leather seating, and warm practicals give the set a finished look without a custom build.</p>
+          <p className="text-gray-500 text-lg mb-20 max-w-2xl">Choose a desk setup for a solo recording or a two-person conversation, or three black armchairs without a desk. Your photo selection tells our team which layout to prepare.</p>
           
           <div className="space-y-24">
             {/* Detail 1: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/enhanced-executive-podcast-guest-closeup-v20260510.jpg" alt="Broadcast microphones in The Executive at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <Image src="/studio-setups/the-executive/one-office-chair-desk.webp" alt="One black office chair with a walnut desk in The Executive at VibeShack Studios San Francisco" width={1672} height={941} className="w-full h-auto rounded-lg object-contain" />
               </div>
               <div className="order-2">
-                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Broadcast Audio for Both Speakers</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">Each speaker gets a dedicated Shure broadcast microphone positioned for clear dialogue and a consistent frame.</p>
+                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Your Setup. Clear Dialogue.</h3>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">Broadcast microphones are positioned for your selected seating layout, with clear dialogue and consistent framing in mind.</p>
                 <p className="text-gray-400 text-lg leading-relaxed">Audio levels are checked with the camera setup before the session begins.</p>
               </div>
             </div>
@@ -107,12 +110,12 @@ export default function TheExecutivePage() {
             {/* Detail 2: Text Left, Image Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1">
-                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>One Master. Two Singles.</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">You've got the wide master that shows the whole room and both of you talking. Then two singles, one locked on each person. Your editor has everything they need to cut between you, hold on reactions, frame the moment that matters.</p>
-                <p className="text-gray-400 text-lg leading-relaxed">All locked down. All rolling. That's the standard setup for a reason.</p>
+                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Coverage for Your Conversation.</h3>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">Every podcast booking includes a minimum of {PODCAST_MINIMUM_CAMERAS} cameras. Our operators arrange the framing around your selected desk or armchair layout.</p>
+                <p className="text-gray-400 text-lg leading-relaxed">Have a particular shot list or a different arrangement in mind? Contact us before booking so we can plan it together.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg" alt="Two hosts recording in The Executive podcast studio at VibeShack Studios San Francisco" width={1678} height={937} className="w-full h-auto rounded-lg object-cover" />
+                <Image src="/studio-setups/the-executive/two-office-chairs-desk.webp" alt="Two black office chairs with a desk in The Executive at VibeShack Studios San Francisco" width={1673} height={879} className="w-full h-auto rounded-lg object-contain" />
               </div>
             </div>
 
@@ -123,7 +126,7 @@ export default function TheExecutivePage() {
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Walnut Slats and Leather Seating</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">The vertical walnut slats add texture behind both speakers while helping control reflections in the set.</p>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">The vertical walnut slats add texture behind the conversation while helping control reflections in the set.</p>
                 <p className="text-gray-400 text-lg leading-relaxed">Leather seating and warm practical lights complete the look in camera without extra set dressing.</p>
               </div>
             </div>
@@ -150,7 +153,7 @@ export default function TheExecutivePage() {
               </div>
             ))}
           </div>
-          <a href="/book/?studio=the-executive" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+          <a href="#choose-setup" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book The Executive
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
@@ -222,7 +225,7 @@ export default function TheExecutivePage() {
           </h2>
           <p className="text-gray-500 text-lg mb-10">${hourlyRate}/hr. {PODCAST_CREW_LABEL}. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="/book/?studio=the-executive" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
+            <a href="#choose-setup" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </a>

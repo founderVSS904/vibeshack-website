@@ -1,4 +1,5 @@
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES } from './podcast-package'
+import { EXECUTIVE_SETUPS } from './studio-setups'
 
 export interface Studio {
   id: string
@@ -26,16 +27,16 @@ export const STUDIOS: Studio[] = [
     name: 'The Executive',
     price: PODCAST_HOURLY_RATES['the-executive'],
     tag: 'Walnut Series',
-    description: 'Wood slat walls. Leather seating. Minimum 3 cameras and 2 studio operators included.',
-    heroImage: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
-    photos: ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', '/studio-images/enhanced-executive-podcast-guest-closeup-v20260510.jpg'],
+    description: 'Desk layouts for 1 or 2 people, or 3 black armchairs without a desk. Minimum 3 cameras and 2 studio operators included.',
+    heroImage: '/studio-setups/the-executive/two-office-chairs-desk.webp',
+    photos: EXECUTIVE_SETUPS.map((setup) => setup.image),
     includes: [PODCAST_CAMERA_LABEL, '4K recording', 'Broadcast microphones', PODCAST_CREW_LABEL, 'Walnut Series design', 'Hair & Makeup room', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
       'Have your talking points or outline ready.',
       'Hair & Makeup room on-site.',
       "Wear what you'd wear on camera. Avoid busy patterns, fine stripes, or logos. Solid colors film best.",
-      'Everything is set up and ready when you arrive.',
+      'Check the setup listed in your booking details. Email us before your session to discuss any other arrangements.',
     ],
   },
   {

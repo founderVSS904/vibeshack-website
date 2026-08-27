@@ -133,7 +133,12 @@ const pageImages = [
   },
   {
     loc: '/the-executive/',
-    images: [['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', 'The Executive podcast studio at VibeShack Studios San Francisco']],
+    images: [
+      ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', 'The Executive podcast studio at VibeShack Studios San Francisco'],
+      ['/studio-setups/the-executive/one-office-chair-desk.webp', 'The Executive with one black office chair and a desk at VibeShack Studios San Francisco'],
+      ['/studio-setups/the-executive/two-office-chairs-desk.webp', 'The Executive with two black office chairs and a desk at VibeShack Studios San Francisco'],
+      ['/studio-setups/the-executive/three-black-armchairs.webp', 'The Executive with three black armchairs and no desk at VibeShack Studios San Francisco'],
+    ],
   },
   {
     loc: '/the-wing/',

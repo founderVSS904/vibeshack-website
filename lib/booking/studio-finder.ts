@@ -1,4 +1,5 @@
 import { STUDIOS, type Studio } from './catalog'
+import { getStudioSetups } from './studio-setups'
 
 export const STUDIO_FINDER_FORMATS = ['podcast', 'video', 'photo', 'greenscreen', 'notsure'] as const
 export type StudioFinderFormat = (typeof STUDIO_FINDER_FORMATS)[number]
@@ -9,12 +10,12 @@ export interface StudioFinderAnswers {
   bringingCrew: boolean
 }
 
-// These are the largest on-camera groups supported by the published room
-// descriptions, not building occupancy limits. Executive and Wing explicitly
-// describe two-person layouts. Do not infer other limits from seats or floor area.
+// These are confirmed seated/on-camera layouts, not building occupancy limits.
+// Tay supplied Executive's three-armchair/no-desk setup on August 27, 2026.
+// Its desk layouts seat one or two. Wing's supplied layouts seat up to two.
 // Unverified rooms must stay on a team-confirmation path until Tay confirms them.
 export const VERIFIED_ON_CAMERA_CAPACITY: Readonly<Record<string, number | null>> = {
-  'the-executive': 2,
+  'the-executive': 3,
   'the-wing': 2,
   encore: null,
   sunset: null,
@@ -51,6 +52,23 @@ export function getStudioFinderMatches(answers: StudioFinderAnswers): Studio[] {
     if (answers.format === 'photo') return studio.type === 'photo'
     return studio.type === 'photo' || studio.type === 'greenscreen'
   })
+}
+
+// Carry a photo choice only when exactly one supplied layout fits the count.
+// Otherwise keep the customer's choice open, including Wing's chair colors.
+export function getStudioFinderSetup(studioId: string, answers: StudioFinderAnswers) {
+  if (answers.peopleOnCamera === null || !getStudioFinderMatches(answers).some((studio) => studio.id === studioId)) return undefined
+  const count = answers.peopleOnCamera
+  const suitable = getStudioSetups(studioId).filter((setup) => setup.chairs >= count)
+  return suitable.length === 1 ? suitable[0] : undefined
+}
+
+export function getStudioFinderBookingHref(studioId: string, answers: StudioFinderAnswers) {
+  if (!getStudioFinderMatches(answers).some((studio) => studio.id === studioId)) return getStudioFinderContactHref(answers)
+  const query = new URLSearchParams({ studio: studioId })
+  const setup = getStudioFinderSetup(studioId, answers)
+  if (setup) query.set('setup', setup.id)
+  return `/book/?${query.toString()}`
 }
 
 const SERVICE_BY_FORMAT: Record<StudioFinderFormat, string> = {

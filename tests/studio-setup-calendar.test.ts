@@ -6,7 +6,7 @@ import {
   type BookingCalendarDependencies, type BookingCartItem, type CalendarConfig,
 } from '../lib/booking/calendar'
 import { buildCanonicalBookingCart } from '../lib/booking/checkout-pricing'
-import { WING_SETUPS } from '../lib/booking/studio-setups'
+import { WING_SETUPS, EXECUTIVE_SETUPS, getStudioSetup, getStudioSetups } from '../lib/booking/studio-setups'
 import { primaryStudioResourceGroup, studioResourceGroups } from '../lib/booking/resources'
 import { getTimeSlotsForDay } from '../lib/booking/time'
 
@@ -65,16 +65,22 @@ test('real Calendar insertion and reminder functions round-trip each setup witho
   const fixture = memoryCalendar()
   const date = '2026-09-12'
   const daySlots = getTimeSlotsForDay(date).map(({ start }) => start.toISOString())
-  const cart: BookingCartItem[] = WING_SETUPS.map((setup, index) => buildCanonicalBookingCart([{
-    studioId: 'the-wing', date, slots: daySlots.slice(16 + index * 2, 18 + index * 2), setupId: setup.id,
+  const variants = [
+    ...WING_SETUPS.map((setup) => ({ studioId: 'the-wing', setup })),
+    ...EXECUTIVE_SETUPS.map((setup) => ({ studioId: 'the-executive', setup })),
+  ]
+  const cart: BookingCartItem[] = variants.map(({ studioId, setup }, index) => buildCanonicalBookingCart([{
+    studioId, date, slots: daySlots.slice(16 + index * 2, 18 + index * 2), setupId: setup.id,
   }])[0])
-  cart.push({ ...cart[0], slots: daySlots.slice(24, 26), setupId: undefined })
-  cart.push(buildCanonicalBookingCart([{ studioId: 'canvas-rental', date, slots: daySlots.slice(26, 28) }])[0])
+  const nextSlots = () => daySlots.slice(16 + cart.length * 2, 18 + cart.length * 2)
+  cart.push({ ...cart[0], slots: nextSlots(), setupId: undefined })
+  cart.push({ ...cart[4], slots: nextSlots(), setupId: undefined })
+  cart.push(buildCanonicalBookingCart([{ studioId: 'canvas-rental', date, slots: nextSlots() }])[0])
   const customer = { name: 'Example Guest', email: 'guest@example.invalid', phone: '' }
   const insert = () => addBookingEvents(cart, customer, [], null, 'fixture-setup-booking', 'evt_fixture', fixture.dependencies)
 
   await insert()
-  assert.equal(fixture.insertedCount(), 6)
+  assert.equal(fixture.insertedCount(), 10)
   for (const [index, event] of [...fixture.stored.values()].entries()) {
     const item = cart[index]
     const privateProperties = event.extendedProperties?.private || {}
@@ -82,23 +88,24 @@ test('real Calendar insertion and reminder functions round-trip each setup witho
     assert.equal(privateProperties.resourceGroup, primaryStudioResourceGroup(item.studioId))
     assert.equal(privateProperties.resourceGroups, studioResourceGroups(item.studioId).join(','))
     assert.equal(event.start?.dateTime, item.slots[0])
-    if (index < 4) assert.ok(event.description?.includes(`Setup: ${WING_SETUPS[index].label}`))
-    if (index === 4) assert.match(event.description || '', /Setup not recorded/)
-    if (index === 5) assert.doesNotMatch(event.description || '', /chair|Setup:/)
+    const setup = getStudioSetup(item.studioId, item.setupId)
+    if (setup) assert.ok(event.description?.includes(`Setup: ${setup.label}`))
+    else if (getStudioSetups(item.studioId).length) assert.match(event.description || '', /Setup not recorded/)
+    else assert.doesNotMatch(event.description || '', /chair|Setup:/)
   }
 
   await insert()
-  assert.equal(fixture.insertedCount(), 6)
+  assert.equal(fixture.insertedCount(), 10)
   const originalEvents = structuredClone([...fixture.stored.values()])
-  await addBookingEvents(cart.map((item) => item.studioId === 'the-wing' ? { ...item, setupId: 'one-black-chair' } : item), customer, [], null, 'fixture-setup-booking', 'evt_fixture_retry', fixture.dependencies)
-  assert.equal(fixture.insertedCount(), 6)
+  await addBookingEvents(cart.map((item) => ({ ...item, setupId: getStudioSetups(item.studioId)[0]?.id })), customer, [], null, 'fixture-setup-booking', 'evt_fixture_retry', fixture.dependencies)
+  assert.equal(fixture.insertedCount(), 10)
   assert.deepEqual([...fixture.stored.values()], originalEvents)
 
   const now = new Date('2026-09-11T00:00:00.000Z')
   const reminders = await listBookingEventsForReminderWindow(now, 0, 72, fixture.dependencies)
   assert.ok(reminders)
-  assert.equal(reminders.length, 6)
-  assert.deepEqual(reminders.map(({ setupId }) => setupId), [...WING_SETUPS.map(({ id }) => id), undefined, undefined])
+  assert.equal(reminders.length, 10)
+  assert.deepEqual(reminders.map(({ setupId }) => setupId), cart.map(({ setupId }) => setupId))
   const sentAt = '2026-09-11T18:00:00.000Z'
   await markBookingReminderSent(reminders, sentAt, fixture.dependencies)
   for (const reminder of reminders) {

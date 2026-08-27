@@ -4,6 +4,8 @@ import { STUDIOS } from '../lib/booking/catalog'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES } from '../lib/booking/podcast-package'
 import {
   getStudioFinderContactHref,
+  getStudioFinderBookingHref,
+  getStudioFinderSetup,
   getStudioFinderInquiry,
   getStudioFinderMatches,
   parseOnCameraCount,
@@ -56,8 +58,29 @@ describe('capacity-checked recommendations', () => {
     }
   })
 
-  test('does not route three to five people into a two-person room or large groups into rental rooms', () => {
-    for (const peopleOnCamera of [3, 4, 5, 6, 20, 21, 999]) {
+  test('matches three people only to the supplied Executive armchair setup', () => {
+    for (const bringingCrew of [true, false]) {
+      const answers = { format: 'podcast' as const, peopleOnCamera: 3, bringingCrew }
+      assert.deepEqual(getStudioFinderMatches(answers).map(({ id }) => id), ['the-executive'])
+      assert.equal(getStudioFinderSetup('the-executive', answers)?.id, 'three-black-armchairs')
+      assert.equal(getStudioFinderBookingHref('the-executive', answers), '/book/?studio=the-executive&setup=three-black-armchairs')
+      assert.equal(getStudioFinderSetup('the-wing', answers), undefined)
+      assert.match(getStudioFinderBookingHref('the-wing', answers), /^\/contact\//)
+    }
+  })
+
+  test('leaves the photo choice open when multiple layouts fit the count', () => {
+    for (const peopleOnCamera of [1, 2]) {
+      for (const studioId of ['the-wing', 'the-executive']) {
+        const answers = { format: 'podcast' as const, peopleOnCamera, bringingCrew: false }
+        assert.equal(getStudioFinderSetup(studioId, answers), undefined)
+        assert.equal(getStudioFinderBookingHref(studioId, answers), `/book/?studio=${studioId}`)
+      }
+    }
+  })
+
+  test('does not route four or more people into small sets or unverified rental rooms', () => {
+    for (const peopleOnCamera of [4, 5, 6, 20, 21, 999]) {
       assert.deepEqual(getStudioFinderMatches({ format: 'podcast', peopleOnCamera, bringingCrew: false }), [])
     }
   })

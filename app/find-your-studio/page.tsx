@@ -6,7 +6,9 @@ import { STUDIOS, type Studio } from '@/lib/booking/catalog'
 import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 import {
   getStudioFinderContactHref,
+  getStudioFinderBookingHref,
   getStudioFinderMatches,
+  getStudioFinderSetup,
   parseOnCameraCount,
   VERIFIED_ON_CAMERA_CAPACITY,
   type StudioFinderAnswers,
@@ -56,7 +58,7 @@ function StudioCard({ studio, capacityLabel = false }: { studio: Studio; capacit
         </div>
         <p className="mt-2 text-xs leading-relaxed text-white/65">{studio.description}</p>
         {capacityLabel && capacity !== null && capacity !== undefined && (
-          <p className="mt-3 text-xs text-white/75">Verified for up to {capacity} people on camera</p>
+          <p className="mt-3 text-xs text-white/75">{studio.id === 'the-executive' ? 'Up to 3 in armchairs without a desk. Desk layouts seat 1 or 2.' : `Verified for up to ${capacity} people on camera`}</p>
         )}
       </div>
     </a>
@@ -121,6 +123,7 @@ export default function FindYourStudioPage() {
     : null
   const matches = answers ? getStudioFinderMatches(answers) : []
   const primary = matches[0]
+  const primarySetup = primary && answers ? getStudioFinderSetup(primary.id, answers) : undefined
   const otherStudios = matches.slice(1)
   const inquiryHref = answers ? getStudioFinderContactHref(answers) : '/contact/#project-inquiry'
   const photoService = format === 'photo' && bringingCrew === false
@@ -218,11 +221,11 @@ export default function FindYourStudioPage() {
           {primary ? (
             <div className="mb-7 overflow-hidden rounded-lg border border-white/10">
               <a href={STUDIO_HREFS[primary.id]} className="group relative block h-[280px] overflow-hidden sm:h-[420px]">
-                <Image src={primary.heroImage} alt={primary.name} fill sizes="(min-width: 1024px) 960px, 100vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.035]" priority />
+                <Image src={primarySetup?.image || primary.heroImage} alt={primarySetup?.alt || primary.name} fill sizes="(min-width: 1024px) 960px, 100vw" className={`${primarySetup ? 'object-contain' : 'object-cover'} transition-transform duration-500 group-hover:scale-[1.035]`} priority />
               </a>
               <div className="flex flex-col gap-4 bg-white/[0.025] p-6 sm:flex-row sm:items-start sm:justify-between sm:p-8">
                 <div>
-                  <p className="font-semibold text-white">Verified for up to {VERIFIED_ON_CAMERA_CAPACITY[primary.id]} people on camera.</p>
+                  <p className="font-semibold text-white">{primary.id === 'the-executive' ? 'Seats 3 in the armchair setup, without a desk. Desk setups seat 1 or 2.' : `Verified for up to ${VERIFIED_ON_CAMERA_CAPACITY[primary.id]} people on camera.`}</p>
                   {primary.type === 'podcast' && <p className="mt-2 text-sm leading-relaxed text-white/65">{PODCAST_PACKAGE_SUMMARY}</p>}
                   <p className="mt-2 text-xs leading-relaxed text-white/50">For extra off-camera crew, equipment, or a custom layout, confirm the full setup with us first.</p>
                 </div>
@@ -243,7 +246,7 @@ export default function FindYourStudioPage() {
           )}
 
           <div className="mb-14 flex flex-wrap gap-3">
-            <a href={primary ? `/book/?studio=${primary.id}` : inquiryHref} className={primaryButton}>
+            <a href={primary && answers ? getStudioFinderBookingHref(primary.id, answers) : inquiryHref} className={primaryButton}>
               {primary ? 'Book this studio' : photoService ? 'Start a photo request' : videoService ? 'Start a production request' : 'Confirm my setup'} <span aria-hidden="true">→</span>
             </a>
             <a href={primary ? inquiryHref : '/tour/'} className={secondaryButton}>{primary ? 'Ask about my setup' : 'Book a free tour'}</a>
