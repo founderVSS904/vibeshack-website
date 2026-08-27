@@ -19,11 +19,16 @@ import {
   MAX_BOOKING_SLOTS,
   MIN_BOOKING_SLOTS,
   SLOT_DURATION_MS,
+  bookingDateRange,
   bookingHoursForSlotCount,
   bookingPriceCents,
   formatBookingDuration,
 } from '@/lib/booking/time'
 import { GAEventType, sendGAEvent, trackBookingStep } from '@/lib/analytics'
+import { TELEPROMPTER, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/booking/add-ons'
+import { PENDING_CHECKOUT_STORAGE_KEY } from '@/lib/booking/confirmation-state'
+import { parsePendingCheckout, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
+import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 
 const StripeEmbeddedCheckout = dynamic(() => import('@/components/StripeEmbeddedCheckout'), {
   ssr: false,
@@ -40,27 +45,6 @@ type Step = 'room' | 'datetime' | 'extras' | 'review' | 'payment'
 type Filter = 'podcast' | 'photo' | 'rental' | 'all'
 
 interface Slot { time: string; label: string; available: boolean }
-
-interface PendingCheckoutState {
-  version: 1
-  clientSecret: string
-  publishableKey: string
-  sessionId: string
-  managementToken: string
-  expiresAt: string
-  selectedId: string
-  durationSlots: number
-  date: string
-  startSlot: string
-  slots: Slot[]
-  recurring: string | null
-  name: string
-  email: string
-  phone: string
-  teamEmails: string[]
-}
-
-const PENDING_CHECKOUT_STORAGE_KEY = 'vbs_pending_checkout_v1'
 
 const STEP_ORDER: Exclude<Step, 'payment'>[] = ['room', 'datetime', 'extras', 'review']
 const STEP_LABELS: Record<Exclude<Step, 'payment'>, string> = {
@@ -96,9 +80,7 @@ function filterForStudio(studio: Studio): Filter {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getNext60Days() {
-  return Array.from({ length: 60 }, (_, i) => {
-    const d = new Date(); d.setDate(d.getDate() + i + 1); return d
-  })
+  return bookingDateRange(60).map((date) => new Date(`${date}T12:00:00`))
 }
 
 function padDatePart(value: number) { return String(value).padStart(2, '0') }
@@ -137,40 +119,7 @@ function readPendingCheckout() {
   if (typeof window === 'undefined') return null
 
   try {
-    const parsed = JSON.parse(
-      window.sessionStorage.getItem(PENDING_CHECKOUT_STORAGE_KEY) || '',
-    ) as Partial<PendingCheckoutState>
-    if (
-      !parsed
-      || typeof parsed !== 'object'
-      || parsed.version !== 1
-      || typeof parsed.clientSecret !== 'string'
-      || typeof parsed.publishableKey !== 'string'
-      || typeof parsed.sessionId !== 'string'
-      || typeof parsed.managementToken !== 'string'
-      || typeof parsed.expiresAt !== 'string'
-      || typeof parsed.selectedId !== 'string'
-      || typeof parsed.durationSlots !== 'number'
-      || typeof parsed.date !== 'string'
-      || typeof parsed.startSlot !== 'string'
-      || !Array.isArray(parsed.slots)
-      || !parsed.slots.every((slot) => (
-        slot
-        && typeof slot.time === 'string'
-        && typeof slot.label === 'string'
-        && typeof slot.available === 'boolean'
-      ))
-      || (parsed.recurring !== null && typeof parsed.recurring !== 'string')
-      || typeof parsed.name !== 'string'
-      || typeof parsed.email !== 'string'
-      || typeof parsed.phone !== 'string'
-      || !Array.isArray(parsed.teamEmails)
-      || !parsed.teamEmails.every((item) => typeof item === 'string')
-    ) {
-      return null
-    }
-
-    return parsed as PendingCheckoutState
+    return parsePendingCheckout(window.sessionStorage.getItem(PENDING_CHECKOUT_STORAGE_KEY))
   } catch {
     return null
   }
@@ -375,6 +324,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
 
   // Extras
   const [recurring, setRecurring] = useState<string | null>(null)
+  const [addOnIds, setAddOnIds] = useState<string[]>([])
 
   // Contact
   const [name, setName] = useState('')
@@ -422,6 +372,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
     setStartSlot(pending.startSlot)
     setSlots(pending.slots)
     setRecurring(pending.recurring)
+    setAddOnIds(pending.addOnIds || [])
     setName(pending.name)
     setEmail(pending.email)
     setPhone(pending.phone)
@@ -464,7 +415,9 @@ function BookPageInner({ studios }: BookPageInnerProps) {
   const sessionSubtotal = selectedStudio ? bookingPriceCents(selectedStudio.price, durationSlots) / 100 : 0
   const discountAmount = calculateRecurringDiscountCents(sessionSubtotal * 100, recurring) / 100
   const recurringDiscount = recurring ? RECURRING_OPTIONS.find((r) => r.id === recurring)?.discount || 0 : 0
-  const grandTotal = sessionSubtotal - discountAmount
+  const selectedAddOns = priceBookingAddOns(addOnIds, durationSlots)
+  const addOnTotal = bookingAddOnTotalCents(selectedAddOns) / 100
+  const grandTotal = sessionSubtotal - discountAmount + addOnTotal
 
   const durationLocked = step === 'extras' || step === 'review' || step === 'payment'
 
@@ -637,6 +590,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
             slots: blockSlots,
             hours: durationHours,
             price: sessionSubtotal,
+            addOnIds,
           }],
           recurring,
           recurringDiscount: discountAmount,
@@ -677,6 +631,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
           startSlot,
           slots,
           recurring,
+          addOnIds,
           name,
           email,
           phone,
@@ -714,7 +669,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
       const data = await res.json()
 
       if (data.code === 'booking_completed' && data.confirmationUrl) {
-        clearPendingCheckout()
+        // Verification decides when to clear the draft, including unpaid-complete sessions.
         window.location.assign(data.confirmationUrl)
         return
       }
@@ -748,7 +703,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
   const subline =
     step === 'room' ? 'Choose a studio, then select a date and time.'
       : step === 'datetime' ? 'All times Pacific. Availability is checked live.'
-        : step === 'extras' ? 'Add what the session needs. Skip what it does not.'
+      : step === 'extras' ? 'Optional equipment and recurring savings. Studio-only is always an option.'
           : step === 'review' ? 'Check the details, add your info, and lock it in.'
             : 'Card details are handled by Stripe. We never see them.'
 
@@ -1068,7 +1023,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                           One podcast session at a time
                         </p>
                         <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
-                          All podcast rooms share our three-camera package. The times below reflect availability across every podcast studio.
+                          {PODCAST_PACKAGE_SUMMARY} The times below reflect shared equipment availability across every podcast studio.
                         </p>
                       </div>
                     )}
@@ -1092,7 +1047,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                           </div>
                         )}
                         {availabilityVerified && slots.length > 0 && !anyAvailable && (
-                          <p className="mb-4 text-xs text-zinc-400" role="status">This day is fully booked. Try another date.</p>
+                          <p className="mb-4 text-xs text-zinc-400" role="status">No times remain available on this day. Try another date.</p>
                         )}
                         {availabilityVerified && anyAvailable && !anyStartable && (
                           <p className="mb-4 text-xs text-zinc-400" role="status">
@@ -1116,7 +1071,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                                   type="button"
                                   disabled={!fits}
                                   aria-pressed={isStart}
-                                  aria-label={`${slot.label}${!slot.available ? ', booked' : !fits ? `, does not fit a ${durationLabel.toLowerCase()} session` : ''}`}
+                                  aria-label={`${slot.label}${!slot.available ? ', unavailable' : !fits ? `, does not fit a ${durationLabel.toLowerCase()} session` : ''}`}
                                   onClick={() => pickStart(i)}
                                   className={`rounded-lg border py-3 font-mono text-xs transition-colors ${
                                     isStart
@@ -1156,8 +1111,22 @@ function BookPageInner({ studios }: BookPageInnerProps) {
             {/* ── STEP 3: EXTRAS ── */}
             {step === 'extras' && (
               <div className="max-w-2xl">
+                <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Optional add-on</p>
+                <button
+                  type="button"
+                  aria-pressed={addOnIds.includes(TELEPROMPTER.id)}
+                  onClick={() => setAddOnIds(addOnIds.includes(TELEPROMPTER.id) ? [] : [TELEPROMPTER.id])}
+                  className={`mb-8 flex w-full items-start justify-between gap-5 rounded-lg border px-5 py-5 text-left transition-colors ${addOnIds.includes(TELEPROMPTER.id) ? 'border-brand-red bg-brand-red/5' : 'border-white/15 hover:border-white/40'}`}
+                >
+                  <span>
+                    <span className="block text-base font-semibold text-white">{TELEPROMPTER.name}</span>
+                    <span className="mt-2 block text-sm text-zinc-300">{TELEPROMPTER.description}</span>
+                    <span className="mt-3 block text-xs text-zinc-300">${TELEPROMPTER.hourlyRateCents / 100}/hr · ${bookingAddOnTotalCents(priceBookingAddOns([TELEPROMPTER.id], durationSlots)) / 100} for {durationLabel.toLowerCase()}</span>
+                  </span>
+                  <span className="shrink-0 font-mono text-xs font-bold text-white">{addOnIds.includes(TELEPROMPTER.id) ? 'Added ✓' : 'Add +'}</span>
+                </button>
                 <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Make it a standing booking</p>
-                <p className="mb-5 text-sm text-zinc-500">Lock in this slot on a recurring schedule and save.</p>
+                <p className="mb-5 text-sm text-zinc-300">Request a recurring schedule and save on studio time. Add-ons are not discounted.</p>
                 <div className="space-y-2">
                   {RECURRING_OPTIONS.map((opt) => {
                     const active = recurring === opt.id
@@ -1184,7 +1153,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                 </div>
                 {recurring && (
                   <p className="mt-4 text-xs text-zinc-500">
-                    You save ${discountAmount} on this order. Our team will reach out to confirm your recurring schedule.
+                    You save ${discountAmount} on this session. Today&apos;s payment covers this session only. Our team will confirm future dates with you separately.
                   </p>
                 )}
               </div>
@@ -1214,6 +1183,18 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                     </button>
                   </div>
                 </div>
+
+                {selectedAddOns.length > 0 && (
+                  <div className="border-b border-white/[0.08] py-5">
+                    {selectedAddOns.map((addOn) => (
+                      <div key={addOn.id} className="flex items-start justify-between gap-4 text-sm">
+                        <div><p className="font-semibold text-white">{addOn.name}</p><p className="mt-1 text-zinc-300">${addOn.hourlyRateCents / 100}/hr · {durationLabel}</p></div>
+                        <p className="font-mono text-white">${addOn.amountCents / 100}</p>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => goToStep('extras')} className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 hover:text-white">Edit add-ons</button>
+                  </div>
+                )}
 
                 {recurring && (
                   <div className="border-b border-white/[0.08] py-5">
@@ -1444,11 +1425,16 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                 </div>
               </div>
 
-              {discountAmount > 0 && (
+              {(discountAmount > 0 || addOnTotal > 0) && (
                 <div className="space-y-1 border-t border-white/[0.06] py-3">
                   <div className="flex justify-between text-xs text-zinc-500">
                     <span>Session</span><span>${sessionSubtotal}</span>
                   </div>
+                  {selectedAddOns.map((addOn) => (
+                    <div key={addOn.id} className="flex justify-between gap-3 text-xs text-zinc-300">
+                      <span>{addOn.name} (${addOn.hourlyRateCents / 100}/hr)</span><span>${addOn.amountCents / 100}</span>
+                    </div>
+                  ))}
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-xs">
                       <span className="text-zinc-500">Recurring ({recurringDiscount}%)</span>

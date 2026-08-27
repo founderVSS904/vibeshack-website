@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import CustomSetupForm from './CustomSetupForm'
 import { siteUrl } from '@/lib/seo/site'
+import { PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 
 export const metadata: Metadata = {
   title: 'Canvas Podcast Custom Setup Request',
@@ -37,7 +38,7 @@ export default function CanvasPodcastCustomSetupPage() {
             <div className="space-y-6 text-sm leading-relaxed text-gray-400">
               <p>Send us the creative direction, preferred date, number of people, and any must-haves.</p>
               <p>We review the setup and reply with the cleanest room plan before you commit to the session.</p>
-              <p className="text-white">$400/hr base rate. Custom production needs may require additional setup or crew planning.</p>
+              <p className="text-white">${PODCAST_HOURLY_RATES['canvas-podcast']}/hr base rate. {PODCAST_PACKAGE_SUMMARY} Custom production needs may require additional setup or crew planning.</p>
             </div>
           </aside>
           <div className="rounded-lg border border-white/10 bg-black p-6 sm:p-10">

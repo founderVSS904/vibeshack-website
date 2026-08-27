@@ -6,14 +6,15 @@ import PodcastSetSelector, { type PodcastSet } from '@/components/PodcastSetSele
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 import { shotAtVibeshack } from '@/lib/seo/workProjects'
 import { siteUrl } from '@/lib/seo/site'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY, PODCAST_RATE_SUMMARY } from '@/lib/booking/podcast-package'
 
 export const metadata: Metadata = {
   title: 'Podcast Studios San Francisco',
-  description: 'Seven podcast studios in San Francisco with 3-camera 4K, broadcast audio, and crew options. From $300/hr. Open 24/7.',
+  description: `Podcast studios in San Francisco. ${PODCAST_CREW_LABEL}. ${PODCAST_CAMERA_LABEL}. From $${PODCAST_HOURLY_RATES['the-executive']}/hr. Open 24/7.`,
   alternates: { canonical: `${siteUrl}/podcast-studio-san-francisco/` },
   openGraph: {
     title: 'Podcast Studios SF | VibeShack Studios',
-    description: 'Seven podcast studios in SF with 3-camera 4K, broadcast audio, and crew options. Open 24/7.',
+    description: `Seven podcast studios in San Francisco. ${PODCAST_PACKAGE_SUMMARY} Open 24/7.`,
     url: `${siteUrl}/podcast-studio-san-francisco`,
     images: ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg'],
   },
@@ -32,8 +33,8 @@ const studios: PodcastSet[] = [
     category: 'podcast',
     line: 'A walnut boardroom set for founder interviews and branded shows.',
     bestFor: 'Founder interviews, executive conversations, and branded shows with a composed editorial look.',
-    price: '$300/hr',
-    specs: ['Boardroom table', 'Wood slat wall', '3-camera ready'],
+    price: `$${PODCAST_HOURLY_RATES['the-executive']}/hr`,
+    specs: ['Boardroom table', 'Wood slat wall', PODCAST_CAMERA_LABEL],
     position: 'center 48%',
   },
   {
@@ -48,7 +49,7 @@ const studios: PodcastSet[] = [
     category: 'podcast',
     line: 'Warm leather and close eyelines for personal two-person shows.',
     bestFor: 'Two-person podcasts, close interviews, and conversations that should feel warm and direct.',
-    price: '$300/hr',
+    price: `$${PODCAST_HOURLY_RATES['the-wing']}/hr`,
     specs: ['Two-person set', 'Warm leather seating', 'Broadcast audio'],
     position: 'center 44%',
   },
@@ -64,7 +65,7 @@ const studios: PodcastSet[] = [
     category: 'podcast',
     line: 'A clean white backdrop that keeps focus on the conversation.',
     bestFor: 'Clean interviews, direct-to-camera episodes, and shows that need a neutral visual system.',
-    price: '$300/hr',
+    price: `$${PODCAST_HOURLY_RATES['encore']}/hr`,
     specs: ['Acoustic treatment', 'Clean white backdrop', 'Direct interview angles'],
     position: 'center 48%',
   },
@@ -80,7 +81,7 @@ const studios: PodcastSet[] = [
     category: 'podcast',
     line: 'Programmable color for creators and brands with a bold visual identity.',
     bestFor: 'Creator shows, social-first episodes, and formats with a strong color identity.',
-    price: '$300/hr',
+    price: `$${PODCAST_HOURLY_RATES['sunset']}/hr`,
     specs: ['Programmable color', 'Creator set', 'Short-form friendly'],
     position: 'center 46%',
   },
@@ -96,8 +97,8 @@ const studios: PodcastSet[] = [
     category: 'signature',
     line: 'A relaxed Chesterfield lounge built for longer conversations.',
     bestFor: 'Long-form guest interviews, relaxed panels, and conversations with a more intimate pace.',
-    price: '$400/hr',
-    specs: ['Chesterfield seating', 'Signature lounge look', 'Crew options'],
+    price: `$${PODCAST_HOURLY_RATES['parlor']}/hr`,
+    specs: ['Chesterfield seating', 'Signature lounge look', PODCAST_CREW_LABEL],
     position: 'center 54%',
   },
   {
@@ -112,7 +113,7 @@ const studios: PodcastSet[] = [
     category: 'signature',
     line: 'A panoramic set for wider, multi-person conversations.',
     bestFor: 'Premium guest shows, editorial conversations, and wider multi-person compositions.',
-    price: '$400/hr',
+    price: `$${PODCAST_HOURLY_RATES['horizon']}/hr`,
     specs: ['Immersive wall', 'Warm sunset palette', 'Wide conversation setup'],
     position: 'center 48%',
   },
@@ -128,7 +129,7 @@ const studios: PodcastSet[] = [
     category: 'signature',
     line: 'Our largest podcast set, ready for full art direction.',
     bestFor: 'Custom visual podcasts, larger productions, and shows that need a fully directed environment.',
-    price: '$400/hr',
+    price: `$${PODCAST_HOURLY_RATES['canvas-podcast']}/hr`,
     specs: ['Custom LED backdrop', 'Cinema lighting', 'Large-format set'],
     position: 'center 48%',
   },
@@ -168,7 +169,7 @@ const studios: PodcastSet[] = [
 
 const productionStack = [
   {
-    title: 'Three angles, already framed.',
+    title: `${PODCAST_CAMERA_LABEL}, already framed.`,
     eyebrow: 'Multi-camera',
     body: 'Host, guest, and wide angles are set before the first take.',
   },
@@ -183,9 +184,9 @@ const productionStack = [
     body: 'Every set is lit for skin tone, depth, and repeatable episodes.',
   },
   {
-    title: 'Crew when you need it.',
-    eyebrow: 'Operator optional',
-    body: 'Add an operator when you want cameras, sound, and timing handled.',
+    title: PODCAST_CREW_LABEL,
+    eyebrow: 'Included crew',
+    body: PODCAST_PACKAGE_SUMMARY,
   },
 ]
 
@@ -211,7 +212,7 @@ const deliverables = [
 const podcastFaqs = [
   {
     question: 'How much does a podcast studio cost at VibeShack?',
-    answer: 'Most podcast studios are $300 per hour. Parlor, Horizon, and Canvas Podcast are $400 per hour. Each set page lists the included production setup and available crew options.',
+    answer: `${PODCAST_RATE_SUMMARY} ${PODCAST_PACKAGE_SUMMARY}`,
   },
   {
     question: 'Can I book a podcast studio at night or on weekends?',
@@ -219,7 +220,7 @@ const podcastFaqs = [
   },
   {
     question: 'Do the podcast studios include cameras and audio?',
-    answer: 'Yes. Podcast sets include 3-camera 4K production setups, broadcast microphones, lighting, and studio-ready audio routing.',
+    answer: `Yes. ${PODCAST_PACKAGE_SUMMARY} The 4K setup also includes broadcast microphones, lighting, and studio-ready audio routing.`,
   },
   {
     question: 'Where are the podcast studios located?',
@@ -229,10 +230,10 @@ const podcastFaqs = [
 
 const podcastServiceSchema = studioServiceSchema({
   name: 'Podcast Studio Rental in San Francisco',
-  description: 'Podcast studios in San Francisco with 3-camera 4K production, broadcast audio, lighting, and crew options.',
+  description: `Podcast studios in San Francisco with 4K production, broadcast audio, and lighting. ${PODCAST_PACKAGE_SUMMARY}`,
   url: `${siteUrl}/podcast-studio-san-francisco/`,
   image: `${siteUrl}/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg`,
-  price: '300',
+  price: String(PODCAST_HOURLY_RATES['the-executive']),
   serviceType: 'Podcast Studio Rental',
 })
 

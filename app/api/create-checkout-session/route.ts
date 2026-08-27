@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Stripe from 'stripe'
-import { acquireBookingHolds, assertCartSlotsAvailable, releaseBookingHolds, type BookingCartItem } from '@/lib/booking/calendar'
-import { calculateRecurringDiscountCents, getRecurringOptionById, getStudioById } from '@/lib/booking/catalog'
+import { acquireBookingHolds, assertCartSlotsAvailable, releaseBookingHolds } from '@/lib/booking/calendar'
+import { getRecurringOptionById } from '@/lib/booking/catalog'
+import { buildBookingCheckoutLineItems, buildCanonicalBookingCart, calculateBookingCheckoutPricing } from '@/lib/booking/checkout-pricing'
+import { buildBookingCartMetadata, withBookingAttributionMetadata } from '@/lib/booking/checkout-metadata'
 import { bookingCheckoutExpirations } from '@/lib/booking/checkout-lifecycle'
 import { createCheckoutManagementToken } from '@/lib/booking/checkout-management'
 import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
 import { getStripeClient } from '@/lib/booking/stripe'
-import { SLOT_DURATION_MINUTES, SLOT_DURATION_MS, bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate } from '@/lib/booking/time'
 import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
 import { isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
@@ -30,60 +30,6 @@ function getBaseUrl(req: NextRequest) {
   if (vercelUrl) return `https://${vercelUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}`
 
   return new URL(req.url).origin
-}
-
-function toArray(value: unknown) {
-  return Array.isArray(value) ? value : []
-}
-
-function normalizeSlots(value: unknown) {
-  return toArray(value)
-    .filter((slot): slot is string => typeof slot === 'string')
-    .filter((slot) => !Number.isNaN(Date.parse(slot)))
-    .sort((a, b) => Date.parse(a) - Date.parse(b))
-}
-
-function buildCanonicalCart(rawCart: unknown): BookingCartItem[] {
-  const cart: BookingCartItem[] = []
-
-  for (const rawItem of toArray(rawCart)) {
-    if (!rawItem || typeof rawItem !== 'object') continue
-    const item = rawItem as Record<string, unknown>
-    const studioId = stripControlChars(item.studioId, 80)
-    const studio = getStudioById(studioId)
-    const date = stripControlChars(item.date, 20)
-    const slots = normalizeSlots(item.slots)
-
-    if (!studio || !isValidBookingDate(date) || !hasConsecutiveBookingSlots(slots)) {
-      throw new Error('Invalid cart item')
-    }
-
-    cart.push({
-      studioId: studio.id,
-      studioName: studio.name,
-      date,
-      slots,
-      hours: bookingHoursForSlotCount(slots.length),
-      price: bookingPriceCents(studio.price, slots.length) / 100,
-    })
-  }
-
-  return cart
-}
-
-function applyDiscountToSessionAmounts(amounts: number[], discountCents: number) {
-  if (discountCents <= 0) return amounts
-
-  const total = amounts.reduce((sum, amount) => sum + amount, 0)
-  let remaining = Math.min(discountCents, total - amounts.length)
-
-  return amounts.map((amount, index) => {
-    const isLast = index === amounts.length - 1
-    const share = isLast ? remaining : Math.round((discountCents * amount) / total)
-    const discount = Math.min(Math.max(share, 0), amount - 1, remaining)
-    remaining -= discount
-    return amount - discount
-  })
 }
 
 function parseJsonCookie(raw: string) {
@@ -164,7 +110,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Name and valid email are required' }, { status: 400 })
     }
 
-    const cart = buildCanonicalCart(body.cart)
+    const cart = buildCanonicalBookingCart(body.cart)
     if (!cart.length) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 })
     }
@@ -175,42 +121,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error }, { status: availability.status })
     }
 
-    const baseSessionTotalCents = cart.reduce((sum, item) => sum + Math.round(item.price * 100), 0)
-    const discountCents = calculateRecurringDiscountCents(baseSessionTotalCents, recurringOption?.id)
-    const discountedSessionAmounts = applyDiscountToSessionAmounts(cart.map((item) => Math.round(item.price * 100)), discountCents)
-    const computedTotalCents = discountedSessionAmounts.reduce((sum, amount) => sum + amount, 0)
+    const pricing = calculateBookingCheckoutPricing(cart, recurringOption?.id)
+    const { discountCents, addOnTotalCents, computedTotalCents } = pricing
     const referralInfo = buildReferralInfo(referralSource, computedTotalCents)
 
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = cart.map((item, index) => ({
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: `${item.studioName} - VibeShack Studios`,
-          description: `${formatDateForDisplay(item.date)} - ${describeSlotRanges(item.slots)} - ${formatBookingDuration(item.slots.length)}${discountCents ? ' - recurring discount applied' : ''}`,
-          images: [`${siteUrl}/og-image.jpg`],
-        },
-        unit_amount: discountedSessionAmounts[index],
-      },
-      quantity: 1,
-    }))
+    const lineItems = buildBookingCheckoutLineItems(cart, pricing, `${siteUrl}/og-image.jpg`)
 
     const bookingRef = crypto.randomUUID()
     const { checkoutExpiresAt, holdExpiresAt } = bookingCheckoutExpirations()
     const attributionMetadata = readAttributionMetadata(req)
-    const cartMetadata: Record<string, string> = {}
-    cart.forEach((item, index) => {
-      // Stripe caps metadata values at 500 chars, so store the first slot plus
-      // offsets in the current 30-minute booking unit. The unit marker lets the
-      // webhook distinguish these sessions from legacy hourly metadata.
-      const firstSlotMs = Date.parse(item.slots[0])
-      cartMetadata[`cart_${index}`] = JSON.stringify({
-        id: item.studioId,
-        d: item.date,
-        t0: item.slots[0],
-        u: SLOT_DURATION_MINUTES,
-        off: item.slots.map((slot) => Math.round((Date.parse(slot) - firstSlotMs) / SLOT_DURATION_MS)),
-      })
-    })
+    const cartMetadata = buildBookingCartMetadata(cart)
+    const checkoutMetadata = withBookingAttributionMetadata({
+      bookingRef,
+      customerName: name.slice(0, 500),
+      customerEmail: email.slice(0, 500),
+      customerPhone: phone.slice(0, 500),
+      studioName: cart[0].studioName.slice(0, 500),
+      totalSessions: String(cart.length),
+      computedTotalCents: String(computedTotalCents),
+      recurring: recurringOption?.id || '',
+      recurringDiscountCents: String(discountCents),
+      addOnTotalCents: String(addOnTotalCents),
+      teamEmails: JSON.stringify(teamEmails).slice(0, 500),
+      referralSource: referralInfo?.source || '',
+      referralPartner: referralInfo?.partnerName || '',
+      referralCommissionRate: referralInfo ? String(referralInfo.commissionRate) : '',
+      referralCommissionCents: referralInfo ? String(referralInfo.commissionCents) : '0',
+      bookingHoldVersion: '1',
+      bookingHoldExpiresAt: holdExpiresAt.toISOString(),
+      ...cartMetadata,
+    }, attributionMetadata)
 
     const baseUrl = getBaseUrl(req)
     const publishableKey = getStripePublishableKey()
@@ -242,27 +182,7 @@ export async function POST(req: NextRequest) {
             customerName: name.slice(0, 500),
           },
         },
-        metadata: {
-          bookingRef,
-          customerName: name.slice(0, 500),
-          customerEmail: email.slice(0, 500),
-          customerPhone: phone.slice(0, 500),
-          studioName: cart[0].studioName.slice(0, 500),
-          totalSessions: String(cart.length),
-          totalAmount: String(computedTotalCents / 100),
-          computedTotalCents: String(computedTotalCents),
-          recurring: recurringOption?.id || '',
-          recurringDiscountCents: String(discountCents),
-          teamEmails: JSON.stringify(teamEmails).slice(0, 500),
-          referralSource: referralInfo?.source || '',
-          referralPartner: referralInfo?.partnerName || '',
-          referralCommissionRate: referralInfo ? String(referralInfo.commissionRate) : '',
-          referralCommissionCents: referralInfo ? String(referralInfo.commissionCents) : '0',
-          bookingHoldVersion: '1',
-          bookingHoldExpiresAt: holdExpiresAt.toISOString(),
-          ...attributionMetadata,
-          ...cartMetadata,
-        },
+        metadata: checkoutMetadata,
         return_url: `${baseUrl}/book/confirmation?session_id={CHECKOUT_SESSION_ID}`,
       })
 
@@ -289,7 +209,7 @@ export async function POST(req: NextRequest) {
     const bodyError = jsonBodyErrorResponse(err)
     if (bodyError) return bodyError
 
-    if (err instanceof Error && err.message === 'Invalid cart item') {
+    if (err instanceof Error && ['Invalid cart item', 'Invalid add-on selection', 'Invalid add-on duration'].includes(err.message)) {
       return NextResponse.json({ error: 'Invalid booking selection' }, { status: 400 })
     }
 

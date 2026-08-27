@@ -63,6 +63,17 @@ const proofLinks: HeaderLink[] = [
   { href: '/support/', label: 'Support', detail: 'Questions, policies, and help' },
 ]
 
+const mobilePrimaryLinks: HeaderLink[] = [
+  { href: '/pricing/', label: 'Pricing' },
+  { href: '/our-work/', label: 'Our Work' },
+  { href: '/about/', label: 'About' },
+  { href: '/contact/', label: 'Contact' },
+]
+
+const mobilePlanningLinks = [...planningLinks, ...proofLinks].filter(
+  ({ href }) => !mobilePrimaryLinks.some((link) => link.href === href),
+)
+
 const signaturePodcastStudios = podcastStudios.slice(5)
 
 const navLinkClass =
@@ -75,9 +86,14 @@ export default function Header() {
   const pathname = usePathname()
   const [dismissedMenu, setDismissedMenu] = useState<string | null>(null)
   const mobileMenuRef = useRef<HTMLDetailsElement>(null)
+  const mobileMenuToggleRef = useRef<HTMLElement>(null)
 
   const closeMobileMenu = useCallback(() => {
-    mobileMenuRef.current?.removeAttribute('open')
+    const details = mobileMenuRef.current
+    if (!details) return
+    details.removeAttribute('open')
+    const panel = details.querySelector<HTMLElement>('.mobile-menu-panel')
+    if (panel) panel.scrollTop = 0
   }, [])
 
   // The details element is uncontrolled and Header never remounts on client
@@ -139,16 +155,27 @@ export default function Header() {
   }
 
   return (
-    <header className={headerClassName}>
+    <header
+      className={headerClassName}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && mobileMenuRef.current?.open) {
+          event.preventDefault()
+          event.stopPropagation()
+          closeMobileMenu()
+          mobileMenuToggleRef.current?.focus()
+        }
+      }}
+    >
       <div className={headerContainerClassName}>
-        <div className="site-header-inner grid h-20 grid-cols-[auto_1fr_auto] items-center gap-6">
+        <div className="site-header-inner grid h-20 grid-cols-[minmax(70px,1fr)_auto] items-center gap-3 sm:gap-6 xl:grid-cols-[auto_minmax(0,1fr)_auto]">
           <Link
             href="/"
             aria-label="VibeShack Studios home"
-            className="flex flex-shrink-0 items-center transition-opacity duration-200 hover:opacity-80"
+            onClick={closeMobileMenu}
+            className="flex w-[70px] shrink-0 items-center transition-opacity duration-200 hover:opacity-80 sm:w-[119px]"
           >
-            <BrandMark variant="monogram" priority className="h-8 w-auto sm:hidden" />
-            <BrandMark variant="lockup" priority className="hidden h-[34px] w-auto sm:block" />
+            <BrandMark variant="monogram" priority className="h-8 w-[70px] max-w-none shrink-0 sm:hidden" />
+            <BrandMark variant="lockup" priority className="hidden h-[34px] w-[119px] max-w-none shrink-0 sm:block" />
           </Link>
 
           <nav className="hidden items-center justify-center gap-7 xl:flex 2xl:gap-10" aria-label="Primary">
@@ -177,26 +204,33 @@ export default function Header() {
             <Link href="/about/" className={primaryNavClass('/about/')}>About</Link>
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center justify-self-end gap-2 sm:gap-4">
             <Link
               href="/book/"
               prefetch={false}
-              className="relative inline-flex items-center gap-2.5 whitespace-nowrap rounded-lg bg-white px-4 py-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-black transition-colors duration-200 hover:bg-white/90 sm:px-5"
+              aria-label="Book a session"
+              onClick={closeMobileMenu}
+              className="relative inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-lg bg-white px-3 py-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-black transition-colors duration-200 hover:bg-white/90 sm:gap-2.5 sm:px-5"
             >
-              Book a Session
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <span className="sm:hidden">Book</span>
+              <span className="hidden sm:inline">Book a Session</span>
+              <svg className="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="3" y="4" width="18" height="18" rx="2" />
                 <path d="M16 2v4M8 2v4M3 10h18" />
               </svg>
             </Link>
 
-            <details ref={mobileMenuRef} className="group xl:hidden">
-              <summary className="list-none p-3 text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-red [&::-webkit-details-marker]:hidden">
+            <details ref={mobileMenuRef} className="group/mobile-nav xl:hidden">
+              <summary
+                ref={mobileMenuToggleRef}
+                aria-controls="mobile-navigation"
+                className="cursor-pointer list-none p-3 text-gray-400 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-red [&::-webkit-details-marker]:hidden"
+              >
                 <span className="sr-only">Toggle menu</span>
-                <svg className="h-5 w-5 group-open:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="h-5 w-5 group-open/mobile-nav:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
-                <svg className="hidden h-5 w-5 group-open:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="hidden h-5 w-5 group-open/mobile-nav:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </summary>
@@ -265,6 +299,8 @@ function DesktopMenuTrigger({
       }}
       onKeyDown={(e) => {
         if (e.key === 'Escape' && open) {
+          e.preventDefault()
+          e.stopPropagation()
           // Focus first so the reset it fires cannot undo the dismiss.
           buttonRef.current?.focus()
           onDismiss()
@@ -431,15 +467,15 @@ function MenuRoomRow({ room, onNavigate, flagship = false }: { room: HeaderLink;
       {flagship ? (
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-brand-red">Flagship</span>
-          <span className="flex items-baseline justify-between gap-3">
-            <span className="truncate text-[15px] font-medium leading-tight text-white">{room.label}</span>
+          <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="text-[15px] font-medium leading-snug text-white">{room.label}</span>
             {room.price && <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-200 group-hover/room:text-white">{room.price}</span>}
           </span>
-          {room.detail && <span className="truncate text-xs text-zinc-500">{room.detail}</span>}
+          {room.detail && <span className="text-xs leading-snug text-zinc-500">{room.detail}</span>}
         </span>
       ) : (
-        <span className="flex min-w-0 flex-1 items-baseline justify-between gap-3">
-          <span className="truncate text-[15px] font-medium leading-tight text-white">{room.label}</span>
+        <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="text-[15px] font-medium leading-snug text-white">{room.label}</span>
           {room.price && <span className="shrink-0 font-mono text-xs text-zinc-400 transition-colors duration-200 group-hover/room:text-white">{room.price}</span>}
         </span>
       )}
@@ -677,13 +713,26 @@ function DesktopMegaMenu({
 
 function MobileMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
-    <div className="mobile-menu-panel absolute left-0 right-0 top-full h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain border-t border-white/[0.08] bg-black">
+    <nav id="mobile-navigation" aria-label="Mobile primary" className="mobile-menu-panel absolute left-0 right-0 top-full h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain border-t border-white/[0.08] bg-black">
       <div className="mx-auto max-w-7xl px-6 pb-10 pt-6 sm:px-10">
-        <MobileSection title="Studios" links={[...podcastStudios, ...rentalStudios]} onNavigate={onNavigate} />
+        <div className="grid grid-cols-2 gap-x-6 gap-y-1 border-b border-white/[0.08] pb-5">
+          {mobilePrimaryLinks.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={onNavigate}
+              className="flex min-h-11 items-center py-2 text-base font-semibold text-white transition-colors duration-150 hover:text-brand-red"
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+        <MobileSection title="Podcast Studios" links={podcastStudios} onNavigate={onNavigate} />
+        <MobileSection title="Rental Studios" links={rentalStudios} onNavigate={onNavigate} />
         <MobileSection title="Services" links={serviceLinks} onNavigate={onNavigate} />
-        <MobileSection title="Plan" links={[...planningLinks, ...proofLinks]} onNavigate={onNavigate} />
+        <MobileSection title="Plan & Resources" links={mobilePlanningLinks} onNavigate={onNavigate} />
       </div>
-    </div>
+    </nav>
   )
 }
 
@@ -697,25 +746,30 @@ function MobileSection({
   onNavigate: () => void
 }) {
   return (
-    <div className="border-b border-white/[0.08] py-5 last:border-b-0">
-      <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gray-600">{title}</p>
-      <div className="grid gap-1 sm:grid-cols-2 sm:gap-x-8">
+    <details className="group/mobile-section border-b border-white/[0.08] last:border-b-0">
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 font-mono text-xs font-bold uppercase tracking-[0.16em] text-gray-300 transition-colors duration-150 hover:text-white [&::-webkit-details-marker]:hidden">
+        <span>{title}</span>
+        <svg className="h-4 w-4 shrink-0 transition-transform duration-200 group-open/mobile-section:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 9l6 6 6-6" />
+        </svg>
+      </summary>
+      <div className="grid gap-1 pb-5 sm:grid-cols-2 sm:gap-x-8">
         {links.map(({ href, label, detail, price }) => (
           <Link
             key={href + label}
             href={href}
             prefetch={href === '/book/' ? false : undefined}
             onClick={onNavigate}
-            className="flex items-start justify-between gap-4 py-2.5 text-gray-400 transition-colors duration-150 hover:text-white"
+            className="flex min-h-11 items-start justify-between gap-4 py-2.5 text-gray-300 transition-colors duration-150 hover:text-white"
           >
-            <span>
+            <span className="min-w-0">
               <span className="block text-sm font-semibold">{label}</span>
-              {detail && <span className="mt-0.5 block text-xs leading-snug text-gray-600">{detail}</span>}
+              {detail && <span className="mt-0.5 block text-xs leading-snug text-gray-500">{detail}</span>}
             </span>
-            {price && <span className="pt-0.5 text-xs text-gray-600">{price}</span>}
+            {price && <span className="shrink-0 pt-0.5 text-xs text-gray-400">{price}</span>}
           </Link>
         ))}
       </div>
-    </div>
+    </details>
   )
 }

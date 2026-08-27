@@ -1,7 +1,9 @@
 import type { BookingCartItem } from './calendar'
 import { getStudioById } from './catalog'
+import { compactBookingAddOns, parseBookingAddOns } from './add-ons'
 import {
   SLOT_DURATION_MINUTES,
+  SLOT_DURATION_MS,
   addMinutes,
   expandLegacyHourlySlots,
   hasConsecutiveBookingSlots,
@@ -9,6 +11,44 @@ import {
   slotIsoSetForDate,
 } from './time'
 import { stripControlChars } from '@/lib/server/sanitize'
+
+// Stripe permits 50 keys. Reserve ten for fulfillment, conflict, and watchdog
+// stamps so a large cart cannot prevent recording its final booking state.
+export const INITIAL_BOOKING_METADATA_KEY_BUDGET = 40
+
+export function withBookingAttributionMetadata(
+  required: Record<string, string>,
+  attribution: Record<string, string>,
+) {
+  if (Object.keys(required).length > INITIAL_BOOKING_METADATA_KEY_BUDGET) {
+    throw new Error('Booking metadata exceeds its lifecycle-safe capacity')
+  }
+  const result = { ...required }
+  const priority = [
+    'trackingSource', 'trackingMedium', 'trackingCampaign', 'trackingClickId',
+    'trackingContent', 'trackingTerm', 'trackingLandingPath', 'trackingReferrer', 'trackingCapturedAt',
+  ]
+  for (const key of priority) {
+    if (Object.keys(result).length >= INITIAL_BOOKING_METADATA_KEY_BUDGET) break
+    if (attribution[key] && !(key in result)) result[key] = attribution[key]
+  }
+  return result
+}
+
+export function buildBookingCartMetadata(cart: BookingCartItem[]) {
+  return Object.fromEntries(cart.map((item, index) => {
+    const firstSlotMs = Date.parse(item.slots[0])
+    // Stay below Stripe's 500-character value limit using half-hour offsets.
+    return [`cart_${index}`, JSON.stringify({
+      id: item.studioId,
+      d: item.date,
+      t0: item.slots[0],
+      u: SLOT_DURATION_MINUTES,
+      off: item.slots.map((slot) => Math.round((Date.parse(slot) - firstSlotMs) / SLOT_DURATION_MS)),
+      ...(item.addOns?.length ? { a: compactBookingAddOns(item.addOns) } : {}),
+    })]
+  }))
+}
 
 export function parseBookingCartItems(metadata: Record<string, string>) {
   const items: BookingCartItem[] = []
@@ -45,9 +85,10 @@ export function parseBookingCartItems(metadata: Record<string, string>) {
         slots: slots.map((slot: unknown) => stripControlChars(slot, 40)).filter(Boolean),
         hours: Number(compact.h ?? compact.hours ?? slots.length),
         price: Number(compact.p ?? compact.price ?? 0),
+        addOns: parseBookingAddOns(compact.a, slots.length),
       })
-    } catch (error) {
-      console.error('Failed to parse cart metadata item:', error)
+    } catch {
+      // The completeness check rejects this cart without logging private data.
     }
   }
 
@@ -66,9 +107,7 @@ export function parseBookingCartItems(metadata: Record<string, string>) {
           })
         }
       }
-    } catch (error) {
-      console.error('Failed to parse legacy cart metadata:', error)
-    }
+    } catch {}
   }
 
   return items.filter((item) => item.studioName && item.date && item.slots.length)

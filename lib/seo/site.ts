@@ -1,3 +1,5 @@
+import { PODCAST_PACKAGE_SUMMARY } from '../booking/podcast-package'
+
 export const siteUrl = 'https://www.vibeshackstudios.com'
 export const peerspaceUrl = 'https://www.peerspace.com/pages/listings/683fde213c77922ff2b31a0f'
 
@@ -142,7 +144,7 @@ export const moneyPages = [
     href: '/podcast-studio-san-francisco/',
     label: 'Podcast Studio San Francisco',
     keyword: 'podcast studio san francisco',
-    description: 'Podcast sets with broadcast microphones, 4K cameras, and crew options.',
+    description: `Podcast sets with broadcast microphones and 4K production. ${PODCAST_PACKAGE_SUMMARY}`,
   },
   {
     href: '/commercials/',

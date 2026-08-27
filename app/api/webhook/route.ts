@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { acquireBookingHolds, addBookingEvents, assertCartSlotsAvailable, hasBookingEventsForRef, releaseBookingHolds, type BookingCartItem } from '@/lib/booking/calendar'
 import { getStudioById } from '@/lib/booking/catalog'
+import { hasMatchingBookingAddOnTotal } from '@/lib/booking/add-ons'
+import { bookingAddOnsEmailHtml } from '@/lib/booking/add-on-communication'
+import { bookingNeedsAttention, fulfillBookingCalendar } from '@/lib/booking/fulfillment-state'
 import { hasCompleteBookingCartMetadata, parseBookingCartItems } from '@/lib/booking/checkout-metadata'
 import { buildReferralInfo, formatMoneyFromCents, type ReferralInfo } from '@/lib/booking/referrals'
 import { getStripeClient } from '@/lib/booking/stripe'
@@ -49,6 +52,10 @@ function validateCompletedSession(
 
   if (typeof session.amount_total !== 'number' || session.amount_total !== expectedTotalCents) {
     return { ok: false, status: 400, error: 'Checkout amount did not match server-computed metadata' }
+  }
+
+  if (!hasMatchingBookingAddOnTotal(metadata, cartItems)) {
+    return { ok: false, status: 400, error: 'Checkout add-ons did not match server-computed metadata' }
   }
 
   const seenSlots = new Set<string>()
@@ -192,6 +199,8 @@ function buildPrepEmailHtml(cartItems: BookingCartItem[], customer: { name: stri
         <td style="padding:18px 0;border-top:1px solid #e5e7eb;">
           <p style="color:#111827;font-size:16px;font-weight:900;margin:0 0 6px;">${escapeHtml(item.studioName)}</p>
           <p style="color:#4b5563;font-size:14px;line-height:1.65;margin:0;">${escapeHtml(dateStr)}<br>${escapeHtml(slotRanges)} PT</p>
+          ${bookingAddOnsEmailHtml(item.addOns, false, '#4b5563')}
+          ${item.addOns?.length ? '<p style="color:#4b5563;font-size:14px;line-height:1.65;margin:8px 0 0;">Bring your final script for the teleprompter and allow setup time within your session.</p>' : ''}
         </td>
         <td align="right" style="padding:18px 0;border-top:1px solid #e5e7eb;color:#111827;font-size:14px;font-weight:800;vertical-align:top;white-space:nowrap;">
           ${escapeHtml(formatBookingDuration(item.slots.length))}
@@ -375,12 +384,13 @@ async function sendConfirmationEmail(
             <p style="color:#fff;font-weight:900;font-size:16px;margin:0 0 4px;">${escapeHtml(item.studioName)}</p>
             <p style="color:#e11d48;font-size:12px;margin:0;text-transform:uppercase;letter-spacing:0.1em;">VibeShack Studios</p>
           </div>
-          <span style="color:#fff;font-weight:900;font-size:18px;">$${escapeHtml(item.price)}</span>
+          <span style="color:#fff;font-weight:900;font-size:18px;">$${escapeHtml(item.price)}<span style="display:block;color:#999;font-size:11px;font-weight:400;">Studio before discount</span></span>
         </div>
         <div style="border-top:1px solid #222;padding-top:12px;">
           <p style="color:#fff;font-size:13px;font-weight:600;margin:0 0 8px;">${escapeHtml(dateStr)}</p>
           <p style="color:#999;font-size:13px;margin:0 0 8px;">${escapeHtml(slotRanges)} PT</p>
           <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(formatBookingDuration(item.slots.length))}</p>
+          ${bookingAddOnsEmailHtml(item.addOns)}
         </div>
       </div>`
   }).join('')
@@ -395,6 +405,7 @@ async function sendConfirmationEmail(
           <p style="color:#fff;font-size:13px;font-weight:600;margin:0 0 8px;">${escapeHtml(dateStr)}</p>
           <p style="color:#999;font-size:13px;margin:0 0 8px;">${escapeHtml(slotRanges)} PT</p>
           <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(formatBookingDuration(item.slots.length))}</p>
+          ${bookingAddOnsEmailHtml(item.addOns, false)}
         </div>
       </div>`
   }).join('')
@@ -434,7 +445,7 @@ async function sendConfirmationEmail(
     const dateStr = formatDateForDisplay(item.date)
     const start = new Date(item.slots[0])
     const end = addMinutes(new Date(item.slots[item.slots.length - 1]), SLOT_DURATION_MINUTES)
-    return `<li><strong>${escapeHtml(item.studioName)}</strong> - ${escapeHtml(dateStr)} - ${escapeHtml(start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))}-${escapeHtml(end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))} PT - $${escapeHtml(item.price)}</li>`
+    return `<li><strong>${escapeHtml(item.studioName)}</strong> - ${escapeHtml(dateStr)} - ${escapeHtml(start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))}-${escapeHtml(end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))} PT - Studio before discount: $${escapeHtml(item.price)}${bookingAddOnsEmailHtml(item.addOns, true, '#111827')}</li>`
   }).join('')
   const prepEmailHtml = buildPrepEmailHtml(cartItems, customer)
 
@@ -634,6 +645,9 @@ export async function POST(req: NextRequest) {
       }
     }
     const fulfillmentErrors: string[] = []
+    let needsAttention = bookingNeedsAttention(currentMetadata)
+    let conflictReason = holdRenewalError
+    let calendarInserted = Boolean(currentMetadata.vbsCalendarSyncedAt)
 
     if (!currentMetadata.vbsCalendarSyncedAt) {
       // Availability was checked when the checkout session was created, but a
@@ -644,7 +658,6 @@ export async function POST(req: NextRequest) {
       // failure would see them as conflicts), and only re-check slots that have
       // not started yet (getAvailabilityForDate marks past-start slots
       // unavailable even when nothing is booked).
-      let conflictReason = holdRenewalError
       try {
         const alreadyInserted = await hasBookingEventsForRef(bookingRef, cartItems)
         const futureCart = cartItems
@@ -668,12 +681,21 @@ export async function POST(req: NextRequest) {
         console.error('Post-payment availability check failed:', error)
       }
 
-      let calendarInserted = false
+      needsAttention = needsAttention || Boolean(conflictReason)
       let calendarSynced = false
       try {
-        await addBookingEvents(cartItems, customer, teamEmails, referralInfo, bookingRef, event.id)
-        calendarInserted = true
-        await markSessionFulfillmentStep(session.id, 'vbsCalendarSyncedAt')
+        await fulfillBookingCalendar(needsAttention, {
+          markAttention: async () => {
+            if (!currentMetadata.vbsBookingAttentionAt) {
+              await markSessionFulfillmentStep(session.id, 'vbsBookingAttentionAt')
+            }
+          },
+          insertEvents: async () => {
+            await addBookingEvents(cartItems, customer, teamEmails, referralInfo, bookingRef, event.id)
+            calendarInserted = true
+          },
+          markCalendarSynced: () => markSessionFulfillmentStep(session.id, 'vbsCalendarSyncedAt'),
+        })
         calendarSynced = true
       } catch (error) {
         console.error('Calendar event creation failed:', error)
@@ -689,15 +711,6 @@ export async function POST(req: NextRequest) {
           fulfillmentErrors.push('booking hold cleanup')
         }
       }
-
-      if (conflictReason && !currentMetadata.vbsDoubleBookingAlertedAt) {
-        try {
-          await sendDoubleBookingAlert(cartItems, customer, bookingRef, conflictReason, calendarInserted)
-          await markSessionFulfillmentStep(session.id, 'vbsDoubleBookingAlertedAt')
-        } catch (alertError) {
-          console.error('Double booking alert email failed:', alertError)
-        }
-      }
     } else if (metadata.bookingHoldVersion === '1' && !currentMetadata.vbsBookingHoldReleasedAt) {
       try {
         await releaseBookingHolds(cartItems, bookingRef)
@@ -708,7 +721,23 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (!fulfillmentErrors.length && !currentMetadata.vbsConfirmationSentAt) {
+    // Alert delivery is retried independently of calendar insertion. A mail
+    // failure must never clear the persisted attention state.
+    if (needsAttention && !currentMetadata.vbsDoubleBookingAlertedAt) {
+      try {
+        await sendDoubleBookingAlert(
+          cartItems, customer, bookingRef,
+          conflictReason || 'A previous fulfillment attempt flagged a reservation conflict. Review the calendar and contact the customer.',
+          calendarInserted,
+        )
+        await markSessionFulfillmentStep(session.id, 'vbsDoubleBookingAlertedAt')
+      } catch (alertError) {
+        console.error('Double booking alert email failed:', alertError)
+        fulfillmentErrors.push('booking attention alert')
+      }
+    }
+
+    if (!fulfillmentErrors.length && !needsAttention && !currentMetadata.vbsConfirmationSentAt) {
       try {
         await sendConfirmationEmail(cartItems, customer, session.amount_total || 0, teamEmails, referralInfo, attributionDetails, receiptUrl)
         await markSessionFulfillmentStep(session.id, 'vbsConfirmationSentAt')

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { siteUrl } from '@/lib/seo/site'
+import { faqSchema } from '@/lib/schemas'
+import { PODCAST_PACKAGE_SUMMARY, PODCAST_RATE_SUMMARY } from '@/lib/booking/podcast-package'
 
 export const metadata: Metadata = {
   title: 'Support',
@@ -52,11 +54,11 @@ const FAQS = [
     questions: [
       {
         q: 'What is the difference between a Podcast Studio and a Rental?',
-        a: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment. You operate it yourself or bring your own crew.',
+        a: `${PODCAST_PACKAGE_SUMMARY} ${PODCAST_RATE_SUMMARY} Rental studios are $100/hr for the space and listed lighting. Bring your camera package and crew, or arrange production support before booking.`,
       },
       {
         q: 'Is the equipment already set up when I arrive?',
-        a: 'Yes. Everything is configured and tested before your session starts. Cameras on, lights calibrated, mics live. You walk in and start working.',
+        a: 'Yes. The studio and its included equipment are configured and tested before your session starts. Podcast bookings include the cameras, microphones, lighting, and studio operators. For rentals, check the equipment listed on your room page and bring your camera package.',
       },
       {
         q: 'How many people can fit in a studio?',
@@ -85,7 +87,7 @@ const FAQS = [
       },
       {
         q: 'Are there any hidden fees?',
-        a: 'No. The price you see is the price you pay. Rental studios are $100/hr. Podcast studios are $300/hr with cameraman included.',
+        a: `Your booking total shows the selected studio time and any extras before payment. Rental studios are $100/hr. ${PODCAST_RATE_SUMMARY} ${PODCAST_PACKAGE_SUMMARY}`,
       },
       {
         q: 'Do you offer monthly packages?',
@@ -119,7 +121,7 @@ const FAQS = [
       },
       {
         q: 'What should I bring?',
-        a: 'Yourself and your content plan. All equipment is provided. For photography and video, bring outfit options and any products or props you want in frame. For podcast, have your talking points ready.',
+        a: 'For podcasts, bring your talking points, wardrobe, and any props. The podcast cameras, microphones, lighting, and studio operators are included. For rentals, bring your camera package and crew unless production support has been arranged. Check your room page for the included equipment.',
       },
       {
         q: 'What if I\'m running late?',
@@ -129,59 +131,16 @@ const FAQS = [
   },
 ]
 
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'How do I book a studio?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Go to vibeshackstudios.com/book. Pick your studio, choose your date and time, enter your info, and pay. Confirmation is instant.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Can I book same-day?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. We are open 24/7 and accept same-day bookings as long as the slot is available.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'What is the difference between a Podcast Studio and a Rental?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Podcast Studios ($300/hr) include a cameraman. A trained operator handles all the cameras so you focus entirely on your content. Rental studios ($100/hr) include the equipment. You operate it yourself or bring your own crew.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'What is your cancellation policy?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Free cancellation up to 48 hours before your session for a full refund. Cancellations within 48 hours are non-refundable.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Where exactly is VibeShack?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: '950 Battery St, San Francisco, CA 94111. Northern Waterfront. Street parking on Battery St. 10 minute walk from the Ferry Building.',
-      },
-    },
-  ],
-}
+const supportFaqSchema = faqSchema(
+  FAQS.flatMap(({ questions }) => questions.map(({ q, a }) => ({ question: q, answer: a })))
+)
 
 export default function SupportPage() {
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(supportFaqSchema) }}
       />
       <section className="bg-black pt-32 sm:pt-48 pb-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
