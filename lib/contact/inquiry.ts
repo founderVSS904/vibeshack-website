@@ -1,4 +1,6 @@
 import { getStudioFinderInquiry } from '../booking/studio-finder'
+import { getStudioById } from '../booking/catalog'
+import { getStudioSetup, getStudioSetups } from '../booking/studio-setups'
 import { absoluteUrl } from '../seo/site'
 import { getWorkProject, type WorkCategorySlug } from '../seo/workProjects'
 
@@ -18,6 +20,7 @@ const projectTypeByService = new Map([
   ['podcast', 'podcast'],
   ['green-screen', 'green-screen'],
   ['studio-finder', 'other'],
+  ['studio-setup', 'podcast'],
 ])
 
 const projectTypeByWorkCategory: Record<WorkCategorySlug, string> = {
@@ -42,6 +45,18 @@ export function getContactInquiry(searchParams: URLSearchParams): ContactInquiry
   const service = searchParams.get('service')
   const projectType = service ? projectTypeByService.get(service) : undefined
   if (!projectType) return null
+
+  if (service === 'studio-setup') {
+    const studio = getStudioById(searchParams.get('studio') || '')
+    if (studio && getStudioSetups(studio.id).length) {
+      const setup = getStudioSetup(studio.id, searchParams.get('setup'))
+      return {
+        projectType,
+        message: `I'd like to discuss a custom setup for ${studio.name}.${setup ? `\nThe photo option I'm considering is: ${setup.label}.` : ''}\n\nHere's what I have in mind:`,
+      }
+    }
+    return { projectType, message: "I'd like to discuss a custom studio setup." }
+  }
 
   if (service === 'portfolio-inquiry') {
     const project = getWorkProject(searchParams.get('project') || '')

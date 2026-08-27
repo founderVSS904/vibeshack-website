@@ -74,6 +74,7 @@ function ConfirmationContent() {
             {result.summary.sessions.map((session, index) => (
               <div key={index} className="py-5">
                 <h2 className="text-xl text-white">{session.studioName}</h2>
+                {session.setupDescription && <p className="mt-3 text-sm font-semibold text-white">{session.setupDescription}</p>}
                 <p className="mt-3 text-sm text-zinc-300">{session.date}<br />{session.time}<br />{session.duration}</p>
                 {session.addOns.map((addOn) => <p key={addOn.name} className="mt-3 text-sm text-zinc-300">{addOn.name}: ${addOn.hourlyRate}/hr · ${addOn.amount.toFixed(2)}</p>)}
               </div>

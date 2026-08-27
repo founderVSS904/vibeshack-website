@@ -1,5 +1,6 @@
 import { priceBookingAddOns } from './add-ons'
 import { MAX_BOOKING_SLOTS, MIN_BOOKING_SLOTS, isValidBookingDate } from './time'
+import { getStudioSetup, type StudioSetupId } from './studio-setups'
 
 export interface PendingCheckoutSlot { time: string; label: string; available: boolean }
 
@@ -11,6 +12,7 @@ export interface PendingCheckoutState {
   managementToken: string
   expiresAt: string
   selectedId: string
+  setupId?: StudioSetupId
   durationSlots: number
   date: string
   startSlot: string
@@ -21,6 +23,15 @@ export interface PendingCheckoutState {
   email: string
   phone: string
   teamEmails: string[]
+}
+
+export function pendingCheckoutMatchesSelection(
+  pending: Pick<PendingCheckoutState, 'selectedId' | 'setupId'>,
+  requested: { studioId: string; setupId?: unknown },
+) {
+  return pending.selectedId === requested.studioId
+    && (requested.setupId === undefined
+      || getStudioSetup(pending.selectedId, pending.setupId)?.id === getStudioSetup(requested.studioId, requested.setupId)?.id)
 }
 
 export function parsePendingCheckout(raw: string | null): PendingCheckoutState | null {
@@ -53,7 +64,12 @@ export function parsePendingCheckout(raw: string | null): PendingCheckoutState |
 
     const addOns = priceBookingAddOns(parsed.addOnIds, parsed.durationSlots)
     // Restored drafts keep identifiers only. The server will reprice any revision.
-    return { ...parsed, addOnIds: addOns.map((addOn) => addOn.id) } as PendingCheckoutState
+    return {
+      ...parsed,
+      addOnIds: addOns.map((addOn) => addOn.id),
+      // Preserve legacy checkout authority even when its setup is absent or invalid.
+      setupId: getStudioSetup(parsed.selectedId, parsed.setupId)?.id,
+    } as PendingCheckoutState
   } catch {
     return null
   }

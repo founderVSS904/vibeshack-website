@@ -22,7 +22,7 @@ type HeaderLink = {
 const podcastStudios: HeaderLink[] = [
   { href: '/podcast-studio-san-francisco/', label: 'All Podcast Studios', detail: 'Compare every podcast set' },
   { href: '/the-executive/', label: 'The Executive', detail: 'Boardroom set, three cameras', price: '$300/hr', image: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg' },
-  { href: '/the-wing/', label: 'The Wing', detail: 'Warm two-person conversation set', price: '$300/hr', image: '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg' },
+  { href: '/the-wing/', label: 'The Wing', detail: 'Solo or two-person chair setups', price: '$300/hr', image: '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg' },
   { href: '/encore/', label: 'Encore', detail: 'Treated set with clean sightlines', price: '$300/hr', image: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg' },
   { href: '/sunset-studio/', label: 'Sunset', detail: 'Color-backed creative podcast set', price: '$300/hr', image: '/studio-images/sunset-hero-v20260509.jpg' },
   { href: '/parlor/', label: 'Parlor', detail: 'Signature lounge interview set', price: '$400/hr', image: '/studio-images/parlor-production-v20260509.jpg' },

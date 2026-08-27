@@ -4,6 +4,7 @@ import { acquireBookingHolds, addBookingEvents, assertCartSlotsAvailable, hasBoo
 import { getStudioById } from '@/lib/booking/catalog'
 import { hasMatchingBookingAddOnTotal } from '@/lib/booking/add-ons'
 import { bookingAddOnsEmailHtml } from '@/lib/booking/add-on-communication'
+import { bookingSetupEmailHtml } from '@/lib/booking/setup-communication'
 import { bookingNeedsAttention, fulfillBookingCalendar } from '@/lib/booking/fulfillment-state'
 import { hasCompleteBookingCartMetadata, parseBookingCartItems } from '@/lib/booking/checkout-metadata'
 import { buildReferralInfo, formatMoneyFromCents, type ReferralInfo } from '@/lib/booking/referrals'
@@ -200,6 +201,7 @@ function buildPrepEmailHtml(cartItems: BookingCartItem[], customer: { name: stri
           <p style="color:#111827;font-size:16px;font-weight:900;margin:0 0 6px;">${escapeHtml(item.studioName)}</p>
           <p style="color:#4b5563;font-size:14px;line-height:1.65;margin:0;">${escapeHtml(dateStr)}<br>${escapeHtml(slotRanges)} PT</p>
           ${bookingAddOnsEmailHtml(item.addOns, false, '#4b5563')}
+          ${bookingSetupEmailHtml(item.studioId, item.setupId, '#4b5563')}
           ${item.addOns?.length ? '<p style="color:#4b5563;font-size:14px;line-height:1.65;margin:8px 0 0;">Bring your final script for the teleprompter and allow setup time within your session.</p>' : ''}
         </td>
         <td align="right" style="padding:18px 0;border-top:1px solid #e5e7eb;color:#111827;font-size:14px;font-weight:800;vertical-align:top;white-space:nowrap;">
@@ -298,7 +300,7 @@ async function sendDoubleBookingAlert(
   })
 
   const sessionRows = cartItems
-    .map((item) => `<li style="margin:0 0 6px;">${escapeHtml(item.studioName)} on ${escapeHtml(formatDateForDisplay(item.date))}: ${escapeHtml(describeSlotRanges(item.slots))}</li>`)
+    .map((item) => `<li style="margin:0 0 6px;">${escapeHtml(item.studioName)} on ${escapeHtml(formatDateForDisplay(item.date))}: ${escapeHtml(describeSlotRanges(item.slots))}${bookingSetupEmailHtml(item.studioId, item.setupId, '#111827')}</li>`)
     .join('')
 
   await transporter.sendMail({
@@ -391,6 +393,7 @@ async function sendConfirmationEmail(
           <p style="color:#999;font-size:13px;margin:0 0 8px;">${escapeHtml(slotRanges)} PT</p>
           <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(formatBookingDuration(item.slots.length))}</p>
           ${bookingAddOnsEmailHtml(item.addOns)}
+          ${bookingSetupEmailHtml(item.studioId, item.setupId)}
         </div>
       </div>`
   }).join('')
@@ -406,6 +409,7 @@ async function sendConfirmationEmail(
           <p style="color:#999;font-size:13px;margin:0 0 8px;">${escapeHtml(slotRanges)} PT</p>
           <p style="color:#666;font-size:13px;margin:0;">${escapeHtml(formatBookingDuration(item.slots.length))}</p>
           ${bookingAddOnsEmailHtml(item.addOns, false)}
+          ${bookingSetupEmailHtml(item.studioId, item.setupId)}
         </div>
       </div>`
   }).join('')
@@ -445,7 +449,7 @@ async function sendConfirmationEmail(
     const dateStr = formatDateForDisplay(item.date)
     const start = new Date(item.slots[0])
     const end = addMinutes(new Date(item.slots[item.slots.length - 1]), SLOT_DURATION_MINUTES)
-    return `<li><strong>${escapeHtml(item.studioName)}</strong> - ${escapeHtml(dateStr)} - ${escapeHtml(start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))}-${escapeHtml(end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))} PT - Studio before discount: $${escapeHtml(item.price)}${bookingAddOnsEmailHtml(item.addOns, true, '#111827')}</li>`
+    return `<li><strong>${escapeHtml(item.studioName)}</strong> - ${escapeHtml(dateStr)} - ${escapeHtml(start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))}-${escapeHtml(end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' }))} PT - Studio before discount: $${escapeHtml(item.price)}${bookingSetupEmailHtml(item.studioId, item.setupId, '#111827')}${bookingAddOnsEmailHtml(item.addOns, true, '#111827')}</li>`
   }).join('')
   const prepEmailHtml = buildPrepEmailHtml(cartItems, customer)
 

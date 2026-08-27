@@ -4,6 +4,7 @@ import { bookingAddOnTotalCents, priceBookingAddOns } from './add-ons'
 import { calculateRecurringDiscountCents, getStudioById } from './catalog'
 import { bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate } from './time'
 import { stripControlChars } from '../server/sanitize'
+import { getStudioSetup, validateBookingSetup } from './studio-setups'
 
 export function buildCanonicalBookingCart(rawCart: unknown): BookingCartItem[] {
   if (!Array.isArray(rawCart) || rawCart.length > 20) throw new Error('Invalid cart item')
@@ -28,6 +29,7 @@ export function buildCanonicalBookingCart(rawCart: unknown): BookingCartItem[] {
       hours: bookingHoursForSlotCount(slots.length),
       price: bookingPriceCents(studio.price, slots.length) / 100,
       addOns: priceBookingAddOns(rawItem.addOnIds, slots.length),
+      setupId: validateBookingSetup(studio.id, rawItem.setupId),
     }
   })
 }
@@ -42,7 +44,7 @@ export function buildBookingCheckoutLineItems(
       currency: 'usd',
       product_data: {
         name: `${item.studioName} - VibeShack Studios`,
-        description: `${formatDateForDisplay(item.date)} - ${describeSlotRanges(item.slots)} - ${formatBookingDuration(item.slots.length)}${pricing.discountCents ? ' - recurring discount applied' : ''}`,
+        description: `${formatDateForDisplay(item.date)} - ${describeSlotRanges(item.slots)} - ${formatBookingDuration(item.slots.length)}${getStudioSetup(item.studioId, item.setupId) ? ` - Setup: ${getStudioSetup(item.studioId, item.setupId)!.label}` : ''}${pricing.discountCents ? ' - recurring discount applied' : ''}`,
         images: [imageUrl],
       },
       unit_amount: pricing.discountedSessionAmounts[index],

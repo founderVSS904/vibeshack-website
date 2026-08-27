@@ -47,7 +47,7 @@ const studios: PodcastSet[] = [
     thumb: '/studio-images/the-wing-hero.jpg',
     series: 'Walnut Series',
     category: 'podcast',
-    line: 'Warm leather and close eyelines for personal two-person shows.',
+    line: 'Black or brown chairs, arranged for solo recordings or two-person shows.',
     bestFor: 'Two-person podcasts, close interviews, and conversations that should feel warm and direct.',
     price: `$${PODCAST_HOURLY_RATES['the-wing']}/hr`,
     specs: ['Two-person set', 'Warm leather seating', 'Broadcast audio'],

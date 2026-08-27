@@ -10,6 +10,7 @@ import { getStripeClient } from '@/lib/booking/stripe'
 import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
 import { isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
+import { BookingSetupSelectionError } from '@/lib/booking/studio-setups'
 
 const ATTRIBUTION_COOKIE = 'vbs_attribution'
 const CHECKOUT_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -206,6 +207,9 @@ export async function POST(req: NextRequest) {
       throw error
     }
   } catch (err) {
+    if (err instanceof BookingSetupSelectionError) {
+      return NextResponse.json({ error: err.message }, { status: 400 })
+    }
     const bodyError = jsonBodyErrorResponse(err)
     if (bodyError) return bodyError
 

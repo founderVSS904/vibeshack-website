@@ -27,8 +27,10 @@ import {
 import { GAEventType, sendGAEvent, trackBookingStep } from '@/lib/analytics'
 import { TELEPROMPTER, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/booking/add-ons'
 import { PENDING_CHECKOUT_STORAGE_KEY } from '@/lib/booking/confirmation-state'
-import { parsePendingCheckout, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
+import { parsePendingCheckout, pendingCheckoutMatchesSelection, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
 import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
+import StudioSetupPicker from '@/components/StudioSetupPicker'
+import { getStudioSetup, getStudioSetups, type StudioSetupId } from '@/lib/booking/studio-setups'
 
 const StripeEmbeddedCheckout = dynamic(() => import('@/components/StripeEmbeddedCheckout'), {
   ssr: false,
@@ -191,12 +193,6 @@ function readReferralSourceFromBrowser() {
   return ''
 }
 
-function studioFromQuery(studios: Studio[]) {
-  if (typeof window === 'undefined') return null
-  const id = new URLSearchParams(window.location.search).get('studio')
-  return id ? studios.find((s) => s.id === id) ?? null : null
-}
-
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 const iconProps = {
@@ -231,7 +227,7 @@ const CheckCircleIcon = () => (
 
 // ─── Stepper ──────────────────────────────────────────────────────────────────
 
-function Stepper({ step, onJump }: { step: Step; onJump: (s: Exclude<Step, 'payment'>) => void }) {
+function Stepper({ step, onJump, locked = false }: { step: Step; onJump: (s: Exclude<Step, 'payment'>) => void; locked?: boolean }) {
   const activeIndex = step === 'payment' ? 3 : STEP_ORDER.indexOf(step)
 
   return (
@@ -239,11 +235,11 @@ function Stepper({ step, onJump }: { step: Step; onJump: (s: Exclude<Step, 'paym
       {STEP_ORDER.map((s, i) => {
         const done = i < activeIndex
         const active = i === activeIndex
-        const clickable = done && step !== 'payment'
+        const clickable = done && step !== 'payment' && !locked
         return (
-          <div key={s} className={`flex items-center ${i > 0 ? 'flex-1' : ''}`}>
+          <div key={s} className={`flex min-w-0 items-center ${i > 0 ? 'flex-1' : ''}`}>
             {i > 0 && (
-              <div className="relative mx-4 h-px flex-1 bg-white/[0.12] sm:mx-6">
+              <div className="relative mx-2 h-px flex-1 bg-white/[0.12] sm:mx-6">
                 <span
                   className="absolute inset-0 origin-left bg-brand-red transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   style={{ transform: `scaleX(${i <= activeIndex ? 1 : i === activeIndex + 1 ? 0.45 : 0})` }}
@@ -255,12 +251,12 @@ function Stepper({ step, onJump }: { step: Step; onJump: (s: Exclude<Step, 'paym
               onClick={clickable ? () => onJump(s) : undefined}
               disabled={!clickable}
               aria-current={active ? 'step' : undefined}
-              className={`group flex items-center gap-3 ${clickable ? 'cursor-pointer' : 'cursor-default'}`}
+              className={`group flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 sm:gap-3 ${clickable ? 'cursor-pointer' : 'cursor-default'}`}
             >
               <span className="sr-only">{`Step ${i + 1}: ${STEP_LABELS[s]}${done ? ', completed' : ''}`}</span>
               <span
                 aria-hidden="true"
-                className={`flex h-9 w-9 items-center justify-center rounded-full border font-mono text-[11px] font-bold transition-colors ${
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-mono text-[11px] font-bold transition-colors ${
                   done
                     ? 'border-brand-red bg-brand-red text-white'
                     : active
@@ -280,7 +276,7 @@ function Stepper({ step, onJump }: { step: Step; onJump: (s: Exclude<Step, 'paym
                 aria-hidden="true"
                 className={`font-mono text-[11px] font-bold uppercase tracking-[0.2em] transition-colors ${
                   active ? 'text-brand-red' : done ? `text-white ${clickable ? 'group-hover:text-brand-red' : ''}` : 'text-zinc-500'
-                } ${active ? '' : 'hidden md:inline'}`}
+                } ${active ? 'hidden min-[400px]:inline' : 'hidden md:inline'}`}
               >
                 {STEP_LABELS[s]}
               </span>
@@ -294,23 +290,29 @@ function Stepper({ step, onJump }: { step: Step; onJump: (s: Exclude<Step, 'paym
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-interface BookPageInnerProps {
+interface InitialBookingSelection {
+  initialStudioId?: string
+  initialSetupId?: StudioSetupId
+  hasSetupRequest?: boolean
+}
+
+interface BookPageInnerProps extends InitialBookingSelection {
   studios: Studio[]
 }
 
-function BookPageInner({ studios }: BookPageInnerProps) {
+function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetupRequest = false }: BookPageInnerProps) {
+  const linkedStudio = studios.find((studio) => studio.id === initialStudioId) || null
   // Room selection
-  const [step, setStep] = useState<Step>(() => (studioFromQuery(studios) ? 'datetime' : 'room'))
+  const [step, setStep] = useState<Step>(() => (linkedStudio ? 'datetime' : 'room'))
   const [filter, setFilter] = useState<Filter>(() => {
-    const linked = studioFromQuery(studios)
-    return linked ? filterForStudio(linked) : 'podcast'
+    return linkedStudio ? filterForStudio(linkedStudio) : 'podcast'
   })
   const [previewId, setPreviewId] = useState(() => {
-    const linked = studioFromQuery(studios)
-    if (linked) return linked.id
+    if (linkedStudio) return linkedStudio.id
     return studios.find((s) => s.type === 'podcast')?.id ?? studios[0]?.id ?? ''
   })
-  const [selectedId, setSelectedId] = useState(() => studioFromQuery(studios)?.id ?? '')
+  const [selectedId, setSelectedId] = useState(() => linkedStudio?.id ?? '')
+  const [setupId, setSetupId] = useState(() => getStudioSetup(initialStudioId, initialSetupId)?.id || '')
   const [photoIndex, setPhotoIndex] = useState(0)
 
   // Date & time
@@ -343,9 +345,12 @@ function BookPageInner({ studios }: BookPageInnerProps) {
   const [checkoutSessionId, setCheckoutSessionId] = useState('')
   const [checkoutManagementToken, setCheckoutManagementToken] = useState('')
   const [checkoutCancelling, setCheckoutCancelling] = useState(false)
+  const [checkoutSelectionConflict, setCheckoutSelectionConflict] = useState(false)
 
   const railRef = useRef<HTMLDivElement>(null)
   const availabilityReqRef = useRef(0)
+  const checkoutCreatingRef = useRef(false)
+  const requestedSelectionRef = useRef<{ studioId: string; setupId?: StudioSetupId } | null>(null)
 
   useEffect(() => {
     const source = readReferralSourceFromBrowser()
@@ -364,7 +369,20 @@ function BookPageInner({ studios }: BookPageInnerProps) {
       return
     }
 
+    const requestedStudio = studios.find((item) => item.id === initialStudioId)
+    if (requestedStudio && !pendingCheckoutMatchesSelection(pending, {
+      studioId: requestedStudio.id,
+      setupId: hasSetupRequest ? initialSetupId || '' : undefined,
+    })) {
+      requestedSelectionRef.current = {
+        studioId: requestedStudio.id,
+        setupId: initialSetupId,
+      }
+      setCheckoutSelectionConflict(true)
+    }
+
     setSelectedId(studio.id)
+    setSetupId(getStudioSetup(studio.id, pending.setupId)?.id || '')
     setPreviewId(studio.id)
     setFilter(filterForStudio(studio))
     setDurationSlots(pending.durationSlots)
@@ -382,7 +400,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
     setCheckoutSessionId(pending.sessionId)
     setCheckoutManagementToken(pending.managementToken)
     setStep('payment')
-  }, [studios])
+  }, [studios, initialStudioId, initialSetupId, hasSetupRequest])
 
   // The global html/body overflow-x:hidden kills position:sticky; clip keeps
   // the same clipping without breaking the session sidebar.
@@ -394,6 +412,9 @@ function BookPageInner({ studios }: BookPageInnerProps) {
   // ── Derived ──
   const previewStudio = studios.find((s) => s.id === previewId) ?? studios[0]
   const selectedStudio = selectedId ? studios.find((s) => s.id === selectedId) ?? null : null
+  const selectedSetup = getStudioSetup(selectedId, setupId)
+  const requiresSetup = getStudioSetups(selectedId).length > 0
+  const setupReady = !requiresSetup || Boolean(selectedSetup)
   const filteredStudios = studios.filter((s) => matchesFilter(s, filter))
 
   const days = getNext60Days()
@@ -437,9 +458,9 @@ function BookPageInner({ studios }: BookPageInnerProps) {
 
   const continueReady =
     step === 'room' ? Boolean(selectedId)
-      : step === 'datetime' ? Boolean(date && startSlot && blockValid)
-        : step === 'extras' ? true
-          : !submitting
+      : step === 'datetime' ? Boolean(date && startSlot && blockValid && setupReady)
+        : step === 'extras' ? setupReady
+          : !submitting && setupReady
 
   const continueLabel =
     step === 'room' ? 'Continue to Date & Time'
@@ -465,6 +486,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
     if (selectedId !== previewStudio.id) {
       availabilityReqRef.current++
       setSelectedId(previewStudio.id)
+      setSetupId('')
       setDate(''); setStartSlot(''); setSlots([]); setSlotsLoading(false); setError('')
       trackBookingStep('studio_select', { studio_id: previewStudio.id, studio_name: previewStudio.name, value: previewStudio.price, currency: 'USD' })
     }
@@ -507,6 +529,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
   }
 
   function goToStep(next: Exclude<Step, 'payment'>) {
+    if (checkoutCreatingRef.current) return
     setError('')
     setStep(next)
     if (typeof window !== 'undefined') {
@@ -560,12 +583,19 @@ function BookPageInner({ studios }: BookPageInnerProps) {
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault()
+    if (checkoutCreatingRef.current) return
+    if (!setupReady) {
+      goToStep('datetime')
+      setError('Choose a Wing setup before continuing.')
+      return
+    }
     if (!selectedStudio || !blockValid) {
       setError('Pick a studio, date, and start time first.')
       return
     }
     if (!name || !email) { setError('Name and email are required.'); return }
     setError('')
+    checkoutCreatingRef.current = true
     setSubmitting(true)
     setCheckoutClientSecret('')
     setCheckoutPublishableKey('')
@@ -591,6 +621,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
             hours: durationHours,
             price: sessionSubtotal,
             addOnIds,
+            setupId: selectedSetup?.id,
           }],
           recurring,
           recurringDiscount: discountAmount,
@@ -602,6 +633,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
       })
       const data = await res.json()
       if (!res.ok) {
+        checkoutCreatingRef.current = false
         if (res.status === 409 && date) {
           // The slot was taken while they reviewed. Send them back to the
           // calendar and refetch, so the stale opening cannot be re-picked.
@@ -626,6 +658,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
           managementToken: data.managementToken,
           expiresAt: data.expiresAt,
           selectedId: selectedStudio.id,
+          setupId: selectedSetup?.id,
           durationSlots,
           date,
           startSlot,
@@ -648,7 +681,8 @@ function BookPageInner({ studios }: BookPageInnerProps) {
         if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
       }
       else { setError('Payment could not be started. Please try again.'); setSubmitting(false) }
-    } catch { setError('Connection error. Try again.'); setSubmitting(false) }
+    } catch { setError('Connection error. Try again.') }
+    finally { checkoutCreatingRef.current = false; setSubmitting(false) }
   }
 
   async function changeCheckoutDetails() {
@@ -684,8 +718,24 @@ function BookPageInner({ studios }: BookPageInnerProps) {
       setCheckoutSessionId('')
       setCheckoutManagementToken('')
       clearPendingCheckout()
+      const requested = requestedSelectionRef.current
+      requestedSelectionRef.current = null
+      setCheckoutSelectionConflict(false)
+      if (requested) {
+        const nextStudio = studios.find((studio) => studio.id === requested.studioId)
+        if (nextStudio) {
+          setSelectedId(nextStudio.id)
+          setPreviewId(nextStudio.id)
+          setPhotoIndex(0)
+          setSetupId(requested.setupId || '')
+          setFilter(filterForStudio(nextStudio))
+        }
+      }
       goToStep('datetime')
-      if (date) await selectDate(date)
+      if (requested && requested.studioId !== selectedId) {
+        availabilityReqRef.current++
+        setDate(''); setStartSlot(''); setSlots([]); setSlotsLoading(false)
+      } else if (date) await selectDate(date)
     } catch {
       setError('Connection error. Your current checkout is still protected. Please try again.')
     } finally {
@@ -695,14 +745,14 @@ function BookPageInner({ studios }: BookPageInnerProps) {
 
   const headline =
     step === 'room' ? 'Build your session'
-      : step === 'datetime' ? 'Pick your time'
+      : step === 'datetime' ? (requiresSetup ? 'Your setup & time' : 'Pick your time')
         : step === 'extras' ? 'Make it yours'
           : step === 'review' ? 'Lock it in'
             : 'Secure payment'
 
   const subline =
     step === 'room' ? 'Choose a studio, then select a date and time.'
-      : step === 'datetime' ? 'All times Pacific. Availability is checked live.'
+      : step === 'datetime' ? (requiresSetup ? 'Choose your chair layout, then find a time. All times Pacific.' : 'All times Pacific. Availability is checked live.')
       : step === 'extras' ? 'Optional equipment and recurring savings. Studio-only is always an option.'
           : step === 'review' ? 'Check the details, add your info, and lock it in.'
             : 'Card details are handled by Stripe. We never see them.'
@@ -712,7 +762,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
     <div className="min-h-screen bg-black pb-32 pt-24 lg:pb-24">
       <div className="mx-auto max-w-[1680px] px-6 sm:px-10 lg:px-16">
 
-        <Stepper step={step} onJump={goToStep} />
+        <Stepper step={step} onJump={goToStep} locked={submitting || checkoutCancelling} />
 
         {/* Headline + filters */}
         <div className="mt-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -914,6 +964,17 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                     Change studio
                   </button>
                 </div>
+
+                {requiresSetup && (
+                  <div className="mb-10">
+                    <StudioSetupPicker
+                      id="booking"
+                      studioId={selectedId}
+                      value={setupId}
+                      onChange={(nextSetupId) => { setSetupId(nextSetupId); setError('') }}
+                    />
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 gap-10 md:grid-cols-[4fr_3fr] 2xl:gap-14">
                   {/* Calendar */}
@@ -1165,7 +1226,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                 <p className="mb-4 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Your session</p>
                 <div className="flex items-center gap-5 border-b border-white/[0.08] pb-5">
                   <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg">
-                    <Image src={selectedStudio.heroImage} alt={selectedStudio.name} fill sizes="192px" className="object-cover" />
+                    <Image src={selectedSetup?.image || selectedStudio.heroImage} alt={selectedSetup?.alt || selectedStudio.name} fill sizes="192px" className={selectedSetup ? 'object-contain' : 'object-cover'} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[15px] font-bold text-white">{selectedStudio.name}</p>
@@ -1176,13 +1237,25 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                     <p className="font-mono text-sm font-bold text-white">${sessionSubtotal}</p>
                     <button
                       type="button"
+                      disabled={submitting}
                       onClick={() => goToStep('datetime')}
-                      className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-white"
+                      className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-white disabled:cursor-wait disabled:opacity-50"
                     >
                       Edit
                     </button>
                   </div>
                 </div>
+
+                {requiresSetup && (
+                  <div className="flex items-center justify-between gap-4 border-b border-white/[0.08] py-5">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.12em] text-zinc-400">Selected setup</p>
+                      <p className="mt-1 font-semibold text-white">{selectedSetup?.label || 'Choose a setup'}</p>
+                      <p className="mt-1 text-xs text-zinc-300">Saved with your booking so our team can prepare.</p>
+                    </div>
+                    <button type="button" disabled={submitting} onClick={() => goToStep('datetime')} className="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-zinc-300 hover:text-white disabled:cursor-wait disabled:opacity-50">Change setup</button>
+                  </div>
+                )}
 
                 {selectedAddOns.length > 0 && (
                   <div className="border-b border-white/[0.08] py-5">
@@ -1192,7 +1265,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                         <p className="font-mono text-white">${addOn.amountCents / 100}</p>
                       </div>
                     ))}
-                    <button type="button" onClick={() => goToStep('extras')} className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 hover:text-white">Edit add-ons</button>
+                    <button type="button" disabled={submitting} onClick={() => goToStep('extras')} className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 hover:text-white disabled:cursor-wait disabled:opacity-50">Edit add-ons</button>
                   </div>
                 )}
 
@@ -1204,8 +1277,9 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                     </div>
                     <button
                       type="button"
+                      disabled={submitting}
                       onClick={() => goToStep('extras')}
-                      className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-white"
+                      className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-white disabled:cursor-wait disabled:opacity-50"
                     >
                       Edit extras
                     </button>
@@ -1235,6 +1309,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                             id={fieldId}
                             type={type}
                             required={req}
+                            disabled={submitting}
                             value={val}
                             onChange={(e) => set(e.target.value)}
                             placeholder={ph}
@@ -1255,6 +1330,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                           <button
                             type="button"
                             aria-label={`Remove ${em}`}
+                            disabled={submitting}
                             onClick={() => setTeamEmails((p) => p.filter((_, j) => j !== i))}
                             className="-m-1 p-1 leading-none text-zinc-400 transition-colors hover:text-white"
                           >
@@ -1266,6 +1342,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                         type="email"
                         value={teamInput}
                         aria-label="Add a team email"
+                        disabled={submitting}
                         onChange={(e) => { setTeamInput(e.target.value); if (teamError) setTeamError('') }}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -1311,7 +1388,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
 
                   <button
                     type="submit"
-                    disabled={submitting}
+                    disabled={submitting || !setupReady}
                     className="w-full rounded-lg bg-brand-red py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 lg:hidden"
                   >
                     {submitting ? 'Processing…' : `Lock In Session · $${grandTotal}`}
@@ -1326,7 +1403,21 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                 <p className="mb-6 text-sm leading-relaxed text-zinc-400">
                   Complete payment here on VibeShack. Your booking lands on the studio calendar only after payment succeeds.
                 </p>
-                {checkoutPublishableKey && checkoutClientSecret ? (
+                {checkoutSelectionConflict ? (
+                  <div className="rounded-lg border border-white/20 p-5 text-sm leading-relaxed text-zinc-300" role="status">
+                    <h3 className="text-lg font-semibold text-white">A checkout is already in progress.</h3>
+                    <p className="mt-3">It is for {selectedStudio?.name}{selectedSetup ? ` with ${selectedSetup.label}` : ''}, which differs from your new selection. Your new photo choice has not changed that checkout.</p>
+                    <div className="mt-5 flex flex-wrap gap-4">
+                      <button type="button" disabled={checkoutCancelling} onClick={() => void changeCheckoutDetails()} className="rounded-lg bg-brand-red px-4 py-3 font-semibold text-white hover:bg-red-700 disabled:opacity-50">{checkoutCancelling ? 'Releasing checkout…' : 'Use my new selection'}</button>
+                      {setupReady && <button type="button" disabled={checkoutCancelling} onClick={() => { requestedSelectionRef.current = null; setCheckoutSelectionConflict(false) }} className="px-2 py-3 text-white underline underline-offset-4 disabled:opacity-50">Resume existing checkout</button>}
+                    </div>
+                    <p className="mt-4 text-xs">Using your new selection safely releases the existing checkout first. You will review the updated booking before payment.</p>
+                  </div>
+                ) : !setupReady ? (
+                  <p className="rounded-lg border border-white/15 p-5 text-sm leading-relaxed text-zinc-300" role="status">
+                    This checkout was started without a setup choice. Use “Change booking details” below to choose your Wing setup before payment. We will safely release this checkout before creating the updated one.
+                  </p>
+                ) : checkoutPublishableKey && checkoutClientSecret ? (
                   <div className="rounded-lg bg-white p-2 sm:p-4">
                     <StripeEmbeddedCheckout
                       publishableKey={checkoutPublishableKey}
@@ -1339,7 +1430,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                   </div>
                 )}
                 <p className="mt-5 max-w-lg text-sm leading-relaxed text-zinc-500">
-                  Need a different room or time? Release this checkout first, then update your booking.
+                  Need a different room, setup, or time? Release this checkout first, then update your booking.
                 </p>
                 {error && (
                   <p className="mt-3 text-sm text-brand-red" role="alert">{error}</p>
@@ -1363,7 +1454,7 @@ function BookPageInner({ studios }: BookPageInnerProps) {
 
               {selectedStudio ? (
                 <div className="relative mt-5 h-40 overflow-hidden rounded-lg 2xl:h-44">
-                  <Image src={selectedStudio.heroImage} alt={selectedStudio.name} fill quality={80} sizes="800px" className="object-cover" />
+                  <Image src={selectedSetup?.image || selectedStudio.heroImage} alt={selectedSetup?.alt || selectedStudio.name} fill quality={80} sizes="800px" className={selectedSetup ? 'object-contain' : 'object-cover'} />
                 </div>
               ) : (
                 <div className="mt-5 flex h-40 items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/[0.02] 2xl:h-44">
@@ -1379,6 +1470,17 @@ function BookPageInner({ studios }: BookPageInnerProps) {
                     {selectedStudio ? selectedStudio.name : 'Not selected'}
                   </span>
                 </div>
+                {requiresSetup && (
+                  <div className="flex items-start justify-between gap-3 py-3.5">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">Setup</span>
+                    <div className="text-right">
+                      <p className="text-[13px] text-white">{selectedSetup?.label || 'Not selected'}</p>
+                      {selectedSetup && step !== 'payment' && step !== 'datetime' && (
+                        <button type="button" disabled={submitting} onClick={() => goToStep('datetime')} className="mt-1 text-xs text-zinc-300 underline underline-offset-4 hover:text-white disabled:opacity-50">Change setup</button>
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-center gap-3 py-3.5 text-zinc-500">
                   <RateIcon />
                   <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">Rate</span>
@@ -1544,6 +1646,14 @@ const BookPageClient = dynamic(() => Promise.resolve(BookPageInner), {
   loading: () => <BookingSkeleton />,
 })
 
-export default function BookPage() {
-  return <BookPageClient studios={DEFAULT_STUDIOS} />
+export default function BookPage({ initialStudioId = '', initialSetupId, hasSetupRequest = false }: InitialBookingSelection) {
+  return (
+    <BookPageClient
+      key={`${initialStudioId}:${initialSetupId || ''}:${hasSetupRequest}`}
+      studios={DEFAULT_STUDIOS}
+      initialStudioId={initialStudioId}
+      initialSetupId={initialSetupId}
+      hasSetupRequest={hasSetupRequest}
+    />
+  )
 }

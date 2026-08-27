@@ -4,6 +4,7 @@ import { hasCompleteBookingCartMetadata, parseBookingCartItems } from './checkou
 import { describeSlotRanges, formatBookingDuration, formatDateForDisplay } from './time'
 import type { BookingConfirmation } from './confirmation-state'
 import { bookingNeedsAttention } from './fulfillment-state'
+import { bookingSetupDescription } from './studio-setups'
 
 export interface BookingConfirmationDependencies {
   retrieveSession: (sessionId: string) => Promise<Stripe.Checkout.Session>
@@ -56,6 +57,7 @@ export async function getBookingConfirmation(
           date: formatDateForDisplay(item.date),
           time: `${describeSlotRanges(item.slots)} Pacific`,
           duration: formatBookingDuration(item.slots.length),
+          ...(bookingSetupDescription(item.studioId, item.setupId) ? { setupDescription: bookingSetupDescription(item.studioId, item.setupId) } : {}),
           addOns: (item.addOns || []).map((addOn) => ({
             name: addOn.name, hourlyRate: addOn.hourlyRateCents / 100, amount: addOn.amountCents / 100,
           })),

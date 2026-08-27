@@ -207,7 +207,7 @@ export default function TheExecutivePage() {
             <div className="absolute bottom-0 left-0 right-0 p-12">
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-3 text-brand-red">Walnut Series</p>
               <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: 0}}>The Wing</h3>
-              <p className="text-gray-300 text-lg max-w-md mb-6">Cozy, intimate 2-person setup. Same finish, sized for two.</p>
+              <p className="text-gray-300 text-lg max-w-md mb-6">A warm walnut set with black or brown chairs, arranged for one person or two.</p>
               <p className="text-gray-400 text-sm">${PODCAST_HOURLY_RATES['the-wing']}/hr · {PODCAST_CREW_LABEL}</p>
             </div>
           </a>

@@ -11,6 +11,7 @@ import {
   slotIsoSetForDate,
 } from './time'
 import { stripControlChars } from '@/lib/server/sanitize'
+import { getStudioSetup } from './studio-setups'
 
 // Stripe permits 50 keys. Reserve ten for fulfillment, conflict, and watchdog
 // stamps so a large cart cannot prevent recording its final booking state.
@@ -46,6 +47,7 @@ export function buildBookingCartMetadata(cart: BookingCartItem[]) {
       u: SLOT_DURATION_MINUTES,
       off: item.slots.map((slot) => Math.round((Date.parse(slot) - firstSlotMs) / SLOT_DURATION_MS)),
       ...(item.addOns?.length ? { a: compactBookingAddOns(item.addOns) } : {}),
+      ...(getStudioSetup(item.studioId, item.setupId) ? { setup: item.setupId } : {}),
     })]
   }))
 }
@@ -86,6 +88,7 @@ export function parseBookingCartItems(metadata: Record<string, string>) {
         hours: Number(compact.h ?? compact.hours ?? slots.length),
         price: Number(compact.p ?? compact.price ?? 0),
         addOns: parseBookingAddOns(compact.a, slots.length),
+        setupId: getStudioSetup(studioId, compact.setup)?.id,
       })
     } catch {
       // The completeness check rejects this cart without logging private data.
@@ -104,6 +107,7 @@ export function parseBookingCartItems(metadata: Record<string, string>) {
             slots: expandLegacyHourlySlots(Array.isArray(item.slots) ? item.slots.map((slot: unknown) => stripControlChars(slot, 40)).filter(Boolean) : []),
             hours: Number(item.hours || item.slots?.length || 1),
             price: Number(item.price || 0),
+            setupId: getStudioSetup(item.studioId, item.setupId)?.id,
           })
         }
       }
