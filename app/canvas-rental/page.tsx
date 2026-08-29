@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import { studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
 
@@ -87,7 +88,7 @@ export default function CanvasRentalPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
             <div className="order-1">
-              <Image src="/studio-images/canvas-rental-blackfloor-v1775094171.jpg" alt="Canvas rental with black floor options" width={800} height={600} className="w-full h-auto rounded-lg" />
+              <ZoomableImage src="/studio-images/canvas-rental-blackfloor-v1775094171.jpg" alt="Canvas rental with black floor options" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
             <div className="order-2 flex flex-col justify-center">
               <h2 className="text-white font-black text-4xl mb-6" style={{letterSpacing: 0}}>Flexible space</h2>

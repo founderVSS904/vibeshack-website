@@ -8,6 +8,7 @@ import { getStudioById } from '@/lib/booking/catalog'
 import { BOOKING_TIME_ZONE, formatDateForDisplay, formatTimeForDisplay } from '@/lib/booking/time'
 import { escapeHtml } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
+import { bookingSetupEmailHtml } from '@/lib/booking/setup-communication'
 
 export const dynamic = 'force-dynamic'
 
@@ -80,6 +81,7 @@ function buildReminderHtml(group: ReminderGroup) {
       <td style="padding:18px 0;border-top:1px solid #e5e7eb;">
         <p style="font-size:16px;font-weight:900;color:#111827;margin:0 0 6px;">${escapeHtml(event.studioName)}</p>
         <p style="font-size:14px;line-height:1.65;color:#4b5563;margin:0;">${escapeHtml(eventDateLabel(event))}<br>${escapeHtml(eventTimeLabel(event))}</p>
+        ${bookingSetupEmailHtml(event.studioId, event.setupId, '#4b5563')}
       </td>
     </tr>`).join('')
   const prepItems = prepItemsForGroup(group).map((item) => `<li style="margin:0 0 9px;">${escapeHtml(item)}</li>`).join('')

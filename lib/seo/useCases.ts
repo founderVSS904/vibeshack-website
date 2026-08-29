@@ -1,3 +1,5 @@
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_MINIMUM_CAMERAS } from '../booking/podcast-package'
+
 import { absoluteUrl } from './site'
 
 export const useCases = [
@@ -44,7 +46,7 @@ export const useCases = [
       {
         name: 'The Executive',
         href: '/the-executive/',
-        fit: 'Best for polished founder interviews, finance/business shows, and three-camera conversations around a table.',
+        fit: `Best for polished founder interviews, finance/business shows, and conversations covered by at least ${PODCAST_MINIMUM_CAMERAS} cameras.`,
         price: '$300/hr',
       },
       {
@@ -118,7 +120,7 @@ export const useCases = [
       'Fabric rustle against a lav mic can quietly ruin takes. Nobody hears it until the edit.',
       'Leave buffer time for guests, resets, and a final review of must-capture lines.',
     ],
-    proof: ['Broadcast microphones', 'Multi-camera rooms', 'Camera-ready sets', 'Crew options', '24/7 booking'],
+    proof: ['Broadcast microphones', PODCAST_CAMERA_LABEL, 'Camera-ready sets', PODCAST_CREW_LABEL, '24/7 booking'],
     faqs: [
       {
         question: 'What is the best VibeShack set for a two-person podcast?',

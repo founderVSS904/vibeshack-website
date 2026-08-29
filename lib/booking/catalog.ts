@@ -1,3 +1,6 @@
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES } from './podcast-package'
+import { EXECUTIVE_SETUPS } from './studio-setups'
+
 export interface Studio {
   id: string
   name: string
@@ -22,46 +25,46 @@ export const STUDIOS: Studio[] = [
   {
     id: 'the-executive',
     name: 'The Executive',
-    price: 300,
+    price: PODCAST_HOURLY_RATES['the-executive'],
     tag: 'Walnut Series',
-    description: 'Wood slat walls. Leather seating. Three cameras. Cameraman included.',
-    heroImage: '/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg',
-    photos: ['/studio-images/enhanced-executive-podcast-table-two-hosts-v20260510.jpg', '/studio-images/enhanced-executive-podcast-guest-closeup-v20260510.jpg'],
-    includes: ['3-camera 4K setup', 'Broadcast microphones', 'Cameraman included', 'Walnut Series design', 'Hair & Makeup room', '6-12hr footage turnaround'],
+    description: 'Desk layouts for 1 or 2 people, or 3 black armchairs without a desk. Minimum 3 cameras and 2 studio operators included.',
+    heroImage: '/studio-setups/the-executive/two-office-chairs-desk.webp',
+    photos: EXECUTIVE_SETUPS.map((setup) => setup.image),
+    includes: [PODCAST_CAMERA_LABEL, '4K recording', 'Broadcast microphones', PODCAST_CREW_LABEL, 'Walnut Series design', 'Hair & Makeup room', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
       'Have your talking points or outline ready.',
       'Hair & Makeup room on-site.',
       "Wear what you'd wear on camera. Avoid busy patterns, fine stripes, or logos. Solid colors film best.",
-      'Everything is set up and ready when you arrive.',
+      'Check the setup listed in your booking details. Email us before your session to discuss any other arrangements.',
     ],
   },
   {
     id: 'the-wing',
     name: 'The Wing',
-    price: 300,
+    price: PODCAST_HOURLY_RATES['the-wing'],
     tag: 'Walnut Series',
-    description: 'Wood slat walls. Leather seating. Three cameras. Cameraman included.',
+    description: 'One or two chairs in brown or black. Minimum 3 cameras and 2 studio operators included.',
     heroImage: '/studio-images/the-wing-hero.jpg',
     photos: ['/studio-images/the-wing-hero.jpg', '/studio-images/enhanced-the-wing-podcast-guest-closeup-v20260510.jpg', '/studio-images/the-wing-3.jpg'],
-    includes: ['3-camera 4K setup', 'Broadcast microphones', 'Cameraman included', 'Walnut Series design', 'Intimate layout', '6-12hr footage turnaround'],
+    includes: [PODCAST_CAMERA_LABEL, '4K recording', 'Broadcast microphones', PODCAST_CREW_LABEL, 'Walnut Series design', 'Intimate layout', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
-      'Great for interviews and co-hosted formats.',
-      "Have your guest's name ready and we'll label their mic.",
-      'Hair & Makeup room on-site for both host and guest.',
-      "Arrive together or separately. Both seats will be ready.",
+      'Great for solo recordings, interviews, and co-hosted formats.',
+      'Have your talking points and any guest names ready.',
+      'Hair & Makeup room on-site.',
+      'Check the setup listed in your booking details. Email us before your session to discuss any other arrangements.',
     ],
   },
   {
     id: 'encore',
     name: 'Encore',
-    price: 300,
+    price: PODCAST_HOURLY_RATES.encore,
     tag: 'Vault Series',
-    description: 'Three cameras. Broadcast audio. Cameraman included.',
+    description: 'Minimum 3 cameras. Broadcast audio. 2 studio operators included.',
     heroImage: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg',
     photos: ['/studio-images/enhanced-encore-podcast-wide-v20260510.jpg'],
-    includes: ['3-camera 4K setup', 'Broadcast microphones', 'Cameraman included', 'Hair & Makeup room', '6-12hr footage turnaround'],
+    includes: [PODCAST_CAMERA_LABEL, '4K recording', 'Broadcast microphones', PODCAST_CREW_LABEL, 'Hair & Makeup room', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
       'Have your talking points or outline ready.',
@@ -73,12 +76,12 @@ export const STUDIOS: Studio[] = [
   {
     id: 'sunset',
     name: 'Sunset',
-    price: 300,
+    price: PODCAST_HOURLY_RATES.sunset,
     tag: 'Creative Series',
-    description: 'Programmable color backdrop. Pick your mood. Cameraman included.',
+    description: 'Programmable color backdrop. Minimum 3 cameras and 2 studio operators included.',
     heroImage: '/studio-images/sunset-hero-v20260509.jpg',
     photos: ['/studio-images/sunset-hero-v20260509.jpg'],
-    includes: ['3-camera 4K setup', 'Broadcast microphones', 'Cameraman included', 'Programmable color backdrop', 'Two leather sofas', '6-12hr footage turnaround'],
+    includes: [PODCAST_CAMERA_LABEL, '4K recording', 'Broadcast microphones', PODCAST_CREW_LABEL, 'Programmable color backdrop', 'Two leather sofas', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
       "Pick your backdrop color before you arrive and we'll have it set.",
@@ -90,12 +93,12 @@ export const STUDIOS: Studio[] = [
   {
     id: 'parlor',
     name: 'Parlor',
-    price: 400,
+    price: PODCAST_HOURLY_RATES.parlor,
     tag: 'Premium',
-    description: 'Premium interview setup. Chesterfield seating. Full crew included.',
+    description: 'Premium interview setup. Chesterfield seating. Minimum 3 cameras and 2 studio operators included.',
     heroImage: '/studio-images/parlor-production-v20260509.jpg',
     photos: ['/studio-images/parlor-hero.jpg', '/studio-images/parlor-side-v20260509.jpg', '/studio-images/parlor-angled-v20260509.jpg'],
-    includes: ['Custom setup', 'Full 4K production', 'Cameraman + producer', 'Chesterfield seating', '6-12hr footage turnaround'],
+    includes: ['Custom setup', PODCAST_CAMERA_LABEL, '4K recording', PODCAST_CREW_LABEL, 'Chesterfield seating', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
       'Schedule a strategy call before your session.',
@@ -107,12 +110,12 @@ export const STUDIOS: Studio[] = [
   {
     id: 'horizon',
     name: 'Horizon',
-    price: 400,
+    price: PODCAST_HOURLY_RATES.horizon,
     tag: 'Premium',
-    description: 'Immersive setup. Warm sunset environment. Full crew included.',
+    description: 'Immersive sunset environment. Minimum 3 cameras and 2 studio operators included.',
     heroImage: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg',
     photos: ['/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg', '/studio-images/enhanced-horizon-orange-guest-closeup-v20260510.jpg', '/studio-images/enhanced-horizon-warm-guest-closeup-v20260510.jpg'],
-    includes: ['Custom setup', 'Full 4K production', 'Cameraman + producer', 'Curated sunset environment', '6-12hr footage turnaround'],
+    includes: ['Custom setup', PODCAST_CAMERA_LABEL, '4K recording', PODCAST_CREW_LABEL, 'Curated sunset environment', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
       'Schedule a strategy call before your session.',
@@ -124,12 +127,12 @@ export const STUDIOS: Studio[] = [
   {
     id: 'canvas-podcast',
     name: 'Canvas Podcast',
-    price: 400,
+    price: PODCAST_HOURLY_RATES['canvas-podcast'],
     tag: 'Premium',
-    description: 'Custom LED backdrop podcast studio. Full crew included.',
+    description: 'Custom LED backdrop. Minimum 3 cameras and 2 studio operators included.',
     heroImage: '/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg',
     photos: ['/studio-images/enhanced-canvas-podcast-blue-stage-wide-v20260510.jpg', '/studio-images/enhanced-canvas-podcast-warm-panel-wide-v20260510.jpg', '/studio-images/enhanced-canvas-podcast-red-set-wide-v20260510.jpg'],
-    includes: ['Custom LED backdrop', '3-camera 4K setup', 'Broadcast microphones', 'Full crew included', 'Premium lighting', '6-12hr footage turnaround'],
+    includes: ['Custom LED backdrop', PODCAST_CAMERA_LABEL, '4K recording', 'Broadcast microphones', PODCAST_CREW_LABEL, 'Premium lighting', '6-12hr footage turnaround'],
     type: 'podcast',
     prep: [
       'Send your desired background color or brand direction ahead of time.',
@@ -146,7 +149,7 @@ export const STUDIOS: Studio[] = [
     description: '750 square feet. Floor-to-ceiling. Lighting grid.',
     heroImage: '/studio-images/inside-green-screen-v20260509.jpg',
     photos: ['/studio-images/inside-green-screen-v20260509.jpg', '/studio-images/greenscreen-wide.jpg'],
-    includes: ['750 sqft green screen', 'Full lighting grid', 'RED Komodo X available', 'Professional lighting', 'Floor-to-ceiling setup'],
+    includes: ['750 sqft green screen', 'Full lighting grid', 'RED Komodo X available by arrangement', 'Professional lighting', 'Floor-to-ceiling setup'],
     type: 'greenscreen',
     prep: [
       'Avoid wearing green or bright lime. It blends with the screen.',
@@ -163,7 +166,7 @@ export const STUDIOS: Studio[] = [
     description: 'Seamless white cyc wall. Overhead lighting grid.',
     heroImage: '/studio-images/inside-canvas-cyc-v20260509.jpg',
     photos: ['/studio-images/inside-canvas-cyc-v20260509.jpg', '/studio-images/enhanced-canvas-podcast-white-cyc-duo-v20260510.jpg', '/studio-images/canvas-rental-space-v20260509.jpg'],
-    includes: ['White cyc wall', 'Overhead lighting grid', 'Black floor mats', 'All equipment included'],
+    includes: ['White cyc wall', 'Overhead lighting grid', 'Black floor mats'],
     type: 'photo',
     prep: [
       'White backdrop works with almost any outfit. Avoid all-white.',

@@ -1,14 +1,19 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import { siteUrl } from '@/lib/seo/site'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_MINIMUM_CAMERAS, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
+
+const hourlyRate = PODCAST_HOURLY_RATES['encore']
+const pageDescription = `4K podcast production in San Francisco. ${PODCAST_CREW_LABEL}. ${PODCAST_CAMERA_LABEL}. $${hourlyRate}/hr. Open 24/7.`
 
 export const metadata: Metadata = {
   title: 'Encore Production Studio',
-  description: 'Vault Series. Full-scale production studio with dual green screens, 4K cinema cameras, and professional crew. $300/hr. Cameraman and audio tech included. Open 24/7.',
+  description: pageDescription,
   alternates: { canonical: `${siteUrl}/encore/` },
   openGraph: {
     title: 'Encore | VibeShack Studios SF',
-    description: 'Vault Series full-scale production studio with dual green screens and 4K cinema cameras. Cameraman and audio tech included. $300/hr in San Francisco.',
+    description: pageDescription,
     url: `${siteUrl}/encore`,
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/enhanced-encore-podcast-wide-v20260510.jpg', width: 1200, height: 630, alt: 'Encore at VibeShack Studios SF' }],
@@ -17,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Encore | VibeShack Studios SF',
-    description: 'Vault Series full-scale production studio with dual green screens and 4K cinema cameras. Cameraman and audio tech included. $300/hr in San Francisco.',
+    description: pageDescription,
     images: ['/studio-images/enhanced-encore-podcast-wide-v20260510.jpg'],
   },
 }
@@ -37,7 +42,7 @@ export default function EncorePage() {
             Encore<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8">
-            Dual green screens, two 4K cameras, broadcast audio, and crew for larger productions.
+            Dual green screens, at least {PODCAST_MINIMUM_CAMERAS} 4K cameras, broadcast audio, and crew for larger productions.
           </p>
           <a href="/book/?studio=encore" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book This Studio
@@ -57,9 +62,9 @@ export default function EncorePage() {
               </h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {[
-                  'Dual 4K cinema cameras',
+                  PODCAST_CAMERA_LABEL,
                   'Dual green screens, independent control',
-                  'Cameraman and audio tech included',
+                  PODCAST_CREW_LABEL,
                   'Professional audio kit with wireless',
                   'Kino Flo lighting for large spaces',
                   'Professional color grading setup',
@@ -72,7 +77,7 @@ export default function EncorePage() {
             </div>
             {/* Right: Full Room Photo */}
             <div>
-              <Image src="/studio-images/encore-production.jpg" alt="Encore studio in full production mode, VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg" />
+              <ZoomableImage src="/studio-images/encore-production.jpg" alt="Encore studio in full production mode, VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -91,11 +96,11 @@ export default function EncorePage() {
             {/* Detail 1: Image Left, Text Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/enhanced-encore-podcast-wide-v20260510.jpg" alt="Encore studio wide view with cinema lighting" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/enhanced-encore-podcast-wide-v20260510.jpg" alt="Encore studio wide view with cinema lighting" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Two Stages, One Shoot</h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-4">Dual green screens mean you're not locked into one setup. Shoot product on one screen. Have your host on the other. Cut between locations. No second take, no lighting reset. One camera can go tight, the other pulls back. Your editor has actual choices.</p>
+                <p className="text-gray-400 text-lg leading-relaxed mb-4">Dual green screens mean you're not locked into one setup. Shoot product on one screen. Have your host on the other. Cut between locations. No second take, no lighting reset. At least {PODCAST_MINIMUM_CAMERAS} cameras cover close-ups and wider angles. Your editor has actual choices.</p>
                 <p className="text-gray-400 text-lg leading-relaxed">We've seen people waste half their time wrestling with single-screen shows. Encore gives you the flexibility to plan the shoot you actually want, not the shoot the room allows.</p>
               </div>
             </div>
@@ -108,7 +113,7 @@ export default function EncorePage() {
                 <p className="text-gray-400 text-lg leading-relaxed">No gels, no filters, no guessing. What you see on set is what you get in post. The crew knows how to light for your show's style, but if you want to direct the lights yourself, you can.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/encore-close.jpg" alt="Encore studio detail, professional lighting and production equipment" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/encore-close.jpg" alt="Encore studio detail, professional lighting and production equipment" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
             </div>
           </div>
@@ -119,14 +124,14 @@ export default function EncorePage() {
       <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
-          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>$300</div>
+          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>${hourlyRate}</div>
           <p className="text-gray-500 text-lg mb-1">per hour</p>
-          <p className="text-white font-semibold mb-12">Cameraman and audio tech included. 1 hour minimum. Open 24/7.</p>
+          <p className="text-white font-semibold mb-12">{PODCAST_PACKAGE_SUMMARY} 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
-              { label: '2 Hours', price: '$600' },
-              { label: '4 Hours', price: '$1,200' },
-              { label: '8 Hours', price: '$2,400' },
+              { label: '2 Hours', price: `$${(hourlyRate * 2).toLocaleString('en-US')}` },
+              { label: '4 Hours', price: `$${(hourlyRate * 4).toLocaleString('en-US')}` },
+              { label: '8 Hours', price: `$${(hourlyRate * 8).toLocaleString('en-US')}` },
             ].map(({ label, price }) => (
               <div key={label} className="flex items-center justify-between py-4">
                 <span className="text-gray-400 text-sm">{label}</span>
@@ -148,7 +153,7 @@ export default function EncorePage() {
           <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0 }}>
             Ready to <span className="text-brand-red">Record?</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10">$300/hr. Cameraman and audio tech included.</p>
+          <p className="text-gray-500 text-lg mb-10">${hourlyRate}/hr. {PODCAST_CREW_LABEL}.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="/book/?studio=encore" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session

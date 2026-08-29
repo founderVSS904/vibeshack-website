@@ -70,10 +70,10 @@ export default function TermsProfessionalPage() {
             <p>The Studio provides access to professional production spaces, equipment, and optional support services. The Studio consists of multiple distinct studios, each configured for specific production types.</p>
             
             <h3>2.2 Equipment Provision</h3>
-            <p>All Equipment is provided as part of your rental, including studio cameras, lighting systems, microphones, audio interfaces, green screen, cyc walls, and miscellaneous production gear.</p>
+            <p>Equipment included with your rental is described in the selected studio package. Every podcast booking includes a minimum of 3 cameras. The teleprompter is an optional add-on, billed separately at $50/hr for the booked session duration.</p>
             
             <h3>2.3 Optional Services</h3>
-            <p>Additional services are available for additional fees: cameraman/camera operation, audio engineering, teleprompter operation, editing consultation, hair &amp; makeup facilities, and crew assistance. Optional services are provided on a first-come, first-served basis. Availability is not guaranteed.</p>
+            <p>Every podcast booking includes 2 studio operators. Services beyond the selected package, including additional production support, are available by arrangement and may carry additional fees. These optional services require separate confirmation.</p>
             
             <h3>2.4 Service Limitations</h3>
             <p><strong>The Studio operates as a rental facility, not a full-service production house.</strong></p>

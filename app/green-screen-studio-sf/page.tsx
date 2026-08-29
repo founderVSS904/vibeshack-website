@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
 
@@ -58,7 +59,7 @@ const specs = [
   { label: 'Load-in', detail: 'Ground-level, street parking + loading zone' },
   { label: 'Rigging Points', detail: 'Available for hanging elements' },
   { label: 'On-site Support', detail: 'Available on request' },
-  { label: 'Live Streaming', detail: 'Add-on available, $100/hr' },
+  { label: 'Live Streaming', detail: 'Available by arrangement' },
 ]
 
 const faqs = [
@@ -75,7 +76,7 @@ const faqs = [
   {
     question: 'Do I need to bring my own camera?',
     answer:
-      'You can bring your own, or add a Camera Operator for $50/hr. We also offer a Ready-to-Shoot package with everything pre-configured.',
+      'Bring your own camera package, or contact us before booking to arrange camera operation and a ready-to-shoot setup. These services are available by arrangement.',
   },
   {
     question: 'What is the load-in process?',
@@ -85,7 +86,7 @@ const faqs = [
   {
     question: 'Can I use the green screen for live streaming?',
     answer:
-      'Yes. Live switching and streaming add-on is available for $100/hr. We handle the technical switching so you focus on your content.',
+      'Yes. Live switching and streaming are available by arrangement. Contact us before booking to confirm the setup and production support.',
   },
 ]
 
@@ -231,12 +232,12 @@ export default function GreenScreenPage() {
               { src: '/studio-images/greenscreen-empty.jpg',   alt: 'Green screen studio empty stage ready for production, VibeShack Studios San Francisco' },
             ].map(({ src, alt }) => (
               <div key={src} className="overflow-hidden rounded-lg relative" style={{height: '220px'}}>
-                <Image src={src} alt={alt} fill sizes="100vw" className="object-cover" />
+                <ZoomableImage src={src} alt={alt} fill sizes="100vw" className="object-cover" />
               </div>
             ))}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-            <Image
+            <ZoomableImage
                 src="/studio-images/greenscreen-wide.jpg"
                 alt="Green Screen Studio with professional overhead lighting grid, VibeShack Studios San Francisco"
                 width={800}

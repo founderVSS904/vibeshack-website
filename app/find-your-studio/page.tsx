@@ -1,95 +1,27 @@
 'use client'
-import { useState, useEffect } from 'react'
+
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import Image from 'next/image'
-import { STUDIOS as CATALOG_STUDIOS } from '@/lib/booking/catalog'
+import { STUDIOS, type Studio } from '@/lib/booking/catalog'
+import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
+import {
+  getStudioFinderContactHref,
+  getStudioFinderBookingHref,
+  getStudioFinderMatches,
+  getStudioFinderSetup,
+  parseOnCameraCount,
+  VERIFIED_ON_CAMERA_CAPACITY,
+  type StudioFinderAnswers,
+  type StudioFinderFormat,
+} from '@/lib/booking/studio-finder'
 
-type Recommendation = { primary: string; others: string[]; reason: string }
-type StudioCard = {
-  id: string
-  name: string
-  price: number
-  priceLabel?: string
-  img: string
-  href: string
-  desc: string
-  series?: string
-}
-
-const QUESTIONS = [
-  {
-    id: 'format',
-    question: 'What are you making?',
-    options: [
-      { id: 'podcast',     label: 'Podcast or interview' },
-      { id: 'video',       label: 'Video content or film' },
-      { id: 'photo',       label: 'Photo shoot' },
-      { id: 'greenscreen', label: 'Green screen production' },
-      { id: 'notsure',     label: 'Not sure yet' },
-    ],
-  },
-  {
-    id: 'size',
-    // Label changes based on format, set dynamically in component
-    question: 'How many people are involved?',
-    options: [
-      { id: 'solo',  label: 'Only me' },
-      { id: 'two',   label: 'Two to five' },
-      { id: 'small', label: 'Six to twenty' },
-      { id: 'large', label: 'More than twenty' },
-    ],
-  },
-  {
-    id: 'crew',
-    question: 'Are you bringing your own crew?',
-    options: [
-      { id: 'yes', label: 'Yes, we have crew' },
-      { id: 'no',  label: 'No, we need VibeShack' },
-    ],
-  },
+const FORMATS: { id: StudioFinderFormat; label: string }[] = [
+  { id: 'podcast', label: 'Podcast or interview' },
+  { id: 'video', label: 'Video content or film' },
+  { id: 'photo', label: 'Photo shoot' },
+  { id: 'greenscreen', label: 'Green screen production' },
+  { id: 'notsure', label: 'Not sure yet' },
 ]
-
-const RECOMMENDATIONS: Record<string, Recommendation> = {
-  'podcast-solo-no':        { primary: 'sunset',          others: ['encore', 'the-executive'],      reason: 'Best for a solo host who wants a polished look without bringing a production team.' },
-  'podcast-two-no':         { primary: 'the-executive',   others: ['the-wing', 'parlor'],           reason: 'A clean two-person interview layout with cameras, audio, lighting, and operator handled.' },
-  'podcast-small-no':       { primary: 'canvas-podcast',  others: ['parlor', 'horizon'],            reason: 'A stronger fit when you need more control over layout, backdrop, talent, and camera lanes.' },
-  'podcast-large-no':       { primary: 'green-screen',    others: ['canvas-rental', 'canvas-podcast'], reason: 'Large podcast productions need floor space first. Start here, then let us shape the setup.' },
-  'podcast-solo-yes':       { primary: 'encore',          others: ['sunset', 'the-executive'],      reason: 'A controlled room for a solo show when your team wants to run the session.' },
-  'podcast-two-yes':        { primary: 'the-wing',        others: ['the-executive', 'parlor'],      reason: 'Intimate, focused, and easy for a lean crew to operate around.' },
-  'podcast-small-yes':      { primary: 'canvas-podcast',  others: ['parlor', 'horizon'],            reason: 'Flexible enough for extra guests, crew, brand visuals, and a more produced podcast look.' },
-  'podcast-large-yes':      { primary: 'canvas-rental',   others: ['green-screen', 'canvas-podcast'], reason: 'The most sensible starting point when your own crew needs space to build a larger setup.' },
-  'video-solo-no':          { primary: 'sunset',          others: ['canvas-rental', 'horizon'],     reason: 'Strong on-camera look, simple setup, and VibeShack can handle the production flow.' },
-  'video-two-no':           { primary: 'sunset',          others: ['the-executive', 'parlor'],      reason: 'A polished choice for interviews, explainers, social content, and brand videos.' },
-  'video-small-no':         { primary: 'horizon',         others: ['canvas-podcast', 'green-screen'], reason: 'Premium visual control with room for a small team and a more intentional production.' },
-  'video-large-no':         { primary: 'green-screen',    others: ['sunset'],         reason: 'The 750 sqft floor gives a larger crew space to stage, light, and block.' },
-  'video-solo-yes':         { primary: 'canvas-rental',   others: ['green-screen'],   reason: 'A pre-lit room with a seamless white cyc and an overhead lighting grid. Your crew can start shooting on arrival.' },
-  'video-two-yes':          { primary: 'canvas-rental',   others: ['green-screen'],   reason: 'A clean two-person setup on the white cyc that your own crew can run without fighting the room.' },
-  'video-small-yes':        { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Room for a small crew and talent to work without resets.' },
-  'video-large-yes':        { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'The safest fit for larger crews, wide shots, lighting control, and flexible blocking.' },
-  'photo-solo-no':          { primary: 'photo-services',  others: ['canvas-rental'],  reason: 'Start with Photo Services when you need VibeShack to help plan or produce headshots, portraits, product shots, or campaign stills.' },
-  'photo-two-no':           { primary: 'photo-services',  others: ['canvas-rental'],  reason: 'A scoped photo request is the right first step when you need help with the shoot, not the room alone.' },
-  'photo-small-no':         { primary: 'photo-services',  others: ['canvas-rental'],  reason: 'Photo Services can match the shoot to the right room, lighting plan, and production flow before you book space.' },
-  'photo-large-no':         { primary: 'photo-services',  others: ['canvas-rental', 'green-screen'], reason: 'For larger photo productions, start with a scoped request so the room, staging, crew, and shot list fit the real footprint.' },
-  'photo-solo-yes':         { primary: 'canvas-rental',   others: ['green-screen'],   reason: 'Bring your photographer into a seamless white cyc that is already lit and ready to shoot.' },
-  'photo-two-yes':          { primary: 'canvas-rental',   others: ['green-screen'],   reason: 'The white cyc and overhead lighting grid give you a controlled setup for portraits, product, and two-person shoots.' },
-  'photo-small-yes':        { primary: 'canvas-rental',   others: ['green-screen'],   reason: 'More floor space for your photographer, stylist, props, and talent.' },
-  'photo-large-yes':        { primary: 'canvas-rental',   others: ['green-screen'],   reason: 'Best for groups, motion, larger sets, and crews that need room to work.' },
-  'greenscreen-solo-no':    { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Full green screen coverage, pre-rigged lighting, and enough space to separate talent from background.' },
-  'greenscreen-two-no':     { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Full wall, lighting grid, and the right setup for clean keying.' },
-  'greenscreen-small-no':   { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Plenty of room for talent, camera, lights, and a compact production team.' },
-  'greenscreen-large-no':   { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'The only choice here when you need full green coverage and production space.' },
-  'greenscreen-solo-yes':   { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Your crew gets the full 750 sqft green screen room and pre-rigged lighting grid.' },
-  'greenscreen-two-yes':    { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'A clean chroma setup with enough space to operate cameras and lights properly.' },
-  'greenscreen-small-yes':  { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Space for crew, talent, camera lanes, and proper background separation.' },
-  'greenscreen-large-yes':  { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'The larger green screen stage leaves room for talent, camera movement, and lighting.' },
-  'notsure-solo-no':        { primary: 'the-executive',   others: ['sunset', 'canvas-rental'], reason: 'Start with a tour. We can show you what changes when the goal is podcast, video, or photo.' },
-  'notsure-two-no':         { primary: 'the-executive',   others: ['parlor', 'canvas-rental'], reason: 'Start with a tour and we will match the room to your format, crew, and final deliverables.' },
-  'notsure-small-no':       { primary: 'canvas-podcast',  others: ['horizon', 'green-screen'], reason: 'Start with a tour because setup choice matters more once guests, crew, and gear increase.' },
-  'notsure-large-no':       { primary: 'green-screen',    others: ['canvas-rental', 'canvas-podcast'], reason: 'For larger productions, tour first so the studio choice matches the real footprint.' },
-  'notsure-solo-yes':       { primary: 'canvas-rental',   others: ['sunset', 'green-screen'], reason: 'Tour first, then choose between the pre-lit white cyc and a more produced podcast or video set.' },
-  'notsure-two-yes':        { primary: 'the-executive',   others: ['canvas-rental'], reason: 'Tour first so your team can compare the controlled rooms against the open rental spaces.' },
-  'notsure-small-yes':      { primary: 'canvas-rental',   others: ['green-screen', 'canvas-podcast'], reason: 'A tour will help decide whether you need open floor space or a fully produced room.' },
-  'notsure-large-yes':      { primary: 'green-screen',    others: ['canvas-rental'],  reason: 'Tour first. Larger shoots are about space, staging, crew movement, and lighting control.' },
-}
 
 const STUDIO_HREFS: Record<string, string> = {
   'the-executive': '/the-executive/',
@@ -103,305 +35,245 @@ const STUDIO_HREFS: Record<string, string> = {
   'canvas-rental': '/canvas-rental/',
 }
 
-const STUDIO_ORDER = [
-  'the-executive',
-  'the-wing',
-  'encore',
-  'sunset',
-  'parlor',
-  'horizon',
-  'canvas-podcast',
-  'green-screen',
-  'canvas-rental',
-]
-
-const catalogById = CATALOG_STUDIOS.reduce<Record<string, (typeof CATALOG_STUDIOS)[number]>>((acc, studio) => {
-  acc[studio.id] = studio
-  return acc
-}, {})
-
-const STUDIOS = STUDIO_ORDER.reduce<Record<string, StudioCard>>((acc, id) => {
-  const studio = catalogById[id]
-  if (!studio) return acc
-  acc[id] = {
-    id,
-    name: studio.name,
-    price: studio.price,
-    img: studio.heroImage,
-    href: STUDIO_HREFS[id],
-    desc: studio.description,
-    series: studio.tag || undefined,
-  }
-  return acc
-}, {})
-
-STUDIOS['photo-services'] = {
-  id: 'photo-services',
-  name: 'Photo Services',
-  price: 0,
-  priceLabel: 'Contact us',
-  img: '/studio-images/enhanced-photography-cyc-fashion-black-curtain-v20260716.jpg',
-  href: '/photo-services/',
-  desc: 'Photoshoots, headshots, portraits, products, and campaign stills.',
-  series: 'Services',
-}
-
 const STUDIO_GROUPS = [
   { title: 'Signature Podcast Sets · $400/hr', ids: ['parlor', 'horizon', 'canvas-podcast'] },
   { title: 'Podcast Studios · $300/hr', ids: ['the-executive', 'the-wing', 'encore', 'sunset'] },
   { title: 'Rental Studios · $100/hr', ids: ['green-screen', 'canvas-rental'] },
 ]
 
-function getQuestionText(currentQ: number, answers: Record<string, string>) {
-  if (currentQ === 1 && answers.format === 'podcast') return 'How many people on camera?'
-  if (currentQ === 1 && (answers.format === 'photo' || answers.format === 'greenscreen')) return 'How large is your production?'
-  if (currentQ === 2 && answers.format === 'podcast') return 'Are you bringing your own crew?'
-  if (currentQ === 2 && answers.format === 'photo') return 'Are you bringing your own photographer or crew?'
-  if (currentQ === 2 && answers.format === 'greenscreen') return 'Are you bringing your own production crew?'
-  return QUESTIONS[currentQ].question
-}
+const primaryButton = 'inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3.5 text-sm font-bold text-black transition-colors hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white'
+const secondaryButton = 'inline-flex items-center justify-center gap-2 rounded-lg border border-white/25 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:border-white/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white'
 
-function getQuestionOptions(currentQ: number, answers: Record<string, string>) {
-  if (currentQ !== 2) return QUESTIONS[currentQ].options
-  if (answers.format === 'podcast' || answers.format === 'video') {
-    return [
-      { id: 'yes', label: 'Yes, we have crew' },
-      { id: 'no', label: 'No, handle it for us' },
-    ]
-  }
-  return QUESTIONS[currentQ].options
+function StudioCard({ studio, capacityLabel = false }: { studio: Studio; capacityLabel?: boolean }) {
+  const capacity = VERIFIED_ON_CAMERA_CAPACITY[studio.id]
+  return (
+    <a href={STUDIO_HREFS[studio.id]} className="group block overflow-hidden rounded-lg border border-white/10 bg-white/[0.025] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+      <div className="relative h-[170px] overflow-hidden">
+        <Image src={studio.heroImage} alt={studio.name} fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.035]" />
+      </div>
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="text-sm font-bold text-white">{studio.name}</h3>
+          <p className="shrink-0 text-sm font-bold text-white">${studio.price}/hr</p>
+        </div>
+        <p className="mt-2 text-xs leading-relaxed text-white/65">{studio.description}</p>
+        {capacityLabel && capacity !== null && capacity !== undefined && (
+          <p className="mt-3 text-xs text-white/75">{studio.id === 'the-executive' ? 'Up to 3 in armchairs without a desk. Desk layouts seat 1 or 2.' : `Verified for up to ${capacity} people on camera`}</p>
+        )}
+      </div>
+    </a>
+  )
 }
 
 export default function FindYourStudioPage() {
-  const [answers, setAnswers]   = useState<Record<string, string>>({})
-  const [currentQ, setCurrentQ] = useState(0)
-  const [done, setDone]         = useState(false)
-  const [selecting, setSelecting] = useState<string | null>(null)
+  const [format, setFormat] = useState<StudioFinderFormat | null>(null)
+  const [countValue, setCountValue] = useState('')
+  const [countUnknown, setCountUnknown] = useState(false)
+  const [bringingCrew, setBringingCrew] = useState<boolean | null>(null)
+  const [currentQuestion, setCurrentQuestion] = useState(0)
+  const [done, setDone] = useState(false)
+  const [countError, setCountError] = useState('')
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const interactedRef = useRef(false)
 
-  // Reset quiz state whenever the page is navigated to
   useEffect(() => {
-    setAnswers({})
-    setCurrentQ(0)
-    setDone(false)
-    setSelecting(null)
-  }, [])
+    if (!interactedRef.current) return
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    headingRef.current?.focus({ preventScroll: true })
+  }, [currentQuestion, done])
 
-  function answer(questionId: string, optionId: string) {
-    setSelecting(optionId)
-    setTimeout(() => {
-      const newAnswers = { ...answers, [questionId]: optionId }
-      setAnswers(newAnswers)
-      setSelecting(null)
-      if (currentQ < QUESTIONS.length - 1) {
-        setCurrentQ(currentQ + 1)
-      } else {
-        setDone(true)
-      }
-    }, 180)
+  function chooseFormat(value: StudioFinderFormat) {
+    interactedRef.current = true
+    setFormat(value)
+    setCountValue('')
+    setCountUnknown(false)
+    setBringingCrew(null)
+    setCountError('')
+    setCurrentQuestion(1)
+  }
+
+  function submitCount(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!format || parseOnCameraCount(countValue, format) === null) {
+      setCountError(`Enter a whole number from ${format === 'podcast' ? 1 : 0} to 999, or choose “I’m not sure yet.”`)
+      return
+    }
+    setCountUnknown(false)
+    setCountError('')
+    setCurrentQuestion(2)
+  }
+
+  function chooseCrew(value: boolean) {
+    setBringingCrew(value)
+    setDone(true)
   }
 
   function reset() {
-    setAnswers({}); setCurrentQ(0); setDone(false); setSelecting(null)
+    setFormat(null)
+    setCountValue('')
+    setCountUnknown(false)
+    setBringingCrew(null)
+    setCountError('')
+    setCurrentQuestion(0)
+    setDone(false)
   }
 
-  const recKey = done ? `${answers.format}-${answers.size}-${answers.crew}` : null
-  const rec     = recKey ? (RECOMMENDATIONS[recKey] || RECOMMENDATIONS['notsure-solo-no']) : null
-  const primary = rec ? STUDIOS[rec.primary] : null
-  const questionText = getQuestionText(currentQ, answers)
-  const questionOptions = getQuestionOptions(currentQ, answers)
-  const otherStudios = rec?.others
-    .map((id) => STUDIOS[id])
-    .filter((studio): studio is StudioCard => !!studio && studio.id !== primary?.id) ?? []
-  const shouldTourFirst = done && answers.format === 'notsure'
-  const isPhotoServicesMatch = primary?.id === 'photo-services'
-  const primaryCtaHref = isPhotoServicesMatch
-    ? '/contact/?service=photo-services'
-    : shouldTourFirst
-      ? `/tour/?studio=${rec?.primary}`
-      : `/book/?studio=${rec?.primary}`
+  const answers: StudioFinderAnswers | null = done && format && bringingCrew !== null
+    ? { format, peopleOnCamera: countUnknown ? null : parseOnCameraCount(countValue, format), bringingCrew }
+    : null
+  const matches = answers ? getStudioFinderMatches(answers) : []
+  const primary = matches[0]
+  const primarySetup = primary && answers ? getStudioFinderSetup(primary.id, answers) : undefined
+  const otherStudios = matches.slice(1)
+  const inquiryHref = answers ? getStudioFinderContactHref(answers) : '/contact/#project-inquiry'
+  const photoService = format === 'photo' && bringingCrew === false
+  const videoService = format === 'video' && bringingCrew === false
+  const question = currentQuestion === 0
+    ? 'What are you making?'
+    : currentQuestion === 1
+      ? 'How many people will be on camera at once?'
+      : format === 'photo'
+        ? 'Are you bringing your own photographer or crew?'
+        : 'Are you bringing your own crew?'
 
   return (
     <div className="min-h-screen bg-black">
-
       {!done ? (
-        /* ── QUESTION VIEW ── */
-        <div className="min-h-screen flex flex-col">
-
-          {/* Thin progress line at very top */}
-          <div className="h-[2px] bg-white/5 fixed top-0 left-0 right-0 z-50">
-            <div className="h-full w-full origin-left bg-brand-red transition-transform duration-500 ease-out"
-              style={{transform: `scaleX(${currentQ / QUESTIONS.length})`}} />
+        <div className="flex min-h-screen flex-col">
+          <div className="fixed inset-x-0 top-0 z-50 h-[2px] bg-white/5" aria-hidden="true">
+            <div className="h-full w-full origin-left bg-brand-red transition-transform duration-300" style={{ transform: `scaleX(${currentQuestion / 3})` }} />
           </div>
-
-          <div className="flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full px-6 sm:px-10 pt-32 pb-20">
-
-            {/* Step label */}
-            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-700 mb-8">
-              {currentQ + 1} of {QUESTIONS.length}
-            </p>
-
-            {/* Question, context-aware label for Q2 */}
-            <h1 className="text-white font-black mb-16"
-              style={{fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', letterSpacing: 0, lineHeight: 1.05}}>
-              {questionText}
+          <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 pb-20 pt-32 sm:px-10">
+            <p className="mb-8 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-white/55">{currentQuestion + 1} of 3</p>
+            <h1 ref={headingRef} tabIndex={-1} className="mb-10 font-black text-white outline-none" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.05 }}>
+              {question}
             </h1>
 
-            {/* Options: clean text rows, no boxes */}
-            <div className="space-y-0">
-              {questionOptions.map((opt, i) => (
-                <button key={opt.id} onClick={() => answer(QUESTIONS[currentQ].id, opt.id)}
-                  className={`w-full text-left py-5 border-b flex items-center justify-between group transition-colors duration-150 ${
-                    selecting === opt.id
-                      ? 'border-brand-red'
-                      : i === 0 ? 'border-t border-b border-white/[0.08]' : 'border-white/[0.08]'
-                  }`}>
-                  <span className={`font-semibold text-lg transition-colors duration-150 ${
-                    selecting === opt.id ? 'text-brand-red' : 'text-gray-300 group-hover:text-white'
-                  }`} style={{letterSpacing: 0}}>
-                    {opt.label}
-                  </span>
-                  <span className={`text-sm transition-colors duration-150 flex-shrink-0 ml-4 ${
-                    selecting === opt.id ? 'text-brand-red' : 'text-gray-700 group-hover:text-gray-400'
-                  }`}>→</span>
-                </button>
-              ))}
-            </div>
+            {currentQuestion === 1 ? (
+              <form onSubmit={submitCount} noValidate>
+                <p id="people-on-camera-help" className="mb-7 max-w-lg text-sm leading-relaxed text-white/65">
+                  Count everyone who will appear in the shot at the same time, including hosts and guests. Do not include crew behind the camera.
+                  {format !== 'podcast' && ' Enter 0 for products or scenes without people.'}
+                </p>
+                <label htmlFor="people-on-camera" className="mb-3 block text-sm font-semibold text-white">People on camera</label>
+                <input
+                  id="people-on-camera"
+                  name="peopleOnCamera"
+                  type="number"
+                  inputMode="numeric"
+                  min={format === 'podcast' ? 1 : 0}
+                  max={999}
+                  step={1}
+                  value={countValue}
+                  onChange={(event) => { setCountValue(event.target.value); setCountError('') }}
+                  aria-describedby={`people-on-camera-help${countError ? ' people-on-camera-error' : ''}`}
+                  aria-invalid={!!countError}
+                  className="w-full max-w-[220px] rounded-lg border border-white/30 bg-white/5 px-5 py-4 text-2xl font-bold text-white outline-none focus:border-white"
+                  placeholder="e.g. 2"
+                />
+                {countError && <p id="people-on-camera-error" role="alert" className="mt-3 text-sm text-red-300">{countError}</p>}
+                <div className="mt-7 flex flex-wrap items-center gap-4">
+                  <button type="submit" className={primaryButton}>Continue <span aria-hidden="true">→</span></button>
+                  <button type="button" onClick={() => { setCountUnknown(true); setCountError(''); setCurrentQuestion(2) }} className="px-2 py-3 text-sm text-white/65 underline underline-offset-4 hover:text-white">
+                    I’m not sure yet
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div>
+                {currentQuestion === 2 && format === 'podcast' && <p className="mb-8 text-sm leading-relaxed text-white/65">{PODCAST_PACKAGE_SUMMARY} You can still bring your own team.</p>}
+                {(currentQuestion === 0 ? FORMATS : [
+                  { id: 'yes', label: format === 'photo' ? 'Yes, we have a photographer or crew' : 'Yes, we have crew' },
+                  { id: 'no', label: 'No, we need VibeShack' },
+                ]).map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => currentQuestion === 0 ? chooseFormat(option.id as StudioFinderFormat) : chooseCrew(option.id === 'yes')}
+                    className="group flex w-full items-center justify-between gap-4 border-b border-white/15 py-5 text-left first:border-t focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  >
+                    <span className="text-lg font-semibold text-white/80 transition-colors group-hover:text-white">{option.label}</span>
+                    <span aria-hidden="true" className="shrink-0 text-white/50 transition-colors group-hover:text-white">→</span>
+                  </button>
+                ))}
+              </div>
+            )}
 
-            {/* Back */}
-            {currentQ > 0 && (
-              <button onClick={() => setCurrentQ(currentQ - 1)}
-                className="mt-10 text-gray-700 hover:text-white text-sm transition-colors text-left">
+            {currentQuestion > 0 && (
+              <button onClick={() => { setCountError(''); setBringingCrew(null); setCurrentQuestion(currentQuestion - 1) }} className="mt-10 w-fit py-2 text-left text-sm text-white/60 transition-colors hover:text-white">
                 ← Back
               </button>
             )}
           </div>
         </div>
-
       ) : (
-        /* ── RESULT VIEW ── */
-        <div className="pt-32 pb-28 max-w-5xl mx-auto px-6 sm:px-10">
-
-          <div className="mb-14">
-            <button onClick={reset} className="flex items-center gap-2 text-gray-600 hover:text-white text-sm transition-colors mb-6">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
-              Find a different studio
-            </button>
-            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-4">Your match</p>
-            <h1 className="text-white font-black leading-none"
-              style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0}}>
-              {primary?.name}
+        <div className="mx-auto max-w-5xl px-6 pb-28 pt-32 sm:px-10">
+          <div className="mb-10">
+            <button onClick={reset} className="mb-6 flex items-center gap-2 py-2 text-sm text-white/60 transition-colors hover:text-white">← Find a different studio</button>
+            <p className="mb-4 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-white/55">{primary ? 'Verified fit' : 'Confirm your setup'}</p>
+            <h1 ref={headingRef} tabIndex={-1} className="font-black leading-none text-white outline-none" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)' }}>
+              {primary?.name || (photoService ? 'Let’s plan your photo shoot.' : videoService ? 'Let’s plan your production.' : 'Let’s confirm your setup.')}
             </h1>
+            <p className="mt-5 text-sm text-white/65">
+              {FORMATS.find((option) => option.id === format)?.label} · {answers?.peopleOnCamera === null ? 'On-camera count to be confirmed' : `${answers?.peopleOnCamera} ${answers?.peopleOnCamera === 1 ? 'person' : 'people'} on camera`}
+            </p>
           </div>
 
-          {/* Primary studio hero */}
-          {primary && (
-            <a href={primary.href}
-              className="block rounded-lg overflow-hidden mb-4 group relative h-[340px] sm:h-[420px]">
-              <Image src={primary.img} alt={primary.name}
-                fill sizes="100vw"
-                className="object-cover group-hover:scale-[1.035] transition-transform duration-700 ease-out"
-                priority />
-              <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 50%, transparent 80%)'}} />
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-white font-black text-2xl mb-1" style={{letterSpacing: 0}}>{primary.name}</p>
-                  <p className="text-gray-400 text-sm">{rec?.reason}</p>
-                </div>
-                <div className="sm:text-right flex-shrink-0 sm:ml-6">
-                  {primary.priceLabel ? (
-                    <p className="text-white font-black text-xl" style={{letterSpacing: 0}}>{primary.priceLabel}</p>
-                  ) : (
-                    <>
-                      <p className="text-white font-black text-2xl" style={{letterSpacing: 0}}>${primary.price}</p>
-                      <p className="text-gray-500 text-xs">/hr</p>
-                    </>
-                  )}
-                </div>
-              </div>
-            </a>
-          )}
-
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-3 mb-16">
-            {primary && (
-              <a href={primaryCtaHref}
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-black font-bold text-sm rounded-lg hover:bg-gray-100 transition-colors">
-                {isPhotoServicesMatch ? 'Start a photo request' : shouldTourFirst ? 'Book a free tour' : 'Book this studio'}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                </svg>
+          {primary ? (
+            <div className="mb-7 overflow-hidden rounded-lg border border-white/10">
+              <a href={STUDIO_HREFS[primary.id]} className="group relative block h-[280px] overflow-hidden sm:h-[420px]">
+                <Image src={primarySetup?.image || primary.heroImage} alt={primarySetup?.alt || primary.name} fill sizes="(min-width: 1024px) 960px, 100vw" className={`${primarySetup ? 'object-contain' : 'object-cover'} transition-transform duration-500 group-hover:scale-[1.035]`} priority />
               </a>
-            )}
-            <a href={isPhotoServicesMatch ? '/photo-services/' : shouldTourFirst ? '/pricing/' : `/tour/?studio=${rec?.primary}`}
-              className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/20 text-white text-sm font-semibold rounded-lg hover:border-white/40 transition-colors">
-              {isPhotoServicesMatch ? 'See Photo Services' : shouldTourFirst ? 'View pricing' : 'Book a free tour'}
-            </a>
-            <button onClick={reset}
-              className="px-6 py-3.5 text-gray-600 hover:text-white text-sm transition-colors">
-              Start over
-            </button>
-          </div>
-
-          {otherStudios.length > 0 && (
-            <div className="mb-16">
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-4">Also consider</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {otherStudios.map((s) => (
-                  <a key={s.id} href={s.href}
-                    className="block rounded-lg overflow-hidden group">
-                    <div className="relative h-[170px]">
-                      <Image src={s.img} alt={s.name}
-                        fill sizes="100vw"
-                        className="object-cover group-hover:scale-[1.035] transition-transform duration-700 ease-out" />
-                      <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 62%)'}} />
-                      <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 flex items-end justify-between gap-4">
-                        <div>
-                          <p className="text-white font-bold text-sm">{s.name}</p>
-                          <p className="text-gray-400 text-xs">{s.desc}</p>
-                        </div>
-                        <p className="text-white font-black text-sm flex-shrink-0">{s.priceLabel || `$${s.price}/hr`}</p>
-                      </div>
-                    </div>
-                  </a>
-                ))}
+              <div className="flex flex-col gap-4 bg-white/[0.025] p-6 sm:flex-row sm:items-start sm:justify-between sm:p-8">
+                <div>
+                  <p className="font-semibold text-white">{primary.id === 'the-executive' ? 'Seats 3 in the armchair setup, without a desk. Desk setups seat 1 or 2.' : `Verified for up to ${VERIFIED_ON_CAMERA_CAPACITY[primary.id]} people on camera.`}</p>
+                  {primary.type === 'podcast' && <p className="mt-2 text-sm leading-relaxed text-white/65">{PODCAST_PACKAGE_SUMMARY}</p>}
+                  <p className="mt-2 text-xs leading-relaxed text-white/50">For extra off-camera crew, equipment, or a custom layout, confirm the full setup with us first.</p>
+                </div>
+                <p className="shrink-0 text-2xl font-black text-white">${primary.price}<span className="text-sm font-normal text-white/60">/hr</span></p>
               </div>
+            </div>
+          ) : (
+            <div className="mb-7 max-w-3xl rounded-lg border border-white/15 bg-white/[0.025] p-6 sm:p-8">
+              <p className="text-base leading-relaxed text-white/80">
+                {photoService || videoService
+                  ? 'We’ll match your project with the right studio and production support. Send us your details so we can confirm the setup and space before you book.'
+                  : format === 'notsure'
+                    ? 'Tell us a little more about the project or come in for a tour. We’ll help you choose a room and confirm its on-camera capacity.'
+                    : 'We haven’t verified a room for this on-camera count yet. That doesn’t mean we can’t host your production. Let us confirm the capacity and setup before you book.'}
+              </p>
+              {format === 'podcast' && <p className="mt-4 text-sm leading-relaxed text-white/65">{PODCAST_PACKAGE_SUMMARY}</p>}
             </div>
           )}
 
-          {/* All Studios */}
-          <div>
-            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">All Studios</p>
-            {STUDIO_GROUPS.map((group) => {
-              const studios = group.ids
-                .map((id) => STUDIOS[id])
-                .filter((studio): studio is StudioCard => !!studio && studio.id !== primary?.id)
-
-              if (!studios.length) return null
-
-              return (
-                <div key={group.title} className="mb-12 last:mb-0">
-                  <p className="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-4">{group.title}</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {studios.map((s) => (
-                      <a key={s.id} href={s.href}
-                        className="block rounded-lg overflow-hidden group">
-                        <div className="relative h-[160px]">
-                          <Image src={s.img} alt={s.name}
-                            fill sizes="100vw"
-                            className="object-cover group-hover:scale-[1.035] transition-transform duration-700 ease-out" />
-                          <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 55%)'}} />
-                          <div className="absolute bottom-0 left-0 right-0 px-5 pb-3">
-                            <p className="text-white font-bold text-sm">{s.name}</p>
-                            <p className="text-gray-400 text-xs">{s.priceLabel || `$${s.price}/hr`} · {s.desc}</p>
-                          </div>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
+          <div className="mb-14 flex flex-wrap gap-3">
+            <a href={primary && answers ? getStudioFinderBookingHref(primary.id, answers) : inquiryHref} className={primaryButton}>
+              {primary ? 'Book this studio' : photoService ? 'Start a photo request' : videoService ? 'Start a production request' : 'Confirm my setup'} <span aria-hidden="true">→</span>
+            </a>
+            <a href={primary ? inquiryHref : '/tour/'} className={secondaryButton}>{primary ? 'Ask about my setup' : 'Book a free tour'}</a>
+            <button onClick={reset} className="px-4 py-3.5 text-sm text-white/60 transition-colors hover:text-white">Start over</button>
           </div>
+
+          {otherStudios.length > 0 && (
+            <section className="mb-16">
+              <h2 className="mb-5 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-white/60">Other verified fits</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {otherStudios.map((studio) => <StudioCard key={studio.id} studio={studio} capacityLabel />)}
+              </div>
+            </section>
+          )}
+
+          <section>
+            <h2 className="mb-3 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-white/60">Explore all studios</h2>
+            <p className="mb-8 max-w-2xl text-sm leading-relaxed text-white/55">These are all of our spaces, not additional capacity-checked recommendations. Ask us to confirm your setup before choosing a room outside your verified matches.</p>
+            {STUDIO_GROUPS.map((group) => (
+              <div key={group.title} className="mb-12 last:mb-0">
+                <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-white/60">{group.title}</h3>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {group.ids.map((id) => STUDIOS.find((studio) => studio.id === id)).filter((studio): studio is Studio => !!studio).map((studio) => <StudioCard key={studio.id} studio={studio} />)}
+                </div>
+              </div>
+            ))}
+          </section>
         </div>
       )}
     </div>

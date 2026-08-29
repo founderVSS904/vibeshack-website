@@ -1,15 +1,20 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
 import { studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
+
+const hourlyRate = PODCAST_HOURLY_RATES['horizon']
+const pageDescription = `Warm sunset podcast set in San Francisco. ${PODCAST_CREW_LABEL}. ${PODCAST_CAMERA_LABEL}. $${hourlyRate}/hr. Open 24/7.`
 
 export const metadata: Metadata = {
   title: 'Horizon Studio',
-  description: 'Curated sunset environment. Full 4K production. Cameraman included. Studio with ambient light control in San Francisco. $400/hr. Open 24/7.',
+  description: pageDescription,
   alternates: { canonical: `${siteUrl}/horizon/` },
   openGraph: {
     title: 'Horizon | VibeShack Studios SF',
-    description: 'Warm sunset backdrop with ambient light control and full 4K production. Cameraman included. $400/hr in San Francisco.',
+    description: pageDescription,
     url: `${siteUrl}/horizon`,
     siteName: 'VibeShack Studios',
     images: [{ url: '/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg', width: 1200, height: 630, alt: 'Horizon at VibeShack Studios SF' }],
@@ -18,17 +23,17 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Horizon | VibeShack Studios SF',
-    description: 'Warm sunset backdrop with ambient light control and full 4K production. Cameraman included. $400/hr in San Francisco.',
+    description: pageDescription,
     images: ['/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg'],
   },
 }
 
 const horizonServiceSchema = studioServiceSchema({
   name: 'Horizon Studio Rental in San Francisco',
-  description: 'Curated sunset podcast and video studio in San Francisco with full 4K production and crew included.',
+  description: pageDescription,
   url: `${siteUrl}/horizon/`,
   image: `${siteUrl}/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg`,
-  price: '400',
+  price: String(hourlyRate),
   serviceType: 'Creative Studio Rental',
 })
 
@@ -51,7 +56,7 @@ export default function HorizonPage() {
             Horizon<span className="text-brand-red">.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-xl mb-8">
-            Warm sunset set, flexible seating, broadcast audio, and full crew included.
+            Warm sunset set, flexible seating, and broadcast audio. {PODCAST_CREW_LABEL}.
           </p>
           <a href="/book/?studio=horizon" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
             Book This Studio
@@ -72,8 +77,8 @@ export default function HorizonPage() {
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {[
                   'Set layout tailored to the production',
-                  'Full 4K coverage from every angle',
-                  'Cameraman + producer included',
+                  PODCAST_CAMERA_LABEL,
+                  PODCAST_CREW_LABEL,
                   'Warm sunset backdrop with practical lighting',
                   'Broadcast mics tuned for the room',
                   'Ambient light control, dialed to your scene',
@@ -86,7 +91,7 @@ export default function HorizonPage() {
             </div>
             {/* Right: Photo */}
             <div>
-              <Image src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg" alt="Horizon warm sunset podcast setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg" />
+              <ZoomableImage src="/studio-images/enhanced-horizon-orange-podcast-wide-v20260510.jpg" alt="Horizon warm sunset podcast setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -104,7 +109,7 @@ export default function HorizonPage() {
           <div className="space-y-24">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/enhanced-horizon-orange-guest-closeup-v20260510.jpg" alt="Warm sunset backdrop and microphones in Horizon at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/enhanced-horizon-orange-guest-closeup-v20260510.jpg" alt="Warm sunset backdrop and microphones in Horizon at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Warm Color Without Compositing</h3>
@@ -115,12 +120,12 @@ export default function HorizonPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1">
-                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Camera and Producer Included</h3>
+                <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>{PODCAST_CREW_LABEL}</h3>
                 <p className="text-gray-400 text-lg leading-relaxed mb-4">The baseline camera, lighting, and audio setup is prepared before the session, then adjusted for the shot list and talent.</p>
                 <p className="text-gray-400 text-lg leading-relaxed">The crew monitors framing and sound while the interview or performance is underway.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/enhanced-horizon-warm-guest-closeup-v20260510.jpg" alt="Horizon warm production setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/enhanced-horizon-warm-guest-closeup-v20260510.jpg" alt="Horizon warm production setup at VibeShack Studios San Francisco" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
             </div>
           </div>
@@ -131,14 +136,14 @@ export default function HorizonPage() {
       <section className="py-32 bg-zinc-950 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
-          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>$400</div>
+          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>${hourlyRate}</div>
           <p className="text-gray-500 text-lg mb-1">per hour</p>
-          <p className="text-white font-semibold mb-12">Cameraman + producer included. 1 hour minimum. Open 24/7.</p>
+          <p className="text-white font-semibold mb-12">{PODCAST_PACKAGE_SUMMARY} 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
-              { label: '2 Hours', price: '$800' },
-              { label: '4 Hours', price: '$1,600' },
-              { label: '8 Hours', price: '$3,200' },
+              { label: '2 Hours', price: `$${(hourlyRate * 2).toLocaleString('en-US')}` },
+              { label: '4 Hours', price: `$${(hourlyRate * 4).toLocaleString('en-US')}` },
+              { label: '8 Hours', price: `$${(hourlyRate * 8).toLocaleString('en-US')}` },
             ].map(({ label, price }) => (
               <div key={label} className="flex items-center justify-between py-4">
                 <span className="text-gray-400 text-sm">{label}</span>
@@ -160,7 +165,7 @@ export default function HorizonPage() {
           <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0 }}>
             Ready to <span className="text-brand-red">Record?</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10">$400/hr. Cameraman + producer included. Instant confirmation.</p>
+          <p className="text-gray-500 text-lg mb-10">${hourlyRate}/hr. {PODCAST_CREW_LABEL}. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="/book/?studio=horizon" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session

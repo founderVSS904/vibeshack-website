@@ -7,7 +7,7 @@
     "build": "npm test && NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
     "start": "NODE_OPTIONS=\"--max-old-space-size=2048\" next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern .next --ignore-pattern node_modules",
-    "test": "tsx --test tests/**/*.test.ts",
+    "test": "tsx --import ./tests/register-css.cjs --test tests/**/*.test.ts",
     "seo:audit": "node scripts/seo-audit.mjs"
   },
   "dependencies": {

@@ -1,6 +1,10 @@
 import Image from 'next/image'
+import ZoomableImage from '@/components/media/ZoomableImage'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 import SunsetColorCarousel from './SunsetColorCarousel'
 import SunsetColorWheel, { type WheelSegment } from './SunsetColorWheel'
+
+const hourlyRate = PODCAST_HOURLY_RATES.sunset
 
 const colors = [
   { img: '/studio-images/sunset-red-v1775053057.jpg', name: 'Red' },
@@ -128,8 +132,8 @@ export default function SunsetPage() {
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {[
                   '12 programmable colors',
-                  '3-camera 4K setup',
-                  'Cameraman included',
+                  PODCAST_CAMERA_LABEL,
+                  PODCAST_CREW_LABEL,
                   'Wireless mic system',
                   'Broadcast lighting',
                   'Color matching for brands',
@@ -142,7 +146,7 @@ export default function SunsetPage() {
             </div>
             {/* Right: Photo */}
             <div>
-              <Image src="/studio-images/sunset-hero-v20260509.jpg" alt="Sunset studio setup" width={800} height={600} className="w-full h-auto rounded-lg" />
+              <ZoomableImage src="/studio-images/sunset-hero-v20260509.jpg" alt="Sunset studio setup" width={800} height={600} className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
@@ -161,7 +165,7 @@ export default function SunsetPage() {
             {/* Detail 1 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div className="order-1">
-                <Image src="/studio-images/sunset-detail-02.jpg" alt="Sunset warm orange tones" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/sunset-detail-02.jpg" alt="Sunset warm orange tones" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
               <div className="order-2">
                 <h3 className="text-white font-black text-3xl mb-6" style={{letterSpacing: 0}}>Warm Tones Make People Look Human</h3>
@@ -178,7 +182,7 @@ export default function SunsetPage() {
                 <p className="text-gray-500 text-sm">Music videos and comedy specials book this room for exactly this.</p>
               </div>
               <div className="order-1 md:order-2">
-                <Image src="/studio-images/sunset-detail-01.jpg" alt="Sunset bold red colors" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
+                <ZoomableImage src="/studio-images/sunset-detail-01.jpg" alt="Sunset bold red colors" width={800} height={600} className="w-full h-auto rounded-lg object-cover" />
               </div>
             </div>
           </div>
@@ -192,14 +196,14 @@ export default function SunsetPage() {
       <section className="py-32 bg-zinc-950 border-t border-white/5">
         <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16">
           <span className="number-label mb-12 block">Pricing</span>
-          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>$300</div>
+          <div className="text-brand-red font-black leading-none mb-2" style={{fontSize: 'clamp(5rem, 14vw, 10rem)', letterSpacing: 0}}>${hourlyRate}</div>
           <p className="text-gray-500 text-lg mb-1">per hour</p>
-          <p className="text-white font-semibold mb-12">Cameraman included. 1 hour minimum. Open 24/7.</p>
+          <p className="text-white font-semibold mb-12">{PODCAST_PACKAGE_SUMMARY} 1 hour minimum. Open 24/7.</p>
           <div className="divide-y divide-white/10 border-y border-white/10 mb-12">
             {[
-              { label: '2 Hours', price: '$600' },
-              { label: '4 Hours', price: '$1,200' },
-              { label: '8 Hours', price: '$2,400' },
+              { label: '2 Hours', price: `$${(hourlyRate * 2).toLocaleString('en-US')}` },
+              { label: '4 Hours', price: `$${(hourlyRate * 4).toLocaleString('en-US')}` },
+              { label: '8 Hours', price: `$${(hourlyRate * 8).toLocaleString('en-US')}` },
             ].map(({ label, price }) => (
               <div key={label} className="flex items-center justify-between py-4">
                 <span className="text-gray-400 text-sm">{label}</span>
@@ -231,7 +235,7 @@ export default function SunsetPage() {
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] mb-3 text-brand-red">Creative Series</p>
               <h3 className="text-white font-black leading-none mb-3" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: 0}}>Canvas Podcast</h3>
               <p className="text-gray-300 text-lg max-w-md mb-6">Signature podcast spaces. Customizable setups. Premium production crew included.</p>
-              <p className="text-gray-400 text-sm">$400/hr · Podcast production</p>
+              <p className="text-gray-400 text-sm">${PODCAST_HOURLY_RATES['canvas-podcast']}/hr · Podcast production</p>
             </div>
           </a>
         </div>
@@ -243,7 +247,7 @@ export default function SunsetPage() {
           <h2 className="font-black text-white leading-none mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: 0 }}>
             Pick your <span className="text-brand-red">color.</span>
           </h2>
-          <p className="text-gray-500 text-lg mb-10">$300/hr. Cameraman included. Instant confirmation.</p>
+          <p className="text-gray-500 text-lg mb-10">${hourlyRate}/hr. {PODCAST_CREW_LABEL}. Instant confirmation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="/book/?studio=sunset" className="group inline-flex items-center gap-3 rounded-lg bg-brand-red px-8 py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700">
               Book Your Session
