@@ -29,6 +29,13 @@ import { TELEPROMPTER, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/
 import { PENDING_CHECKOUT_STORAGE_KEY } from '@/lib/booking/confirmation-state'
 import { parsePendingCheckout, pendingCheckoutMatchesSelection, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
 import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
+import {
+  EDITABLE_BOOKING_STEPS,
+  bookingStepIsReady,
+  stepAfterPrimarySelection,
+  type BookingStep as Step,
+  type EditableBookingStep,
+} from '@/lib/booking/step-flow'
 import StudioSetupPicker from '@/components/StudioSetupPicker'
 import { getStudioSetup, getStudioSetups, type StudioSetupId } from '@/lib/booking/studio-setups'
 
@@ -43,13 +50,11 @@ const StripeEmbeddedCheckout = dynamic(() => import('@/components/StripeEmbedded
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Step = 'room' | 'datetime' | 'extras' | 'review' | 'payment'
 type Filter = 'podcast' | 'photo' | 'rental' | 'all'
 
 interface Slot { time: string; label: string; available: boolean }
 
-const STEP_ORDER: Exclude<Step, 'payment'>[] = ['room', 'datetime', 'extras', 'review']
-const STEP_LABELS: Record<Exclude<Step, 'payment'>, string> = {
+const STEP_LABELS: Record<EditableBookingStep, string> = {
   room: 'Studio',
   datetime: 'Date & Time',
   extras: 'Extras',
@@ -227,12 +232,12 @@ const CheckCircleIcon = () => (
 
 // ─── Stepper ──────────────────────────────────────────────────────────────────
 
-function Stepper({ step, onJump, locked = false }: { step: Step; onJump: (s: Exclude<Step, 'payment'>) => void; locked?: boolean }) {
-  const activeIndex = step === 'payment' ? 3 : STEP_ORDER.indexOf(step)
+function Stepper({ step, onJump, locked = false }: { step: Step; onJump: (s: EditableBookingStep) => void; locked?: boolean }) {
+  const activeIndex = step === 'payment' ? 3 : EDITABLE_BOOKING_STEPS.indexOf(step)
 
   return (
     <div className="flex items-center">
-      {STEP_ORDER.map((s, i) => {
+      {EDITABLE_BOOKING_STEPS.map((s, i) => {
         const done = i < activeIndex
         const active = i === activeIndex
         const clickable = done && step !== 'payment' && !locked
@@ -456,11 +461,13 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
   const anyAvailable = slots.some((s) => s.available)
   const anyStartable = slots.some((_, i) => blockFits(i, durationSlots))
 
-  const continueReady =
-    step === 'room' ? Boolean(selectedId)
-      : step === 'datetime' ? Boolean(date && startSlot && blockValid && setupReady)
-        : step === 'extras' ? setupReady
-          : !submitting && setupReady
+  const continueReady = bookingStepIsReady({
+    step,
+    hasStudio: Boolean(selectedId),
+    hasValidTime: Boolean(date && startSlot && blockValid),
+    setupReady,
+    submitting,
+  })
 
   const continueLabel =
     step === 'room' ? 'Continue to Date & Time'
@@ -490,6 +497,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
       setDate(''); setStartSlot(''); setSlots([]); setSlotsLoading(false); setError('')
       trackBookingStep('studio_select', { studio_id: previewStudio.id, studio_name: previewStudio.name, value: previewStudio.price, currency: 'USD' })
     }
+    goToStep(stepAfterPrimarySelection('room'))
   }
 
   async function selectDate(ds: string) {
@@ -518,6 +526,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
     if (!slot || !blockFits(index, durationSlots)) return
     setStartSlot(slot.time)
     trackBookingStep('time_select', { studio_id: selectedId, booking_date: date, slot_time: slot.time, hours: durationHours })
+    advanceToExtras()
   }
 
   function changeDuration(next: number) {
@@ -528,7 +537,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
     }
   }
 
-  function goToStep(next: Exclude<Step, 'payment'>) {
+  function goToStep(next: EditableBookingStep) {
     if (checkoutCreatingRef.current) return
     setError('')
     setStep(next)
@@ -540,20 +549,25 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
     }
   }
 
+  function advanceToExtras() {
+    if (!selectedStudio || !date) return
+    sendGAEvent(GAEventType.ADD_TO_CART, {
+      studio_id: selectedStudio.id,
+      studio_name: selectedStudio.name,
+      booking_date: date,
+      hours: durationHours,
+      value: sessionSubtotal,
+      currency: 'USD',
+    })
+    goToStep(stepAfterPrimarySelection('datetime'))
+  }
+
   function continueFlow() {
     if (!continueReady) return
     if (step === 'room') {
       goToStep('datetime')
     } else if (step === 'datetime' && selectedStudio) {
-      sendGAEvent(GAEventType.ADD_TO_CART, {
-        studio_id: selectedStudio.id,
-        studio_name: selectedStudio.name,
-        booking_date: date,
-        hours: durationHours,
-        value: sessionSubtotal,
-        currency: 'USD',
-      })
-      goToStep('extras')
+      advanceToExtras()
     } else if (step === 'extras') {
       trackBookingStep('cart_view', { studio_id: selectedId, value: grandTotal, currency: 'USD' })
       goToStep('review')
@@ -585,7 +599,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
     e.preventDefault()
     if (checkoutCreatingRef.current) return
     if (!setupReady) {
-      goToStep('datetime')
+      goToStep('extras')
       setError(`Choose a setup for ${selectedStudio?.name || 'this studio'} before continuing.`)
       return
     }
@@ -745,15 +759,15 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
 
   const headline =
     step === 'room' ? 'Build your session'
-      : step === 'datetime' ? (requiresSetup ? 'Your setup & time' : 'Pick your time')
+      : step === 'datetime' ? 'Pick your time'
         : step === 'extras' ? 'Make it yours'
           : step === 'review' ? 'Lock it in'
             : 'Secure payment'
 
   const subline =
     step === 'room' ? 'Choose a studio, then select a date and time.'
-      : step === 'datetime' ? (requiresSetup ? 'Choose your setup, then find a time. All times Pacific.' : 'All times Pacific. Availability is checked live.')
-      : step === 'extras' ? 'Optional equipment and recurring savings. Studio-only is always an option.'
+      : step === 'datetime' ? 'Choose a date and available start time. All times Pacific.'
+      : step === 'extras' ? (requiresSetup ? 'Choose your setup, then add optional equipment or recurring savings.' : 'Optional equipment and recurring savings. Studio-only is always an option.')
           : step === 'review' ? 'Check the details, add your info, and lock it in.'
             : 'Card details are handled by Stripe. We never see them.'
 
@@ -965,17 +979,6 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                   </button>
                 </div>
 
-                {requiresSetup && (
-                  <div className="mb-10">
-                    <StudioSetupPicker
-                      id="booking"
-                      studioId={selectedId}
-                      value={setupId}
-                      onChange={(nextSetupId) => { setSetupId(nextSetupId); setError('') }}
-                    />
-                  </div>
-                )}
-
                 <div className="grid grid-cols-1 gap-10 md:grid-cols-[4fr_3fr] 2xl:gap-14">
                   {/* Calendar */}
                   <div>
@@ -1172,7 +1175,19 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
             {/* ── STEP 3: EXTRAS ── */}
             {step === 'extras' && (
               <div className="max-w-2xl">
-                <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Optional add-on</p>
+                {error && <p className="mb-6 text-sm text-brand-red" role="alert">{error}</p>}
+                {requiresSetup && selectedStudio && (
+                  <div className="mb-10">
+                    <StudioSetupPicker
+                      id="booking"
+                      studioId={selectedId}
+                      value={setupId}
+                      onChange={(nextSetupId) => { setSetupId(nextSetupId); setError('') }}
+                      wide
+                    />
+                  </div>
+                )}
+                <p className={`${requiresSetup ? 'border-t border-white/[0.08] pt-8' : ''} mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white`}>Optional add-on</p>
                 <button
                   type="button"
                   aria-pressed={addOnIds.includes(TELEPROMPTER.id)}
@@ -1253,7 +1268,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                       <p className="mt-1 font-semibold text-white">{selectedSetup?.label || 'Choose a setup'}</p>
                       <p className="mt-1 text-xs text-zinc-300">Saved with your booking so our team can prepare.</p>
                     </div>
-                    <button type="button" disabled={submitting} onClick={() => goToStep('datetime')} className="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-zinc-300 hover:text-white disabled:cursor-wait disabled:opacity-50">Change setup</button>
+                    <button type="button" disabled={submitting} onClick={() => goToStep('extras')} className="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-zinc-300 hover:text-white disabled:cursor-wait disabled:opacity-50">Change setup</button>
                   </div>
                 )}
 
@@ -1415,7 +1430,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                   </div>
                 ) : !setupReady ? (
                   <p className="rounded-lg border border-white/15 p-5 text-sm leading-relaxed text-zinc-300" role="status">
-                    This checkout was started without a setup choice. Use “Change booking details” below to choose a setup for {selectedStudio?.name} before payment. We will safely release this checkout before creating the updated one.
+                    This checkout was started without a setup choice. Use “Change booking details” below to safely release it, reconfirm the time, and choose a setup for {selectedStudio?.name} before payment.
                   </p>
                 ) : checkoutPublishableKey && checkoutClientSecret ? (
                   <div className="rounded-lg bg-white p-2 sm:p-4">
@@ -1475,8 +1490,8 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                     <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">Setup</span>
                     <div className="text-right">
                       <p className="text-[13px] text-white">{selectedSetup?.label || 'Not selected'}</p>
-                      {selectedSetup && step !== 'payment' && step !== 'datetime' && (
-                        <button type="button" disabled={submitting} onClick={() => goToStep('datetime')} className="mt-1 text-xs text-zinc-300 underline underline-offset-4 hover:text-white disabled:opacity-50">Change setup</button>
+                      {selectedSetup && step === 'review' && (
+                        <button type="button" disabled={submitting} onClick={() => goToStep('extras')} className="mt-1 text-xs text-zinc-300 underline underline-offset-4 hover:text-white disabled:opacity-50">Change setup</button>
                       )}
                     </div>
                   </div>
@@ -1599,7 +1614,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                 ${selectedStudio ? grandTotal : 0}
               </p>
               <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-400">
-                {STEP_LABELS[step as Exclude<Step, 'payment'>]}
+                {STEP_LABELS[step as EditableBookingStep]}
               </p>
             </div>
             <button
