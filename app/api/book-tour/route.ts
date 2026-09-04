@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
     if (!reservation.ok) return NextResponse.json({ error: reservation.error }, { status: reservation.status })
 
     try {
-      await sendTourEmails(tour)
+      if (!reservation.alreadyReserved) await sendTourEmails(tour)
     } catch (error) {
       console.error('Tour confirmation email failed:', error)
     }

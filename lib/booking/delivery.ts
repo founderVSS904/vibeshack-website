@@ -44,7 +44,9 @@ function definitelyNotDelivered(error: unknown) {
   return Number(value?.responseCode) >= 400
     || value?.code === 'EDNS'
     || value?.code === 'EAUTH'
-    || /^(CONN|EHLO|HELO|STARTTLS|AUTH(?: |$)|MAIL(?: FROM)?$|RCPT(?: TO)?$)/i.test(value?.command || '')
+    // Nodemailer uses CONN for generic socket errors, even after DATA. It is
+    // not evidence that delivery had not begun, so never infer safety from it.
+    || /^(EHLO|HELO|STARTTLS|AUTH(?: |$)|MAIL(?: FROM)?$|RCPT(?: TO)?$)/i.test(value?.command || '')
 }
 
 export async function deliverMessage(

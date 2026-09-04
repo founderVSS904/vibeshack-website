@@ -10,8 +10,8 @@ import { parseTeamEmailMetadata } from '../lib/booking/team-email-metadata'
 // Execute the actual route/helper functions with isolated provider bindings.
 // No environment values, network APIs, real mail transport, or Stripe client
 // can be reached through this VM context.
-function actualFunction(name: string) {
-  const source = fs.readFileSync('app/api/webhook/route.ts', 'utf8')
+function actualFunction(name: string, file = 'app/api/webhook/route.ts') {
+  const source = fs.readFileSync(file, 'utf8')
   const ast = ts.createSourceFile('route.ts', source, ts.ScriptTarget.ES2022, true)
   const declaration = ast.statements.find((statement) => ts.isFunctionDeclaration(statement) && statement.name?.text === name)
   assert.ok(declaration)
@@ -116,4 +116,30 @@ test('concurrent webhook deliveries claim each actual email only once', async ()
   assert.equal((await instance.run()).status, 200)
   assert.equal(instance.attempts.size, 4)
   for (const count of instance.attempts.values()) assert.equal(count, 1)
+})
+
+
+test('tour POST does not resend confirmations when an already committed reservation is retried', async () => {
+  let emails = 0
+  let alreadyReserved = false
+  const context = vm.createContext({
+    Date, Number, Response,
+    console: { error: () => undefined },
+    RATE_LIMIT_MAX: 6, RATE_LIMIT_WINDOW_MS: 600_000, MAX_BODY_BYTES: 10_240, MIN_FORM_AGE_MS: 1500,
+    rateLimit: () => null,
+    readJsonBody: async () => ({ name: 'Fixture Guest', email: 'guest@example.invalid', date: '2026-09-12', slot: '2026-09-12T15:00:00.000Z' }),
+    stripControlChars: (value: unknown) => String(value ?? ''),
+    isEmail: () => true, isValidBookingDate: () => true,
+    reserveTourBooking: async () => ({ ok: true, status: 200, error: '', alreadyReserved }),
+    sendTourEmails: async () => { emails++ },
+    formatTourSlotRange: () => '8:00 AM-8:30 AM',
+    jsonBodyErrorResponse: () => null,
+    NextResponse: { json: (body: unknown, options?: { status?: number }) => new Response(JSON.stringify(body), { status: options?.status || 200 }) },
+  })
+  vm.runInContext(`${actualFunction('POST', 'app/api/book-tour/route.ts')}\nglobalThis.run = POST`, context)
+  assert.equal((await context.run({})).status, 200)
+  assert.equal(emails, 1)
+  alreadyReserved = true
+  assert.equal((await context.run({})).status, 200)
+  assert.equal(emails, 1)
 })

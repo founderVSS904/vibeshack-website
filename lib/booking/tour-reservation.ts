@@ -21,8 +21,10 @@ export interface TourReservationDependencies {
   now?: () => Date
 }
 
-export async function reserveTour(tour: TourBookingDetails, dependencies: TourReservationDependencies) {
-  if (await dependencies.exists(tour)) return { ok: true, status: 200, error: '' }
+export interface TourReservationResult { ok: boolean; status: number; error: string; alreadyReserved?: boolean }
+
+export async function reserveTour(tour: TourBookingDetails, dependencies: TourReservationDependencies): Promise<TourReservationResult> {
+  if (await dependencies.exists(tour)) return { ok: true, status: 200, error: '', alreadyReserved: true }
   const initialAvailability = await dependencies.availability(tour.date, tour.slot, '')
   if (!initialAvailability.ok) return initialAvailability
   const ref = `tour-${randomUUID()}`
@@ -35,7 +37,7 @@ export async function reserveTour(tour: TourBookingDetails, dependencies: TourRe
   if (!availability.ok) {
     const alreadyReserved = await dependencies.exists(tour)
     await dependencies.release(cart, ref)
-    return alreadyReserved ? { ok: true, status: 200, error: '' } : availability
+    return alreadyReserved ? { ok: true, status: 200, error: '', alreadyReserved: true } : availability
   }
   try {
     await dependencies.insert(reservedTour)

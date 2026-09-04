@@ -14,7 +14,9 @@ not prevent retrying a failed preparation, team, or staff message.
 
 Concurrent webhook deliveries claim individual messages through an ETag update.
 A successful message is marked `sent` and skipped by later webhook deliveries.
-Explicit SMTP rejections and failures before the DATA phase are marked `failed`.
+Explicit SMTP rejections and failures demonstrably before the DATA phase are marked `failed`.
+Nodemailer uses `CONN` for socket failures even after DATA, so a generic `CONN`
+timeout or disconnect is treated as uncertain, not proof of nondelivery.
 An incomplete mail sequence returns HTTP 500 so Stripe can retry only those
 messages. Team recipients are sent individually to track each outcome.
 

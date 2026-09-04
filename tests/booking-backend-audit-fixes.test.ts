@@ -226,7 +226,7 @@ test('a committed tour blocks all rooms even when the guest expressed interest i
 test('SMTP connection and envelope timeouts remain retryable before DATA', async () => {
   const fixture = memoryCalendar()
   const store = await bookingDeliveryStore('fixture-pre-data', fixture.dependencies)
-  for (const command of ['CONN', 'EHLO', 'AUTH PLAIN', 'MAIL FROM', 'RCPT TO']) {
+  for (const command of ['EHLO', 'AUTH PLAIN', 'MAIL FROM', 'RCPT TO']) {
     const key = command.replace(/ /g, '')
     let attempts = 0
     await assert.rejects(deliverMessage(store, key, async () => {
@@ -234,5 +234,20 @@ test('SMTP connection and envelope timeouts remain retryable before DATA', async
     }, { identity: 'fixture-pre-data' }))
     await deliverMessage(store, key, async () => { attempts++ }, { identity: 'fixture-pre-data' })
     assert.equal(attempts, 2)
+  }
+})
+
+
+test('Nodemailer CONN transport errors remain uncertain because they can occur after DATA', async () => {
+  const fixture = memoryCalendar()
+  const store = await bookingDeliveryStore('fixture-conn-ambiguity', fixture.dependencies)
+  for (const code of ['ETIMEDOUT', 'ESOCKET', 'ECONNECTION']) {
+    let attempts = 0
+    const options = { identity: 'fixture-conn-ambiguity' }
+    await assert.rejects(deliverMessage(store, code, async () => {
+      attempts++; throw Object.assign(new Error('Generic socket failure'), { code, command: 'CONN' })
+    }, options))
+    await assert.rejects(deliverMessage(store, code, async () => { attempts++ }, options), /uncertain/)
+    assert.equal(attempts, 1)
   }
 })
