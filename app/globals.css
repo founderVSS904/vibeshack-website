@@ -147,9 +147,26 @@ body .placeholder-gray-700::placeholder {
 }
 
 .dynamic-frame-hero {
+  position: relative;
   min-height: 0;
   padding-top: 5rem;
   background: #050505;
+}
+
+.home-hero-motion-control {
+  position: absolute;
+  top: 6rem;
+  right: 1rem;
+  z-index: 3;
+}
+
+.home-landing-page[data-motion-paused='true'] .shot-logo-track {
+  animation-play-state: paused;
+}
+
+.home-landing-page[data-motion-paused='true'] .dynamic-frame-grid,
+.home-landing-page[data-motion-paused='true'] .dynamic-frame-row {
+  transition: none;
 }
 
 .home-landing-page {
@@ -1388,8 +1405,21 @@ body:has(.cinema-experience-root) > footer {
 
 .cinema-runtime-plate {
   display: block;
-  object-fit: fill;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   user-select: none;
+}
+
+/* The mobile theater uses the clean film frame. Defining backgrounds only
+   here keeps the desktop plates out of its network requests entirely. */
+@media (min-width: 768px) {
+  .cinema-runtime-idle {
+    background-image: url('/studio-videos/cinema/runtime-v017/theater_idle-q95.webp');
+  }
+
+  .cinema-runtime-playing-base {
+    background-image: url('/studio-videos/cinema/runtime-v017/theater_playing_base-q95.webp');
+  }
 }
 
 .cinema-runtime-idle {

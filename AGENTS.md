@@ -64,7 +64,7 @@ https://www.vibeshackstudios.com. A San Francisco studio-booking business
 - `npm run build` shares the `.next` folder with the dev server, so building
   kills a running dev server (routes return 500). After a build, restart
   `npm run dev -- -p 3011`, or serve the build with `npx next start -p 3011`.
-- Node requirement: `>=20 <25`.
+- Node requirement: `>=20.9 <25` (CI uses Node 22).
 
 ## Verify before claiming done
 

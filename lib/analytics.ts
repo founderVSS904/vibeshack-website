@@ -2,6 +2,9 @@
  * VibeShack GA4 Event Tracking Library
  * Centralized analytics event tracking for conversion funnel
  */
+import { analyticsLocation, analyticsReferrer } from './analytics-config'
+import { createPurchaseTracker, recordSuccessfulLead } from './analytics-conversions'
+import type { BookingConfirmation } from './booking/confirmation-state'
 
 declare global {
   interface Window {
@@ -65,12 +68,32 @@ export interface GAEvent {
  * Send event to GA4 via gtag
  */
 export const sendGAEvent = (eventType: GAEventType | string, params?: Record<string, unknown>) => {
-  if (typeof window !== 'undefined' && window.gtag) {
+  if (typeof window === 'undefined' || !window.gtag) return false
+  // Dates, exact slot times, contact fields and query strings are not metrics.
+  const safeParams = Object.fromEntries(Object.entries(params || {}).filter(([key]) => [
+    'booking_step', 'studio_id', 'studio_name', 'value', 'currency', 'hours',
+    'sessions', 'studios', 'referral_source', 'transaction_id', 'items', 'lead_type',
+  ].includes(key)))
+  try {
     window.gtag('event', eventType, {
-      timestamp: new Date().toISOString(),
-      ...params,
+      ...safeParams,
+      page_location: analyticsLocation(window.location.href),
+      page_referrer: analyticsReferrer(document.referrer),
+      transport_type: 'beacon',
     })
-  }
+    return true
+  } catch { return false }
+}
+
+const recordPurchase = createPurchaseTracker()
+export function trackVerifiedPurchase(result: BookingConfirmation) {
+  let storage: Storage | undefined
+  try { storage = window.localStorage } catch {}
+  try { return recordPurchase(result, sendGAEvent, storage) } catch { return false }
+}
+
+export function trackSuccessfulLead(type: 'project_inquiry' | 'tour') {
+  return recordSuccessfulLead(type, true, sendGAEvent)
 }
 
 /**

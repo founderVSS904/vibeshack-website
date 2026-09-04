@@ -4,6 +4,12 @@ export type BookingConfirmationStatus = typeof CONFIRMATION_STATUSES[number]
 export interface BookingConfirmation {
   status: BookingConfirmationStatus
   emailSent?: boolean
+  purchase?: {
+    transactionId: string
+    value: number
+    currency: 'USD'
+    items: Array<{ itemId: string; quantity: 1 }>
+  }
   summary?: {
     totalPaid: number
     sessions: Array<{

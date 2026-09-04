@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       html,
     })
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, delivered: true })
   } catch (err) {
     const bodyError = jsonBodyErrorResponse(err)
     if (bodyError) return bodyError

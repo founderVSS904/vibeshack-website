@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, type FormEvent } from 'react'
 import { getContactInquiry } from '@/lib/contact/inquiry'
+import { trackSuccessfulLead } from '@/lib/analytics'
 import { contactFieldError, firstInvalidContactField, sendContactBrief, validateContactBrief, type ContactField, type ContactFieldErrors } from '@/lib/contact/form'
 
 export default function ContactForm() {
@@ -80,6 +81,7 @@ export default function ContactForm() {
     const result = await sendContactBrief(data, fetch)
     sendingRef.current = false
     if (result.ok) {
+      if (result.delivered) trackSuccessfulLead('project_inquiry')
       setStatus('success')
     } else {
       setDeliveryError(result.message)

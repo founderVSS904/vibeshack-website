@@ -48,7 +48,7 @@ const serviceLinks: HeaderLink[] = [
 ]
 
 const planningLinks: HeaderLink[] = [
-  { href: '/find-your-studio/', label: 'Find a Studio', detail: 'Pick by goal, room style, and deliverable' },
+  { href: '/find-your-studio/', label: 'Find a Studio', detail: 'Choose by format, on-camera count, and crew' },
   { href: '/pricing/', label: 'Pricing', detail: 'See room rates and production starting points' },
   { href: '/book/', label: 'Book a Session', detail: 'Reserve studio time with live availability' },
   { href: '/tour/', label: 'Tour the Studio', detail: 'Book a walkthrough before a bigger shoot' },

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { siteUrl } from '@/lib/seo/site'
+import { BOOKING_CONFIRMATION_SUMMARY, RECURRING_BOOKING_SUMMARY, SINGLE_SESSION_BOOKING_SUMMARY } from '@/lib/booking/public-policy'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <main className="bg-black min-h-screen">
+    <div className="bg-black min-h-screen">
 
       {/* Hero */}
       <section className="pt-40 pb-24 px-6 sm:px-10 lg:px-16 max-w-4xl mx-auto">
@@ -39,7 +40,13 @@ export default function TermsPage() {
           </div>
           <div className="lg:col-span-2 space-y-6 text-gray-400 text-lg leading-relaxed">
             <p>
-              Your session is confirmed the moment payment is processed. You&apos;ll receive a confirmation email with your booking details immediately after.
+              {BOOKING_CONFIRMATION_SUMMARY}
+            </p>
+            <p>
+              {SINGLE_SESSION_BOOKING_SUMMARY}
+            </p>
+            <p>
+              {RECURRING_BOOKING_SUMMARY}
             </p>
             <p>
               Sessions run on a fixed schedule. Your booked time is your time: it starts when it starts and ends when it ends. Late arrivals don&apos;t extend your session, and early departures aren&apos;t refunded.
@@ -232,6 +239,6 @@ export default function TermsPage() {
         </p>
       </div>
 
-    </main>
+    </div>
   )
 }

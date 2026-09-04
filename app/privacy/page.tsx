@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main className="bg-black min-h-screen">
+    <div className="bg-black min-h-screen">
 
       {/* Hero */}
       <section className="pt-40 pb-24 px-6 sm:px-10 lg:px-16 max-w-4xl mx-auto">
-        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-600 mb-8">Legal</p>
+        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-400 mb-8">Legal</p>
         <h1
           className="font-black text-white leading-none mb-6"
           style={{ fontSize: 'clamp(3.5rem, 8vw, 7rem)', letterSpacing: 0 }}
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
         <p className="text-gray-400 text-xl leading-relaxed max-w-xl">
           What we collect, how we use it, and what you can do about it.
         </p>
-        <p className="text-gray-600 text-sm mt-8">Effective April 2026</p>
+        <p className="text-gray-400 text-sm mt-8">Effective April 2026</p>
       </section>
 
       {/* What we collect */}
@@ -189,7 +189,7 @@ export default function PrivacyPage() {
                 founder@vibeshackstudios.com
               </a>
               <br />
-              <span className="text-gray-600">
+              <span className="text-gray-400">
                 VibeShack Studios · 950 Battery St · San Francisco, CA 94111
               </span>
             </p>
@@ -199,11 +199,11 @@ export default function PrivacyPage() {
 
       {/* Footer note */}
       <div className="border-t border-white/5 py-12 px-6 sm:px-10 lg:px-16 max-w-4xl mx-auto">
-        <p className="text-gray-700 text-sm">
+        <p className="text-gray-400 text-sm">
           We may update this policy as our services evolve. Changes are posted here with a new effective date.
         </p>
       </div>
 
-    </main>
+    </div>
   )
 }

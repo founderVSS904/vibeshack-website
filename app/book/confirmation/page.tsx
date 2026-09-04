@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
+import { trackVerifiedPurchase } from '@/lib/analytics'
 import { CONFIRMATION_STATUSES, PENDING_CHECKOUT_STORAGE_KEY, clearConfirmedPendingCheckout, pendingConfirmationToken, type BookingConfirmation, type BookingConfirmationStatus } from '@/lib/booking/confirmation-state'
 
 const messages: Record<BookingConfirmationStatus, { title: string; body: string }> = {
@@ -46,6 +47,7 @@ function ConfirmationContent() {
         if (!CONFIRMATION_STATUSES.includes(data?.status)) throw new Error('Invalid verification response')
         if (controller.signal.aborted) return
         setResult(data)
+        trackVerifiedPurchase(data)
         try { clearConfirmedPendingCheckout(window.sessionStorage, sessionId, data.status) } catch {}
         if (attempts < 8 && (data.status === 'processing' || (data.status === 'confirmed' && !data.emailSent))) {
           timer = setTimeout(() => { void check() }, 3000)

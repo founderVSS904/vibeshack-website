@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { addTourEvent, assertTourSlotAvailable, formatTourSlotRange } from '@/lib/booking/calendar'
+import { reserveTourBooking, formatTourSlotRange } from '@/lib/booking/calendar'
 import { getStudioById } from '@/lib/booking/catalog'
 import { formatDateForDisplay, isValidBookingDate } from '@/lib/booking/time'
 import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
@@ -116,24 +116,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Choose a valid studio interest' }, { status: 400 })
     }
 
-    const availability = await assertTourSlotAvailable(date, slot)
-    if (!availability.ok) {
-      return NextResponse.json({ error: availability.error }, { status: availability.status })
-    }
-
     const studioName = studio?.name || 'Not sure yet'
     const tour = { name, email, phone, date, slot, studioId: studio?.id, studioName, notes }
 
-    await addTourEvent(tour)
+    const reservation = await reserveTourBooking(tour)
+    if (!reservation.ok) return NextResponse.json({ error: reservation.error }, { status: reservation.status })
 
     try {
-      await sendTourEmails(tour)
+      if (!reservation.alreadyReserved) await sendTourEmails(tour)
     } catch (error) {
       console.error('Tour confirmation email failed:', error)
     }
 
     return NextResponse.json({
       ok: true,
+      created: !reservation.alreadyReserved,
       tour: {
         date,
         time: formatTourSlotRange(slot),

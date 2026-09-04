@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <main className="overflow-hidden bg-black">
+    <div className="overflow-hidden bg-black">
       <section className="relative isolate min-h-[720px] overflow-hidden border-b border-white/10 sm:min-h-[780px]">
         <Image
           src="/brand/vibeshack/dream-factory-rooftop-wide-v20260520.jpg"
@@ -100,7 +100,7 @@ export default function ContactPage() {
 
             <aside className="border-t border-white/15 lg:sticky lg:top-28">
               <div className="py-8">
-                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-white/45">Studio booking</p>
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-white/60">Studio booking</p>
                 <h3 className="mt-4 max-w-sm text-2xl font-bold leading-tight tracking-[-0.025em] text-white sm:text-3xl">
                   Already know the room and time?
                 </h3>
@@ -117,33 +117,33 @@ export default function ContactPage() {
               </div>
 
               <div className="border-t border-white/15 py-8">
-                <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-white/45">Direct contact</p>
+                <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-white/60">Direct contact</p>
                 <div>
                   <div className="grid grid-cols-[86px_minmax(0,1fr)] gap-4 border-b border-white/10 py-4">
-                    <p className="text-xs text-white/35">Phone</p>
+                    <p className="text-xs text-white/60">Phone</p>
                     <a href={`tel:${business.phone.replace(/[^\d+]/g, '')}`} className="text-sm font-medium text-white transition-colors hover:text-brand-red">
                       {business.phone}
                     </a>
                   </div>
                   <div className="grid grid-cols-[86px_minmax(0,1fr)] gap-4 border-b border-white/10 py-4">
-                    <p className="text-xs text-white/35">Email</p>
+                    <p className="text-xs text-white/60">Email</p>
                     <a href="mailto:founder@vibeshackstudios.com" className="break-words text-sm font-medium text-white transition-colors hover:text-brand-red">
                       founder@vibeshackstudios.com
                     </a>
                   </div>
                   <div className="grid grid-cols-[86px_minmax(0,1fr)] gap-4 py-4">
-                    <p className="text-xs text-white/35">Studio</p>
+                    <p className="text-xs text-white/60">Studio</p>
                     <address className="not-italic text-sm text-white">
                       950 Battery St, San Francisco
-                      <span className="mt-1 block text-xs text-white/40">Open 24/7 by confirmed booking</span>
+                      <span className="mt-1 block text-xs text-white/60">Open 24/7 by confirmed booking</span>
                     </address>
                   </div>
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 font-mono text-[9px] font-bold uppercase tracking-[0.16em]">
                   <Link href="/tour/" className="text-brand-red transition-colors hover:text-white">Book a tour →</Link>
-                  <a href={peerspaceUrl} target="_blank" rel="noopener noreferrer" className="text-white/45 transition-colors hover:text-white">Peerspace →</a>
-                  <a href="https://instagram.com/vibeshackhq/" target="_blank" rel="noopener noreferrer" className="text-white/45 transition-colors hover:text-white">Instagram →</a>
+                  <a href={peerspaceUrl} target="_blank" rel="noopener noreferrer" className="text-white/60 transition-colors hover:text-white">Peerspace →</a>
+                  <a href="https://instagram.com/vibeshackhq/" target="_blank" rel="noopener noreferrer" className="text-white/60 transition-colors hover:text-white">Instagram →</a>
                 </div>
               </div>
             </aside>
@@ -152,6 +152,6 @@ export default function ContactPage() {
       </section>
 
       <StudioLocation heightClassName="h-[320px] sm:h-[380px]" />
-    </main>
+    </div>
   )
 }

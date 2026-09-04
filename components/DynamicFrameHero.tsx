@@ -4,6 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
+import { HomeMotionButton, useHomeMotion } from '@/components/home/HomeMotion'
+import { allowAmbientVideo } from '@/lib/media/playback'
 
 type Frame = {
   label: string
@@ -92,21 +94,29 @@ const frames: Frame[] = [
 ]
 
 export function DynamicFrameHero() {
+  const { preferences, paused } = useHomeMotion()
   const [activeFrame, setActiveFrame] = useState<string | null>(null)
   const [spotlightFrame, setSpotlightFrame] = useState<string | null>(null)
   const [videoIndices, setVideoIndices] = useState<Record<string, number>>({})
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map())
   const spotlightIndexRef = useRef(0)
   const sectionRef = useRef<HTMLElement>(null)
-  const inViewRef = useRef(true)
+  const [inView, setInView] = useState(false)
+  const [pageVisible, setPageVisible] = useState(true)
+  const videoAllowed = allowAmbientVideo(preferences, { inView: inView && pageVisible, paused, requiresHover: true })
+  const playingFrame = videoAllowed ? activeFrame ?? spotlightFrame : null
 
   // The spotlight walk stops downloading and decoding video once the hero
   // scrolls out of view.
   useEffect(() => {
     const el = sectionRef.current
-    if (!el || typeof IntersectionObserver === 'undefined') return
+    if (!el) return
+    if (typeof IntersectionObserver === 'undefined') {
+      setInView(true)
+      return
+    }
     const io = new IntersectionObserver(([entry]) => {
-      inViewRef.current = entry.isIntersecting
+      setInView(entry.isIntersecting)
       if (!entry.isIntersecting) {
         setSpotlightFrame(null)
         videoRefs.current.forEach((video) => video.pause())
@@ -114,6 +124,13 @@ export function DynamicFrameHero() {
     })
     io.observe(el)
     return () => io.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const sync = () => setPageVisible(!document.hidden)
+    sync()
+    document.addEventListener('visibilitychange', sync)
+    return () => document.removeEventListener('visibilitychange', sync)
   }, [])
   const activeIndex = activeFrame ? Number(activeFrame) - 1 : null
   const activeColumn = activeIndex !== null ? String((activeIndex % 3) + 1) : undefined
@@ -123,16 +140,16 @@ export function DynamicFrameHero() {
   // before anyone hovers. A real pointer always takes control; the walk
   // resumes where it left off after a beat.
   useEffect(() => {
-    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!canHover || reducedMotion) return
+    if (!videoAllowed) {
+      setSpotlightFrame(null)
+      return
+    }
     if (activeFrame !== null) {
       setSpotlightFrame(null)
       return
     }
 
     const advance = () => {
-      if (document.hidden || !inViewRef.current) return
       spotlightIndexRef.current = (spotlightIndexRef.current % frames.length) + 1
       setSpotlightFrame(String(spotlightIndexRef.current))
     }
@@ -147,31 +164,20 @@ export function DynamicFrameHero() {
       clearInterval(interval)
       setSpotlightFrame(null)
     }
-  }, [activeFrame])
+  }, [activeFrame, videoAllowed])
 
   // Play the hovered or spotlighted tile's loop; rewind the rest so the next
   // pass starts fresh.
   useEffect(() => {
-    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!canHover) {
-      // Phones and other touch-first devices use the still-image stack.
-      videoRefs.current.forEach((video) => {
-        video.pause()
-        video.currentTime = 0
-      })
-      return
-    }
-    const playingFrame = activeFrame ?? spotlightFrame
     videoRefs.current.forEach((video, frameIndex) => {
-      if (frameIndex === playingFrame && !reducedMotion) {
+      if (frameIndex === playingFrame) {
         void video.play().catch(() => undefined)
       } else {
         video.pause()
         video.currentTime = 0
       }
     })
-  }, [activeFrame, spotlightFrame, videoIndices])
+  }, [playingFrame, videoIndices])
 
   const activateFrame = (frameIndex: string) => {
     setActiveFrame((currentFrame) => currentFrame === frameIndex ? currentFrame : frameIndex)
@@ -186,6 +192,7 @@ export function DynamicFrameHero() {
       <h1 id="dynamic-frame-title" className="sr-only">
         VibeShack Studios podcast, video, and photo production studios in San Francisco
       </h1>
+      <HomeMotionButton className="home-hero-motion-control" />
       <div
         className="dynamic-frame-grid"
         data-active={activeFrame ?? undefined}
@@ -230,7 +237,7 @@ export function DynamicFrameHero() {
                     className="dynamic-frame-image"
                     style={{ objectPosition: frame.position || 'center' }}
                   />
-                  {activeVideo && (
+                  {activeVideo && playingFrame === frameIndex && (
                     <video
                       key={activeVideo}
                       ref={(el) => {

@@ -72,12 +72,6 @@ export const peerspaceListings = [
     href: 'https://www.peerspace.com/pages/listings/69a348681710c446c2a7e0aa',
     price: '$300/hr on Peerspace',
   },
-  {
-    name: 'Photo & Video Studio with HMU Room for Interviews & Portraits',
-    serviceType: 'Photo and Video Studio Rental',
-    href: 'https://www.peerspace.com/pages/listings/696b13947d5d350c77c56c90',
-    price: '$75/hr on Peerspace',
-  },
 ]
 
 export const externalProfiles = [
@@ -90,7 +84,6 @@ export const externalProfiles = [
   { label: 'Peerspace green screen listing', href: peerspaceListings[1].href },
   { label: 'Peerspace podcast listing', href: peerspaceListings[2].href },
   { label: 'Peerspace sunset podcast listing', href: peerspaceListings[6].href },
-  { label: 'Peerspace photo and video studio listing', href: peerspaceListings[7].href },
   { label: 'IMDbPro production company profile', href: 'https://pro.imdb.com/company/co1101816/' },
 ]
 

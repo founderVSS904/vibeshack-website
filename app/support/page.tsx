@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { siteUrl } from '@/lib/seo/site'
 import { faqSchema } from '@/lib/schemas'
 import { PODCAST_PACKAGE_SUMMARY, PODCAST_RATE_SUMMARY } from '@/lib/booking/podcast-package'
+import { BOOKING_CONFIRMATION_SUMMARY, RECURRING_BOOKING_SUMMARY, SINGLE_SESSION_BOOKING_SUMMARY } from '@/lib/booking/public-policy'
 
 export const metadata: Metadata = {
   title: 'Support',
@@ -29,11 +30,11 @@ const FAQS = [
     questions: [
       {
         q: 'How do I book a studio?',
-        a: 'Go to vibeshackstudios.com/book. Pick your studio, choose your date and time, enter your info, and pay. Confirmation is instant.',
+        a: `Go to vibeshackstudios.com/book. Pick your studio, choose your date and time, enter your info, and pay. ${BOOKING_CONFIRMATION_SUMMARY}`,
       },
       {
         q: 'Can I book multiple sessions at once?',
-        a: 'Yes. Our booking system lets you add multiple studios and time slots to a single order and pay once. No need to go through checkout multiple times.',
+        a: SINGLE_SESSION_BOOKING_SUMMARY,
       },
       {
         q: 'Can I book same-day?',
@@ -45,7 +46,7 @@ const FAQS = [
       },
       {
         q: 'Can I set up a recurring booking?',
-        a: 'Yes. During checkout, you can select a recurring schedule: weekly, bi-weekly, or monthly. We\'ll lock in your slot and apply a discount.',
+        a: RECURRING_BOOKING_SUMMARY,
       },
     ],
   },
@@ -62,7 +63,7 @@ const FAQS = [
       },
       {
         q: 'How many people can fit in a studio?',
-        a: 'It depends on the studio and what you\'re making. Our white cyc wall has held productions with over 100 people. Podcast studios are designed for intimate on-camera formats. Rental studios vary in size and can support anything from solo shoots to large-scale productions. Tell us your headcount and project type and we\'ll point you to the right space.',
+        a: 'Tell us how many people will appear on camera at the same time, plus your off-camera crew and equipment needs. The studio finder checks documented on-camera layouts. For other arrangements, our team will confirm the room and full setup before you book.',
       },
       {
         q: 'Do you have Hair and Makeup on-site?',
@@ -70,7 +71,7 @@ const FAQS = [
       },
       {
         q: 'How quickly do I get my footage?',
-        a: 'We offer a 6 to 12 hour turnaround. We process your footage and send it to you the same day as your session.',
+        a: 'Podcast bookings include a 6 to 12 hour footage turnaround after your session. For photo, video, or editing services, we confirm the delivery timeline with your project quote.',
       },
       {
         q: 'Can I do a free tour before I book?',

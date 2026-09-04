@@ -9,7 +9,9 @@ import {
   getStudioFinderBookingHref,
   getStudioFinderMatches,
   getStudioFinderSetup,
+  getStudioFinderGuidance,
   parseOnCameraCount,
+  studioFinderNeedsProductionSupport,
   VERIFIED_ON_CAMERA_CAPACITY,
   type StudioFinderAnswers,
   type StudioFinderFormat,
@@ -127,7 +129,7 @@ export default function FindYourStudioPage() {
   const otherStudios = matches.slice(1)
   const inquiryHref = answers ? getStudioFinderContactHref(answers) : '/contact/#project-inquiry'
   const photoService = format === 'photo' && bringingCrew === false
-  const videoService = format === 'video' && bringingCrew === false
+  const videoService = answers !== null && format !== 'photo' && studioFinderNeedsProductionSupport(answers)
   const question = currentQuestion === 0
     ? 'What are you making?'
     : currentQuestion === 1
@@ -148,6 +150,7 @@ export default function FindYourStudioPage() {
             <h1 ref={headingRef} tabIndex={-1} className="mb-10 font-black text-white outline-none" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.05 }}>
               {question}
             </h1>
+            {currentQuestion === 0 && <p className="mb-7 max-w-lg text-sm leading-relaxed text-white/65">Choose your format, on-camera count, and crew. We will show a verified room fit or help you send the details to our team.</p>}
 
             {currentQuestion === 1 ? (
               <form onSubmit={submitCount} noValidate>
@@ -235,12 +238,9 @@ export default function FindYourStudioPage() {
           ) : (
             <div className="mb-7 max-w-3xl rounded-lg border border-white/15 bg-white/[0.025] p-6 sm:p-8">
               <p className="text-base leading-relaxed text-white/80">
-                {photoService || videoService
-                  ? 'We’ll match your project with the right studio and production support. Send us your details so we can confirm the setup and space before you book.'
-                  : format === 'notsure'
-                    ? 'Tell us a little more about the project or come in for a tour. We’ll help you choose a room and confirm its on-camera capacity.'
-                    : 'We haven’t verified a room for this on-camera count yet. That doesn’t mean we can’t host your production. Let us confirm the capacity and setup before you book.'}
+                {answers && getStudioFinderGuidance(answers)}
               </p>
+              <p className="mt-4 text-sm leading-relaxed text-white/65">Your answers will be included in the inquiry. You can add your date and project details before sending.</p>
               {format === 'podcast' && <p className="mt-4 text-sm leading-relaxed text-white/65">{PODCAST_PACKAGE_SUMMARY}</p>}
             </div>
           )}
@@ -264,7 +264,7 @@ export default function FindYourStudioPage() {
 
           <section>
             <h2 className="mb-3 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-white/60">Explore all studios</h2>
-            <p className="mb-8 max-w-2xl text-sm leading-relaxed text-white/55">These are all of our spaces, not additional capacity-checked recommendations. Ask us to confirm your setup before choosing a room outside your verified matches.</p>
+            <p className="mb-8 max-w-2xl text-sm leading-relaxed text-white/55">Browse the room photos and options below. For any room outside your verified fits, ask us to confirm the full setup before booking.</p>
             {STUDIO_GROUPS.map((group) => (
               <div key={group.title} className="mb-12 last:mb-0">
                 <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-white/60">{group.title}</h3>

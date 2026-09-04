@@ -8,6 +8,8 @@ import { flushSync } from 'react-dom'
 import type { CinemaProject } from '@/lib/cinema/cinemaCatalog'
 import { CinemaRuntimeTheater } from './CinemaRuntimeTheater'
 import { CinemaYouTubeTheater } from './CinemaYouTubeTheater'
+import { useMediaPreferences } from '@/components/media/useMediaPreferences'
+import { allowAmbientVideo, allowPreShowSource } from '@/lib/media/playback'
 
 type CinemaExperienceProps = {
   projects: CinemaProject[]
@@ -55,12 +57,6 @@ const PRE_SHOW_SRC = '/studio-videos/cinema/our-work-preshow-v018.mp4'
 const PRE_SHOW_POSTER = '/studio-videos/cinema/our-work-preshow-v018.jpg'
 const PRE_SHOW_TITLE = 'VibeShack Pre-Show'
 
-type NavigatorWithSaveData = Navigator & {
-  connection?: {
-    saveData?: boolean
-  }
-}
-
 function getFullscreenElement() {
   return document.fullscreenElement
     ?? (document as WebkitFullscreenDocument).webkitFullscreenElement
@@ -77,7 +73,9 @@ function clampMediaTime(video: HTMLVideoElement, seconds: number) {
 export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [showingPreShow, setShowingPreShow] = useState(true)
-  const [preShowAutoplayAllowed, setPreShowAutoplayAllowed] = useState(false)
+  const mediaPreferences = useMediaPreferences()
+  const [preShowRequested, setPreShowRequested] = useState(false)
+  const [preShowPaused, setPreShowPaused] = useState(false)
   const [ready, setReady] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [screeningActive, setScreeningActive] = useState(false)
@@ -102,6 +100,8 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const cardRefs = useRef(new Map<string, HTMLButtonElement>())
   const pendingFilmPlayRef = useRef(false)
 
+  const preShowAutoplayAllowed = allowAmbientVideo(mediaPreferences, { inView: !isMobileViewport, paused: preShowPaused, requiresHover: true })
+  const preShowSourceAllowed = allowPreShowSource(mediaPreferences, preShowRequested, !isMobileViewport && !preShowPaused)
   const selected = projects[selectedIndex]
   const filteredProjects = activeCollection === 'all'
     ? projects
@@ -114,7 +114,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
   const activeMediaKey = showingPreShow ? 'vibeshack-pre-show' : selected.slug
   const activeCinemaMode = showingPreShow || useCleanMobileSource ? 'runtime' : selected.cinemaMode
   const activeCinemaSrc = showingPreShow
-    ? PRE_SHOW_SRC
+    ? (preShowSourceAllowed ? PRE_SHOW_SRC : undefined)
     : useCleanMobileSource
       ? (selected.fullscreenSrc ?? '')
       : (selected.cinemaSrc ?? '')
@@ -140,18 +140,6 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     syncViewport()
     viewportQuery.addEventListener('change', syncViewport)
     return () => viewportQuery.removeEventListener('change', syncViewport)
-  }, [])
-
-  useEffect(() => {
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const saveData = (navigator as NavigatorWithSaveData).connection?.saveData === true
-    const syncPreShowPreference = () => {
-      setPreShowAutoplayAllowed(!motionQuery.matches && !saveData)
-    }
-
-    syncPreShowPreference()
-    motionQuery.addEventListener('change', syncPreShowPreference)
-    return () => motionQuery.removeEventListener('change', syncPreShowPreference)
   }, [])
 
   const finishFullscreenSession = useCallback(() => {
@@ -238,6 +226,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     setFullscreenSourceDuration(0)
     setFullscreenSourceReady(false)
     setError(null)
+    setPreShowRequested(false)
     setShowingPreShow(true)
   }, [])
 
@@ -247,6 +236,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     const browseReturn = browseReturnRef.current
     if (!chrome) return
     if (chromeHidden) {
+      playbackActions?.removeAttribute('inert')
       if (document.activeElement instanceof Node && chrome.contains(document.activeElement)) {
         browseReturn?.focus({ preventScroll: true })
       }
@@ -262,6 +252,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       ) {
         playButtonRef.current?.focus({ preventScroll: true })
       }
+      playbackActions?.setAttribute('inert', '')
     }
   }, [chromeHidden])
 
@@ -366,8 +357,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
 
     video.muted = true
     if (!preShowAutoplayAllowed) {
-      video.pause()
-      video.currentTime = 0
+      if (!preShowRequested || preShowPaused) video.pause()
       return
     }
 
@@ -376,7 +366,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
       setPlaying(false)
       setChromeHidden(false)
     })
-  }, [activeMediaKey, preShowAutoplayAllowed, showingPreShow])
+  }, [activeMediaKey, preShowAutoplayAllowed, preShowRequested, preShowPaused, showingPreShow])
 
   useEffect(() => {
     const video = fullscreenVideoRef.current
@@ -437,9 +427,17 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     video.muted = true
     setError(null)
     if (!video.paused) {
+      setPreShowRequested(true)
+      setPreShowPaused(true)
       video.pause()
       return
     }
+    // Assign the source during the gesture so touch browsers retain playback
+    // permission and low-data visitors can still explicitly choose to watch.
+    flushSync(() => {
+      setPreShowRequested(true)
+      setPreShowPaused(false)
+    })
     try {
       await video.play()
     } catch {
@@ -510,13 +508,13 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
     const next = (index + offset + filteredProjects.length) % filteredProjects.length
     const project = filteredProjects[next]
     cardRefs.current.get(project.slug)?.focus()
-    cardRefs.current.get(project.slug)?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+    cardRefs.current.get(project.slug)?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: mediaPreferences.reducedMotion ? 'auto' : 'smooth' })
   }
 
   const filterCollection = (collection: CinemaCollectionFilter) => {
     setActiveCollection(collection)
     window.requestAnimationFrame(() => {
-      railRef.current?.scrollTo({ left: 0, behavior: 'smooth' })
+      railRef.current?.scrollTo({ left: 0, behavior: mediaPreferences.reducedMotion ? 'auto' : 'smooth' })
     })
   }
 
@@ -709,7 +707,7 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
             autoPlay={showingPreShow && preShowAutoplayAllowed}
             loop={showingPreShow}
             poster={activeCinemaPoster}
-            preload={showingPreShow ? 'auto' : 'metadata'}
+            preload={showingPreShow ? (preShowAutoplayAllowed ? 'auto' : 'none') : 'metadata'}
             screenFit={activeScreenFit}
             screenPosition={activeScreenPosition}
             screenBackdrop={activeScreenBackdrop}
@@ -916,11 +914,11 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
                       if (playing) pauseAndBrowse()
                       else void play()
                     }}
-                    disabled={!ready}
+                    disabled={!ready && !showingPreShow}
                     className="cinema-play-button"
                   >
                     <span aria-hidden="true">{playing ? 'Ⅱ' : '▶'}</span>
-                    {ready
+                    {ready || showingPreShow
                       ? showingPreShow
                         ? (playing ? 'Pause pre-show' : 'Play pre-show')
                         : (playing ? 'Pause screening' : 'Play in theater')
@@ -1006,7 +1004,6 @@ export function CinemaExperience({ projects }: CinemaExperienceProps) {
         ref={playbackActionsRef}
         className="cinema-playback-actions"
         aria-hidden={!chromeHidden}
-        inert={chromeHidden ? undefined : true}
       >
         <button
           ref={browseReturnRef}

@@ -78,12 +78,21 @@ describe('mocked contact delivery', () => {
       assert.equal(init?.method, 'POST')
       assert.deepEqual(init?.headers, { 'Content-Type': 'application/json' })
       assert.deepEqual(JSON.parse(String(init?.body)), brief)
-      return new Response(null, { status: 200 })
+      return Response.json({ ok: true, delivered: true })
     }
     const original = structuredClone(brief)
-    assert.deepEqual(await sendContactBrief(Object.freeze({ ...brief }), request), { ok: true })
+    assert.deepEqual(await sendContactBrief(Object.freeze({ ...brief }), request), { ok: true, delivered: true })
     assert.deepEqual(brief, original)
     assert.equal(calls, 1)
+  })
+
+  test('does not count honeypot, empty, or malformed successful responses as delivered leads', async () => {
+    for (const body of ['{"ok":true}', '', 'not json', '{"ok":true,"delivered":false}']) {
+      const request: typeof fetch = async () => new Response(body, { status: 200 })
+      assert.deepEqual(await sendContactBrief(brief, request), { ok: true, delivered: false })
+    }
+    const request: typeof fetch = async () => Response.json({ ok: true, delivered: true })
+    assert.deepEqual(await sendContactBrief({ ...brief, company: 'spam' }, request), { ok: true, delivered: false })
   })
 
   test('keeps project, studio-finder, and exact studio-setup context intact after delivery failure', async () => {

@@ -7,7 +7,7 @@ import { buildCanonicalBookingCart } from '../lib/booking/checkout-pricing'
 import { buildBookingCartMetadata } from '../lib/booking/checkout-metadata'
 import { fulfillBookingCalendar } from '../lib/booking/fulfillment-state'
 
-const sessionId = 'cs_test_bookingFixture123'
+const sessionId = 'cs_live_bookingFixture123'
 const bookingRef = 'fixture-booking-reference'
 const timestamp = '2026-09-01T16:00:00.000Z'
 const cart = buildCanonicalBookingCart([{
@@ -23,7 +23,7 @@ const baseMetadata = {
 
 function session(overrides: Partial<Stripe.Checkout.Session> = {}): Stripe.Checkout.Session {
   return {
-    id: sessionId, mode: 'payment', status: 'complete', payment_status: 'paid',
+    id: sessionId, mode: 'payment', status: 'complete', payment_status: 'paid', livemode: true,
     amount_total: 22500, currency: 'usd', metadata: { ...baseMetadata }, ...overrides,
   } as Stripe.Checkout.Session
 }
@@ -173,6 +173,7 @@ describe('verified booking confirmation', () => {
     for (const token of ['', 'invalid-token']) {
       const result = await getBookingConfirmation(sessionId, token, deps)
       assert.equal(result.summary, undefined)
+      assert.equal(result.purchase, undefined)
       assert.doesNotMatch(JSON.stringify(result), /Private Name|example.invalid|private-phone|2026-09-12/)
     }
     const result = await getBookingConfirmation(sessionId, 'valid-fixture-token', deps)
@@ -180,6 +181,24 @@ describe('verified booking confirmation', () => {
     assert.equal(result.summary?.sessions[0].studioName, 'Canvas Rental')
     assert.deepEqual(result.summary?.sessions[0].addOns, [{ name: 'Teleprompter', hourlyRate: 50, amount: 75 }])
     assert.doesNotMatch(JSON.stringify(result), /Private Name|example.invalid|private-phone|client_secret/)
+    assert.equal(result.purchase?.value, 225)
+    assert.equal(result.purchase?.currency, 'USD')
+    assert.match(result.purchase?.transactionId || '', /^vbs_[a-f0-9]{32}$/)
+    assert.doesNotMatch(JSON.stringify(result.purchase), /cs_test|fixture-booking-reference|2026-09|Private Name|example.invalid/)
+    assert.deepEqual(result.purchase?.items, [{ itemId: 'canvas-rental', quantity: 1 }])
+    assert.deepEqual((await getBookingConfirmation(sessionId, 'valid-fixture-token', deps)).purchase, result.purchase)
+    const pending = dependencies(session())
+    assert.equal((await getBookingConfirmation(sessionId, 'valid-fixture-token', pending.deps)).purchase, undefined)
+  })
+
+  test('test payments and sessions without an explicit live flag never produce revenue', async () => {
+    for (const livemode of [false, undefined]) {
+      const { deps } = dependencies(session({ livemode, metadata: { ...baseMetadata, vbsCalendarSyncedAt: timestamp } }))
+      const result = await getBookingConfirmation(sessionId, 'valid-fixture-token', deps)
+      assert.equal(result.status, 'confirmed')
+      assert.equal(result.summary?.totalPaid, 225)
+      assert.equal(result.purchase, undefined)
+    }
   })
 
   test('still confirms managed legacy checkout metadata with no add-ons', async () => {
