@@ -165,7 +165,7 @@ export default function TourBookingForm() {
       }
       if (isConfirmedTourResponse(data)) {
         setConfirmed(data.tour)
-        if (!company.trim()) trackSuccessfulLead('tour')
+        if (!company.trim() && data.created) trackSuccessfulLead('tour')
       }
     } catch {
       setError('Connection error. Please try again.')

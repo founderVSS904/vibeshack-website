@@ -65,7 +65,7 @@ booking business in San Francisco (podcast, video, photo, rental studios).
   the running dev server (all routes 500). After any build, either restart
   `npm run dev -- -p 3011`, or serve the production build with
   `npx next start -p 3011` for a stable preview.
-- Node requirement: `>=20 <25`.
+- Node requirement: `>=20.9 <25` (CI uses Node 22).
 
 ## Verify before claiming done
 

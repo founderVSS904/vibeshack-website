@@ -137,9 +137,13 @@ test('tour POST does not resend confirmations when an already committed reservat
     NextResponse: { json: (body: unknown, options?: { status?: number }) => new Response(JSON.stringify(body), { status: options?.status || 200 }) },
   })
   vm.runInContext(`${actualFunction('POST', 'app/api/book-tour/route.ts')}\nglobalThis.run = POST`, context)
-  assert.equal((await context.run({})).status, 200)
+  const created = await context.run({}) as Response
+  assert.equal(created.status, 200)
+  assert.equal((await created.json()).created, true)
   assert.equal(emails, 1)
   alreadyReserved = true
-  assert.equal((await context.run({})).status, 200)
+  const retried = await context.run({}) as Response
+  assert.equal(retried.status, 200)
+  assert.equal((await retried.json()).created, false)
   assert.equal(emails, 1)
 })

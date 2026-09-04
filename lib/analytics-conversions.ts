@@ -4,9 +4,9 @@ type EventSender = (name: string, params: Record<string, unknown>) => boolean
 type ConversionStorage = Pick<Storage, 'getItem' | 'setItem'>
 const STORAGE_KEY = 'vbs_purchase_events_v1'
 
-export function isConfirmedTourResponse(value: unknown): value is { ok: true; tour: { date: string; time: string; studioName: string } } {
-  const response = value as { ok?: unknown; tour?: { date?: unknown; time?: unknown; studioName?: unknown } } | null
-  return response?.ok === true && Boolean(response.tour)
+export function isConfirmedTourResponse(value: unknown): value is { ok: true; created: boolean; tour: { date: string; time: string; studioName: string } } {
+  const response = value as { ok?: unknown; created?: unknown; tour?: { date?: unknown; time?: unknown; studioName?: unknown } } | null
+  return response?.ok === true && typeof response.created === 'boolean' && Boolean(response.tour)
     && typeof response.tour?.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(response.tour.date)
     && typeof response.tour.time === 'string' && Boolean(response.tour.time.trim())
     && typeof response.tour.studioName === 'string' && Boolean(response.tour.studioName.trim())

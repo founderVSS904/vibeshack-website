@@ -130,6 +130,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
+      created: !reservation.alreadyReserved,
       tour: {
         date,
         time: formatTourSlotRange(slot),
