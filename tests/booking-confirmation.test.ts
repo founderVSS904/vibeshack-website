@@ -173,6 +173,7 @@ describe('verified booking confirmation', () => {
     for (const token of ['', 'invalid-token']) {
       const result = await getBookingConfirmation(sessionId, token, deps)
       assert.equal(result.summary, undefined)
+      assert.equal(result.purchase, undefined)
       assert.doesNotMatch(JSON.stringify(result), /Private Name|example.invalid|private-phone|2026-09-12/)
     }
     const result = await getBookingConfirmation(sessionId, 'valid-fixture-token', deps)
@@ -180,6 +181,14 @@ describe('verified booking confirmation', () => {
     assert.equal(result.summary?.sessions[0].studioName, 'Canvas Rental')
     assert.deepEqual(result.summary?.sessions[0].addOns, [{ name: 'Teleprompter', hourlyRate: 50, amount: 75 }])
     assert.doesNotMatch(JSON.stringify(result), /Private Name|example.invalid|private-phone|client_secret/)
+    assert.equal(result.purchase?.value, 225)
+    assert.equal(result.purchase?.currency, 'USD')
+    assert.match(result.purchase?.transactionId || '', /^vbs_[a-f0-9]{32}$/)
+    assert.doesNotMatch(JSON.stringify(result.purchase), /cs_test|fixture-booking-reference|2026-09|Private Name|example.invalid/)
+    assert.deepEqual(result.purchase?.items, [{ itemId: 'canvas-rental', quantity: 1 }])
+    assert.deepEqual((await getBookingConfirmation(sessionId, 'valid-fixture-token', deps)).purchase, result.purchase)
+    const pending = dependencies(session())
+    assert.equal((await getBookingConfirmation(sessionId, 'valid-fixture-token', pending.deps)).purchase, undefined)
   })
 
   test('still confirms managed legacy checkout metadata with no add-ons', async () => {

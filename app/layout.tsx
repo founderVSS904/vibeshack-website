@@ -4,6 +4,8 @@ import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import AttributionCapture from '@/components/AttributionCapture'
+import AnalyticsPageViews from '@/components/AnalyticsPageViews'
+import { analyticsBootstrap, validMeasurementId } from '@/lib/analytics-config'
 import { ibmPlexMono, inter } from './fonts'
 import { business, externalProfiles, founders, parentBrand, peerspaceListings, siteUrl, studioOffers } from '@/lib/seo/site'
 
@@ -250,7 +252,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   const gaId = process.env.NEXT_PUBLIC_GA4_ID
-  const hasValidGaId = gaId && gaId !== 'undefined' && gaId !== 'G-PLACEHOLDER'
+  const hasValidGaId = validMeasurementId(gaId)
 
   return (
     <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable}`} style={brandFontStyle}>
@@ -261,15 +263,7 @@ export default function RootLayout({
             <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
             <script
               dangerouslySetInnerHTML={{
-                __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${gaId}', {
-                page_path: window.location.pathname,
-                cookie_flags: 'SameSite=None;Secure'
-              });
-            `,
+                __html: analyticsBootstrap(gaId!),
               }}
             />
           </>
@@ -278,6 +272,7 @@ export default function RootLayout({
       <body className="bg-black text-white antialiased">
         <a href="#main-content" className="sr-only z-[100] rounded-lg bg-brand-red font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:px-6 focus:py-3">Skip to content</a>
         <AttributionCapture />
+        {hasValidGaId && <AnalyticsPageViews />}
         <Header />
         <main id="main-content">{children}</main>
         <Footer />

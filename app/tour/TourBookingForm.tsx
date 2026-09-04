@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { STUDIOS } from '@/lib/booking/catalog'
 import { bookingDateRange } from '@/lib/booking/time'
+import { trackSuccessfulLead } from '@/lib/analytics'
 
 type TourSlot = { time: string; label: string; available: boolean }
 
@@ -131,6 +132,7 @@ export default function TourBookingForm() {
         return
       }
       setConfirmed(data.tour)
+      trackSuccessfulLead('tour')
     } catch {
       setError('Connection error. Please try again.')
     }

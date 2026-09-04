@@ -1,4 +1,5 @@
 import type Stripe from 'stripe'
+import { createHash } from 'node:crypto'
 import { hasMatchingBookingAddOnTotal } from './add-ons'
 import { hasCompleteBookingCartMetadata, parseBookingCartItems } from './checkout-metadata'
 import { describeSlotRanges, formatBookingDuration, formatDateForDisplay } from './time'
@@ -50,6 +51,14 @@ export async function getBookingConfirmation(
     }
     // A URL alone reveals status only. Details require signed checkout authority.
     if (managementToken && dependencies.verifyManagementToken(managementToken, sessionId, metadata.bookingRef)) {
+      if (result.status === 'confirmed') {
+        result.purchase = {
+          transactionId: `vbs_${createHash('sha256').update(`purchase:${metadata.bookingRef}`).digest('hex').slice(0, 32)}`,
+          value: expectedTotal / 100,
+          currency: 'USD',
+          items: cart.map((item) => ({ itemId: item.studioId, quantity: 1 })),
+        }
+      }
       result.summary = {
         totalPaid: expectedTotal / 100,
         sessions: cart.map((item) => ({
