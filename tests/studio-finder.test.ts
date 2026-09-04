@@ -8,6 +8,8 @@ import {
   getStudioFinderSetup,
   getStudioFinderInquiry,
   getStudioFinderMatches,
+  getStudioFinderGuidance,
+  studioFinderNeedsProductionSupport,
   parseOnCameraCount,
   STUDIO_FINDER_FORMATS,
   VERIFIED_ON_CAMERA_CAPACITY,
@@ -112,6 +114,22 @@ describe('capacity-checked recommendations', () => {
 })
 
 describe('team-confirmation handoff', () => {
+  test('distinguishes unknown headcounts from a requested production service', () => {
+    assert.match(getStudioFinderGuidance({ format: 'podcast', peopleOnCamera: null, bringingCrew: false }), /on-camera count is still open/)
+    assert.match(getStudioFinderGuidance({ format: 'podcast', peopleOnCamera: 8, bringingCrew: true }), /setup check/)
+    assert.match(getStudioFinderGuidance({ format: 'photo', peopleOnCamera: 1, bringingCrew: false }), /photographer.*quote/)
+    assert.match(getStudioFinderGuidance({ format: 'greenscreen', peopleOnCamera: 1, bringingCrew: false }), /crew.*equipment.*quote/)
+    assert.match(getStudioFinderGuidance({ format: 'notsure', peopleOnCamera: null, bringingCrew: false }), /choose the format/)
+  })
+
+  test('rental productions without their own crew require a production handoff', () => {
+    for (const format of ['photo', 'video', 'greenscreen'] as const) {
+      assert.equal(studioFinderNeedsProductionSupport({ format, peopleOnCamera: 1, bringingCrew: false }), true)
+      assert.equal(studioFinderNeedsProductionSupport({ format, peopleOnCamera: 1, bringingCrew: true }), false)
+    }
+    assert.equal(studioFinderNeedsProductionSupport({ format: 'podcast', peopleOnCamera: 2, bringingCrew: false }), false)
+  })
+
   test('preserves format, exact count and crew context in an editable inquiry', () => {
     const href = getStudioFinderContactHref({ format: 'podcast', peopleOnCamera: 5, bringingCrew: false })
     const url = new URL(href, 'https://www.vibeshackstudios.com')

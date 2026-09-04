@@ -41,7 +41,7 @@ export function getStudioFinderMatches(answers: StudioFinderAnswers): Studio[] {
   const count = answers.peopleOnCamera
   if (count === null || parseOnCameraCount(String(count), answers.format) === null) return []
   if (answers.format === 'notsure') return []
-  if ((answers.format === 'photo' || answers.format === 'video') && !answers.bringingCrew) return []
+  if (studioFinderNeedsProductionSupport(answers)) return []
 
   return STUDIOS.filter((studio) => {
     const capacity = VERIFIED_ON_CAMERA_CAPACITY[studio.id]
@@ -52,6 +52,25 @@ export function getStudioFinderMatches(answers: StudioFinderAnswers): Studio[] {
     if (answers.format === 'photo') return studio.type === 'photo'
     return studio.type === 'photo' || studio.type === 'greenscreen'
   })
+}
+
+export function studioFinderNeedsProductionSupport(answers: StudioFinderAnswers) {
+  return !answers.bringingCrew && ['photo', 'video', 'greenscreen'].includes(answers.format)
+}
+
+export function getStudioFinderGuidance(answers: StudioFinderAnswers) {
+  if (studioFinderNeedsProductionSupport(answers)) {
+    return answers.format === 'photo'
+      ? 'Tell us about the photos you need. We will confirm the photographer, room, and production quote before you book.'
+      : 'Tell us about your production. We will confirm the crew, equipment, room, and quote before you book.'
+  }
+  if (answers.format === 'notsure') {
+    return 'Share what you want to make, or book a free tour. We will help you choose the format, room, and setup.'
+  }
+  if (answers.peopleOnCamera === null) {
+    return 'Your on-camera count is still open. Send us your project details so we can confirm the group size and a suitable setup with you.'
+  }
+  return 'Your project needs a setup check with our team. Send us your on-camera count, crew, and equipment needs so we can confirm a suitable room before you book.'
 }
 
 // Carry a photo choice only when exactly one supplied layout fits the count.

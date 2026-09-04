@@ -15,10 +15,6 @@ function formatDate(d: Date) {
   return `${d.getFullYear()}-${padDatePart(d.getMonth() + 1)}-${padDatePart(d.getDate())}`
 }
 
-function getNext45Days() {
-  return bookingDateRange(45).map((date) => new Date(`${date}T12:00:00`))
-}
-
 function fmtDateFull(date: string) {
   return new Date(`${date}T12:00:00`).toLocaleDateString('en-US', {
     weekday: 'long',
@@ -43,6 +39,7 @@ export default function TourBookingForm() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [confirmed, setConfirmed] = useState<{ date: string; time: string; studioName: string } | null>(null)
+  const [tourDates, setTourDates] = useState<string[]>([])
   const availabilityReqRef = useRef(0)
 
   useEffect(() => {
@@ -53,7 +50,41 @@ export default function TourBookingForm() {
     }
   }, [])
 
-  const days = useMemo(() => getNext45Days(), [])
+  useEffect(() => {
+    // The static page and first client render share an empty calendar. Only
+    // the browser clock supplies dates, so a past deployment cannot hydrate
+    // with stale days. Refresh long-open tabs when the Pacific date changes.
+    const refreshDates = () => {
+      const nextDates = bookingDateRange(45)
+      setTourDates((current) => current[0] === nextDates[0] ? current : nextDates)
+    }
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') refreshDates()
+    }
+    refreshDates()
+    const interval = window.setInterval(refreshDates, 60_000)
+    window.addEventListener('focus', refreshDates)
+    document.addEventListener('visibilitychange', refreshWhenVisible)
+    return () => {
+      window.clearInterval(interval)
+      window.removeEventListener('focus', refreshDates)
+      document.removeEventListener('visibilitychange', refreshWhenVisible)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!selectedDate || !tourDates.length || tourDates.includes(selectedDate)) return
+    availabilityReqRef.current += 1
+    setSelectedDate('')
+    setSelectedSlot('')
+    setSlots([])
+    setSlotsLoading(false)
+    setAvailabilityVerified(true)
+    setMonthOffset(0)
+    setError('That date has passed. Choose a new tour date and time.')
+  }, [selectedDate, tourDates])
+
+  const days = useMemo(() => tourDates.map((date) => new Date(`${date}T12:00:00`)), [tourDates])
   const daysByMonth = useMemo(() => {
     const groups: Record<string, Date[]> = {}
     days.forEach((date) => {
@@ -174,7 +205,7 @@ export default function TourBookingForm() {
             >
               ← Prev
             </button>
-            <p className="text-gray-600 text-xs uppercase tracking-widest">{monthLabel}</p>
+            <p className="text-gray-600 text-xs uppercase tracking-widest">{monthLabel || 'Tour dates'}</p>
             <button
               type="button"
               onClick={() => setMonthOffset((value) => Math.min(months.length - 1, value + 1))}
@@ -185,6 +216,7 @@ export default function TourBookingForm() {
             </button>
           </div>
 
+          {!tourDates.length && <p role="status" className="mb-7 py-6 text-sm text-gray-500">Loading current tour dates…</p>}
           <div className="grid grid-cols-5 gap-1 mb-7">
             {monthDays.map((date) => {
               const ds = formatDate(date)
@@ -322,7 +354,7 @@ export default function TourBookingForm() {
 
           <button
             type="submit"
-            disabled={submitting || !availabilityVerified}
+            disabled={submitting || !tourDates.length || !availabilityVerified}
             className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-white py-4 text-sm font-bold text-black transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? 'Booking tour…' : 'Book Free Tour'}
