@@ -72,7 +72,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
             <Link href="/our-work/" className="text-sm font-semibold text-white/[0.48] transition-colors hover:text-white">
               Back to Our Work
             </Link>
-            <p className="w-full text-left text-xs font-bold uppercase tracking-[0.16em] text-white/35 sm:w-auto sm:text-right">
+            <p className="w-full text-left text-xs font-bold uppercase tracking-[0.16em] text-white/60 sm:w-auto sm:text-right">
               {project.categoryLabel} / {project.year}
             </p>
           </div>
@@ -88,7 +88,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
               </p>
               <ul className="mt-6 space-y-2">
                 {project.credits.map((credit) => (
-                  <li key={credit} className="text-xs font-bold uppercase tracking-[0.14em] text-white/45">
+                  <li key={credit} className="text-xs font-bold uppercase tracking-[0.14em] text-white/60">
                     {credit}
                   </li>
                 ))}
@@ -147,7 +147,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
         </div>
       </section>
 
-      <main className="bg-black text-white">
+      <div className="bg-black text-white">
         <section className="border-y border-white/10">
           <div className="mx-auto grid max-w-[1680px] grid-cols-1 divide-y divide-white/10 px-6 sm:px-10 md:grid-cols-3 md:divide-x md:divide-y-0 lg:px-16">
             {[
@@ -156,7 +156,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
               ['Year', project.year],
             ].map(([label, value]) => (
               <div key={label} className="py-5 md:px-8 md:first:pl-0 md:last:pr-0">
-                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">{label}</p>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">{label}</p>
                 <p className="text-xl font-black text-white">{value}</p>
               </div>
             ))}
@@ -215,7 +215,7 @@ export default async function WorkProjectPage({ params }: PageProps) {
             </Link>
           </div>
         </section>
-      </main>
+      </div>
     </>
   )
 }

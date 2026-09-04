@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import type { CSSProperties, VideoHTMLAttributes } from 'react'
 
@@ -17,7 +16,7 @@ type Rgb = [number, number, number]
 type FamilySamples = Record<ResponseFamily, Rgb[]>
 
 type CinemaRuntimeTheaterProps = {
-  src: string
+  src?: string
   title: string
   muted: boolean
   autoPlay?: boolean
@@ -281,25 +280,9 @@ export const CinemaRuntimeTheater = forwardRef<HTMLVideoElement, CinemaRuntimeTh
         className={`cinema-runtime-stage ${screeningActive ? 'is-screening-active' : ''} ${ending ? 'is-ending' : ''}`}
         aria-hidden={filmFullscreen ? undefined : true}
       >
-        <Image
-          className="cinema-runtime-plate cinema-runtime-idle"
-          src={`${RUNTIME_ASSET_ROOT}/theater_idle.png`}
-          alt=""
-          fill
-          sizes="100vw"
-          priority
-          unoptimized
-        />
+        <div className="cinema-runtime-plate cinema-runtime-idle" />
         <div className="cinema-runtime-playing">
-          <Image
-            className="cinema-runtime-plate cinema-runtime-playing-base"
-            src={`${RUNTIME_ASSET_ROOT}/theater_playing_base.png`}
-            alt=""
-            fill
-            sizes="100vw"
-            priority
-            unoptimized
-          />
+          <div className="cinema-runtime-plate cinema-runtime-playing-base" />
           <div className="cinema-runtime-screen" style={positionStyle}>
             <canvas
               ref={fillCanvasRef}

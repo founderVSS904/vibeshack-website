@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import MediaDialog from '@/components/media/MediaDialog'
 import { getFeaturedPlaybackState, getFeaturedVideoEmbedUrl } from '@/lib/home/featuredOriginals'
+import { HomeMotionButton, useHomeMotion } from './HomeMotion'
+import { allowAmbientVideo } from '@/lib/media/playback'
 
 type FeaturedSlide = {
   title: [string] | [string, string]
@@ -67,11 +69,11 @@ const slides: FeaturedSlide[] = [
 export function FeaturedOriginals() {
   const [index, setIndex] = useState(0)
   const [autoAdvance, setAutoAdvance] = useState(true)
-  const [motionPaused, setMotionPaused] = useState(false)
-  const [reducedMotion, setReducedMotion] = useState(true)
+  const { preferences, paused: motionPaused } = useHomeMotion()
   const [hovered, setHovered] = useState(false)
   const [focusWithin, setFocusWithin] = useState(false)
-  const [inView, setInView] = useState(true)
+  const [inView, setInView] = useState(false)
+  const [pageVisible, setPageVisible] = useState(true)
   const [videoIndex, setVideoIndex] = useState<number | null>(null)
   const carouselId = useId()
   const sectionRef = useRef<HTMLElement>(null)
@@ -82,7 +84,7 @@ export function FeaturedOriginals() {
   const closeVideo = useCallback(() => setVideoIndex(null), [])
   const { playPreview, advanceSlides } = getFeaturedPlaybackState({
     motionPaused,
-    reducedMotion,
+    reducedMotion: !allowAmbientVideo(preferences, { inView: pageVisible, requiresHover: true }),
     inView,
     videoOpen: embedUrl !== null,
     autoAdvance,
@@ -91,17 +93,20 @@ export function FeaturedOriginals() {
   })
 
   useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const syncMotionPreference = () => setReducedMotion(query.matches)
-    syncMotionPreference()
-    query.addEventListener('change', syncMotionPreference)
-    return () => query.removeEventListener('change', syncMotionPreference)
+    const sync = () => setPageVisible(!document.hidden)
+    sync()
+    document.addEventListener('visibilitychange', sync)
+    return () => document.removeEventListener('visibilitychange', sync)
   }, [])
 
   // Offscreen, the carousel neither advances nor plays video.
   useEffect(() => {
     const el = sectionRef.current
-    if (!el || typeof IntersectionObserver === 'undefined') return
+    if (!el) return
+    if (typeof IntersectionObserver === 'undefined') {
+      setInView(true)
+      return
+    }
     const io = new IntersectionObserver(([entry]) => {
       setInView(entry.isIntersecting)
     })
@@ -114,16 +119,6 @@ export function FeaturedOriginals() {
     setAutoAdvance(false)
     go(next)
   }
-  const toggleMotion = () => {
-    if (motionPaused) {
-      setMotionPaused(false)
-      setAutoAdvance(true)
-    } else {
-      setMotionPaused(true)
-      setAutoAdvance(false)
-    }
-  }
-
   useEffect(() => {
     if (!advanceSlides) return
     const timer = window.setInterval(() => {
@@ -164,25 +159,10 @@ export function FeaturedOriginals() {
           }
         }}
       >
-        <button
-          type="button"
-          onClick={toggleMotion}
-          disabled={reducedMotion}
-          aria-controls={carouselId}
-          title={reducedMotion ? 'Reduced motion is on. Use the arrows to browse featured work.' : undefined}
-          className="absolute left-6 top-8 z-10 inline-flex h-10 items-center gap-2 rounded-full border border-white/25 bg-black/70 px-4 text-xs font-bold text-white backdrop-blur transition-colors hover:border-white/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-red disabled:cursor-default sm:left-12 lg:left-24 lg:top-12"
-        >
-          {motionPaused && !reducedMotion ? (
-            <svg className="h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-              <path d="M2 1.5v9l8-4.5-8-4.5z" />
-            </svg>
-          ) : (
-            <svg className="h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-              <path d="M2 1h3v10H2zm5 0h3v10H7z" />
-            </svg>
-          )}
-          {reducedMotion ? 'Motion paused' : motionPaused ? 'Resume motion' : 'Pause motion'}
-        </button>
+        <HomeMotionButton
+          onResume={() => setAutoAdvance(true)}
+          className="absolute left-6 top-8 z-10 sm:left-12 lg:left-24 lg:top-12"
+        />
         <div
           id={carouselId}
           className="flex transition-transform duration-[760ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
@@ -194,7 +174,7 @@ export function FeaturedOriginals() {
               className="relative min-h-[520px] w-full flex-shrink-0 sm:min-h-[640px] lg:min-h-[76vh]"
               aria-hidden={i !== index}
             >
-              {slide.video ? (
+              {slide.video && playPreview && i === index ? (
                 <video
                   ref={(el) => {
                     videoRefs.current[i] = el
@@ -211,7 +191,7 @@ export function FeaturedOriginals() {
                 />
               ) : (
                 <Image
-                  src={slide.image}
+                  src={slide.posterSrc ?? slide.image}
                   alt={slide.imageAlt}
                   fill
                   loading="lazy"

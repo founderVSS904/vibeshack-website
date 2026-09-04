@@ -1,7 +1,7 @@
 'use client'
 export default function BookError({ error, reset }: { error: Error; reset: () => void }) {
   return (
-    <main className="bg-black min-h-screen flex items-center justify-center">
+    <div className="bg-black min-h-screen flex items-center justify-center">
       <div className="text-center max-w-md px-6">
         <p className="mb-6 font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-red">Booking unavailable</p>
         <h1 className="mb-4 text-4xl text-white">
@@ -17,6 +17,6 @@ export default function BookError({ error, reset }: { error: Error; reset: () =>
           </a>
         </div>
       </div>
-    </main>
+    </div>
   )
 }

@@ -16,6 +16,7 @@ import {
 } from '@/lib/home/idleScreensaver'
 import type { BounceBounds, BounceState, EdgeInsets } from '@/lib/home/idleScreensaver'
 import styles from './HomeIdleScreensaver.module.css'
+import { useHomeMotion } from './HomeMotion'
 
 const editableSelector = 'input, textarea, select, [contenteditable="true"]'
 const blockingOverlaySelector = 'dialog[open], [role="dialog"][aria-modal="true"], header details[open]'
@@ -41,6 +42,7 @@ const hasForegroundMedia = () =>
   )
 
 export function HomeIdleScreensaver() {
+  const { motionEnabled } = useHomeMotion()
   const [active, setActive] = useState(false)
   const [shielding, setShielding] = useState(false)
   const [colorIndex, setColorIndex] = useState(0)
@@ -54,6 +56,12 @@ export function HomeIdleScreensaver() {
   const wakeShieldTimeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
+    if (!motionEnabled) {
+      activeRef.current = false
+      setActive(false)
+      setShielding(false)
+      return
+    }
     let disposed = false
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     reducedMotionRef.current = motionQuery.matches
@@ -183,7 +191,7 @@ export function HomeIdleScreensaver() {
       idleTimer.dispose()
       clearWakeShield()
     }
-  }, [])
+  }, [motionEnabled])
 
   useEffect(() => {
     if (!active) return

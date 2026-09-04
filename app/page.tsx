@@ -5,6 +5,7 @@ import { TrustedStrip } from '@/components/home/TrustedStrip'
 import { WhatWeDo } from '@/components/home/WhatWeDo'
 import { StudioSpaces } from '@/components/home/StudioSpaces'
 import { HomeIdleScreensaver } from '@/components/home/HomeIdleScreensaver'
+import { HomeMotionProvider } from '@/components/home/HomeMotion'
 import { siteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
@@ -33,13 +34,13 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="home-landing-page">
+    <HomeMotionProvider>
       <DynamicFrameHero />
       <FeaturedOriginals />
       <TrustedStrip />
       <StudioSpaces />
       <WhatWeDo />
       <HomeIdleScreensaver />
-    </div>
+    </HomeMotionProvider>
   )
 }
