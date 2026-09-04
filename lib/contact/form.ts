@@ -39,7 +39,7 @@ export function firstInvalidContactField(errors: ContactFieldErrors): ContactFie
 }
 
 export type ContactDeliveryResult =
-  | { ok: true }
+  | { ok: true; delivered: boolean }
   | { ok: false; kind: 'network' | 'server' | 'retry' | 'rate-limit'; message: string }
 
 export async function sendContactBrief(brief: ContactBrief, request: typeof fetch): Promise<ContactDeliveryResult> {
@@ -49,7 +49,10 @@ export async function sendContactBrief(brief: ContactBrief, request: typeof fetc
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(brief),
     })
-    if (response.ok) return { ok: true }
+    if (response.ok) {
+      const result = await response.json().catch(() => null)
+      return { ok: true, delivered: result?.ok === true && result?.delivered === true && !brief.company.trim() }
+    }
     if (response.status === 429) {
       return { ok: false, kind: 'rate-limit', message: 'Too many attempts. Please wait a few minutes before trying again.' }
     }

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
 import { analyticsBootstrap, analyticsLocation, analyticsReferrer, validMeasurementId } from '../lib/analytics-config'
-import { createPurchaseTracker, purchaseEvent, recordSuccessfulLead } from '../lib/analytics-conversions'
+import { createPurchaseTracker, isConfirmedTourResponse, purchaseEvent, recordSuccessfulLead } from '../lib/analytics-conversions'
 import type { BookingConfirmation } from '../lib/booking/confirmation-state'
 
 const confirmed: BookingConfirmation = {
@@ -66,5 +66,12 @@ describe('conversion measurement boundaries', () => {
     assert.equal(analyticsBootstrap('not-a-measurement-id'), '')
     assert.match(analyticsBootstrap('G-ABC1234567'), /send_page_view:false/)
     assert.match(analyticsBootstrap('G-ABC1234567'), /window.location.origin\+window.location.pathname/)
+  })
+
+  test('tour acknowledgments require a real reservation receipt before lead tracking', () => {
+    for (const response of [null, undefined, {}, { ok: true }, { ok: true, tour: {} }, { ok: false, tour: { date: '2026-09-12', time: '10:00-10:30 AM', studioName: 'The Executive' } }]) {
+      assert.equal(isConfirmedTourResponse(response), false)
+    }
+    assert.equal(isConfirmedTourResponse({ ok: true, tour: { date: '2026-09-12', time: '10:00-10:30 AM', studioName: 'The Executive' } }), true)
   })
 })

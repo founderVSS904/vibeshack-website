@@ -81,7 +81,7 @@ export default function ContactForm() {
     const result = await sendContactBrief(data, fetch)
     sendingRef.current = false
     if (result.ok) {
-      trackSuccessfulLead('project_inquiry')
+      if (result.delivered) trackSuccessfulLead('project_inquiry')
       setStatus('success')
     } else {
       setDeliveryError(result.message)

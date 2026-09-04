@@ -25,6 +25,10 @@ if (!process.argv.includes('--apply')) {
     console.error('Cannot apply branch protection: the connected GitHub account is not a repository administrator. No settings were changed.')
     process.exitCode = 1
   } else {
+    const branch = JSON.parse(execFileSync('gh', ['api', `repos/${repository}/branches/main`], { encoding: 'utf8' }))
+    if (branch.protected) {
+      throw new Error('Main already has protection. Review its existing rules before changing them; this script will not overwrite a potentially stronger policy.')
+    }
     execFileSync('gh', ['api', '--method', 'PUT', `repos/${repository}/branches/main/protection`, '--input', '-'], {
       input: JSON.stringify(protection), stdio: ['pipe', 'ignore', 'inherit'],
     })

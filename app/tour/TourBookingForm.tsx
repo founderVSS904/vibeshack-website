@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { STUDIOS } from '@/lib/booking/catalog'
 import { bookingDateRange } from '@/lib/booking/time'
 import { trackSuccessfulLead } from '@/lib/analytics'
+import { isConfirmedTourResponse } from '@/lib/analytics-conversions'
 
 type TourSlot = { time: string; label: string; available: boolean }
 
@@ -162,8 +163,10 @@ export default function TourBookingForm() {
         setSubmitting(false)
         return
       }
-      setConfirmed(data.tour)
-      trackSuccessfulLead('tour')
+      if (isConfirmedTourResponse(data)) {
+        setConfirmed(data.tour)
+        if (!company.trim()) trackSuccessfulLead('tour')
+      }
     } catch {
       setError('Connection error. Please try again.')
     }

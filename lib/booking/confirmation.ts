@@ -51,7 +51,7 @@ export async function getBookingConfirmation(
     }
     // A URL alone reveals status only. Details require signed checkout authority.
     if (managementToken && dependencies.verifyManagementToken(managementToken, sessionId, metadata.bookingRef)) {
-      if (result.status === 'confirmed') {
+      if (result.status === 'confirmed' && session.livemode === true) {
         result.purchase = {
           transactionId: `vbs_${createHash('sha256').update(`purchase:${metadata.bookingRef}`).digest('hex').slice(0, 32)}`,
           value: expectedTotal / 100,

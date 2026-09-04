@@ -252,7 +252,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   const gaId = process.env.NEXT_PUBLIC_GA4_ID
-  const hasValidGaId = validMeasurementId(gaId)
+  // Enable only after the GA stream's automatic Enhanced Measurement events
+  // are disabled. They bypass our explicit URL and submitted-field filtering.
+  const hasValidGaId = validMeasurementId(gaId) && process.env.NEXT_PUBLIC_GA4_MANUAL_EVENTS_ONLY === 'true'
 
   return (
     <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable}`} style={brandFontStyle}>
