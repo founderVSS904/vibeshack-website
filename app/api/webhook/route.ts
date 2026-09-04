@@ -1,35 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { acquireBookingHolds, addBookingEvents, assertCartSlotsAvailable, hasBookingEventsForRef, releaseBookingHolds, type BookingCartItem } from '@/lib/booking/calendar'
+import { createHash } from 'node:crypto'
+import { deliverMessage } from '@/lib/booking/delivery'
+import { acquireBookingHolds, addBookingEvents, bookingDeliveryStore, assertCartSlotsAvailable, hasBookingEventsForRef, releaseBookingHolds, type BookingCartItem } from '@/lib/booking/calendar'
 import { getStudioById } from '@/lib/booking/catalog'
 import { hasMatchingBookingAddOnTotal } from '@/lib/booking/add-ons'
 import { bookingAddOnsEmailHtml } from '@/lib/booking/add-on-communication'
 import { bookingSetupEmailHtml } from '@/lib/booking/setup-communication'
 import { bookingNeedsAttention, fulfillBookingCalendar } from '@/lib/booking/fulfillment-state'
 import { hasCompleteBookingCartMetadata, parseBookingCartItems } from '@/lib/booking/checkout-metadata'
-import { buildReferralInfo, formatMoneyFromCents, type ReferralInfo } from '@/lib/booking/referrals'
+import { buildReferralInfo, type ReferralInfo } from '@/lib/booking/referrals'
+import { parseTeamEmailMetadata } from '@/lib/booking/team-email-metadata'
 import { getStripeClient } from '@/lib/booking/stripe'
 import { SLOT_DURATION_MINUTES, addMinutes, bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate } from '@/lib/booking/time'
-import { escapeHtml, isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
+import { escapeHtml, isEmail, stripControlChars } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
 
 const PAID_BOOKING_HOLD_RECOVERY_MS = 7 * 24 * 60 * 60 * 1000
 
-function parseReferralInfo(metadata: Record<string, string>, amountTotal: number): ReferralInfo | null {
-  const referral = buildReferralInfo(metadata.referralSource, amountTotal)
-  if (!referral) return null
-
-  const metadataCommission = Number.parseInt(metadata.referralCommissionCents || '', 10)
-  const metadataRate = Number.parseFloat(metadata.referralCommissionRate || '')
-
-  return {
-    ...referral,
-    partnerName: stripControlChars(metadata.referralPartner || referral.partnerName, 120),
-    commissionRate: Number.isFinite(metadataRate) && metadataRate > 0 ? metadataRate : referral.commissionRate,
-    commissionCents: Number.isFinite(metadataCommission) && metadataCommission >= 0
-      ? metadataCommission
-      : referral.commissionCents,
-  }
+function parseReferralInfo(metadata: Record<string, string>): ReferralInfo | null {
+  // Historical payout fields are deliberately ignored. Attribution remains valid.
+  return buildReferralInfo(metadata.referralSource)
 }
 
 function validateCompletedSession(
@@ -40,6 +31,10 @@ function validateCompletedSession(
 ) {
   if (session.payment_status !== 'paid') {
     return { ok: false, status: 200, error: `Checkout session is not paid: ${session.payment_status}` }
+  }
+
+  if (session.mode !== 'payment' || session.status !== 'complete' || session.currency !== 'usd') {
+    return { ok: false, status: 400, error: 'Checkout is not a completed USD payment' }
   }
 
   if (!isEmail(customerEmail)) {
@@ -288,6 +283,7 @@ async function sendDoubleBookingAlert(
   bookingRef: string,
   reason: string,
   calendarInserted: boolean,
+  messageId?: string,
 ) {
   const gmailUser = process.env.GMAIL_USER || 'founder@vibeshackstudios.com'
   const gmailPass = process.env.GMAIL_APP_PASSWORD
@@ -297,6 +293,7 @@ async function sendDoubleBookingAlert(
   const transporter = nodemailer.default.createTransport({
     service: 'gmail',
     auth: { user: gmailUser, pass: gmailPass },
+    connectionTimeout: 20_000, greetingTimeout: 20_000, socketTimeout: 30_000,
   })
 
   const sessionRows = cartItems
@@ -304,6 +301,7 @@ async function sendDoubleBookingAlert(
     .join('')
 
   await transporter.sendMail({
+    messageId,
     from: `VibeShack Studios <${gmailUser}>`,
     to: gmailUser,
     subject: `[ACTION NEEDED] Possible double booking - ${bookingRef}`,
@@ -328,6 +326,8 @@ async function sendConfirmationEmail(
   referralInfo: ReferralInfo | null,
   attributionDetails = '',
   receiptUrl = '',
+  sessionId = '',
+  previouslyConfirmed = false,
 ) {
   const gmailUser = process.env.GMAIL_USER || 'founder@vibeshackstudios.com'
   const gmailPass = process.env.GMAIL_APP_PASSWORD
@@ -337,18 +337,34 @@ async function sendConfirmationEmail(
   const transporter = nodemailer.default.createTransport({
     service: 'gmail',
     auth: { user: gmailUser, pass: gmailPass },
+    connectionTimeout: 20_000, greetingTimeout: 20_000, socketTimeout: 30_000,
   })
-  const criticalFailures: string[] = []
+  const deliveryStore = await bookingDeliveryStore(sessionId)
+  // A completed legacy checkout had one aggregate marker and no outbox.
+  if (previouslyConfirmed && !(await deliveryStore.read())) return
+  const identity = createHash('sha256').update(sessionId).digest('hex').slice(0, 40)
+  const deliveryFailures: string[] = []
   const sendMail = async (
     label: string,
     mailOptions: Parameters<typeof transporter.sendMail>[0],
-    critical = false,
   ) => {
-    try {
-      await transporter.sendMail(mailOptions)
-    } catch (error) {
-      console.error(`${label} email failed:`, error)
-      if (critical) criticalFailures.push(label)
+    const keys: Record<string, string> = { 'Booking confirmation': 'confirmation', 'Session prep': 'prep', 'Team session details': 'team', 'Internal booking': 'staff' }
+    const recipients = Array.isArray(mailOptions.to) ? mailOptions.to : [mailOptions.to]
+    for (const [index, recipient] of recipients.entries()) {
+      const key = `${keys[label]}${recipients.length > 1 ? index : ''}`
+      try {
+        await deliverMessage(deliveryStore, key, async (messageId) => {
+          const result = await transporter.sendMail({ ...mailOptions, to: recipient, messageId })
+          if (Array.isArray(result.rejected) && result.rejected.length
+            && (!Array.isArray(result.accepted) || !result.accepted.length)) {
+            throw Object.assign(new Error('The message recipient was rejected'), { responseCode: 550 })
+          }
+        }, { identity })
+        if (label === 'Booking confirmation') await markSessionFulfillmentStep(sessionId, 'vbsConfirmationSentAt')
+      } catch (error) {
+        console.error(`${label} email delivery failed:`, error)
+        deliveryFailures.push(key)
+      }
     }
   }
 
@@ -372,7 +388,6 @@ async function sendConfirmationEmail(
         <p style="font-size:14px;line-height:1.7;margin:0;">
           <strong>Partner:</strong> ${escapeHtml(referralInfo.partnerName)}<br>
           <strong>Source:</strong> ${escapeHtml(referralInfo.source)}<br>
-          <strong>Commission:</strong> ${escapeHtml(formatMoneyFromCents(referralInfo.commissionCents))} (${escapeHtml(String(Math.round(referralInfo.commissionRate * 100)))}%)
         </p>
       </div>` : ''
 
@@ -458,7 +473,7 @@ async function sendConfirmationEmail(
     to: customer.email,
     subject: `You're booked - ${subjectStudio} - ${firstDate}`,
     html: emailHtml,
-  }, true)
+  })
 
   await sendMail('Session prep', {
     from: `"VibeShack Studios" <${gmailUser}>`,
@@ -517,10 +532,10 @@ async function sendConfirmationEmail(
       ${attributionDetails}
       <ul style="line-height:2;">${internalHtml}</ul>
     `,
-  }, true)
+  })
 
-  if (criticalFailures.length) {
-    throw new Error(`Critical booking emails failed: ${criticalFailures.join(', ')}`)
+  if (deliveryFailures.length) {
+    throw new Error(`Booking email delivery incomplete: ${deliveryFailures.join(', ')}`)
   }
 }
 
@@ -616,14 +631,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: validation.status })
     }
 
-    let teamEmails: string[] = []
+    let teamEmails: string[]
     try {
-      teamEmails = parseEmailList(JSON.parse(metadata.teamEmails || '[]'), 10)
+      teamEmails = parseTeamEmailMetadata(metadata)
     } catch {
-      teamEmails = []
+      return NextResponse.json({ error: 'Team booking metadata is incomplete' }, { status: 500 })
     }
 
-    const referralInfo = parseReferralInfo(metadata, session.amount_total || 0)
+    const referralInfo = parseReferralInfo(metadata)
     const attributionDetails = attributionHtml(metadata)
     const receiptUrl = await getStripeReceiptUrl(session)
     const currentMetadata = await getCurrentSessionMetadata(session)
@@ -729,11 +744,12 @@ export async function POST(req: NextRequest) {
     // failure must never clear the persisted attention state.
     if (needsAttention && !currentMetadata.vbsDoubleBookingAlertedAt) {
       try {
-        await sendDoubleBookingAlert(
+        const alertStore = await bookingDeliveryStore(`attention:${session.id}`)
+        await deliverMessage(alertStore, 'attention', (messageId) => sendDoubleBookingAlert(
           cartItems, customer, bookingRef,
           conflictReason || 'A previous fulfillment attempt flagged a reservation conflict. Review the calendar and contact the customer.',
-          calendarInserted,
-        )
+          calendarInserted, messageId,
+        ), { identity: createHash('sha256').update(`attention:${session.id}`).digest('hex').slice(0, 40) })
         await markSessionFulfillmentStep(session.id, 'vbsDoubleBookingAlertedAt')
       } catch (alertError) {
         console.error('Double booking alert email failed:', alertError)
@@ -741,10 +757,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (!fulfillmentErrors.length && !needsAttention && !currentMetadata.vbsConfirmationSentAt) {
+    if (!fulfillmentErrors.length && !needsAttention) {
       try {
-        await sendConfirmationEmail(cartItems, customer, session.amount_total || 0, teamEmails, referralInfo, attributionDetails, receiptUrl)
-        await markSessionFulfillmentStep(session.id, 'vbsConfirmationSentAt')
+        await sendConfirmationEmail(cartItems, customer, session.amount_total || 0, teamEmails, referralInfo, attributionDetails, receiptUrl, session.id, Boolean(currentMetadata.vbsConfirmationSentAt))
       } catch (error) {
         console.error('Booking email failed:', error)
         fulfillmentErrors.push('email')

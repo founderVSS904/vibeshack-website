@@ -1,14 +1,11 @@
 export interface ReferralPartner {
   id: string
   displayName: string
-  commissionRate: number
 }
 
 export interface ReferralInfo {
   source: string
   partnerName: string
-  commissionRate: number
-  commissionCents: number
 }
 
 export const REFERRAL_COOKIE = 'vibeshack_referral'
@@ -19,7 +16,6 @@ export const REFERRAL_PARTNERS: Record<string, ReferralPartner> = {
   'patriot-black': {
     id: 'patriot-black',
     displayName: 'Patriot Black',
-    commissionRate: 0.2,
   },
 }
 
@@ -38,18 +34,12 @@ export function getReferralPartner(value: unknown) {
   return source ? REFERRAL_PARTNERS[source] || null : null
 }
 
-export function buildReferralInfo(value: unknown, amountCents: number): ReferralInfo | null {
+export function buildReferralInfo(value: unknown): ReferralInfo | null {
   const partner = getReferralPartner(value)
   if (!partner) return null
 
   return {
     source: partner.id,
     partnerName: partner.displayName,
-    commissionRate: partner.commissionRate,
-    commissionCents: Math.round(Math.max(0, amountCents) * partner.commissionRate),
   }
-}
-
-export function formatMoneyFromCents(cents: number) {
-  return `$${(Math.max(0, cents) / 100).toFixed(2)}`
 }

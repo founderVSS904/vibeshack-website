@@ -1,4 +1,6 @@
 import fs from 'fs'
+import { reserveTour } from './tour-reservation'
+import type { DeliveryRecord, DeliveryStore } from './delivery'
 import { createHash } from 'node:crypto'
 import { google, type calendar_v3 } from 'googleapis'
 import { getStudioById, STUDIOS } from './catalog'
@@ -12,7 +14,7 @@ import {
   deleteBookingHoldArtifact,
   runOptimisticBookingHoldCleanup,
 } from './hold-cleanup'
-import { formatMoneyFromCents, type ReferralInfo } from './referrals'
+import { type ReferralInfo } from './referrals'
 import { primaryStudioResourceGroup, studioIdsThatAffectAvailability, studioResourceGroups, studiosShareResources } from './resources'
 import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
 
@@ -53,6 +55,7 @@ export interface TourBookingDetails {
   studioId?: string
   studioName?: string
   notes?: string
+  reservationRef?: string
 }
 
 export interface BookingReminderEvent {
@@ -776,8 +779,10 @@ export async function acquireBookingHolds(
   cartItems: BookingCartItem[],
   bookingRef: string,
   expiresAt: Date,
+  visible = true,
+  dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
 ) {
-  const config = await getCalendarConfig()
+  const config = await dependencies.getConfig()
   if (!config) {
     return { ok: false, status: 503, error: 'Live calendar availability is temporarily unavailable. Please try again shortly.' }
   }
@@ -806,7 +811,7 @@ export async function acquireBookingHolds(
       }
     }
 
-    await upsertBookingHoldBusyEvents(config.client, calendarId, cartItems, bookingRef, expiresAt)
+    if (visible) await upsertBookingHoldBusyEvents(config.client, calendarId, cartItems, bookingRef, expiresAt)
     return { ok: true, status: 200, error: '' }
   } catch (error) {
     await releaseAcquiredBookingHolds(config.client, calendarId, attemptedTargets, cartItems, bookingRef)
@@ -817,10 +822,11 @@ export async function acquireBookingHolds(
 export async function releaseBookingHolds(
   cartItems: BookingCartItem[],
   bookingRef: string,
+  dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
 ) {
   if (!bookingRef || !cartItems.length) return
 
-  const config = await getCalendarConfig()
+  const config = await dependencies.getConfig()
   if (!config) throw new Error('Calendar credentials are not configured')
 
   const targets = bookingHoldTargets(cartItems)
@@ -1005,7 +1011,7 @@ function eventResourceGroups(event: calendar_v3.Schema$Event) {
     .filter(Boolean)
 }
 
-function eventBlocksStudio(
+export function eventBlocksStudio(
   event: calendar_v3.Schema$Event,
   studioId: string | undefined,
   calendarStudioIds: Set<string>,
@@ -1026,6 +1032,9 @@ function eventBlocksStudio(
     return false
   }
 
+  // Tours need the same all-room constraint after insertion as while held.
+  // A visitor's studio interest is descriptive, not a smaller resource lock.
+  if (privateProperties.source === 'vibeshack-tour-booking') return true
   if (!studioId) return true
 
   const eventStudio = eventStudioId(event)
@@ -1238,7 +1247,7 @@ export function formatTourSlotRange(slot: string) {
   return `${formatTimeForDisplay(start)}-${formatTimeForDisplay(addMinutes(start, TOUR_DURATION_MINUTES))}`
 }
 
-export async function getTourAvailabilityForDate(date: string) {
+export async function getTourAvailabilityForDate(date: string, excludedBookingRef?: string) {
   if (!isValidBookingDate(date)) {
     return { verified: false, error: 'Invalid date', durationMinutes: TOUR_DURATION_MINUTES, slots: [] }
   }
@@ -1267,7 +1276,7 @@ export async function getTourAvailabilityForDate(date: string) {
     if (!holdConfig) {
       throw new Error('Calendar credentials are not configured')
     }
-    busyTimes.push(...await getBookingHoldBusyTimes(holdConfig.client, undefined, date))
+    busyTimes.push(...await getBookingHoldBusyTimes(holdConfig.client, undefined, date, excludedBookingRef))
 
     return {
       verified: true,
@@ -1300,7 +1309,7 @@ export async function getTourAvailabilityForDate(date: string) {
   }
 }
 
-export async function assertTourSlotAvailable(date: string, slot: string) {
+export async function assertTourSlotAvailable(date: string, slot: string, excludedBookingRef?: string) {
   if (!isValidBookingDate(date)) {
     return { ok: false, status: 400, error: 'Invalid tour date' }
   }
@@ -1309,7 +1318,7 @@ export async function assertTourSlotAvailable(date: string, slot: string) {
     return { ok: false, status: 400, error: 'Selected tour time does not match the date' }
   }
 
-  const availability = await getTourAvailabilityForDate(date)
+  const availability = await getTourAvailabilityForDate(date, excludedBookingRef)
   if (!availability.verified) {
     return { ok: false, status: 503, error: 'Live tour availability is temporarily unavailable. Please try again shortly.' }
   }
@@ -1612,7 +1621,6 @@ export async function addBookingEvents(
                 '',
                 `Referral partner: ${referralInfo.partnerName}`,
                 `Referral source: ${referralInfo.source}`,
-                `Partner commission: ${formatMoneyFromCents(referralInfo.commissionCents)} (${Math.round(referralInfo.commissionRate * 100)}%)`,
               ] : []),
               '',
               'Booked via VibeShack website',
@@ -1707,8 +1715,44 @@ export async function markBookingReminderSent(events: BookingReminderEvent[], se
   }
 }
 
-export async function addTourEvent(tour: TourBookingDetails) {
+function tourCalendarEventId(tour: TourBookingDetails) {
+  if (!tour.reservationRef) throw new Error('Tour reservation authority is required')
+  return `vbst${createHash('sha256').update(tour.reservationRef).digest('hex').slice(0, 48)}`
+}
+
+async function existingTourReservation(tour: TourBookingDetails) {
   const config = await getCalendarConfig()
+  if (!config) throw new Error('Calendar credentials are not configured')
+  // Find a committed retry by guest and exact time, including bookings from
+  // the previous implementation. Cancelled tours do not prevent rebooking.
+  let pageToken: string | undefined
+  do {
+    const response = await config.client.events.list({
+      calendarId: getTourCalendarId(),
+      timeMin: new Date(tour.slot).toISOString(),
+      timeMax: addMinutes(new Date(tour.slot), TOUR_DURATION_MINUTES).toISOString(),
+      privateExtendedProperty: ['source=vibeshack-tour-booking', `guestEmail=${tour.email}`],
+      singleEvents: true, showDeleted: false, pageToken,
+    })
+    if ((response.data.items || []).some((event) => event.status !== 'cancelled'
+      && event.start?.dateTime && Date.parse(event.start.dateTime) === Date.parse(tour.slot))) return true
+    pageToken = response.data.nextPageToken || undefined
+  } while (pageToken)
+  return false
+}
+
+export async function reserveTourBooking(tour: TourBookingDetails) {
+  return reserveTour(tour, {
+    acquire: (cart, ref, expiry) => acquireBookingHolds(cart, ref, expiry, false),
+    availability: assertTourSlotAvailable,
+    insert: addTourEvent,
+    release: releaseBookingHolds,
+    exists: existingTourReservation,
+  })
+}
+
+export async function addTourEvent(tour: TourBookingDetails, dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies) {
+  const config = await dependencies.getConfig()
   if (!config) throw new Error('Calendar credentials are not configured')
 
   const startTime = new Date(tour.slot)
@@ -1717,27 +1761,18 @@ export async function addTourEvent(tour: TourBookingDetails) {
   const dateStr = formatDateForDisplay(tour.date)
   const tourCalendarId = getTourCalendarId()
 
-  const existingTour = await config.client.events.list({
-    calendarId: tourCalendarId,
-    timeMin: startTime.toISOString(),
-    timeMax: endTime.toISOString(),
-    privateExtendedProperty: [
-      'source=vibeshack-tour-booking',
-      `guestEmail=${tour.email}`,
-    ],
-    showDeleted: false,
-    maxResults: 1,
-  })
-
-  if (existingTour.data.items?.length) {
-    console.info(`Skipping duplicate tour insert for ${tour.email} at ${tour.slot}`)
-    return
-  }
+  const eventId = tourCalendarEventId(tour)
+  try {
+    const existing = (await config.client.events.get({ calendarId: tourCalendarId, eventId })).data
+    if (existing.extendedProperties?.private?.guestEmail === tour.email && existing.status !== 'cancelled') return
+    throw new Error('That tour time has already been reserved')
+  } catch (error) { if (googleApiStatus(error) !== 404) throw error }
 
   await config.client.events.insert({
     calendarId: tourCalendarId,
     sendUpdates: 'all',
     requestBody: {
+      id: eventId,
       summary: `Studio Tour - ${tour.name}`,
       location: '950 Battery St, San Francisco, CA 94111',
       description: [
@@ -1757,6 +1792,7 @@ export async function addTourEvent(tour: TourBookingDetails) {
         private: {
           source: 'vibeshack-tour-booking',
           bookingType: 'tour',
+          reservationRef: tour.reservationRef || '',
           guestEmail: tour.email,
           studioId: tour.studioId || '',
           studioName,
@@ -1768,4 +1804,52 @@ export async function addTourEvent(tour: TourBookingDetails) {
       colorId: '5',
     },
   })
+}
+
+
+export async function bookingDeliveryStore(identity: string, dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies): Promise<DeliveryStore> {
+  const config = await dependencies.getConfig()
+  if (!config) throw new Error('Calendar credentials are not configured')
+  const calendarId = getHoldCalendarId()
+  const eventId = `vbsm${createHash('sha256').update(identity).digest('hex').slice(0, 48)}`
+  const requestBody = (record: DeliveryRecord) => ({
+    id: eventId,
+    summary: 'Website message delivery state',
+    description: JSON.stringify(record),
+    visibility: 'private',
+    transparency: 'transparent',
+    start: { date: '2020-01-01' },
+    end: { date: '2020-01-02' },
+    extendedProperties: { private: { source: 'vibeshack-message-delivery' } },
+  })
+  return {
+    read: async () => {
+      try {
+        const event = (await config.client.events.get({ calendarId, eventId })).data
+        if (!event.etag || event.extendedProperties?.private?.source !== 'vibeshack-message-delivery') {
+          throw new Error('Unverified message delivery record')
+        }
+        const record = JSON.parse(event.description || '') as DeliveryRecord
+        if (record.version !== 1 || !record.messages || typeof record.messages !== 'object' || Array.isArray(record.messages)) {
+          throw new Error('Invalid message delivery record')
+        }
+        for (const message of Object.values(record.messages)) {
+          if (!message || !['sending', 'sent', 'failed', 'uncertain'].includes(message.state)
+            || typeof message.attempt !== 'string' || !message.attempt
+            || !Number.isFinite(Date.parse(message.startedAt))) {
+            throw new Error('Invalid message delivery state')
+          }
+        }
+        return { etag: event.etag, record }
+      } catch (error) { if (googleApiStatus(error) === 404) return null; throw error }
+    },
+    create: async () => {
+      await config.client.events.insert({ calendarId, sendUpdates: 'none', requestBody: requestBody({ version: 1, messages: {} }) })
+    },
+    save: async (snapshot, record) => {
+      await config.client.events.update({ calendarId, eventId, sendUpdates: 'none', requestBody: requestBody(record) }, {
+        headers: { 'If-Match': snapshot.etag },
+      })
+    },
+  }
 }

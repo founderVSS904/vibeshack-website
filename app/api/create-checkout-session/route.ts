@@ -3,6 +3,7 @@ import { acquireBookingHolds, assertCartSlotsAvailable, releaseBookingHolds } fr
 import { getRecurringOptionById } from '@/lib/booking/catalog'
 import { buildBookingCheckoutLineItems, buildCanonicalBookingCart, calculateBookingCheckoutPricing } from '@/lib/booking/checkout-pricing'
 import { buildBookingCartMetadata, withBookingAttributionMetadata } from '@/lib/booking/checkout-metadata'
+import { buildTeamEmailMetadata } from '@/lib/booking/team-email-metadata'
 import { bookingCheckoutExpirations } from '@/lib/booking/checkout-lifecycle'
 import { createCheckoutManagementToken } from '@/lib/booking/checkout-management'
 import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
@@ -124,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     const pricing = calculateBookingCheckoutPricing(cart, recurringOption?.id)
     const { discountCents, addOnTotalCents, computedTotalCents } = pricing
-    const referralInfo = buildReferralInfo(referralSource, computedTotalCents)
+    const referralInfo = buildReferralInfo(referralSource)
 
     const lineItems = buildBookingCheckoutLineItems(cart, pricing, `${siteUrl}/og-image.jpg`)
 
@@ -137,17 +138,14 @@ export async function POST(req: NextRequest) {
       customerName: name.slice(0, 500),
       customerEmail: email.slice(0, 500),
       customerPhone: phone.slice(0, 500),
-      studioName: cart[0].studioName.slice(0, 500),
       totalSessions: String(cart.length),
       computedTotalCents: String(computedTotalCents),
       recurring: recurringOption?.id || '',
       recurringDiscountCents: String(discountCents),
       addOnTotalCents: String(addOnTotalCents),
-      teamEmails: JSON.stringify(teamEmails).slice(0, 500),
+      ...buildTeamEmailMetadata(teamEmails),
       referralSource: referralInfo?.source || '',
       referralPartner: referralInfo?.partnerName || '',
-      referralCommissionRate: referralInfo ? String(referralInfo.commissionRate) : '',
-      referralCommissionCents: referralInfo ? String(referralInfo.commissionCents) : '0',
       bookingHoldVersion: '1',
       bookingHoldExpiresAt: holdExpiresAt.toISOString(),
       ...cartMetadata,
