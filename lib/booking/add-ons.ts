@@ -5,21 +5,21 @@ export const TELEPROMPTER = {
   id: 'teleprompter',
   name: 'Teleprompter',
   hourlyRateCents: 5000,
-  description: 'Keep your script at eye level. Optional, for the full session.',
+  description: 'Keep your script at eye level while you record.',
 } as const
 
 export const LIVE_SWITCHING = {
   id: 'live-switching',
   name: 'Live switching',
   hourlyRateCents: 7500,
-  description: 'Switch between camera angles in real time during your session.',
+  description: 'Switch between camera angles as you record.',
 } as const
 
 export const REMOTE_PODCAST = {
   id: 'remote-podcast',
   name: 'Remote podcast',
   hourlyRateCents: 0,
-  description: 'Bring remote guests into your podcast using Riverside, Zoom, or your preferred platform.',
+  description: 'Record with remote guests on Riverside, Zoom, or your preferred platform.',
 } as const
 
 export const BOOKING_ADD_ONS = [TELEPROMPTER, LIVE_SWITCHING, REMOTE_PODCAST] as const
