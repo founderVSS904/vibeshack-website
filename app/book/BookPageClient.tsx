@@ -38,6 +38,9 @@ import {
 } from '@/lib/booking/step-flow'
 import StudioSetupPicker from '@/components/StudioSetupPicker'
 import BookingAddOnPicker from '@/components/BookingAddOnPicker'
+import BookingReviewCard, { bookingDisplayPrice } from '@/components/BookingReviewCard'
+import BookingContactFields from '@/components/BookingContactFields'
+import styles from './Checkout.module.css'
 import { getStudioSetup, getStudioSetups, type StudioSetupId } from '@/lib/booking/studio-setups'
 
 const StripeEmbeddedCheckout = dynamic(() => import('@/components/StripeEmbeddedCheckout'), {
@@ -244,7 +247,7 @@ function Stepper({ step, onJump, locked = false }: { step: Step; onJump: (s: Edi
             {i > 0 && (
               <div className="relative mx-2 h-px flex-1 bg-white/[0.12] sm:mx-6">
                 <span
-                  className="absolute inset-0 origin-left bg-brand-red transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  className="absolute inset-0 origin-left bg-white/60 motion-safe:transition-transform motion-safe:duration-500"
                   style={{ transform: `scaleX(${i <= activeIndex ? 1 : i === activeIndex + 1 ? 0.45 : 0})` }}
                 />
               </div>
@@ -254,16 +257,16 @@ function Stepper({ step, onJump, locked = false }: { step: Step; onJump: (s: Edi
               onClick={clickable ? () => onJump(s) : undefined}
               disabled={!clickable}
               aria-current={active ? 'step' : undefined}
-              className={`group flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 sm:gap-3 ${clickable ? 'cursor-pointer' : 'cursor-default'}`}
+              className={`group flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:gap-3 ${clickable ? 'cursor-pointer' : 'cursor-default'}`}
             >
               <span className="sr-only">{`Step ${i + 1}: ${STEP_LABELS[s]}${done ? ', completed' : ''}`}</span>
               <span
                 aria-hidden="true"
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-mono text-[11px] font-bold transition-colors ${
                   done
-                    ? 'border-brand-red bg-brand-red text-white'
+                    ? 'border-white/25 bg-white/10 text-white'
                     : active
-                      ? 'border-brand-red text-brand-red'
+                      ? 'border-white bg-white text-black'
                       : 'border-white/20 text-zinc-500'
                 }`}
               >
@@ -278,7 +281,7 @@ function Stepper({ step, onJump, locked = false }: { step: Step; onJump: (s: Edi
               <span
                 aria-hidden="true"
                 className={`font-mono text-[11px] font-bold uppercase tracking-[0.2em] transition-colors ${
-                  active ? 'text-brand-red' : done ? `text-white ${clickable ? 'group-hover:text-brand-red' : ''}` : 'text-zinc-500'
+                  active ? 'text-white' : done ? `text-zinc-300 ${clickable ? 'group-hover:text-white' : ''}` : 'text-zinc-500'
                 } ${active ? 'hidden min-[400px]:inline' : 'hidden md:inline'}`}
               >
                 {STEP_LABELS[s]}
@@ -475,7 +478,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
     step === 'room' ? 'Continue to Date & Time'
       : step === 'datetime' ? 'Continue to Extras'
         : step === 'extras' ? 'Continue to Review'
-          : submitting ? 'Processing…' : `Lock In Session · $${grandTotal}`
+          : submitting ? 'Preparing payment…' : 'Continue to payment'
 
   // ── Actions ──
   function previewRoom(id: string) {
@@ -771,19 +774,19 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
     step === 'room' ? 'Build your session'
       : step === 'datetime' ? 'Pick your time'
         : step === 'extras' ? 'Make it yours'
-          : step === 'review' ? 'Lock it in'
+          : step === 'review' ? 'Review your session'
             : 'Secure payment'
 
   const subline =
     step === 'room' ? 'Choose a studio, then select a date and time.'
       : step === 'datetime' ? 'Choose a date and available start time. All times Pacific.'
       : step === 'extras' ? (requiresSetup ? 'Choose your setup, then add optional equipment or recurring savings.' : 'Optional equipment and recurring savings. Studio-only is always an option.')
-          : step === 'review' ? 'Check the details, add your info, and lock it in.'
+          : step === 'review' ? 'Check your session and add your details. You’ll confirm and pay in the next step.'
             : 'Card details are handled by Stripe. We never see them.'
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-black pb-32 pt-24 lg:pb-24">
+    <div className={`${styles.checkout} min-h-screen bg-black pb-32 pt-24 lg:pb-24`}>
       <div className="mx-auto max-w-[1680px] px-6 sm:px-10 lg:px-16">
 
         <Stepper step={step} onJump={goToStep} locked={submitting || checkoutCancelling} />
@@ -791,8 +794,8 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
         {/* Headline + filters */}
         <div className="mt-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 id="booking-step-headline" tabIndex={-1} className="text-white outline-none" style={{ fontSize: 'clamp(2.75rem, 4vw, 4rem)' }}>
-              {headline}<span className="text-brand-red">.</span>
+            <h2 id="booking-step-headline" tabIndex={-1} className="brand-sans font-semibold leading-[1.1] !tracking-[-0.045em] text-white outline-none" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)' }}>
+              {headline}
             </h2>
             <p className="mt-3 text-sm text-zinc-400">{subline}</p>
           </div>
@@ -804,9 +807,9 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                   type="button"
                   aria-pressed={filter === f.id}
                   onClick={() => changeFilter(f.id)}
-                  className={`rounded-sm border px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition-colors ${
+                  className={`min-h-11 rounded-full border px-4 py-2 text-sm font-medium motion-safe:transition-colors ${
                     filter === f.id
-                      ? 'border-brand-red text-brand-red'
+                      ? 'border-white bg-white text-black'
                       : 'border-white/15 text-zinc-400 hover:border-white/35 hover:text-white'
                   }`}
                 >
@@ -983,7 +986,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                   <button
                     type="button"
                     onClick={() => goToStep('room')}
-                    className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500 transition-colors hover:text-white"
+                    className="min-h-11 rounded-lg px-2 text-sm font-medium text-zinc-300 underline underline-offset-4 transition-colors hover:text-white"
                   >
                     Change studio
                   </button>
@@ -1010,7 +1013,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                               type="button"
                               onClick={() => setMonthOffset((m) => Math.max(0, m - 1))}
                               disabled={monthOffset === 0}
-                              className="font-mono text-[11px] uppercase tracking-[0.12em] text-zinc-500 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                              className="min-h-11 rounded-lg text-sm text-zinc-300 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
                             >
                               ← Prev
                             </button>
@@ -1019,7 +1022,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                               type="button"
                               onClick={() => setMonthOffset((m) => Math.min(months.length - 1, m + 1))}
                               disabled={monthOffset >= months.length - 1}
-                              className="font-mono text-[11px] uppercase tracking-[0.12em] text-zinc-500 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                              className="min-h-11 rounded-lg text-sm text-zinc-300 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
                             >
                               Next →
                             </button>
@@ -1050,7 +1053,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                                   onClick={() => selectDate(ds)}
                                   className={`flex h-11 items-center justify-center rounded-lg text-[15px] transition-colors sm:h-12 2xl:h-14 ${
                                     sel
-                                      ? 'bg-brand-red font-bold text-white'
+                                      ? 'bg-white font-semibold text-black'
                                       : inWindow
                                         ? 'font-medium text-zinc-300 hover:bg-white/[0.07] hover:text-white'
                                         : 'cursor-default font-medium text-zinc-700'
@@ -1133,11 +1136,11 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                                   aria-pressed={isStart}
                                   aria-label={`${slot.label}${!slot.available ? ', unavailable' : !fits ? ', no session length fits' : isStart ? ', selected, choose a session length below' : ', available'}`}
                                   onClick={() => pickStart(i)}
-                                  className={`rounded-lg border py-3 font-mono text-xs transition-colors ${
+                                  className={`min-h-11 rounded-xl border py-3 text-[13px] motion-safe:transition-colors ${
                                     isStart
-                                      ? 'border-brand-red bg-brand-red font-bold text-white'
+                                      ? 'border-white bg-white font-semibold text-black'
                                       : inBlock
-                                        ? 'border-brand-red/40 bg-brand-red/10 text-white'
+                                        ? 'border-white/30 bg-white/10 text-white'
                                         : !slot.available
                                           ? 'cursor-not-allowed border-white/5 text-zinc-600 line-through'
                                           : !fits
@@ -1152,7 +1155,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                           </div>
                         </div>
                         {startSlot && selectedStartDurations.length > 0 && (
-                          <div className="mt-4 rounded-lg border border-brand-red/40 bg-brand-red/[0.06] p-4" aria-label={`Session length options for ${fmtTime(startSlot)}`}>
+                          <div className="mt-4 rounded-[20px] border border-white/15 bg-[#141416] p-4" aria-label={`Session length options for ${fmtTime(startSlot)}`}>
                             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white">
                               How long from {fmtTime(startSlot)}?
                             </p>
@@ -1168,9 +1171,9 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                                     type="button"
                                     aria-pressed={selected}
                                     onClick={() => pickDuration(slotCount)}
-                                    className={`rounded-md border px-3 py-2.5 text-left font-mono text-[11px] uppercase tracking-[0.08em] transition-colors ${
+                                    className={`min-h-11 rounded-xl border px-3 py-2.5 text-left text-sm motion-safe:transition-colors ${
                                       selected
-                                        ? 'border-brand-red bg-brand-red font-bold text-white'
+                                        ? 'border-white bg-white font-semibold text-black'
                                         : 'border-white/15 text-zinc-300 hover:border-white/40 hover:text-white'
                                     }`}
                                   >
@@ -1187,12 +1190,12 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                 </div>
 
                 {timeRange && (
-                  <div className="mt-8 flex items-center justify-between border-t border-white/[0.08] pt-6">
+                  <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.08] pt-6">
                     <div>
                       <p className="text-lg font-bold text-white">{timeRange}</p>
                       <p className="mt-1 text-sm text-zinc-500">{fmtDateFull(date)} · {durationLabel}</p>
                     </div>
-                    <p className="font-black text-white" style={{ fontSize: '1.75rem' }}>${sessionSubtotal}</p>
+                    <p className="text-2xl font-semibold tracking-tight text-white">{bookingDisplayPrice(sessionSubtotal)}</p>
                   </div>
                 )}
               </div>
@@ -1222,7 +1225,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                     onPlatformChange={setRemotePodcastPlatform}
                   />
                 </div>
-                <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Make it a standing booking</p>
+                <h3 className="brand-sans mb-2 text-[22px] font-semibold leading-snug !tracking-[-0.035em] text-white">Make it a standing booking</h3>
                 <p className="mb-5 text-sm text-zinc-300">Request a recurring schedule and save on studio time. Add-ons are not discounted.</p>
                 <div className="space-y-2">
                   {RECURRING_OPTIONS.map((opt) => {
@@ -1233,23 +1236,23 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                         type="button"
                         aria-pressed={active}
                         onClick={() => setRecurring(active ? null : opt.id)}
-                        className={`flex w-full items-center justify-between rounded-lg border px-5 py-4 text-left transition-colors ${
-                          active ? 'border-brand-red bg-brand-red/5' : 'border-white/10 hover:border-white/25'
+                        className={`flex min-h-[72px] w-full items-center justify-between gap-4 rounded-[20px] border px-5 py-4 text-left motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
+                          active ? 'border-white/45 bg-[#1c1c1e]' : 'border-white/10 bg-[#141416] hover:border-white/25'
                         }`}
                       >
                         <span className="flex items-center gap-4">
-                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${active ? 'border-brand-red bg-brand-red' : 'border-white/30'}`}>
-                            {active && <span className="h-2 w-2 rounded-full bg-white" />}
+                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${active ? 'border-white bg-white' : 'border-white/30'}`}>
+                            {active && <span className="h-2 w-2 rounded-full bg-black" />}
                           </span>
                           <span className="text-sm font-semibold text-white">{opt.label}</span>
                         </span>
-                        <span className="font-mono text-xs font-bold text-brand-red">{opt.discount}% off</span>
+                        <span className="shrink-0 rounded-full bg-white/[0.08] px-3 py-1.5 text-xs font-medium text-zinc-200">{opt.discount}% off</span>
                       </button>
                     )
                   })}
                 </div>
                 {recurring && (
-                  <p className="mt-4 text-xs text-zinc-500">
+                  <p className="mt-4 text-sm leading-relaxed text-zinc-400">
                     You save ${discountAmount} on this session. Today&apos;s payment covers this session only. Our team will confirm future dates with you separately.
                   </p>
                 )}
@@ -1259,123 +1262,61 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
             {/* ── STEP 4: REVIEW ── */}
             {step === 'review' && selectedStudio && (
               <div className="max-w-2xl">
-                <p className="mb-4 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Your session</p>
-                <div className="flex items-center gap-5 border-b border-white/[0.08] pb-5">
-                  <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg">
-                    <Image src={selectedSetup?.image || selectedStudio.heroImage} alt={selectedSetup?.alt || selectedStudio.name} fill sizes="192px" className={selectedSetup ? 'object-contain' : 'object-cover'} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[15px] font-bold text-white">{selectedStudio.name}</p>
-                    <p className="mt-0.5 text-sm text-zinc-500">{fmtDateFull(date)}</p>
-                    <p className="text-sm text-zinc-400">{timeRange} · {durationLabel}</p>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <p className="font-mono text-sm font-bold text-white">${sessionSubtotal}</p>
-                    <button
-                      type="button"
-                      disabled={submitting}
-                      onClick={() => goToStep('datetime')}
-                      className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-white disabled:cursor-wait disabled:opacity-50"
-                    >
-                      Edit
-                    </button>
-                  </div>
-                </div>
+                <BookingReviewCard
+                  studioName={selectedStudio.name}
+                  image={selectedSetup?.image || selectedStudio.heroImage}
+                  imageAlt={selectedSetup?.alt || selectedStudio.name}
+                  dateLabel={fmtDateFull(date)}
+                  timeRange={timeRange}
+                  durationLabel={durationLabel}
+                  hourlyRate={selectedStudio.price}
+                  sessionSubtotal={sessionSubtotal}
+                  addOns={selectedAddOns}
+                  recurringLabel={RECURRING_OPTIONS.find((option) => option.id === recurring)?.label}
+                  discountAmount={discountAmount}
+                  total={grandTotal}
+                  requiresSetup={requiresSetup}
+                  setupLabel={selectedSetup?.label}
+                  disabled={submitting}
+                  onEditTime={() => goToStep('datetime')}
+                  onEditExtras={() => goToStep('extras')}
+                />
 
-                {requiresSetup && (
-                  <div className="flex items-center justify-between gap-4 border-b border-white/[0.08] py-5">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.12em] text-zinc-400">Selected setup</p>
-                      <p className="mt-1 font-semibold text-white">{selectedSetup?.label || 'Choose a setup'}</p>
-                      <p className="mt-1 text-xs text-zinc-300">Saved with your booking so our team can prepare.</p>
-                    </div>
-                    <button type="button" disabled={submitting} onClick={() => goToStep('extras')} className="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-zinc-300 hover:text-white disabled:cursor-wait disabled:opacity-50">Change setup</button>
-                  </div>
-                )}
+                <form id="review-form" onSubmit={handlePay} className="mt-6 space-y-6">
+                  <BookingContactFields
+                    name={name} email={email} phone={phone} disabled={submitting}
+                    onNameChange={setName} onEmailChange={setEmail} onPhoneChange={setPhone}
+                  />
 
-                {selectedAddOns.length > 0 && (
-                  <div className="border-b border-white/[0.08] py-5">
-                    {selectedAddOns.map((addOn) => (
-                      <div key={addOn.id} className="flex items-start justify-between gap-4 py-2 text-sm">
-                        <div className="min-w-0 break-words"><p className="font-semibold text-white">{bookingAddOnLabel(addOn)}</p><p className="mt-1 text-zinc-300">{addOn.amountCents === 0 ? 'Included with your session' : `$${addOn.hourlyRateCents / 100}/hr · ${durationLabel}`}</p></div>
-                        <p className="shrink-0 font-mono text-white">{addOn.amountCents === 0 ? 'No charge' : `$${addOn.amountCents / 100}`}</p>
-                      </div>
-                    ))}
-                    <button type="button" disabled={submitting} onClick={() => goToStep('extras')} className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 hover:text-white disabled:cursor-wait disabled:opacity-50">Edit add-ons</button>
-                  </div>
-                )}
-
-                {recurring && (
-                  <div className="border-b border-white/[0.08] py-5">
-                    <div className="flex items-center justify-between py-1">
-                      <p className="text-sm text-zinc-300">Recurring · {RECURRING_OPTIONS.find((r) => r.id === recurring)?.label}</p>
-                      <p className="font-mono text-sm font-semibold text-brand-red">−${discountAmount}</p>
-                    </div>
-                    <button
-                      type="button"
-                      disabled={submitting}
-                      onClick={() => goToStep('extras')}
-                      className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-white disabled:cursor-wait disabled:opacity-50"
-                    >
-                      Edit extras
-                    </button>
-                  </div>
-                )}
-
-                <div className="flex items-baseline justify-between py-5">
-                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">Total</p>
-                  <p className="font-black text-white" style={{ fontSize: '2rem' }}>${grandTotal}</p>
-                </div>
-
-                <form id="review-form" onSubmit={handlePay} className="mt-4 space-y-8">
-                  <div className="space-y-6">
-                    <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Your details</p>
-                    {[
-                      { label: 'Full Name', type: 'text', val: name, set: setName, ph: 'Your name', req: true },
-                      { label: 'Email', type: 'email', val: email, set: setEmail, ph: 'you@example.com', req: true },
-                      { label: 'Phone', type: 'tel', val: phone, set: setPhone, ph: '+1 (415) 000-0000', req: false },
-                    ].map(({ label, type, val, set, ph, req }) => {
-                      const fieldId = `detail-${label.toLowerCase().replace(/\s+/g, '-')}`
-                      return (
-                        <div key={label}>
-                          <label htmlFor={fieldId} className="mb-3 block font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-                            {label}{!req && <span className="ml-2 normal-case tracking-normal text-zinc-500">optional</span>}
-                          </label>
-                          <input
-                            id={fieldId}
-                            type={type}
-                            required={req}
-                            disabled={submitting}
-                            value={val}
-                            onChange={(e) => set(e.target.value)}
-                            placeholder={ph}
-                            className="w-full border-b border-white/20 bg-transparent pb-3 text-base text-white placeholder-zinc-500 transition-colors focus:border-white/50 focus:outline-none"
-                          />
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  <div className="border-t border-white/[0.08] pt-6">
-                    <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Who else needs to know?</p>
-                    <p className="mb-5 text-xs text-zinc-500">Guests, co-hosts, crew, clients. Everyone gets a copy of the confirmation.</p>
-                    <div className="flex min-h-[44px] flex-wrap items-center gap-2 border-b border-white/20 pb-3">
+                  <section aria-labelledby="guest-details-heading" className="rounded-[20px] border border-white/10 bg-[#141416] p-5 sm:p-6">
+                    <h3 id="guest-details-heading" className="brand-sans text-xl font-semibold leading-snug !tracking-[-0.025em] text-white">Keep your team in the loop</h3>
+                    <p id="team-email-help" className="mb-5 mt-2 text-sm leading-relaxed text-zinc-400">Optional. Add guests or crew to receive a copy of the confirmation. Press Enter after each address.</p>
+                    <label htmlFor="team-email" className="mb-2 block text-sm font-medium text-zinc-200">Guest or crew email</label>
+                    <div className="flex min-h-[52px] flex-wrap items-center gap-2 rounded-xl border border-white/20 bg-[#0b0b0d] p-3 focus-within:border-white/60 focus-within:ring-2 focus-within:ring-white/20">
                       {teamEmails.map((em, i) => (
-                        <span key={i} className="inline-flex items-center gap-1.5 rounded-sm bg-white/10 px-3 py-1.5 text-xs text-white">
-                          {em}
+                        <span key={i} className="inline-flex max-w-full items-center gap-1 rounded-lg bg-white/10 pl-3 text-sm text-white">
+                          <span className="min-w-0 break-all">{em}</span>
                           <button
                             type="button"
                             aria-label={`Remove ${em}`}
                             disabled={submitting}
                             onClick={() => setTeamEmails((p) => p.filter((_, j) => j !== i))}
-                            className="-m-1 p-1 leading-none text-zinc-400 transition-colors hover:text-white"
+                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-xl text-zinc-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                           >
                             ×
                           </button>
                         </span>
                       ))}
                       <input
+                        id="team-email"
+                        name="team-email"
                         type="email"
+                        inputMode="email"
+                        autoComplete="off"
+                        autoCapitalize="none"
+                        spellCheck={false}
+                        aria-describedby={teamError ? 'team-email-help team-email-error' : 'team-email-help'}
+                        aria-invalid={Boolean(teamError)}
                         value={teamInput}
                         aria-label="Add a team email"
                         disabled={submitting}
@@ -1397,19 +1338,19 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                         onBlur={() => {
                           if (addTeamEmail(teamInput)) setTeamInput('')
                         }}
-                        placeholder={teamEmails.length === 0 ? 'their@email.com, press Enter to add more' : 'Add another…'}
-                        className="min-w-[180px] flex-1 bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
+                        placeholder={teamEmails.length === 0 ? 'guest@example.com' : 'Add another email'}
+                        className="min-h-7 min-w-0 basis-full bg-transparent text-base text-white placeholder:text-zinc-500 focus:outline-none"
                       />
                     </div>
-                    {teamError && <p className="mt-2 text-xs text-brand-red" role="alert">{teamError}</p>}
+                    {teamError && <p id="team-email-error" className="mt-2 text-sm text-red-400" role="alert">{teamError}</p>}
                     {!teamError && teamEmails.length > 0 && (
-                      <p className="mt-2 text-xs text-zinc-500">{teamEmails.length} person{teamEmails.length > 1 ? 's' : ''} will receive the confirmation</p>
+                      <p className="mt-2 text-sm text-zinc-400">{teamEmails.length} person{teamEmails.length > 1 ? 's' : ''} will receive the confirmation</p>
                     )}
-                  </div>
+                  </section>
 
-                  <div className="border-t border-white/[0.08] pt-6">
-                    <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Before you arrive</p>
-                    <div className="space-y-3">
+                  <details className="rounded-[20px] border border-white/10 bg-[#141416] p-5 sm:p-6">
+                    <summary className="cursor-pointer rounded-lg py-1 text-base font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Before you arrive</summary>
+                    <div className="mt-5 space-y-3">
                       {selectedStudio.prep.map((tip, i) => (
                         <div key={i} className="flex items-start gap-4">
                           <span className="mt-0.5 w-5 shrink-0 font-mono text-[11px] font-bold text-zinc-500">0{i + 1}</span>
@@ -1417,17 +1358,18 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                         </div>
                       ))}
                     </div>
-                    <p className="mt-5 text-xs text-zinc-500">950 Battery St, SF 94111 · Northern Waterfront · Street parking on Battery St</p>
-                  </div>
+                    <p className="mt-5 text-sm leading-relaxed text-zinc-400">950 Battery St, SF 94111 · Northern Waterfront · Street parking on Battery St</p>
+                  </details>
 
-                  {error && <p className="text-sm text-brand-red" role="alert">{error}</p>}
+                  {error && <p className="rounded-xl border border-red-400/30 bg-red-400/10 p-4 text-sm text-red-300" role="alert">{error}</p>}
 
+                  <p className="text-sm leading-relaxed text-zinc-400">Your booking is confirmed after payment. Free cancellation up to 48 hours before your session.</p>
                   <button
                     type="submit"
                     disabled={submitting || !setupReady}
-                    className="w-full rounded-lg bg-brand-red py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 lg:hidden"
+                    className="min-h-[52px] w-full rounded-xl bg-brand-red px-4 py-3.5 text-[15px] font-semibold text-white motion-safe:transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-50 lg:hidden"
                   >
-                    {submitting ? 'Processing…' : `Lock In Session · $${grandTotal}`}
+                    {continueLabel}
                   </button>
                 </form>
               </div>
@@ -1454,7 +1396,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                     This checkout was started without a setup choice. Use “Change booking details” below to safely release it, reconfirm the time, and choose a setup for {selectedStudio?.name} before payment.
                   </p>
                 ) : checkoutPublishableKey && checkoutClientSecret ? (
-                  <div className="rounded-lg bg-white p-2 sm:p-4">
+                  <div className="overflow-hidden rounded-[20px] bg-white p-2 sm:p-4">
                     <StripeEmbeddedCheckout
                       publishableKey={checkoutPublishableKey}
                       clientSecret={checkoutClientSecret}
@@ -1485,8 +1427,8 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
 
           {/* ══════════════════ YOUR SESSION ══════════════════ */}
           <div className="hidden lg:block">
-            <div className="sticky top-24 rounded-lg border border-white/10 bg-[#0b0b0b] p-6">
-              <p className="text-[15px] font-bold uppercase tracking-[0.12em] text-white">Your Session</p>
+            <div className="sticky top-24 rounded-[20px] border border-white/10 bg-[#141416] p-6">
+              <p className="text-lg font-semibold tracking-tight text-white">Your session</p>
 
               {selectedStudio ? (
                 <div className="relative mt-5 h-40 overflow-hidden rounded-lg 2xl:h-44">
@@ -1561,8 +1503,8 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
 
               <div className="flex items-baseline justify-between border-t border-white/[0.06] pt-4">
                 <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">Estimated total</p>
-                <p className="font-black text-white" style={{ fontSize: '2rem' }}>
-                  ${selectedStudio ? grandTotal : 0}
+                <p className="text-3xl font-semibold tracking-tight tabular-nums text-white">
+                  {bookingDisplayPrice(selectedStudio ? grandTotal : 0)}
                 </p>
               </div>
 
@@ -1571,7 +1513,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                   type="button"
                   onClick={continueFlow}
                   disabled={!continueReady}
-                  className={`mt-5 w-full rounded-lg py-4 font-mono text-[12px] font-bold uppercase tracking-[0.16em] transition-colors ${
+                  className={`mt-5 min-h-[52px] w-full rounded-xl px-4 py-3.5 text-[15px] font-semibold motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
                     continueReady
                       ? 'bg-brand-red text-white hover:bg-red-700'
                       : 'cursor-not-allowed bg-white/[0.04] text-zinc-600'
@@ -1606,10 +1548,10 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
           className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/95 px-5 pt-3.5 backdrop-blur lg:hidden"
           style={{ paddingBottom: 'calc(0.875rem + env(safe-area-inset-bottom))' }}
         >
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="font-black text-white" style={{ fontSize: '1.4rem' }}>
-                ${selectedStudio ? grandTotal : 0}
+          <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
+            <div className="shrink-0">
+              <p className="text-xl font-semibold tracking-tight tabular-nums text-white">
+                {bookingDisplayPrice(selectedStudio ? grandTotal : 0)}
               </p>
               <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-400">
                 {STEP_LABELS[step as EditableBookingStep]}
@@ -1619,13 +1561,13 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
               type="button"
               onClick={continueFlow}
               disabled={!continueReady}
-              className={`rounded-lg px-6 py-3 font-mono text-[12px] font-bold uppercase tracking-[0.16em] transition-colors ${
+              className={`min-h-[52px] min-w-0 max-w-[240px] flex-1 rounded-xl px-4 py-3 text-sm font-semibold leading-snug motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
                 continueReady
                   ? 'bg-brand-red text-white hover:bg-red-700'
                   : 'cursor-not-allowed bg-white/[0.06] text-zinc-600'
               }`}
             >
-              {step === 'review' ? (submitting ? 'Processing…' : 'Lock In Session') : continueLabel}
+              {continueLabel}
             </button>
           </div>
         </div>

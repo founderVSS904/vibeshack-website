@@ -1,0 +1,28 @@
+/* Keep checkout's utility labels readable without changing the rest of the site. */
+.checkout :global(.font-mono) {
+  font-family: var(--font-brand-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.checkout button:focus-visible,
+.checkout a:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.75);
+  outline-offset: 3px;
+}
+
+.checkout input {
+  scroll-margin-block: 7rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkout *,
+  .checkout *::before,
+  .checkout *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
