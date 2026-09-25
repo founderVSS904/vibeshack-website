@@ -17,6 +17,16 @@ const summaryProps = {
 }
 
 describe('polished checkout presentation', () => {
+  test('uses a neutral focus edge without removing high-contrast keyboard focus', () => {
+    const css = readFileSync(new URL('../app/book/Checkout.module.css', import.meta.url), 'utf8')
+    assert.match(css, /input:not\(\[type='radio'\]\):not\(\[type='checkbox'\]\)/)
+    assert.match(css, /border-color: rgba\(255, 255, 255, 0\.6\) !important/)
+    assert.match(css, /box-shadow: none/)
+    assert.match(css, /@media \(forced-colors: active\)/)
+    assert.match(css, /outline-color: Highlight/)
+    assert.doesNotMatch(css, /rgba?\(236|#ec0000|var\(--vibeshack-red\)/i)
+  })
+
   test('gives date, time and duration their own full-width details', () => {
     const html = renderToStaticMarkup(createElement(BookingReviewCard, summaryProps))
     assert.match(html, /aria-labelledby="session-summary-heading"/)

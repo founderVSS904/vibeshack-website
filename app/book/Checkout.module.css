@@ -17,6 +17,20 @@
   scroll-margin-block: 7rem;
 }
 
+/* Use one neutral edge, not the legacy global red border and glow. */
+.checkout :is(input:not([type='radio']):not([type='checkbox']), textarea, select):focus {
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  .checkout :is(input:not([type='radio']):not([type='checkbox']), textarea, select):focus {
+    outline-color: Highlight;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .checkout *,
   .checkout *::before,
