@@ -70,6 +70,7 @@ export interface BookingReminderEvent {
   start: string
   end: string
   summary: string
+  addOnDescriptions?: string[]
   privateProperties: Record<string, string>
 }
 
@@ -1124,6 +1125,7 @@ function eventToBookingReminder(calendarId: string, event: calendar_v3.Schema$Ev
     start: new Date(start).toISOString(),
     end: new Date(end).toISOString(),
     summary: event.summary || studioName,
+    addOnDescriptions: description.split('\n').filter((line) => line.startsWith('Add-on: ')).map((line) => line.slice(8)),
     privateProperties,
   }
 }

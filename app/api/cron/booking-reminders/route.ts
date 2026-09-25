@@ -82,6 +82,7 @@ function buildReminderHtml(group: ReminderGroup) {
         <p style="font-size:16px;font-weight:900;color:#111827;margin:0 0 6px;">${escapeHtml(event.studioName)}</p>
         <p style="font-size:14px;line-height:1.65;color:#4b5563;margin:0;">${escapeHtml(eventDateLabel(event))}<br>${escapeHtml(eventTimeLabel(event))}</p>
         ${bookingSetupEmailHtml(event.studioId, event.setupId, '#4b5563')}
+        ${(event.addOnDescriptions || []).map((detail) => `<p style="font-size:13px;line-height:1.65;color:#4b5563;margin:8px 0 0;">Selected add-on: ${escapeHtml(detail)}</p>`).join('')}
       </td>
     </tr>`).join('')
   const prepItems = prepItemsForGroup(group).map((item) => `<li style="margin:0 0 9px;">${escapeHtml(item)}</li>`).join('')

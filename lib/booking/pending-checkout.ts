@@ -1,4 +1,4 @@
-import { priceBookingAddOns } from './add-ons'
+import { REMOTE_PODCAST, priceBookingAddOns } from './add-ons'
 import { MAX_BOOKING_SLOTS, MIN_BOOKING_SLOTS, isValidBookingDate } from './time'
 import { getStudioSetup, type StudioSetupId } from './studio-setups'
 
@@ -19,6 +19,7 @@ export interface PendingCheckoutState {
   slots: PendingCheckoutSlot[]
   recurring: string | null
   addOnIds?: string[]
+  remotePodcastPlatform?: string
   name: string
   email: string
   phone: string
@@ -62,11 +63,12 @@ export function parsePendingCheckout(raw: string | null): PendingCheckoutState |
       || !parsed.teamEmails.every((item) => typeof item === 'string')
     ) return null
 
-    const addOns = priceBookingAddOns(parsed.addOnIds, parsed.durationSlots)
+    const addOns = priceBookingAddOns(parsed.addOnIds, parsed.durationSlots, parsed.remotePodcastPlatform)
     // Restored drafts keep identifiers only. The server will reprice any revision.
     return {
       ...parsed,
       addOnIds: addOns.map((addOn) => addOn.id),
+      remotePodcastPlatform: addOns.find((addOn) => addOn.id === REMOTE_PODCAST.id)?.platform || '',
       // Preserve legacy checkout authority even when its setup is absent or invalid.
       setupId: getStudioSetup(parsed.selectedId, parsed.setupId)?.id,
     } as PendingCheckoutState

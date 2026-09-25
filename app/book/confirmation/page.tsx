@@ -78,7 +78,7 @@ function ConfirmationContent() {
                 <h2 className="text-xl text-white">{session.studioName}</h2>
                 {session.setupDescription && <p className="mt-3 text-sm font-semibold text-white">{session.setupDescription}</p>}
                 <p className="mt-3 text-sm text-zinc-300">{session.date}<br />{session.time}<br />{session.duration}</p>
-                {session.addOns.map((addOn) => <p key={addOn.name} className="mt-3 text-sm text-zinc-300">{addOn.name}: ${addOn.hourlyRate}/hr · ${addOn.amount.toFixed(2)}</p>)}
+                {session.addOns.map((addOn) => <p key={addOn.name} className="mt-3 text-sm text-zinc-300">{addOn.name}: {addOn.amount === 0 ? 'No charge' : `$${addOn.hourlyRate}/hr · $${addOn.amount.toFixed(2)}`}</p>)}
               </div>
             ))}
             <p className="flex justify-between py-5 font-semibold text-white"><span>Total paid</span><span>${result.summary.totalPaid.toFixed(2)}</span></p>

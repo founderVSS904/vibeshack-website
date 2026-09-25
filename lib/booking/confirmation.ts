@@ -1,6 +1,6 @@
 import type Stripe from 'stripe'
 import { createHash } from 'node:crypto'
-import { hasMatchingBookingAddOnTotal } from './add-ons'
+import { bookingAddOnLabel, hasMatchingBookingAddOnTotal } from './add-ons'
 import { hasCompleteBookingCartMetadata, parseBookingCartItems } from './checkout-metadata'
 import { describeSlotRanges, formatBookingDuration, formatDateForDisplay } from './time'
 import type { BookingConfirmation } from './confirmation-state'
@@ -68,7 +68,7 @@ export async function getBookingConfirmation(
           duration: formatBookingDuration(item.slots.length),
           ...(bookingSetupDescription(item.studioId, item.setupId) ? { setupDescription: bookingSetupDescription(item.studioId, item.setupId) } : {}),
           addOns: (item.addOns || []).map((addOn) => ({
-            name: addOn.name, hourlyRate: addOn.hourlyRateCents / 100, amount: addOn.amountCents / 100,
+            name: bookingAddOnLabel(addOn), hourlyRate: addOn.hourlyRateCents / 100, amount: addOn.amountCents / 100,
           })),
         })),
       }

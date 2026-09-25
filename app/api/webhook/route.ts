@@ -197,7 +197,7 @@ function buildPrepEmailHtml(cartItems: BookingCartItem[], customer: { name: stri
           <p style="color:#4b5563;font-size:14px;line-height:1.65;margin:0;">${escapeHtml(dateStr)}<br>${escapeHtml(slotRanges)} PT</p>
           ${bookingAddOnsEmailHtml(item.addOns, false, '#4b5563')}
           ${bookingSetupEmailHtml(item.studioId, item.setupId, '#4b5563')}
-          ${item.addOns?.length ? '<p style="color:#4b5563;font-size:14px;line-height:1.65;margin:8px 0 0;">Bring your final script for the teleprompter and allow setup time within your session.</p>' : ''}
+          ${item.addOns?.some((addOn) => addOn.id === 'teleprompter') ? '<p style="color:#4b5563;font-size:14px;line-height:1.65;margin:8px 0 0;">Bring your final script for the teleprompter and allow setup time within your session.</p>' : ''}
         </td>
         <td align="right" style="padding:18px 0;border-top:1px solid #e5e7eb;color:#111827;font-size:14px;font-weight:800;vertical-align:top;white-space:nowrap;">
           ${escapeHtml(formatBookingDuration(item.slots.length))}
