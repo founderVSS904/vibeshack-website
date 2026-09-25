@@ -4,8 +4,10 @@ import { describe, test } from 'node:test'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import BookingContactFields from '../components/BookingContactFields'
+import BookingPodcastNote from '../components/BookingPodcastNote'
 import BookingReviewCard, { bookingDisplayPrice } from '../components/BookingReviewCard'
 import { priceBookingAddOns } from '../lib/booking/add-ons'
+import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL } from '../lib/booking/podcast-package'
 
 const summaryProps = {
   studioName: 'Canvas Podcast', image: '/studio-images/canvas.webp', imageAlt: 'Canvas Podcast',
@@ -17,6 +19,23 @@ const summaryProps = {
 }
 
 describe('polished checkout presentation', () => {
+  test('presents podcast inclusions in a quiet card while keeping the shared-session rule clear', () => {
+    const html = renderToStaticMarkup(createElement(BookingPodcastNote))
+    assert.match(html, /<aside aria-labelledby="podcast-session-includes"/)
+    assert.match(html, /id="podcast-session-includes"/)
+    assert.match(html, /Included in your session/)
+    assert.ok(html.includes(PODCAST_CREW_LABEL))
+    assert.ok(html.includes(PODCAST_CAMERA_LABEL))
+    assert.match(html, /One session at a time across all podcast studios\./)
+    assert.equal((html.match(/<li /g) || []).length, 2)
+    assert.equal((html.match(/aria-hidden="true"/g) || []).length, 2)
+    assert.doesNotMatch(html, /brand-red|border-l|role="alert"|font-mono|uppercase/)
+
+    const source = readFileSync(new URL('../app/book/BookPageClient.tsx', import.meta.url), 'utf8')
+    assert.match(source, /selectedStudio\.type === 'podcast' && <BookingPodcastNote \/>/)
+    assert.doesNotMatch(source, /One podcast session at a time|shared equipment availability/)
+  })
+
   test('uses a neutral focus edge without removing high-contrast keyboard focus', () => {
     const css = readFileSync(new URL('../app/book/Checkout.module.css', import.meta.url), 'utf8')
     assert.match(css, /input:not\(\[type='radio'\]\):not\(\[type='checkbox'\]\)/)

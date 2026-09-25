@@ -28,7 +28,6 @@ import { GAEventType, sendGAEvent, trackBookingStep } from '@/lib/analytics'
 import { bookingAddOnLabel, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/booking/add-ons'
 import { PENDING_CHECKOUT_STORAGE_KEY } from '@/lib/booking/confirmation-state'
 import { parsePendingCheckout, pendingCheckoutMatchesSelection, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
-import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
 import {
   EDITABLE_BOOKING_STEPS,
   bookingStepIsReady,
@@ -40,6 +39,7 @@ import StudioSetupPicker from '@/components/StudioSetupPicker'
 import BookingAddOnPicker from '@/components/BookingAddOnPicker'
 import BookingReviewCard, { bookingDisplayPrice } from '@/components/BookingReviewCard'
 import BookingContactFields from '@/components/BookingContactFields'
+import BookingPodcastNote from '@/components/BookingPodcastNote'
 import styles from './Checkout.module.css'
 import { getStudioSetup, getStudioSetups, type StudioSetupId } from '@/lib/booking/studio-setups'
 
@@ -1079,16 +1079,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                         Pick a start time, then choose how long you want to book from that time.
                       </p>
                     </div>
-                    {selectedStudio.type === 'podcast' && (
-                      <div className="mb-5 border-l-2 border-brand-red bg-white/[0.03] px-4 py-3.5">
-                        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white">
-                          One podcast session at a time
-                        </p>
-                        <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
-                          {PODCAST_PACKAGE_SUMMARY} The times below reflect shared equipment availability across every podcast studio.
-                        </p>
-                      </div>
-                    )}
+                    {selectedStudio.type === 'podcast' && <BookingPodcastNote />}
                     {!date && (
                       <div className="flex h-44 items-center justify-center rounded-lg border border-dashed border-white/10">
                         <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Select a date first</p>
