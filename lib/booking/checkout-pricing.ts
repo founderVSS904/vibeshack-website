@@ -1,6 +1,6 @@
 import type { BookingCartItem } from './calendar'
 import type Stripe from 'stripe'
-import { bookingAddOnTotalCents, priceBookingAddOns } from './add-ons'
+import { REMOTE_PODCAST, bookingAddOnLabel, bookingAddOnTotalCents, priceBookingAddOns } from './add-ons'
 import { calculateRecurringDiscountCents, getStudioById } from './catalog'
 import { bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate } from './time'
 import { stripControlChars } from '../server/sanitize'
@@ -28,7 +28,7 @@ export function buildCanonicalBookingCart(rawCart: unknown): BookingCartItem[] {
       slots,
       hours: bookingHoursForSlotCount(slots.length),
       price: bookingPriceCents(studio.price, slots.length) / 100,
-      addOns: priceBookingAddOns(rawItem.addOnIds, slots.length),
+      addOns: priceBookingAddOns(rawItem.addOnIds, slots.length, rawItem.remotePodcastPlatform),
       setupId: validateBookingSetup(studio.id, rawItem.setupId),
     }
   })
@@ -57,8 +57,10 @@ export function buildBookingCheckoutLineItems(
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${addOn.name} - ${item.studioName}`,
-            description: `$${(addOn.hourlyRateCents / 100).toFixed(2)}/hr for ${formatBookingDuration(item.slots.length)} on ${formatDateForDisplay(item.date)}. Recurring discounts do not apply.`,
+            name: `${bookingAddOnLabel(addOn)} - ${item.studioName}`,
+            description: addOn.id === REMOTE_PODCAST.id
+              ? `No charge. Included with your session on ${formatDateForDisplay(item.date)}.`
+              : `$${(addOn.hourlyRateCents / 100).toFixed(2)}/hr for ${formatBookingDuration(item.slots.length)} on ${formatDateForDisplay(item.date)}. Recurring discounts do not apply.`,
           },
           unit_amount: addOn.amountCents,
         },

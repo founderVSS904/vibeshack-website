@@ -38,6 +38,23 @@ function dependencies(value: Stripe.Checkout.Session) {
 }
 
 describe('verified booking confirmation', () => {
+  test('confirms paid switching and free remote podcast with the saved platform', async () => {
+    const newCart = buildCanonicalBookingCart([{
+      studioId: 'canvas-rental', date: '2026-09-12', slots: cart[0].slots,
+      addOnIds: ['live-switching', 'remote-podcast'], remotePodcastPlatform: 'Zoom',
+    }])
+    const { deps } = dependencies(session({
+      amount_total: 26250,
+      metadata: { ...baseMetadata, ...buildBookingCartMetadata(newCart), computedTotalCents: '26250', addOnTotalCents: '11250', vbsCalendarSyncedAt: timestamp },
+    }))
+    const result = await getBookingConfirmation(sessionId, 'valid-fixture-token', deps)
+    assert.equal(result.status, 'confirmed')
+    assert.deepEqual(result.summary?.sessions[0].addOns, [
+      { name: 'Live switching', hourlyRate: 75, amount: 112.5 },
+      { name: 'Remote podcast (Zoom)', hourlyRate: 0, amount: 0 },
+    ])
+  })
+
   test('does not look up missing or malformed IDs and never claim success', async () => {
     const { calls, deps } = dependencies(session())
     assert.deepEqual(await getBookingConfirmation(null, '', deps), { status: 'missing' })

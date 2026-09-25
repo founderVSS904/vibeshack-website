@@ -2,6 +2,10 @@ import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
 import {
   TELEPROMPTER,
+  BOOKING_ADD_ONS,
+  LIVE_SWITCHING,
+  REMOTE_PODCAST,
+  REMOTE_PLATFORM_MAX_LENGTH,
   bookingAddOnDescription,
   bookingAddOnTotalCents,
   hasMatchingBookingAddOnTotal,
@@ -25,6 +29,78 @@ const rawItem = (count = 3, addOnIds: unknown = [TELEPROMPTER.id]) => ({
   price: 0.01,
   addOnIds,
   addOns: [{ id: TELEPROMPTER.id, amountCents: 1, hourlyRateCents: 1 }],
+})
+
+describe('live switching and remote podcast add-ons', () => {
+  const allIds = BOOKING_ADD_ONS.map(({ id }) => id)
+
+  test('prices switching at $75 per hour and remote podcast at zero for every duration', () => {
+    for (const count of [2, 3, 4, 16]) {
+      assert.equal(bookingAddOnTotalCents(priceBookingAddOns([LIVE_SWITCHING.id], count)), 7500 * count / 2)
+      assert.equal(bookingAddOnTotalCents(priceBookingAddOns([REMOTE_PODCAST.id], count, 'Zoom')), 0)
+    }
+    assert.deepEqual(priceBookingAddOns([REMOTE_PODCAST.id], 4, 'Riverside'), [{
+      id: 'remote-podcast', name: 'Remote podcast', hourlyRateCents: 0, amountCents: 0, platform: 'Riverside',
+    }])
+  })
+
+  test('supports every combination and deduplicates selections without trusting client prices', () => {
+    for (let mask = 0; mask < 8; mask++) {
+      const ids = allIds.filter((_, index) => mask & (1 << index))
+      const cart = buildCanonicalBookingCart([{ ...rawItem(3, [...ids, ...ids].reverse()), remotePodcastPlatform: 'Zoom' }])
+      assert.deepEqual(cart[0].addOns?.map(({ id }) => id), ids)
+      const expectedAddOns = (ids.includes(TELEPROMPTER.id) ? 7500 : 0) + (ids.includes(LIVE_SWITCHING.id) ? 11250 : 0)
+      const pricing = calculateBookingCheckoutPricing(cart, 'weekly')
+      assert.equal(pricing.addOnTotalCents, expectedAddOns)
+      assert.equal(pricing.computedTotalCents, 13500 + expectedAddOns)
+      const lines = buildBookingCheckoutLineItems(cart, pricing, 'https://example.invalid/fixture.jpg')
+      assert.equal(lines.reduce((sum, line) => sum + (line.price_data?.unit_amount || 0), 0), pricing.computedTotalCents)
+      if (ids.includes(REMOTE_PODCAST.id)) {
+        const remote = lines.find((line) => line.price_data?.product_data?.name?.startsWith('Remote podcast'))
+        assert.equal(remote?.price_data?.unit_amount, 0)
+        assert.match(remote?.price_data?.product_data?.name || '', /Zoom/)
+        assert.match(remote?.price_data?.product_data?.description || '', /No charge/)
+      }
+    }
+  })
+
+  test('round-trips all add-ons and a custom platform within Stripe metadata limits', () => {
+    const cart = buildCanonicalBookingCart(Array.from({ length: 20 }, () => ({
+      ...rawItem(16, allIds), studioId: 'the-executive', setupId: 'three-black-armchairs',
+      remotePodcastPlatform: '"'.repeat(REMOTE_PLATFORM_MAX_LENGTH),
+    })))
+    const metadata = { totalSessions: '20', bookingHoldVersion: '1', ...buildBookingCartMetadata(cart) }
+    for (const value of Object.values(metadata)) assert.ok(value.length <= 500, `Metadata value uses ${value.length} characters`)
+    const parsed = parseBookingCartItems(metadata)
+    assert.equal(hasCompleteBookingCartMetadata(metadata, parsed), true)
+    assert.deepEqual(parsed.map(({ addOns }) => addOns), cart.map(({ addOns }) => addOns))
+  })
+
+  test('allows zero only for the free option and rejects corrupt or duplicate metadata', () => {
+    const validRemote = { id: 'remote-podcast', r: 0, p: 0, f: 'Zoom' }
+    for (const entries of [
+      [{ id: 'live-switching', r: 0, p: 0 }], [{ id: 'teleprompter', r: 0, p: 0 }],
+      [{ ...validRemote, r: 7500, p: 11250 }], [{ ...validRemote, p: -1 }],
+      [validRemote, validRemote], [{ ...validRemote, f: {} }],
+      [{ ...validRemote, f: 'Zoom\nInjected: text' }], [{ ...validRemote, f: 'x'.repeat(61) }],
+    ]) assert.throws(() => parseBookingAddOns(entries, 3), /Invalid add-on metadata/)
+    assert.equal(parseBookingAddOns([{ id: 'live-switching', r: 10000, p: 15000 }], 3)[0].amountCents, 15000)
+    assert.equal(parseBookingAddOns([validRemote], 3)[0].platform, 'Zoom')
+  })
+
+  test('normalizes platform input, defaults to coordination, and escapes communication', () => {
+    const free = priceBookingAddOns([REMOTE_PODCAST.id], 4)
+    assert.equal(bookingAddOnDescription(free[0]), 'Remote podcast (platform to be confirmed): No charge')
+    const custom = priceBookingAddOns([REMOTE_PODCAST.id], 4, '  Other\n platform  ')
+    assert.equal(custom[0].platform, 'Other platform')
+    assert.equal(priceBookingAddOns([REMOTE_PODCAST.id], 4, 'x'.repeat(100))[0].platform?.length, REMOTE_PLATFORM_MAX_LENGTH)
+    assert.throws(() => priceBookingAddOns([REMOTE_PODCAST.id], 4, {}), /Invalid remote podcast platform/)
+    assert.deepEqual(priceBookingAddOns([], 4, {}), [])
+    const escaped = bookingAddOnsEmailHtml(priceBookingAddOns([REMOTE_PODCAST.id], 4, '<script>alert(1)</script>'), false)
+    assert.doesNotMatch(escaped, /<script>/)
+    assert.match(escaped, /&lt;script&gt;/)
+    assert.match(bookingAddOnsEmailHtml(custom, false), /Remote podcast \(Other platform\)/)
+  })
 })
 
 describe('optional server-priced teleprompter', () => {
@@ -212,6 +288,17 @@ describe('checkout draft and revision compatibility', () => {
     assert.equal(restored?.managementToken, draft.managementToken)
     assert.deepEqual(parsePendingCheckout(JSON.stringify({ ...draft, addOnIds: undefined }))?.addOnIds, [])
     assert.deepEqual(parsePendingCheckout(JSON.stringify({ ...draft, addOnIds: ['teleprompter', 'teleprompter'] }))?.addOnIds, ['teleprompter'])
+  })
+
+  test('preserves new add-ons and the platform through draft restore and repricing', () => {
+    const restored = parsePendingCheckout(JSON.stringify({ ...draft, addOnIds: ['live-switching', 'remote-podcast'], remotePodcastPlatform: 'Riverside' }))!
+    assert.deepEqual(restored.addOnIds, ['live-switching', 'remote-podcast'])
+    assert.equal(restored.remotePodcastPlatform, 'Riverside')
+    const revised = buildCanonicalBookingCart([{ ...rawItem(4, restored.addOnIds), remotePodcastPlatform: restored.remotePodcastPlatform }])
+    assert.equal(calculateBookingCheckoutPricing(revised).addOnTotalCents, 15000)
+    assert.equal(revised[0].addOns?.[1].platform, 'Riverside')
+    const removed = parsePendingCheckout(JSON.stringify({ ...draft, addOnIds: ['live-switching'], remotePodcastPlatform: 'Zoom' }))!
+    assert.equal(removed.remotePodcastPlatform, '')
   })
 
   test('reprices preserved add-on IDs for a longer revised session', () => {

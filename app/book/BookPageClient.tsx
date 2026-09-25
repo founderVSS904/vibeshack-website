@@ -25,7 +25,7 @@ import {
   formatBookingDuration,
 } from '@/lib/booking/time'
 import { GAEventType, sendGAEvent, trackBookingStep } from '@/lib/analytics'
-import { TELEPROMPTER, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/booking/add-ons'
+import { BOOKING_ADD_ONS, REMOTE_PODCAST, REMOTE_PLATFORM_MAX_LENGTH, bookingAddOnLabel, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/booking/add-ons'
 import { PENDING_CHECKOUT_STORAGE_KEY } from '@/lib/booking/confirmation-state'
 import { parsePendingCheckout, pendingCheckoutMatchesSelection, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
 import { PODCAST_PACKAGE_SUMMARY } from '@/lib/booking/podcast-package'
@@ -329,6 +329,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
   // Extras
   const [recurring, setRecurring] = useState<string | null>(null)
   const [addOnIds, setAddOnIds] = useState<string[]>([])
+  const [remotePodcastPlatform, setRemotePodcastPlatform] = useState('')
 
   // Contact
   const [name, setName] = useState('')
@@ -393,6 +394,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
     setSlots(pending.slots)
     setRecurring(pending.recurring)
     setAddOnIds(pending.addOnIds || [])
+    setRemotePodcastPlatform(pending.remotePodcastPlatform || '')
     setName(pending.name)
     setEmail(pending.email)
     setPhone(pending.phone)
@@ -438,7 +440,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
   const sessionSubtotal = selectedStudio ? bookingPriceCents(selectedStudio.price, durationSlots) / 100 : 0
   const discountAmount = calculateRecurringDiscountCents(sessionSubtotal * 100, recurring) / 100
   const recurringDiscount = recurring ? RECURRING_OPTIONS.find((r) => r.id === recurring)?.discount || 0 : 0
-  const selectedAddOns = priceBookingAddOns(addOnIds, durationSlots)
+  const selectedAddOns = priceBookingAddOns(addOnIds, durationSlots, remotePodcastPlatform)
   const addOnTotal = bookingAddOnTotalCents(selectedAddOns) / 100
   const grandTotal = sessionSubtotal - discountAmount + addOnTotal
 
@@ -640,6 +642,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
             hours: durationHours,
             price: sessionSubtotal,
             addOnIds,
+            remotePodcastPlatform,
             setupId: selectedSetup?.id,
           }],
           recurring,
@@ -684,6 +687,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
           slots,
           recurring,
           addOnIds,
+          remotePodcastPlatform,
           name,
           email,
           phone,
@@ -1208,20 +1212,46 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                     />
                   </div>
                 )}
-                <p className={`${requiresSetup ? 'border-t border-white/[0.08] pt-8' : ''} mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white`}>Optional add-on</p>
-                <button
-                  type="button"
-                  aria-pressed={addOnIds.includes(TELEPROMPTER.id)}
-                  onClick={() => setAddOnIds(addOnIds.includes(TELEPROMPTER.id) ? [] : [TELEPROMPTER.id])}
-                  className={`mb-8 flex w-full items-start justify-between gap-5 rounded-lg border px-5 py-5 text-left transition-colors ${addOnIds.includes(TELEPROMPTER.id) ? 'border-brand-red bg-brand-red/5' : 'border-white/15 hover:border-white/40'}`}
-                >
-                  <span>
-                    <span className="block text-base font-semibold text-white">{TELEPROMPTER.name}</span>
-                    <span className="mt-2 block text-sm text-zinc-300">{TELEPROMPTER.description}</span>
-                    <span className="mt-3 block text-xs text-zinc-300">${TELEPROMPTER.hourlyRateCents / 100}/hr · ${bookingAddOnTotalCents(priceBookingAddOns([TELEPROMPTER.id], durationSlots)) / 100} for {durationLabel.toLowerCase()}</span>
-                  </span>
-                  <span className="shrink-0 font-mono text-xs font-bold text-white">{addOnIds.includes(TELEPROMPTER.id) ? 'Added ✓' : 'Add +'}</span>
-                </button>
+                <p className={`${requiresSetup ? 'border-t border-white/[0.08] pt-8' : ''} mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white`}>Optional add-ons</p>
+                <p className="mb-4 text-sm text-zinc-300">Choose any combination. Paid add-ons cover your full session.</p>
+                <div className="mb-8 space-y-3">
+                  {BOOKING_ADD_ONS.map((addOn) => {
+                    const active = addOnIds.includes(addOn.id)
+                    return (
+                      <div key={addOn.id}>
+                        <button
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => setAddOnIds((current) => current.includes(addOn.id) ? current.filter((id) => id !== addOn.id) : [...current, addOn.id])}
+                          className={`flex w-full items-start justify-between gap-3 rounded-lg border px-4 py-5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:gap-5 sm:px-5 ${active ? 'border-brand-red bg-brand-red/5' : 'border-white/15 hover:border-white/40'}`}
+                        >
+                          <span className="min-w-0">
+                            <span className="block text-base font-semibold text-white">{addOn.name}</span>
+                            <span className="mt-2 block text-sm text-zinc-300">{addOn.description}</span>
+                            <span className="mt-3 block text-xs text-zinc-300">{addOn.hourlyRateCents === 0 ? 'No charge' : `$${addOn.hourlyRateCents / 100}/hr · $${bookingAddOnTotalCents(priceBookingAddOns([addOn.id], durationSlots)) / 100} for ${durationLabel.toLowerCase()}`}</span>
+                          </span>
+                          <span className="shrink-0 font-mono text-xs font-bold text-white">{active ? 'Added ✓' : 'Add +'}</span>
+                        </button>
+                        {addOn.id === REMOTE_PODCAST.id && active && (
+                          <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+                            <label htmlFor="remote-podcast-platform" className="block text-sm font-semibold text-white">Preferred platform (optional)</label>
+                            <input
+                              id="remote-podcast-platform"
+                              type="text"
+                              value={remotePodcastPlatform}
+                              onChange={(event) => setRemotePodcastPlatform(event.target.value)}
+                              maxLength={REMOTE_PLATFORM_MAX_LENGTH}
+                              placeholder="Riverside, Zoom, or another platform"
+                              aria-describedby="remote-podcast-platform-help"
+                              className="mt-2 w-full min-w-0 rounded-md border border-white/20 bg-black px-3 py-3 text-base text-white placeholder:text-zinc-500 focus:border-white focus:outline-none"
+                            />
+                            <p id="remote-podcast-platform-help" className="mt-2 text-xs text-zinc-300">Not sure yet? Leave this blank and we can confirm before your session.</p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
                 <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">Make it a standing booking</p>
                 <p className="mb-5 text-sm text-zinc-300">Request a recurring schedule and save on studio time. Add-ons are not discounted.</p>
                 <div className="space-y-2">
@@ -1296,9 +1326,9 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                 {selectedAddOns.length > 0 && (
                   <div className="border-b border-white/[0.08] py-5">
                     {selectedAddOns.map((addOn) => (
-                      <div key={addOn.id} className="flex items-start justify-between gap-4 text-sm">
-                        <div><p className="font-semibold text-white">{addOn.name}</p><p className="mt-1 text-zinc-300">${addOn.hourlyRateCents / 100}/hr · {durationLabel}</p></div>
-                        <p className="font-mono text-white">${addOn.amountCents / 100}</p>
+                      <div key={addOn.id} className="flex items-start justify-between gap-4 py-2 text-sm">
+                        <div className="min-w-0 break-words"><p className="font-semibold text-white">{bookingAddOnLabel(addOn)}</p><p className="mt-1 text-zinc-300">{addOn.amountCents === 0 ? 'Included with your session' : `$${addOn.hourlyRateCents / 100}/hr · ${durationLabel}`}</p></div>
+                        <p className="shrink-0 font-mono text-white">{addOn.amountCents === 0 ? 'No charge' : `$${addOn.amountCents / 100}`}</p>
                       </div>
                     ))}
                     <button type="button" disabled={submitting} onClick={() => goToStep('extras')} className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 hover:text-white disabled:cursor-wait disabled:opacity-50">Edit add-ons</button>
@@ -1540,14 +1570,14 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                 </div>
               </div>
 
-              {(discountAmount > 0 || addOnTotal > 0) && (
+              {(discountAmount > 0 || selectedAddOns.length > 0) && (
                 <div className="space-y-1 border-t border-white/[0.06] py-3">
                   <div className="flex justify-between text-xs text-zinc-500">
                     <span>Session</span><span>${sessionSubtotal}</span>
                   </div>
                   {selectedAddOns.map((addOn) => (
                     <div key={addOn.id} className="flex justify-between gap-3 text-xs text-zinc-300">
-                      <span>{addOn.name} (${addOn.hourlyRateCents / 100}/hr)</span><span>${addOn.amountCents / 100}</span>
+                      <span className="min-w-0 break-words">{bookingAddOnLabel(addOn)}{addOn.hourlyRateCents > 0 ? ` ($${addOn.hourlyRateCents / 100}/hr)` : ''}</span><span className="shrink-0">{addOn.amountCents === 0 ? 'No charge' : `$${addOn.amountCents / 100}`}</span>
                     </div>
                   ))}
                   {discountAmount > 0 && (

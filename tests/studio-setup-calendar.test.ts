@@ -9,6 +9,7 @@ import { buildCanonicalBookingCart } from '../lib/booking/checkout-pricing'
 import { WING_SETUPS, EXECUTIVE_SETUPS, getStudioSetup, getStudioSetups } from '../lib/booking/studio-setups'
 import { primaryStudioResourceGroup, studioResourceGroups } from '../lib/booking/resources'
 import { getTimeSlotsForDay } from '../lib/booking/time'
+import { bookingAddOnDescription } from '../lib/booking/add-ons'
 
 // The real functions run against an injected in-memory calendar. This fixture
 // cannot read credentials or create a real event, email, or network request.
@@ -71,6 +72,7 @@ test('real Calendar insertion and reminder functions round-trip each setup witho
   ]
   const cart: BookingCartItem[] = variants.map(({ studioId, setup }, index) => buildCanonicalBookingCart([{
     studioId, date, slots: daySlots.slice(16 + index * 2, 18 + index * 2), setupId: setup.id,
+    addOnIds: ['live-switching', 'remote-podcast'], remotePodcastPlatform: 'Riverside',
   }])[0])
   const nextSlots = () => daySlots.slice(16 + cart.length * 2, 18 + cart.length * 2)
   cart.push({ ...cart[0], slots: nextSlots(), setupId: undefined })
@@ -83,6 +85,7 @@ test('real Calendar insertion and reminder functions round-trip each setup witho
   assert.equal(fixture.insertedCount(), 10)
   for (const [index, event] of [...fixture.stored.values()].entries()) {
     const item = cart[index]
+    for (const addOn of item.addOns || []) assert.ok(event.description?.includes(bookingAddOnDescription(addOn)))
     const privateProperties = event.extendedProperties?.private || {}
     assert.equal(privateProperties.setupId, item.setupId || '')
     assert.equal(privateProperties.resourceGroup, primaryStudioResourceGroup(item.studioId))
@@ -106,6 +109,7 @@ test('real Calendar insertion and reminder functions round-trip each setup witho
   assert.ok(reminders)
   assert.equal(reminders.length, 10)
   assert.deepEqual(reminders.map(({ setupId }) => setupId), cart.map(({ setupId }) => setupId))
+  assert.deepEqual(reminders.map(({ addOnDescriptions }) => addOnDescriptions), cart.map(({ addOns }) => (addOns || []).map(bookingAddOnDescription)))
   const sentAt = '2026-09-11T18:00:00.000Z'
   await markBookingReminderSent(reminders, sentAt, fixture.dependencies)
   for (const reminder of reminders) {

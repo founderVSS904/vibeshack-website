@@ -3,6 +3,7 @@ import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY, PODCAST_RATE_SUMMARY } from '@/lib/booking/podcast-package'
 import PricingFaqs from './PricingFaqs'
+import { BOOKING_ADD_ONS } from '@/lib/booking/add-ons'
 
 export const metadata: Metadata = {
   title: 'Studio Pricing',
@@ -101,6 +102,9 @@ const pricingServiceSchema = {
   }),
   offers: [
     ...studios.map((studio) => hourlyOffer(studio.name, studio.price.replace('$', ''))),
+    ...BOOKING_ADD_ONS.map((addOn) => addOn.hourlyRateCents > 0
+      ? hourlyOffer(addOn.name, String(addOn.hourlyRateCents / 100))
+      : { '@type': 'Offer', name: addOn.name, price: '0', priceCurrency: 'USD', url: `${siteUrl}/book/`, description: `${addOn.description} No charge with a studio booking.` }),
     quotedOffer('Photo Services', 'Contact VibeShack Studios for a scoped photo services quote.'),
     quotedOffer('Video Production Services', 'Contact VibeShack Studios for a scoped video production quote.'),
   ],
@@ -182,6 +186,22 @@ export default function PricingPage() {
                 </a>
               ))}
             </div>
+          </div>
+
+          <div className="mt-10">
+            <h2 className="mb-4 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-gray-400">Optional add-ons</h2>
+            <div className="divide-y divide-white/10 border-t border-white/10">
+              {BOOKING_ADD_ONS.map((addOn) => (
+                <a key={addOn.id} href="/book/" className="group flex flex-col gap-3 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+                  <div>
+                    <p className="text-base text-white group-hover:text-gray-300">{addOn.name}</p>
+                    <p className="mt-1 max-w-xl text-sm text-gray-400">{addOn.description}</p>
+                  </div>
+                  <p className="shrink-0 text-lg font-bold text-white">{addOn.hourlyRateCents === 0 ? 'No charge' : `$${addOn.hourlyRateCents / 100}/hr`}</p>
+                </a>
+              ))}
+            </div>
+            <p className="mt-4 text-xs leading-relaxed text-gray-400">Add-ons are optional with a studio booking. Paid add-ons cover the full session and are not discounted for recurring bookings.</p>
           </div>
 
           {/* Production Services, scoped */}
