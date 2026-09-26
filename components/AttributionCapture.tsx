@@ -25,6 +25,7 @@ function hasCookie(name: string) {
 export default function AttributionCapture() {
   useEffect(() => {
     const url = new URL(window.location.href)
+    if (url.pathname.startsWith('/employee')) return
     const params = Object.fromEntries(
       trackedParams
         .map((key) => [key, url.searchParams.get(key)] as const)

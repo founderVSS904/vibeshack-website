@@ -1,0 +1,135 @@
+# Employee booking
+
+Local implementation, September 26, 2026. Not deployed or activated.
+
+## Routes and behavior
+
+- `/employee/`: invite-only Google sign-in, linked from the website footer.
+- `/employee/book/`: authenticated one-page calendar, time, setup, extras,
+  client details and session summary. No payment fields for staff.
+- `/employee/preview/`: development-only browser-memory preview. Requires
+  `EMPLOYEE_LOCAL_PREVIEW=1`, `NODE_ENV=development`, and no `VERCEL` environment.
+  It never authenticates API calls or creates provider records. Production
+  builds return 404 even if the preview flag is accidentally set.
+- `/api/employee/*`: authorization is enforced on the server. Write requests
+  additionally require the configured exact Origin. Prices are rebuilt from
+  the existing canonical catalog, including the $50/session teleprompter.
+
+Employee reservations acquire only the chosen studio's resource lock, with
+30 minutes of turnaround, plus any limited equipment lock. Public checkout
+continues to use the existing shared podcast/stage rules. Staff must coordinate
+operators and cameras for overlapping staff-created sessions. Tours and
+unidentified manual busy events continue to block conservatively.
+
+Pending-payment policy currently defaults to keeping the reservation until
+staff cancels it. Tay was asked to confirm this policy; no answer was received
+during implementation. Invoices request payment before the booked start time,
+but overdue invoices do not automatically release the room.
+
+## Production setup still required
+
+No credentials, account permissions, Vercel settings, Google settings or Stripe
+settings were changed during this local task. Configure these in the secure
+deployment environment before activating the feature:
+
+| Variable | Purpose |
+| --- | --- |
+| `EMPLOYEE_GOOGLE_CLIENT_ID` | Dedicated Google OAuth web client for staff sign-in |
+| `EMPLOYEE_GOOGLE_CLIENT_SECRET` | That client's secret, stored only in Vercel |
+| `EMPLOYEE_SESSION_SECRET` | Cryptographically random signing secret, at least 32 characters |
+| `EMPLOYEE_ALLOWED_EMAILS` | Comma-separated exact approved addresses, no automatic domain-wide access |
+| `EMPLOYEE_BASE_URL` | Canonical origin, normally `https://www.vibeshackstudios.com` |
+| `EMPLOYEE_BOOKING_ENABLED` | Set to `1` only after configuration and authorized integration checks |
+
+Use a dedicated Google sign-in OAuth client, not the calendar refresh-token
+client. Register this exact callback for the production origin:
+`https://www.vibeshackstudios.com/api/employee/auth/callback`.
+Approve only identity/email scopes. The existing Google Calendar integration
+continues to supply calendar access separately. Sessions use HTTP-only,
+Secure (HTTPS), SameSite=Lax cookies with an eight-hour expiry. OAuth attempts
+use a signed short-lived state cookie, PKCE, a nonce and verified Google ID
+tokens. Removing an address from the allowlist revokes its existing sessions.
+
+Confirm the exact employee list with Tay. No account was automatically granted
+access by this change. Keep OAuth secrets and the signing secret out of chat,
+Git, logs and screenshots.
+
+The existing Stripe webhook at `/api/webhook/` must also receive `invoice.paid`
+and `invoice.voided` events. Retain its existing checkout events and signing
+secret. Employee invoices are identified by `source=vibeshack-employee-booking`
+and an exact booking reference. Only verified webhook signatures enter the
+handler, which retrieves current invoice status and checks customer, amount,
+currency and booking identity before changing the calendar. Stripe Invoicing
+is used, so review the account's applicable invoicing fees before activation.
+
+References: [Google OpenID Connect](https://developers.google.com/identity/openid-connect/openid-connect),
+[Stripe manual invoice finalization](https://docs.stripe.com/api/invoices/finalize),
+[Stripe invoice sending](https://docs.stripe.com/api/invoices/send).
+
+## Reservation and payment lifecycle
+
+1. Authenticate the employee and validate the canonical session/client input.
+2. Create a private transparent state event in the existing hold calendar. A
+   deterministic reference and ETag lease serialize retries across instances.
+3. Check availability, acquire room/equipment ledgers, recheck, and create a
+   private opaque studio reservation. Failed post-hold conflict checks release
+   their ledgers. An uncertain calendar write stays blocked for recovery.
+4. Create a booking-specific Stripe customer and draft invoice. Use stable
+   provider idempotency keys. Do not sweep unrelated pending invoice items.
+5. Attach the server-priced line, verify the total, finalize without automatic
+   advancement, and send the hosted Stripe invoice email.
+6. Show success only after the send request succeeds. Keep the reservation if
+   invoice creation or email fails; retry the same request to resume safely.
+7. A verified payment webhook marks the calendar Paid. No duplicate public
+   booking event or customer checkout fulfillment is created.
+8. Staff cancellation voids the unpaid invoice first, then removes the room
+   event and releases room/equipment ledgers. Paid invoices cannot be cancelled
+   by this endpoint. Voiding the invoice in Stripe also reconciles via webhook.
+
+The employee page supports cancelling the reservation just created. A broader
+staff booking-history/rescheduling dashboard is not included in this change.
+After leaving the page, existing reservations can be managed through Calendar
+and Stripe; void the invoice in Stripe to release through the webhook. Do not
+delete only the calendar event, because the resource ledger also needs release.
+
+## Interrupted bookings and recovery
+
+Do not refresh or start a new booking after an uncertain create response. The
+page preserves its request ID and locks the form so Retry uses the same input.
+The durable state keeps invoice/customer identifiers and completed stages.
+If a process dies while holding a lease, wait five minutes before retrying.
+
+Stripe idempotency keys have a limited retention period. An incomplete booking
+older than 23 hours is blocked from automatic recreation. An administrator must
+inspect its private booking-state record and the bookingRef metadata in Stripe,
+reconcile any existing invoice, and resolve its room/teleprompter holds before
+retrying or clearing it. Never blindly create a replacement invoice.
+
+Calendar records contain client contact data and internal notes. Keep the
+calendar private and do not export those records into public artifacts.
+Employee notes are not copied into Stripe invoice descriptions or client mail.
+Employee routes are noindex, omitted from sitemaps, and excluded from the site's
+page-view and attribution capture components.
+
+## Local review and safe testing
+
+Run from the feature checkout:
+
+```sh
+EMPLOYEE_LOCAL_PREVIEW=1 npm run dev -- -H 127.0.0.1 -p 3011
+```
+
+Open `http://localhost:3011/employee/preview/`. Use fictional client data.
+Reservations exist only in that tab's memory and disappear on reload. The local
+preview explicitly says nothing is emailed or charged.
+
+Automated tests exercise canonical prices, strict authentication, origin
+protection, concurrent and repeated submissions, invoice/email failures,
+late-retry protection, cancellation ordering, Stripe invoice parameters,
+webhook reconciliation, room-only occupancy, turnaround, global teleprompter
+inventory and preservation of public checkout rules. Provider tests use
+in-memory fakes, not live services.
+
+Real Google sign-in, Stripe invoice/email delivery and live payment webhooks
+remain untested. Those require the missing configuration and separate explicit
+authorization for exact external actions. Publication is also a separate step.

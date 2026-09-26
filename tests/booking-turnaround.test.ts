@@ -6,6 +6,7 @@ import {
   addBookingEvents, bookingEventBusyRange, listBookingEventsForReminderWindow,
   getTourAvailabilityForDate,
   type BookingCalendarDependencies, type CalendarConfig,
+  eventBlocksStudio,
 } from '../lib/booking/calendar'
 import { buildCanonicalBookingCart } from '../lib/booking/checkout-pricing'
 import { getStudioSetups } from '../lib/booking/studio-setups'
@@ -85,6 +86,36 @@ function memoryCalendar(initial: calendar_v3.Schema$Event[] = []) {
     getAvailabilityForDate(day, studioId, excludedRef, false, dependencies)
   return { stored, dependencies, requests, availability, fail: () => { failListing = true } }
 }
+
+test('employee reservations block only their room and its turnaround, while public shared-resource rules remain unchanged', async () => {
+  const event = bookingEvent('the-executive')
+  event.extendedProperties!.private!.source = 'vibeshack-employee-booking'
+  const fixture = memoryCalendar([event])
+  const executive = await fixture.availability('the-executive')
+  assert.equal(executive.slots.find((slot) => slot.time === iso(17))?.available, false)
+  assert.equal(executive.slots.find((slot) => slot.time === iso(17, 30))?.available, true)
+  assert.equal((await fixture.availability('the-wing')).slots.find((slot) => slot.time === iso(15))?.available, true)
+  assert.equal((await fixture.availability('sunset')).slots.find((slot) => slot.time === iso(15))?.available, true)
+  const publicEvent = bookingEvent('the-executive')
+  assert.equal(eventBlocksStudio(publicEvent, 'the-wing', new Set(), false), true)
+  assert.equal(eventBlocksStudio(publicEvent, 'the-wing', new Set(), false, undefined, true), false)
+  assert.equal(eventBlocksStudio({ ...publicEvent, extendedProperties: { private: { source: 'vibeshack-tour-booking' } } }, 'the-wing', new Set(), false, undefined, true), true)
+  assert.equal(eventBlocksStudio({ summary: 'Manual busy event' }, 'the-wing', new Set(), false, undefined, true), true)
+})
+
+test('employee holds serialize same-room races without locking the shared podcast or stage pools', async () => {
+  const fixture = memoryCalendar()
+  const employee = cart('the-wing').map((item) => ({ ...item, reservationKind: 'employee' as const }))
+  assert.equal((await acquireBookingHolds(employee, 'staff-wing', new Date(Date.now() + 60_000), false, fixture.dependencies)).ok, true)
+  const resources = [...fixture.stored.values()].map((event) => JSON.parse(event.description || '{}').resourceGroup)
+  assert.deepEqual(resources, ['studio:the-wing'])
+  assert.equal((await fixture.availability('the-executive')).slots.find((slot) => slot.time === iso(15))?.available, true)
+  assert.equal((await fixture.availability('canvas-rental')).slots.find((slot) => slot.time === iso(15))?.available, true)
+  assert.equal((await fixture.availability('the-wing')).slots.find((slot) => slot.time === iso(17))?.available, false)
+  assert.equal((await acquireBookingHolds(employee, 'other-staff', new Date(Date.now() + 60_000), false, fixture.dependencies)).status, 409)
+  await releaseBookingHolds(employee, 'staff-wing', fixture.dependencies)
+  assert.equal((await fixture.availability('the-wing')).slots.find((slot) => slot.time === iso(15))?.available, true)
+})
 
 test('a 3-5 booking blocks 5 PM, reopens exactly at 5:30, and reserves cleanup before a later booking too', async () => {
   const fixture = memoryCalendar([bookingEvent()])

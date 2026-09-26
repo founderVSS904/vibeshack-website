@@ -172,6 +172,7 @@ export default function Footer() {
           <FooterMonogram />
           <p className="text-white text-xs tracking-[0.15em] uppercase font-bold mb-6">The Dream Factory</p>
           <p className="text-gray-500 text-xs mt-2">© 2026 VibeShack Studios · San Francisco</p>
+          <Link href="/employee/" className="mt-4 inline-block text-xs text-gray-400 hover:text-white">Employee login</Link>
 
         </div>
       </div>

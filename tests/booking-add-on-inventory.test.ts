@@ -76,6 +76,18 @@ function memoryCalendar(initial: calendar_v3.Schema$Event[] = []) {
   return { stored, events, dependencies, available }
 }
 
+test('employee room-only reservations still lock the single teleprompter globally', async () => {
+  const fixture = memoryCalendar()
+  const staffCart = cart('the-executive').map((item) => ({ ...item, reservationKind: 'employee' as const }))
+  assert.equal((await acquireBookingHolds(staffCart, 'staff-equipment', expiry(), false, fixture.dependencies)).ok, true)
+  assert.equal((await getAvailabilityForDate(date, 'the-wing', undefined, false, fixture.dependencies)).slots.find((slot) => slot.time === iso(15))?.available, true)
+  assert.equal((await fixture.available()).availability.teleprompter, false)
+  assert.equal((await acquireBookingHolds(cart('canvas-rental'), 'public-equipment', expiry(), false, fixture.dependencies)).status, 409)
+  const anotherStaff = cart('the-wing').map((item) => ({ ...item, reservationKind: 'employee' as const }))
+  assert.equal((await acquireBookingHolds(anotherStaff, 'staff-other', expiry(), false, fixture.dependencies)).status, 409)
+  assert.equal((await fixture.available(17, 2)).availability.teleprompter, true)
+})
+
 test('one teleprompter is global across independent rooms, without blocking room-only bookings', async () => {
   const fixture = memoryCalendar([reserved()])
   const room = await getAvailabilityForDate(date, 'canvas-rental', undefined, false, fixture.dependencies)
