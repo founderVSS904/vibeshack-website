@@ -27,6 +27,7 @@ import {
 import { GAEventType, sendGAEvent, trackBookingStep } from '@/lib/analytics'
 import { bookingAddOnLabel, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/booking/add-ons'
 import { PENDING_CHECKOUT_STORAGE_KEY } from '@/lib/booking/confirmation-state'
+import { STUDIO_TURNAROUND_MINUTES } from '@/lib/booking/turnaround'
 import { parsePendingCheckout, pendingCheckoutMatchesSelection, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
 import {
   EDITABLE_BOOKING_STEPS,
@@ -1108,9 +1109,14 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                           </p>
                         )}
                         {anyStartable && (
-                          <p className="mb-4 text-xs text-zinc-500">
-                            Available start times are shown below. Session length options appear after you choose a start.
-                          </p>
+                          <div className="mb-4 space-y-2">
+                            <p className="text-xs text-zinc-500">
+                              Available start times are shown below. Session length options appear after you choose a start.
+                            </p>
+                            <p className="text-sm leading-relaxed text-zinc-400">
+                              We reserve {STUDIO_TURNAROUND_MINUTES} minutes after your session for studio turnaround, at no extra charge.
+                            </p>
+                          </div>
                         )}
                         <div className="max-h-[300px] overflow-y-auto pr-1">
                           <div className="grid grid-cols-3 gap-1.5">
