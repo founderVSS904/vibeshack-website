@@ -16,15 +16,15 @@ const cart = buildCanonicalBookingCart([{
   addOnIds: ['teleprompter'],
 }])
 const baseMetadata = {
-  bookingHoldVersion: '1', bookingRef, totalSessions: '1', computedTotalCents: '22500',
-  addOnTotalCents: '7500', customerName: 'Fixture Private Name', customerEmail: 'fixture-private@example.invalid',
+  bookingHoldVersion: '1', bookingRef, totalSessions: '1', computedTotalCents: '20000',
+  addOnTotalCents: '5000', customerName: 'Fixture Private Name', customerEmail: 'fixture-private@example.invalid',
   customerPhone: 'fixture-private-phone', ...buildBookingCartMetadata(cart),
 }
 
 function session(overrides: Partial<Stripe.Checkout.Session> = {}): Stripe.Checkout.Session {
   return {
     id: sessionId, mode: 'payment', status: 'complete', payment_status: 'paid', livemode: true,
-    amount_total: 22500, currency: 'usd', metadata: { ...baseMetadata }, ...overrides,
+    amount_total: 20000, currency: 'usd', metadata: { ...baseMetadata }, ...overrides,
   } as Stripe.Checkout.Session
 }
 
@@ -194,11 +194,11 @@ describe('verified booking confirmation', () => {
       assert.doesNotMatch(JSON.stringify(result), /Private Name|example.invalid|private-phone|2026-09-12/)
     }
     const result = await getBookingConfirmation(sessionId, 'valid-fixture-token', deps)
-    assert.equal(result.summary?.totalPaid, 225)
+    assert.equal(result.summary?.totalPaid, 200)
     assert.equal(result.summary?.sessions[0].studioName, 'Canvas Rental')
-    assert.deepEqual(result.summary?.sessions[0].addOns, [{ name: 'Teleprompter', hourlyRate: 50, amount: 75 }])
+    assert.deepEqual(result.summary?.sessions[0].addOns, [{ name: 'Teleprompter', hourlyRate: 50, amount: 50, billing: 'session' }])
     assert.doesNotMatch(JSON.stringify(result), /Private Name|example.invalid|private-phone|client_secret/)
-    assert.equal(result.purchase?.value, 225)
+    assert.equal(result.purchase?.value, 200)
     assert.equal(result.purchase?.currency, 'USD')
     assert.match(result.purchase?.transactionId || '', /^vbs_[a-f0-9]{32}$/)
     assert.doesNotMatch(JSON.stringify(result.purchase), /cs_test|fixture-booking-reference|2026-09|Private Name|example.invalid/)
@@ -213,7 +213,7 @@ describe('verified booking confirmation', () => {
       const { deps } = dependencies(session({ livemode, metadata: { ...baseMetadata, vbsCalendarSyncedAt: timestamp } }))
       const result = await getBookingConfirmation(sessionId, 'valid-fixture-token', deps)
       assert.equal(result.status, 'confirmed')
-      assert.equal(result.summary?.totalPaid, 225)
+      assert.equal(result.summary?.totalPaid, 200)
       assert.equal(result.purchase, undefined)
     }
   })

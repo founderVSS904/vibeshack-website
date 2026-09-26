@@ -3,10 +3,11 @@ import { describe, test } from 'node:test'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import BookingAddOnPicker from '../components/BookingAddOnPicker'
+import type { AddOnAvailabilityState } from '../lib/booking/add-on-inventory'
 
-function renderPicker(selectedIds: string[] = [], durationSlots = 4, remotePlatform = '') {
+function renderPicker(selectedIds: string[] = [], durationSlots = 4, remotePlatform = '', state: AddOnAvailabilityState = 'available') {
   return renderToStaticMarkup(createElement(BookingAddOnPicker, {
-    selectedIds, durationSlots, remotePlatform, onToggle: () => {}, onPlatformChange: () => {},
+    selectedIds, durationSlots, remotePlatform, availability: { teleprompter: state }, onToggle: () => {}, onPlatformChange: () => {},
   }))
 }
 
@@ -43,5 +44,29 @@ describe('booking add-on cards', () => {
     assert.match(html, /value="&lt;script&gt;test&lt;\/script&gt;"/)
     assert.match(html, /motion-safe:transition-colors/)
     assert.match(html, /focus-visible:ring-2/)
+  })
+
+  test('teleprompter is a flat session fee at both short and long durations', () => {
+    for (const count of [2, 3, 16]) {
+      const card = renderPicker([], count).split('</button>')[0]
+      assert.match(card, /\$50/)
+      assert.match(card, /\/ session/)
+      assert.match(card, /One-time session fee/)
+      assert.doesNotMatch(card, /\/ hour|\$400/)
+    }
+  })
+
+  test('unavailable or unverified teleprompters cannot be added but can always be removed', () => {
+    for (const state of ['checking', 'unavailable', 'unverified'] as const) {
+      const html = renderPicker([], 4, '', state)
+      const buttons = [...html.matchAll(/<button\b[^>]*>/g)].map(([tag]) => tag)
+      assert.match(buttons[0], /disabled=""/)
+      assert.doesNotMatch(buttons[1] + buttons[2], / disabled=""/)
+      const selected = renderPicker(['teleprompter'], 4, '', state)
+      assert.doesNotMatch(selected.match(/<button\b[^>]*>/)![0], / disabled=""/)
+      assert.match(selected, /Remove to continue/)
+      assert.match(selected, /add-on-teleprompter-status/)
+    }
+    assert.match(renderPicker([], 4, '', 'unavailable'), /Reserved for this time/)
   })
 })

@@ -55,16 +55,16 @@ describe('Executive desk and armchair options', () => {
     }
   })
 
-  test('keeps each layout at $300/hr and the teleprompter at $50/hr, including fractional durations and discounts', () => {
+  test('keeps each layout at $300/hr and the teleprompter at $50/session, including fractional durations and discounts', () => {
     for (const setup of EXECUTIVE_SETUPS) {
       const cart = buildCanonicalBookingCart([rawItem(setup.id, 3)])
       const pricing = calculateBookingCheckoutPricing(cart, 'weekly')
       assert.deepEqual(pricing, {
         baseSessionTotalCents: 45000, discountCents: 4500,
-        discountedSessionAmounts: [40500], addOnTotalCents: 7500, computedTotalCents: 48000,
+        discountedSessionAmounts: [40500], addOnTotalCents: 5000, computedTotalCents: 45500,
       })
       const lines = buildBookingCheckoutLineItems(cart, pricing, 'https://example.invalid/fixture.jpg')
-      assert.deepEqual(lines.map((line) => line.price_data?.unit_amount), [40500, 7500])
+      assert.deepEqual(lines.map((line) => line.price_data?.unit_amount), [40500, 5000])
       assert.ok(lines[0].price_data?.product_data?.description?.includes(`Setup: ${setup.label}`))
       assert.doesNotMatch(JSON.stringify(lines), /Untrusted/)
     }

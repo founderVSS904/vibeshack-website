@@ -18,6 +18,7 @@ import { type ReferralInfo } from './referrals'
 import { primaryStudioResourceGroup, studioIdsThatAffectAvailability, studioResourceGroups, studiosShareResources } from './resources'
 import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingDateInPacific, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
 import { bookingSlotFitsTurnaround, slotsWithTurnaround, STUDIO_TURNAROUND_MINUTES, type BookingBusyRange } from './turnaround'
+import { SINGLE_UNIT_ADD_ONS, addOnConflict, addOnForResource, addOnResourceGroup, limitedAddOnIds, type AddOnAvailability } from './add-on-inventory'
 
 export interface BookingCartItem {
   studioId: string
@@ -111,6 +112,7 @@ interface BookingHoldBusyEventTarget {
   studioName: string
   setupId?: StudioSetupId
   resourceGroups: string[]
+  addOnIds: string[]
   date: string
   start: string
   end: string
@@ -250,7 +252,7 @@ function bookingHoldTargets(cartItems: BookingCartItem[]) {
   const targets = new Map<string, BookingHoldLedgerTarget>()
 
   for (const item of cartItems) {
-    for (const resourceGroup of studioResourceGroups(item.studioId)) {
+    for (const resourceGroup of [...studioResourceGroups(item.studioId), ...limitedAddOnIds(item.addOns).map(addOnResourceGroup)]) {
       const slots = resourceGroup === `studio:${item.studioId}` && item.reservationKind !== 'tour'
         ? slotsWithTurnaround(item.slots)
         : item.slots
@@ -297,6 +299,7 @@ function bookingHoldBusyEventTargets(
         studioName: item.studioName,
         setupId: getStudioSetup(item.studioId, item.setupId)?.id,
         resourceGroups: studioResourceGroups(item.studioId),
+        addOnIds: (item.addOns || []).map(({ id }) => id),
         date: item.date,
         start,
         end,
@@ -504,6 +507,8 @@ function bookingHoldBusyEventRequestBody(
     extendedProperties: {
       private: {
         source: 'vibeshack-booking-checkout-hold',
+        addOnIds: target.addOnIds.join(','),
+        addOnInventoryVersion: '1',
         bookingRef,
         studioId: target.studioId,
         studioName: target.studioName,
@@ -760,6 +765,8 @@ async function acquireBookingHoldTarget(
     ))
 
     if (conflict) {
+      const addOn = addOnForResource(target.resourceGroup)
+      if (addOn) return addOnConflict([addOn.id])
       return {
         ok: false,
         status: 409,
@@ -1462,6 +1469,8 @@ export async function assertCartSlotsAvailable(
     for (const target of bookingHoldTargets([item])) {
       const resourceSlotKeys = target.slots.map((slot) => `${target.resourceGroup}|${target.date}|${slot}`)
       if (resourceSlotKeys.some((requestedSlotKey) => requestedSlotKeys.has(requestedSlotKey))) {
+        const addOn = addOnForResource(target.resourceGroup)
+        if (addOn) return addOnConflict([addOn.id])
         return { ok: false, status: 409, error: 'Selected sessions overlap or do not leave 30 minutes for studio turnaround.' }
       }
 
@@ -1488,6 +1497,84 @@ export async function assertCartSlotsAvailable(
     }
   }
 
+  return assertCartAddOnsAvailable(cartItems, excludedBookingRef, dependencies)
+}
+
+// Do not infer equipment from a room name. Explicit metadata or a named manual
+// equipment reservation is authoritative; old checkout holds are conservative
+// until they expire because they did not record which add-ons were selected.
+function eventInventoryIds(event: calendar_v3.Schema$Event) {
+  const props = event.extendedProperties?.private || {}
+  const declared = props.addOnIds ?? event.extendedProperties?.shared?.addOnIds
+  if (declared !== undefined) return declared.split(',')
+  if (props.source === 'vibeshack-booking-checkout-hold') return SINGLE_UNIT_ADD_ONS.map(({ id }) => id)
+  return SINGLE_UNIT_ADD_ONS.filter(({ name }) => (
+    (event.description || '').split('\n').some((line) => line.startsWith(`Add-on: ${name}:`))
+    || normalizeText(event.summary).includes(normalizeText(name))
+  )).map(({ id }) => id)
+}
+
+export async function getAddOnAvailabilityForSlots(
+  date: string,
+  slots: string[],
+  excludedBookingRef?: string,
+  dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
+) {
+  const availability: AddOnAvailability = Object.fromEntries(SINGLE_UNIT_ADD_ONS.map(({ id }) => [id, false]))
+  if (!isValidBookingDate(date) || !hasConsecutiveBookingSlots(slots, 1)
+    || !slots.every((slot) => slotIsoSetForDate(date).has(slot))) {
+    return { verified: false, availability, error: 'Invalid add-on session' }
+  }
+  try {
+    const config = await dependencies.getConfig()
+    if (!config) throw new Error('Calendar unavailable')
+    const start = new Date(slots[0])
+    const end = addMinutes(new Date(slots[slots.length - 1]), SLOT_DURATION_MINUTES)
+    const blocked = new Set<string>()
+    // Equipment is global, even when the two rooms share no studio resources.
+    for (const calendarId of new Set([config.calendarId, ...dependencies.calendarIds()])) {
+      let pageToken: string | undefined
+      do {
+        const response = await config.client.events.list({
+          calendarId, timeMin: start.toISOString(), timeMax: end.toISOString(),
+          timeZone: BOOKING_TIME_ZONE, singleEvents: true, showDeleted: false,
+          maxResults: 2500, pageToken,
+        })
+        for (const event of response.data.items || []) {
+          if (!eventBlocksStudio(event, undefined, new Set(), false, excludedBookingRef)) continue
+          if (event.extendedProperties?.private?.source === 'vibeshack-tour-booking') continue
+          const eventStart = eventBoundaryToDate(event.start)
+          const eventEnd = eventBoundaryToDate(event.end, true)
+          if (eventStart && eventEnd && start < eventEnd && end > eventStart) {
+            eventInventoryIds(event).forEach((id) => blocked.add(id))
+          }
+        }
+        pageToken = response.data.nextPageToken || undefined
+      } while (pageToken)
+    }
+    for (const { id } of SINGLE_UNIT_ADD_ONS) {
+      const target = bookingHoldLedgerTarget(addOnResourceGroup(id), date)
+      const event = await getExistingBookingHoldLedger(config.client, getHoldCalendarId(), target)
+      if (event && Object.entries(activeBookingHoldLedger(event, target).holds).some(([ref, hold]) => (
+        ref !== excludedBookingRef && holdSlotsConflict(slots, hold.slots)
+      ))) blocked.add(id)
+      availability[id] = !blocked.has(id)
+    }
+    return { verified: true, availability }
+  } catch {
+    return { verified: false, availability: Object.fromEntries(SINGLE_UNIT_ADD_ONS.map(({ id }) => [id, false])) as AddOnAvailability, error: 'Equipment availability could not be verified. Please try again.' }
+  }
+}
+
+async function assertCartAddOnsAvailable(cart: BookingCartItem[], excludedBookingRef: string | undefined, dependencies: BookingCalendarDependencies) {
+  for (const item of cart) {
+    const selected = limitedAddOnIds(item.addOns)
+    if (!selected.length) continue
+    const result = await getAddOnAvailabilityForSlots(item.date, item.slots, excludedBookingRef, dependencies)
+    if (!result.verified) return { ok: false, status: 503, error: result.error || 'Equipment availability could not be verified.' }
+    const unavailable = selected.filter((id) => result.availability[id] !== true)
+    if (unavailable.length) return addOnConflict(unavailable)
+  }
   return { ok: true, status: 200, error: '' }
 }
 

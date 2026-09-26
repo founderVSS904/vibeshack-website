@@ -82,7 +82,7 @@ export default function BookingReviewCard(props: BookingReviewCardProps) {
             <div key={addOn.id} className="flex items-start justify-between gap-4">
               <dt className="min-w-0 break-words text-zinc-300">
                 {bookingAddOnLabel(addOn)}
-                {addOn.hourlyRateCents > 0 && <span className="mt-1 block text-xs text-zinc-400">{bookingDisplayPrice(addOn.hourlyRateCents / 100)}/hr · {props.durationLabel}</span>}
+                {addOn.hourlyRateCents > 0 && <span className="mt-1 block text-xs text-zinc-400">{addOn.billing === 'session' ? 'One-time session fee' : `${bookingDisplayPrice(addOn.hourlyRateCents / 100)}/hr · ${props.durationLabel}`}</span>}
               </dt>
               <dd className="shrink-0 tabular-nums text-white">{addOn.amountCents === 0 ? 'No charge' : bookingDisplayPrice(addOn.amountCents / 100)}</dd>
             </div>

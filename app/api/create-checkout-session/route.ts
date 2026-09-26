@@ -87,6 +87,13 @@ function checkoutAvailabilityError(status: number, error: string) {
   return 'This slot is not available. Please choose another open time.'
 }
 
+function availabilityFailure(result: { status: number; error: string; unavailableAddOnIds?: string[] }) {
+  return NextResponse.json({
+    error: result.unavailableAddOnIds ? result.error : checkoutAvailabilityError(result.status, result.error),
+    ...(result.unavailableAddOnIds ? { unavailableAddOnIds: result.unavailableAddOnIds } : {}),
+  }, { status: result.status })
+}
+
 export async function POST(req: NextRequest) {
   try {
     const limited = rateLimit(req, {
@@ -119,8 +126,7 @@ export async function POST(req: NextRequest) {
 
     const availability = await assertCartSlotsAvailable(cart)
     if (!availability.ok) {
-      const error = checkoutAvailabilityError(availability.status, availability.error)
-      return NextResponse.json({ error }, { status: availability.status })
+      return availabilityFailure(availability)
     }
 
     const pricing = calculateBookingCheckoutPricing(cart, recurringOption?.id)
@@ -155,15 +161,14 @@ export async function POST(req: NextRequest) {
     const publishableKey = getStripePublishableKey()
     const hold = await acquireBookingHolds(cart, bookingRef, holdExpiresAt)
     if (!hold.ok) {
-      return NextResponse.json({ error: hold.error }, { status: hold.status })
+      return availabilityFailure(hold)
     }
 
     try {
       const finalAvailability = await assertCartSlotsAvailable(cart, bookingRef)
       if (!finalAvailability.ok) {
         await releaseBookingHolds(cart, bookingRef)
-        const error = checkoutAvailabilityError(finalAvailability.status, finalAvailability.error)
-        return NextResponse.json({ error }, { status: finalAvailability.status })
+        return availabilityFailure(finalAvailability)
       }
 
       const session = await getStripeClient().checkout.sessions.create({

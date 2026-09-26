@@ -61,10 +61,10 @@ describe('explicit, non-priced Wing setup selection', () => {
       const pricing = calculateBookingCheckoutPricing(cart, 'weekly')
       assert.deepEqual(pricing, {
         baseSessionTotalCents: 60000, discountCents: 6000,
-        discountedSessionAmounts: [54000], addOnTotalCents: 10000, computedTotalCents: 64000,
+        discountedSessionAmounts: [54000], addOnTotalCents: 5000, computedTotalCents: 59000,
       })
       const lines = buildBookingCheckoutLineItems(cart, pricing, 'https://example.invalid/fixture.jpg')
-      assert.deepEqual(lines.map((line) => line.price_data?.unit_amount), [54000, 10000])
+      assert.deepEqual(lines.map((line) => line.price_data?.unit_amount), [54000, 5000])
       assert.ok(lines[0].price_data?.product_data?.description?.includes(`Setup: ${setup.label}`))
       assert.doesNotMatch(JSON.stringify(lines), /Untrusted/)
     }
@@ -131,7 +131,7 @@ describe('setup drafts and checkout revisions', () => {
       assert.equal(restored.setupId, setup.id)
       assert.equal(restored.managementToken, draft.managementToken)
       const revised = buildCanonicalBookingCart([{ ...rawItem(restored.setupId, 4), addOnIds: restored.addOnIds }])
-      assert.equal(calculateBookingCheckoutPricing(revised, restored.recurring).computedTotalCents, 64000)
+      assert.equal(calculateBookingCheckoutPricing(revised, restored.recurring).computedTotalCents, 59000)
     }
   })
 

@@ -5,6 +5,7 @@ export const TELEPROMPTER = {
   id: 'teleprompter',
   name: 'Teleprompter',
   hourlyRateCents: 5000,
+  billing: 'session',
   description: 'Keep your script at eye level while you record.',
 } as const
 
@@ -36,6 +37,9 @@ export interface BookingAddOn {
   id: BookingAddOnId
   name: string
   hourlyRateCents: number
+  // The rate field keeps the legacy wire shape; billing distinguishes flat fees.
+  // Missing billing means the historical hourly price snapshot.
+  billing?: 'session'
   amountCents: number
   platform?: string
 }
@@ -51,7 +55,8 @@ export function priceBookingAddOns(selection: unknown, slotCount: number, remote
     id: addOn.id,
     name: addOn.name,
     hourlyRateCents: addOn.hourlyRateCents,
-    amountCents: Math.round(addOn.hourlyRateCents * bookingHoursForSlotCount(slotCount)),
+    amountCents: Math.round(addOn.hourlyRateCents * (('billing' in addOn && addOn.billing === 'session') ? 1 : bookingHoursForSlotCount(slotCount))),
+    ...('billing' in addOn ? { billing: addOn.billing } : {}),
     ...(addOn.id === REMOTE_PODCAST.id ? { platform: normalizeRemotePodcastPlatform(remotePodcastPlatform) } : {}),
   }))
 }
@@ -61,8 +66,9 @@ export function bookingAddOnTotalCents(addOns: BookingAddOn[] = []) {
 }
 
 export function compactBookingAddOns(addOns: BookingAddOn[] = []) {
-  return addOns.map(({ id, hourlyRateCents, amountCents, platform }) => ({
+  return addOns.map(({ id, hourlyRateCents, amountCents, platform, billing }) => ({
     id, r: hourlyRateCents, p: amountCents,
+    ...(billing === 'session' ? { b: 's' } : {}),
     ...(id === REMOTE_PODCAST.id && platform ? { f: platform } : {}),
   }))
 }
@@ -92,7 +98,8 @@ export function parseBookingAddOns(value: unknown, slotCount: number): BookingAd
       || !Number.isSafeInteger(entry.r) || entry.r < 0
       || !Number.isSafeInteger(entry.p) || entry.p < 0
       || (definition.id === REMOTE_PODCAST.id ? entry.r !== 0 || entry.p !== 0 : entry.r === 0 || entry.p === 0)
-      || entry.p !== Math.round(entry.r * bookingHoursForSlotCount(slotCount))
+      || (entry.b !== undefined && (entry.b !== 's' || definition.id !== TELEPROMPTER.id))
+      || entry.p !== Math.round(entry.r * (entry.b === 's' ? 1 : bookingHoursForSlotCount(slotCount)))
       || (entry.f !== undefined && (
         definition.id !== REMOTE_PODCAST.id || typeof entry.f !== 'string'
         || entry.f !== normalizeRemotePodcastPlatform(entry.f)
@@ -103,6 +110,7 @@ export function parseBookingAddOns(value: unknown, slotCount: number): BookingAd
     seen.add(definition.id)
     return {
       id: definition.id, name: definition.name, hourlyRateCents: entry.r, amountCents: entry.p,
+      ...(entry.b === 's' ? { billing: 'session' as const } : {}),
       ...(definition.id === REMOTE_PODCAST.id ? { platform: entry.f || '' } : {}),
     }
   })
@@ -116,5 +124,11 @@ export function bookingAddOnLabel(addOn: BookingAddOn) {
 
 export function bookingAddOnDescription(addOn: BookingAddOn) {
   if (addOn.id === REMOTE_PODCAST.id) return `${bookingAddOnLabel(addOn)}: No charge`
+  if (addOn.billing === 'session') return `${bookingAddOnLabel(addOn)}: $${(addOn.amountCents / 100).toFixed(2)} per session`
   return `${bookingAddOnLabel(addOn)}: $${(addOn.hourlyRateCents / 100).toFixed(2)}/hr, $${(addOn.amountCents / 100).toFixed(2)} for the session`
+}
+
+export function bookingAddOnRateLabel(addOn: { hourlyRateCents: number; billing?: 'session' }) {
+  if (addOn.hourlyRateCents === 0) return 'No charge'
+  return `$${addOn.hourlyRateCents / 100}/${addOn.billing === 'session' ? 'session' : 'hr'}`
 }

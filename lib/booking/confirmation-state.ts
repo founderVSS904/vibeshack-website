@@ -18,7 +18,7 @@ export interface BookingConfirmation {
       time: string
       duration: string
       setupDescription?: string
-      addOns: Array<{ name: string; hourlyRate: number; amount: number }>
+      addOns: Array<{ name: string; hourlyRate: number; amount: number; billing?: 'session' }>
     }>
   }
 }

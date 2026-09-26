@@ -3,7 +3,7 @@ import { faqSchema, studioServiceSchema } from '@/lib/schemas'
 import { siteUrl } from '@/lib/seo/site'
 import { PODCAST_CAMERA_LABEL, PODCAST_CREW_LABEL, PODCAST_HOURLY_RATES, PODCAST_PACKAGE_SUMMARY, PODCAST_RATE_SUMMARY } from '@/lib/booking/podcast-package'
 import PricingFaqs from './PricingFaqs'
-import { BOOKING_ADD_ONS } from '@/lib/booking/add-ons'
+import { BOOKING_ADD_ONS, bookingAddOnRateLabel } from '@/lib/booking/add-ons'
 
 export const metadata: Metadata = {
   title: 'Studio Pricing',
@@ -102,7 +102,10 @@ const pricingServiceSchema = {
   }),
   offers: [
     ...studios.map((studio) => hourlyOffer(studio.name, studio.price.replace('$', ''))),
-    ...BOOKING_ADD_ONS.map((addOn) => addOn.hourlyRateCents > 0
+    ...BOOKING_ADD_ONS.map((addOn) => 'billing' in addOn && addOn.billing === 'session'
+      ? { '@type': 'Offer', name: addOn.name, price: String(addOn.hourlyRateCents / 100), priceCurrency: 'USD', url: `${siteUrl}/book/`,
+        priceSpecification: { '@type': 'UnitPriceSpecification', price: String(addOn.hourlyRateCents / 100), priceCurrency: 'USD', unitText: 'session' } }
+      : addOn.hourlyRateCents > 0
       ? hourlyOffer(addOn.name, String(addOn.hourlyRateCents / 100))
       : { '@type': 'Offer', name: addOn.name, price: '0', priceCurrency: 'USD', url: `${siteUrl}/book/`, description: `${addOn.description} No charge with a studio booking.` }),
     quotedOffer('Photo Services', 'Contact VibeShack Studios for a scoped photo services quote.'),
@@ -197,7 +200,7 @@ export default function PricingPage() {
                     <p className="text-base text-white group-hover:text-gray-300">{addOn.name}</p>
                     <p className="mt-1 max-w-xl text-sm text-gray-400">{addOn.description}</p>
                   </div>
-                  <p className="shrink-0 text-lg font-bold text-white">{addOn.hourlyRateCents === 0 ? 'No charge' : `$${addOn.hourlyRateCents / 100}/hr`}</p>
+                  <p className="shrink-0 text-lg font-bold text-white">{bookingAddOnRateLabel(addOn)}</p>
                 </a>
               ))}
             </div>

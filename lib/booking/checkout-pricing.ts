@@ -60,6 +60,8 @@ export function buildBookingCheckoutLineItems(
             name: `${bookingAddOnLabel(addOn)} - ${item.studioName}`,
             description: addOn.id === REMOTE_PODCAST.id
               ? `No charge. Included with your session on ${formatDateForDisplay(item.date)}.`
+              : addOn.billing === 'session'
+                ? `$${(addOn.amountCents / 100).toFixed(2)} per session on ${formatDateForDisplay(item.date)}. Recurring discounts do not apply.`
               : `$${(addOn.hourlyRateCents / 100).toFixed(2)}/hr for ${formatBookingDuration(item.slots.length)} on ${formatDateForDisplay(item.date)}. Recurring discounts do not apply.`,
           },
           unit_amount: addOn.amountCents,

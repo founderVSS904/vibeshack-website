@@ -8,11 +8,13 @@ import {
   priceBookingAddOns,
 } from '@/lib/booking/add-ons'
 import { formatBookingDuration } from '@/lib/booking/time'
+import { SINGLE_UNIT_ADD_ONS, type AddOnAvailabilityState } from '@/lib/booking/add-on-inventory'
 
 interface BookingAddOnPickerProps {
   selectedIds: string[]
   durationSlots: number
   remotePlatform: string
+  availability?: Partial<Record<string, AddOnAvailabilityState>>
   onToggle: (id: string) => void
   onPlatformChange: (platform: string) => void
 }
@@ -23,7 +25,7 @@ function formatPrice(cents: number) {
   })
 }
 
-export default function BookingAddOnPicker({ selectedIds, durationSlots, remotePlatform, onToggle, onPlatformChange }: BookingAddOnPickerProps) {
+export default function BookingAddOnPicker({ selectedIds, durationSlots, remotePlatform, availability = {}, onToggle, onPlatformChange }: BookingAddOnPickerProps) {
   const duration = formatBookingDuration(durationSlots).toLowerCase()
 
   return (
@@ -36,10 +38,17 @@ export default function BookingAddOnPicker({ selectedIds, durationSlots, remoteP
         {BOOKING_ADD_ONS.map((addOn) => {
           const active = selectedIds.includes(addOn.id)
           const isFree = addOn.hourlyRateCents === 0
+          const perSession = 'billing' in addOn && addOn.billing === 'session'
+          const limited = SINGLE_UNIT_ADD_ONS.some(({ id }) => id === addOn.id)
+          const state = limited ? availability[addOn.id] || 'checking' : 'available'
+          const status = state === 'checking' ? 'Checking availability…'
+            : state === 'unverified' ? 'Couldn’t verify availability'
+              : state === 'unavailable' ? 'Reserved for this time' : ''
           const sessionAmount = priceBookingAddOns([addOn.id], durationSlots)[0].amountCents
           const titleId = `add-on-${addOn.id}-title`
           const descriptionId = `add-on-${addOn.id}-description`
           const priceId = `add-on-${addOn.id}-price`
+          const statusId = `add-on-${addOn.id}-status`
 
           return (
             <div key={addOn.id} className={`overflow-hidden rounded-[20px] border motion-safe:transition-colors motion-safe:duration-200 ${active ? 'border-white/[0.45] bg-[#1c1c1e]' : 'border-white/10 bg-[#141416] hover:border-white/25 hover:bg-[#19191b]'}`}>
@@ -47,9 +56,10 @@ export default function BookingAddOnPicker({ selectedIds, durationSlots, remoteP
                 type="button"
                 aria-pressed={active}
                 aria-labelledby={titleId}
-                aria-describedby={`${descriptionId} ${priceId}`}
+                aria-describedby={`${descriptionId} ${priceId}${status ? ` ${statusId}` : ''}`}
+                disabled={state !== 'available' && !active}
                 onClick={() => onToggle(addOn.id)}
-                className="group block w-full rounded-[19px] p-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white sm:p-6"
+                className="group block w-full rounded-[19px] p-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white disabled:cursor-not-allowed disabled:opacity-60 sm:p-6"
               >
                 <span className="flex items-center justify-between gap-4">
                   <span id={titleId} className="min-w-0 text-[17px] font-semibold leading-snug tracking-[-0.025em] text-white sm:text-lg">{addOn.name}</span>
@@ -60,12 +70,13 @@ export default function BookingAddOnPicker({ selectedIds, durationSlots, remoteP
                   </span>
                 </span>
                 <span id={descriptionId} className="mt-2.5 block max-w-[48ch] text-sm leading-relaxed text-zinc-400">{addOn.description}</span>
+                {status && <span id={statusId} role="status" className="mt-3 block text-sm font-medium text-zinc-200">{status}{active ? ' · Remove to continue' : ''}</span>}
                 <span id={priceId} className="mt-5 flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-white/[0.08] pt-4">
                   <span className="text-[22px] font-semibold leading-tight tracking-[-0.035em] text-white">
                     {isFree ? 'No charge' : formatPrice(addOn.hourlyRateCents)}
-                    {!isFree && <span className="ml-1.5 text-[13px] font-normal tracking-normal text-zinc-400">/ hour</span>}
+                    {!isFree && <span className="ml-1.5 text-[13px] font-normal tracking-normal text-zinc-400">/ {perSession ? 'session' : 'hour'}</span>}
                   </span>
-                  <span className="text-xs leading-relaxed text-zinc-400">{isFree ? 'Included with your session' : `${formatPrice(sessionAmount)} for ${duration}`}</span>
+                  <span className="text-xs leading-relaxed text-zinc-400">{isFree ? 'Included with your session' : perSession ? 'One-time session fee' : `${formatPrice(sessionAmount)} for ${duration}`}</span>
                 </span>
               </button>
               {addOn.id === REMOTE_PODCAST.id && active && (
@@ -91,7 +102,7 @@ export default function BookingAddOnPicker({ selectedIds, durationSlots, remoteP
           )
         })}
       </div>
-      <p className="mt-4 text-xs leading-relaxed text-zinc-400">Hourly add-ons apply to your full session.</p>
+      <p className="mt-4 text-xs leading-relaxed text-zinc-400">Teleprompter is charged once per session. Hourly add-ons cover your booked time.</p>
     </section>
   )
 }
