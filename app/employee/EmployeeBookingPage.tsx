@@ -141,7 +141,6 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
       <div className="employee-account"><Link href="/">Back to website ↗</Link><span className="employee-avatar" aria-hidden="true">{preview ? 'VS' : email.slice(0, 2).toUpperCase()}</span>{!preview && <form action="/api/employee/auth/logout" method="post"><button type="submit" title={email}>Sign out</button></form>}</div>
     </header>
     <div className="employee-workspace">
-      {preview && <div className="employee-preview-note"><span>LOCAL PREVIEW</span> Sample availability. No real bookings, payments, or emails. Reservations reset when you reload.</div>}
       {!enabled && <p className="employee-notice">Employee booking is not activated yet. You can review availability, but cannot create a reservation.</p>}
       <div className="employee-page-heading"><div><span className="employee-eyebrow">VIBESHACK TEAM</span><h1>Book for a client.</h1><p>Reserve their studio now. Send a payment link for later.</p></div><span className="employee-timezone">◷ All times Pacific</span></div>
       <form onSubmit={submit} className="employee-booking-grid">
