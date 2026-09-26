@@ -1,5 +1,5 @@
-import { REMOTE_PODCAST, priceBookingAddOns } from './add-ons'
-import { MAX_BOOKING_SLOTS, MIN_BOOKING_SLOTS, isValidBookingDate } from './time'
+import { REMOTE_PODCAST, TELEPROMPTER, priceBookingAddOns } from './add-ons'
+import { MAX_BOOKING_SLOTS, MIN_BOOKING_SLOTS, bookingHoursForSlotCount, isValidBookingDate } from './time'
 import { getStudioSetup, type StudioSetupId } from './studio-setups'
 
 export interface PendingCheckoutSlot { time: string; label: string; available: boolean }
@@ -19,6 +19,7 @@ export interface PendingCheckoutState {
   slots: PendingCheckoutSlot[]
   recurring: string | null
   addOnIds?: string[]
+  addOnPricingVersion?: 2
   remotePodcastPlatform?: string
   name: string
   email: string
@@ -68,6 +69,7 @@ export function parsePendingCheckout(raw: string | null): PendingCheckoutState |
     return {
       ...parsed,
       addOnIds: addOns.map((addOn) => addOn.id),
+      addOnPricingVersion: parsed.addOnPricingVersion === 2 ? 2 : undefined,
       remotePodcastPlatform: addOns.find((addOn) => addOn.id === REMOTE_PODCAST.id)?.platform || '',
       // Preserve legacy checkout authority even when its setup is absent or invalid.
       setupId: getStudioSetup(parsed.selectedId, parsed.setupId)?.id,
@@ -75,4 +77,14 @@ export function parsePendingCheckout(raw: string | null): PendingCheckoutState |
   } catch {
     return null
   }
+}
+
+// An open Stripe checkout keeps the price it was created with, including older
+// hourly teleprompters. Editing it creates a new checkout at current prices.
+export function pendingCheckoutAddOns(selection: string[], slotCount: number, platform: string, pricingVersion?: number) {
+  return priceBookingAddOns(selection, slotCount, platform).map((addOn) => {
+    if (pricingVersion === 2 || addOn.id !== TELEPROMPTER.id) return addOn
+    const { billing: _billing, ...legacy } = addOn
+    return { ...legacy, amountCents: Math.round(addOn.hourlyRateCents * bookingHoursForSlotCount(slotCount)) }
+  })
 }

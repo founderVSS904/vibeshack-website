@@ -69,6 +69,7 @@ export async function getBookingConfirmation(
           ...(bookingSetupDescription(item.studioId, item.setupId) ? { setupDescription: bookingSetupDescription(item.studioId, item.setupId) } : {}),
           addOns: (item.addOns || []).map((addOn) => ({
             name: bookingAddOnLabel(addOn), hourlyRate: addOn.hourlyRateCents / 100, amount: addOn.amountCents / 100,
+            ...(addOn.billing === 'session' ? { billing: 'session' as const } : {}),
           })),
         })),
       }

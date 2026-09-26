@@ -25,10 +25,11 @@ import {
   formatBookingDuration,
 } from '@/lib/booking/time'
 import { GAEventType, sendGAEvent, trackBookingStep } from '@/lib/analytics'
-import { bookingAddOnLabel, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/booking/add-ons'
+import { bookingAddOnLabel, bookingAddOnRateLabel, bookingAddOnTotalCents, priceBookingAddOns } from '@/lib/booking/add-ons'
+import { SINGLE_UNIT_ADD_ONS, addOnAvailabilityState, type AddOnAvailability } from '@/lib/booking/add-on-inventory'
 import { PENDING_CHECKOUT_STORAGE_KEY } from '@/lib/booking/confirmation-state'
 import { STUDIO_TURNAROUND_MINUTES } from '@/lib/booking/turnaround'
-import { parsePendingCheckout, pendingCheckoutMatchesSelection, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
+import { parsePendingCheckout, pendingCheckoutAddOns, pendingCheckoutMatchesSelection, type PendingCheckoutState } from '@/lib/booking/pending-checkout'
 import {
   EDITABLE_BOOKING_STEPS,
   bookingStepIsReady,
@@ -335,6 +336,8 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
   const [recurring, setRecurring] = useState<string | null>(null)
   const [addOnIds, setAddOnIds] = useState<string[]>([])
   const [remotePodcastPlatform, setRemotePodcastPlatform] = useState('')
+  const [addOnAvailability, setAddOnAvailability] = useState<{ key: string; verified: boolean; availability: AddOnAvailability } | null>(null)
+  const [addOnRefresh, setAddOnRefresh] = useState(0)
 
   // Contact
   const [name, setName] = useState('')
@@ -354,6 +357,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
   const [checkoutManagementToken, setCheckoutManagementToken] = useState('')
   const [checkoutCancelling, setCheckoutCancelling] = useState(false)
   const [checkoutSelectionConflict, setCheckoutSelectionConflict] = useState(false)
+  const [checkoutPricingVersion, setCheckoutPricingVersion] = useState<number>(2)
 
   const railRef = useRef<HTMLDivElement>(null)
   const availabilityReqRef = useRef(0)
@@ -399,6 +403,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
     setSlots(pending.slots)
     setRecurring(pending.recurring)
     setAddOnIds(pending.addOnIds || [])
+    setCheckoutPricingVersion(pending.addOnPricingVersion || 1)
     setRemotePodcastPlatform(pending.remotePodcastPlatform || '')
     setName(pending.name)
     setEmail(pending.email)
@@ -445,7 +450,9 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
   const sessionSubtotal = selectedStudio ? bookingPriceCents(selectedStudio.price, durationSlots) / 100 : 0
   const discountAmount = calculateRecurringDiscountCents(sessionSubtotal * 100, recurring) / 100
   const recurringDiscount = recurring ? RECURRING_OPTIONS.find((r) => r.id === recurring)?.discount || 0 : 0
-  const selectedAddOns = priceBookingAddOns(addOnIds, durationSlots, remotePodcastPlatform)
+  const selectedAddOns = step === 'payment'
+    ? pendingCheckoutAddOns(addOnIds, durationSlots, remotePodcastPlatform, checkoutPricingVersion)
+    : priceBookingAddOns(addOnIds, durationSlots, remotePodcastPlatform)
   const addOnTotal = bookingAddOnTotalCents(selectedAddOns) / 100
   const grandTotal = sessionSubtotal - discountAmount + addOnTotal
 
@@ -467,13 +474,46 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
   const anyStartable = slots.some((_, i) => durationOptionsForStart(i).length > 0)
   const selectedStartDurations = startIndex >= 0 ? durationOptionsForStart(startIndex) : []
 
+  // The key invalidates old answers immediately when session details change.
+  // Server-side inventory holds are still authoritative at checkout.
+  const addOnAvailabilityKey = `${date}|${startSlot}|${durationSlots}|${addOnRefresh}`
+  const addOnStatuses = Object.fromEntries(SINGLE_UNIT_ADD_ONS.map(({ id }) => [id,
+    addOnAvailabilityState(id, addOnAvailability?.key === addOnAvailabilityKey,
+      addOnAvailability?.verified === true, addOnAvailability?.availability || {}),
+  ]))
+  const selectedAddOnsReady = addOnIds.every((id) => !addOnStatuses[id] || addOnStatuses[id] === 'available')
+
+  useEffect(() => {
+    if ((step !== 'extras' && step !== 'review') || !blockValid || !date || !startSlot) return
+    let controller: AbortController | undefined
+    async function refresh() {
+      controller?.abort()
+      const request = new AbortController()
+      controller = request
+      try {
+        const params = new URLSearchParams({ date, start: startSlot, slots: String(durationSlots) })
+        const response = await fetch(`/api/add-on-availability/?${params}`, { signal: request.signal, cache: 'no-store' })
+        const data = await response.json()
+        if (request.signal.aborted) return
+        setAddOnAvailability({ key: addOnAvailabilityKey, verified: response.ok && data.verified === true, availability: data.availability || {} })
+      } catch {
+        if (!request.signal.aborted) setAddOnAvailability({ key: addOnAvailabilityKey, verified: false, availability: {} })
+      }
+    }
+    void refresh()
+    const interval = window.setInterval(() => { if (!document.hidden) void refresh() }, 30_000)
+    const onFocus = () => { void refresh() }
+    window.addEventListener('focus', onFocus)
+    return () => { controller?.abort(); window.clearInterval(interval); window.removeEventListener('focus', onFocus) }
+  }, [step, blockValid, date, startSlot, durationSlots, addOnAvailabilityKey])
+
   const continueReady = bookingStepIsReady({
     step,
     hasStudio: Boolean(selectedId),
     hasValidTime: Boolean(date && startSlot && blockValid),
     setupReady,
     submitting,
-  })
+  }) && ((step !== 'extras' && step !== 'review') || selectedAddOnsReady)
 
   const continueLabel =
     step === 'room' ? 'Continue to Date & Time'
@@ -610,6 +650,11 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
   async function handlePay(e: React.FormEvent) {
     e.preventDefault()
     if (checkoutCreatingRef.current) return
+    if (!selectedAddOnsReady) {
+      goToStep('extras')
+      setError('Your selected equipment is not currently available. Remove it or choose another time.')
+      return
+    }
     if (!setupReady) {
       goToStep('extras')
       setError(`Choose a setup for ${selectedStudio?.name || 'this studio'} before continuing.`)
@@ -661,7 +706,10 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
       const data = await res.json()
       if (!res.ok) {
         checkoutCreatingRef.current = false
-        if (res.status === 409 && date) {
+        if (res.status === 409 && Array.isArray(data.unavailableAddOnIds) && data.unavailableAddOnIds.length) {
+          goToStep('extras')
+          setAddOnRefresh((value) => value + 1)
+        } else if (res.status === 409 && date) {
           // The slot was taken while they reviewed. Send them back to the
           // calendar and refetch, so the stale opening cannot be re-picked.
           // selectDate clears error state, so the message is set after it.
@@ -677,6 +725,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
         setCheckoutClientSecret(data.clientSecret)
         setCheckoutSessionId(data.sessionId)
         setCheckoutManagementToken(data.managementToken)
+        setCheckoutPricingVersion(2)
         writePendingCheckout({
           version: 1,
           clientSecret: data.clientSecret,
@@ -692,6 +741,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
           slots,
           recurring,
           addOnIds,
+          addOnPricingVersion: 2,
           remotePodcastPlatform,
           name,
           email,
@@ -1218,6 +1268,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                     selectedIds={addOnIds}
                     durationSlots={durationSlots}
                     remotePlatform={remotePodcastPlatform}
+                    availability={addOnStatuses}
                     onToggle={(id) => setAddOnIds((current) => current.includes(id) ? current.filter((selected) => selected !== id) : [...current, id])}
                     onPlatformChange={setRemotePodcastPlatform}
                   />
@@ -1278,6 +1329,13 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                   onEditTime={() => goToStep('datetime')}
                   onEditExtras={() => goToStep('extras')}
                 />
+
+                {!selectedAddOnsReady && (
+                  <div role="status" className="mt-4 rounded-xl border border-white/15 bg-[#1c1c1e] p-4 text-sm text-zinc-200">
+                    Selected equipment needs an availability check before payment.
+                    <button type="button" onClick={() => goToStep('extras')} className="ml-2 rounded underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">Review add-ons</button>
+                  </div>
+                )}
 
                 <form id="review-form" onSubmit={handlePay} className="mt-6 space-y-6">
                   <BookingContactFields
@@ -1363,7 +1421,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                   <p className="text-sm leading-relaxed text-zinc-400">Your booking is confirmed after payment. Free cancellation up to 48 hours before your session.</p>
                   <button
                     type="submit"
-                    disabled={submitting || !setupReady}
+                    disabled={!continueReady}
                     className="min-h-[52px] w-full rounded-xl bg-brand-red px-4 py-3.5 text-[15px] font-semibold text-white motion-safe:transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-50 lg:hidden"
                   >
                     {continueLabel}
@@ -1486,7 +1544,7 @@ function BookPageInner({ studios, initialStudioId = '', initialSetupId, hasSetup
                   </div>
                   {selectedAddOns.map((addOn) => (
                     <div key={addOn.id} className="flex justify-between gap-3 text-xs text-zinc-300">
-                      <span className="min-w-0 break-words">{bookingAddOnLabel(addOn)}{addOn.hourlyRateCents > 0 ? ` ($${addOn.hourlyRateCents / 100}/hr)` : ''}</span><span className="shrink-0">{addOn.amountCents === 0 ? 'No charge' : `$${addOn.amountCents / 100}`}</span>
+                      <span className="min-w-0 break-words">{bookingAddOnLabel(addOn)}{addOn.hourlyRateCents > 0 ? ` (${bookingAddOnRateLabel(addOn)})` : ''}</span><span className="shrink-0">{addOn.amountCents === 0 ? 'No charge' : `$${addOn.amountCents / 100}`}</span>
                     </div>
                   ))}
                   {discountAmount > 0 && (

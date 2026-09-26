@@ -15,7 +15,7 @@ import {
 import { bookingAddOnsEmailHtml } from '../lib/booking/add-on-communication'
 import { INITIAL_BOOKING_METADATA_KEY_BUDGET, buildBookingCartMetadata, hasCompleteBookingCartMetadata, parseBookingCartItems, withBookingAttributionMetadata } from '../lib/booking/checkout-metadata'
 import { buildBookingCheckoutLineItems, buildCanonicalBookingCart, calculateBookingCheckoutPricing } from '../lib/booking/checkout-pricing'
-import { parsePendingCheckout } from '../lib/booking/pending-checkout'
+import { parsePendingCheckout, pendingCheckoutAddOns } from '../lib/booking/pending-checkout'
 import { getTimeSlotsForDay } from '../lib/booking/time'
 
 const date = '2026-09-12'
@@ -49,7 +49,7 @@ describe('live switching and remote podcast add-ons', () => {
       const ids = allIds.filter((_, index) => mask & (1 << index))
       const cart = buildCanonicalBookingCart([{ ...rawItem(3, [...ids, ...ids].reverse()), remotePodcastPlatform: 'Zoom' }])
       assert.deepEqual(cart[0].addOns?.map(({ id }) => id), ids)
-      const expectedAddOns = (ids.includes(TELEPROMPTER.id) ? 7500 : 0) + (ids.includes(LIVE_SWITCHING.id) ? 11250 : 0)
+      const expectedAddOns = (ids.includes(TELEPROMPTER.id) ? 5000 : 0) + (ids.includes(LIVE_SWITCHING.id) ? 11250 : 0)
       const pricing = calculateBookingCheckoutPricing(cart, 'weekly')
       assert.equal(pricing.addOnTotalCents, expectedAddOns)
       assert.equal(pricing.computedTotalCents, 13500 + expectedAddOns)
@@ -104,12 +104,12 @@ describe('live switching and remote podcast add-ons', () => {
 })
 
 describe('optional server-priced teleprompter', () => {
-  test('defaults off and scales at $50 per hour, including half hours', () => {
+  test('defaults off and charges $50 once per session regardless of duration', () => {
     for (const selection of [undefined, null, []]) assert.deepEqual(priceBookingAddOns(selection, 3), [])
-    assert.equal(bookingAddOnTotalCents(priceBookingAddOns([TELEPROMPTER.id], 1)), 2500)
+    assert.equal(bookingAddOnTotalCents(priceBookingAddOns([TELEPROMPTER.id], 1)), 5000)
     assert.equal(bookingAddOnTotalCents(priceBookingAddOns([TELEPROMPTER.id], 2)), 5000)
-    assert.equal(bookingAddOnTotalCents(priceBookingAddOns([TELEPROMPTER.id], 3)), 7500)
-    assert.equal(bookingAddOnTotalCents(priceBookingAddOns([TELEPROMPTER.id], 16)), 40000)
+    assert.equal(bookingAddOnTotalCents(priceBookingAddOns([TELEPROMPTER.id], 3)), 5000)
+    assert.equal(bookingAddOnTotalCents(priceBookingAddOns([TELEPROMPTER.id], 16)), 5000)
   })
 
   test('deduplicates known IDs and rejects unknown, mixed, or malformed selections', () => {
@@ -128,8 +128,8 @@ describe('optional server-priced teleprompter', () => {
     assert.equal(item.studioName, 'Canvas Rental')
     assert.equal(item.hours, 1.5)
     assert.equal(item.price, 150)
-    assert.deepEqual(item.addOns, [{ id: 'teleprompter', name: 'Teleprompter', hourlyRateCents: 5000, amountCents: 7500 }])
-    assert.equal(calculateBookingCheckoutPricing([item]).computedTotalCents, 22500)
+    assert.deepEqual(item.addOns, [{ id: 'teleprompter', name: 'Teleprompter', hourlyRateCents: 5000, amountCents: 5000, billing: 'session' }])
+    assert.equal(calculateBookingCheckoutPricing([item]).computedTotalCents, 20000)
     const [unselected] = buildCanonicalBookingCart([{ ...rawItem(), addOnIds: undefined }])
     assert.equal(bookingAddOnTotalCents(unselected.addOns), 0)
     assert.equal(unselected.price, 150)
@@ -155,12 +155,12 @@ describe('optional server-priced teleprompter', () => {
       baseSessionTotalCents: 15000,
       discountCents: 1500,
       discountedSessionAmounts: [13500],
-      addOnTotalCents: 7500,
-      computedTotalCents: 21000,
+      addOnTotalCents: 5000,
+      computedTotalCents: 18500,
     })
     const lines = buildBookingCheckoutLineItems(cart, pricing, 'https://example.invalid/fixture.jpg')
-    assert.deepEqual(lines.map((line) => line.price_data?.unit_amount), [13500, 7500])
-    assert.match(lines[1].price_data?.product_data?.description || '', /\$50\.00\/hr for 1 hour 30 minutes/)
+    assert.deepEqual(lines.map((line) => line.price_data?.unit_amount), [13500, 5000])
+    assert.match(lines[1].price_data?.product_data?.description || '', /\$50\.00 per session/)
     assert.match(lines[1].price_data?.product_data?.description || '', /Recurring discounts do not apply/)
     assert.equal(lines.reduce((total, line) => total + (line.price_data?.unit_amount || 0) * (line.quantity || 0), 0), pricing.computedTotalCents)
   })
@@ -170,10 +170,10 @@ describe('optional server-priced teleprompter', () => {
     const pricing = calculateBookingCheckoutPricing(cart, 'weekly')
     assert.equal(pricing.baseSessionTotalCents, 75000)
     assert.equal(pricing.discountCents, 7500)
-    assert.equal(pricing.addOnTotalCents, 17500)
-    assert.equal(pricing.computedTotalCents, 85000)
+    assert.equal(pricing.addOnTotalCents, 10000)
+    assert.equal(pricing.computedTotalCents, 77500)
     const lines = buildBookingCheckoutLineItems(cart, pricing, 'https://example.invalid/fixture.jpg')
-    assert.deepEqual(lines.map((line) => line.price_data?.unit_amount), [13500, 54000, 7500, 10000])
+    assert.deepEqual(lines.map((line) => line.price_data?.unit_amount), [13500, 54000, 5000, 5000])
     assert.equal(calculateBookingCheckoutPricing(cart, 'not-a-discount').discountCents, 0)
   })
 })
@@ -208,7 +208,7 @@ describe('checkout add-on metadata and fulfillment', () => {
 
   test('round-trips multiple items and respects Stripe metadata value limits', () => {
     const cart = buildCanonicalBookingCart([rawItem(16), { ...rawItem(3), studioId: 'the-executive', setupId: 'one-office-chair-desk' }])
-    const metadata = { bookingHoldVersion: '1', totalSessions: '2', ...buildBookingCartMetadata(cart), addOnTotalCents: '47500' }
+    const metadata = { bookingHoldVersion: '1', totalSessions: '2', ...buildBookingCartMetadata(cart), addOnTotalCents: '10000' }
     for (const value of Object.values(metadata)) assert.ok(value.length <= 500)
     const parsed = parseBookingCartItems(metadata)
     assert.equal(hasCompleteBookingCartMetadata(metadata, parsed), true)
@@ -261,8 +261,8 @@ describe('checkout add-on metadata and fulfillment', () => {
 
   test('communicates equipment and correct pricing to the studio and customer, without team pricing', () => {
     const addOns = priceBookingAddOns(['teleprompter'], 3)
-    assert.equal(bookingAddOnDescription(addOns[0]), 'Teleprompter: $50.00/hr, $75.00 for the session')
-    assert.match(bookingAddOnsEmailHtml(addOns), /Teleprompter: \$50\.00\/hr, \$75\.00 for the session/)
+    assert.equal(bookingAddOnDescription(addOns[0]), 'Teleprompter: $50.00 per session')
+    assert.match(bookingAddOnsEmailHtml(addOns), /Teleprompter: \$50\.00 per session/)
     assert.match(bookingAddOnsEmailHtml(addOns, false), /Selected add-on: Teleprompter/)
     assert.doesNotMatch(bookingAddOnsEmailHtml(addOns, false), /\$/)
     assert.equal(bookingAddOnsEmailHtml([]), '')
@@ -305,9 +305,9 @@ describe('checkout draft and revision compatibility', () => {
     const restored = parsePendingCheckout(JSON.stringify(draft))!
     const revised = buildCanonicalBookingCart([{ studioId: restored.selectedId, date: restored.date, slots: slots(4), addOnIds: restored.addOnIds, price: 0.01 }])
     const pricing = calculateBookingCheckoutPricing(revised, restored.recurring)
-    assert.equal(pricing.addOnTotalCents, 10000)
+    assert.equal(pricing.addOnTotalCents, 5000)
     assert.equal(pricing.discountCents, 2000)
-    assert.equal(pricing.computedTotalCents, 28000)
+    assert.equal(pricing.computedTotalCents, 23000)
     const removed = buildCanonicalBookingCart([{ ...rawItem(4), addOnIds: [] }])
     assert.equal(calculateBookingCheckoutPricing(removed, restored.recurring).computedTotalCents, 18000)
   })
@@ -316,5 +316,26 @@ describe('checkout draft and revision compatibility', () => {
     for (const raw of [null, 'invalid JSON', '{}', JSON.stringify({ ...draft, addOnIds: ['unknown'] }), JSON.stringify({ ...draft, durationSlots: 0 }), JSON.stringify({ ...draft, durationSlots: 2.5 })]) {
       assert.equal(parsePendingCheckout(raw), null)
     }
+  })
+
+  test('restores old open checkout totals without changing new per-session prices', () => {
+    const legacy = parsePendingCheckout(JSON.stringify(draft))!
+    assert.equal(pendingCheckoutAddOns(legacy.addOnIds!, 3, '', legacy.addOnPricingVersion)[0].amountCents, 7500)
+    assert.equal(pendingCheckoutAddOns(legacy.addOnIds!, 3, '', legacy.addOnPricingVersion)[0].billing, undefined)
+    const current = parsePendingCheckout(JSON.stringify({ ...draft, addOnPricingVersion: 2 }))!
+    assert.equal(pendingCheckoutAddOns(current.addOnIds!, 3, '', current.addOnPricingVersion)[0].amountCents, 5000)
+    assert.equal(pendingCheckoutAddOns(current.addOnIds!, 3, '', current.addOnPricingVersion)[0].billing, 'session')
+    assert.equal(parsePendingCheckout(JSON.stringify({ ...draft, addOnPricingVersion: 99 }))?.addOnPricingVersion, undefined)
+  })
+
+  test('rejects malformed flat-fee snapshots while preserving historical hourly snapshots', () => {
+    const flat = { id: 'teleprompter', r: 5000, p: 5000, b: 's' }
+    assert.equal(parseBookingAddOns([flat], 16)[0].amountCents, 5000)
+    for (const invalid of [{ ...flat, p: 40000 }, { ...flat, b: 'h' }, { ...flat, id: 'live-switching' }]) {
+      assert.throws(() => parseBookingAddOns([invalid], 16), /Invalid add-on metadata/)
+    }
+    const historical = parseBookingAddOns([{ id: 'teleprompter', r: 5000, p: 7500 }], 3)[0]
+    assert.equal(historical.billing, undefined)
+    assert.equal(bookingAddOnDescription(historical), 'Teleprompter: $50.00/hr, $75.00 for the session')
   })
 })
