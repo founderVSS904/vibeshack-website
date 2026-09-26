@@ -9,6 +9,7 @@ export function tourReservationCart(tour: Pick<TourBookingDetails, 'date' | 'slo
   return STUDIOS.map((studio) => ({
     studioId: studio.id, studioName: studio.name, date: tour.date,
     slots: [tour.slot], hours: 0.5, price: 0,
+    reservationKind: 'tour',
   }))
 }
 

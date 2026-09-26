@@ -16,7 +16,8 @@ import {
 } from './hold-cleanup'
 import { type ReferralInfo } from './referrals'
 import { primaryStudioResourceGroup, studioIdsThatAffectAvailability, studioResourceGroups, studiosShareResources } from './resources'
-import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
+import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingDateInPacific, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
+import { bookingSlotFitsTurnaround, slotsWithTurnaround, STUDIO_TURNAROUND_MINUTES, type BookingBusyRange } from './turnaround'
 
 export interface BookingCartItem {
   studioId: string
@@ -27,6 +28,8 @@ export interface BookingCartItem {
   price: number
   addOns?: BookingAddOn[]
   setupId?: StudioSetupId
+  // Internal tour lock carts only. Canonical paid checkout never accepts this flag.
+  reservationKind?: 'tour'
 }
 
 export interface CalendarConfig {
@@ -92,6 +95,7 @@ interface BookingHoldLedgerTarget {
 interface BookingHold {
   expiresAt: string
   slots: string[]
+  occupancyVersion?: 2
 }
 
 interface BookingHoldLedger {
@@ -247,16 +251,15 @@ function bookingHoldTargets(cartItems: BookingCartItem[]) {
 
   for (const item of cartItems) {
     for (const resourceGroup of studioResourceGroups(item.studioId)) {
-      const key = `${resourceGroup}|${item.date}`
-      const existing = targets.get(key)
-      targets.set(
-        key,
-        bookingHoldLedgerTarget(
-          resourceGroup,
-          item.date,
-          [...(existing?.slots || []), ...item.slots],
-        ),
-      )
+      const slots = resourceGroup === `studio:${item.studioId}` && item.reservationKind !== 'tour'
+        ? slotsWithTurnaround(item.slots)
+        : item.slots
+      for (const slot of slots) {
+        const date = bookingDateInPacific(new Date(slot))
+        const key = `${resourceGroup}|${date}`
+        const existing = targets.get(key)
+        targets.set(key, bookingHoldLedgerTarget(resourceGroup, date, [...(existing?.slots || []), slot]))
+      }
     }
   }
 
@@ -484,6 +487,7 @@ function bookingHoldBusyEventRequestBody(
     summary: `Temporary checkout hold: ${target.studioName}`,
     description: [
       `A customer is completing checkout for this time. The temporary hold expires at ${expiresAt.toISOString()}.`,
+      `Studio turnaround: ${STUDIO_TURNAROUND_MINUTES} minutes are also reserved after the session at no extra charge.`,
       setupFields.description,
     ].filter(Boolean).join('\n'),
     status: 'tentative',
@@ -685,7 +689,7 @@ async function getBookingHoldBusyTimes(
   if (!isValidBookingDate(date)) return []
 
   const calendarId = getHoldCalendarId()
-  const busySlots = new Set<string>()
+  const busySlots = new Map<string, boolean>()
 
   for (const target of availabilityHoldTargets(studioId, date)) {
     const currentEvent = createMissing
@@ -696,15 +700,18 @@ async function getBookingHoldBusyTimes(
     const ledger = activeBookingHoldLedger(currentEvent, target)
     for (const [bookingRef, hold] of Object.entries(ledger.holds)) {
       if (bookingRef === excludedBookingRef) continue
-      hold.slots.forEach((slot) => busySlots.add(slot))
+      const blocksTurnaround = !studioId || target.resourceGroup === `studio:${studioId}`
+      const slots = holdOccupancySlots(hold, target.resourceGroup, bookingRef)
+      slots.forEach((slot) => busySlots.set(slot, Boolean(busySlots.get(slot)) || blocksTurnaround))
     }
   }
 
-  return Array.from(busySlots).map((slot) => {
+  return Array.from(busySlots).map(([slot, blocksTurnaround]) => {
     const start = new Date(slot)
     return {
       start: start.toISOString(),
       end: addMinutes(start, SLOT_DURATION_MINUTES).toISOString(),
+      blocksTurnaround,
     }
   })
 }
@@ -731,6 +738,12 @@ async function releaseAcquiredBookingHolds(
   }
 }
 
+function holdOccupancySlots(hold: BookingHold, resourceGroup: string, bookingRef: string) {
+  return hold.occupancyVersion !== 2 && resourceGroup.startsWith('studio:') && !bookingRef.startsWith('tour-')
+    ? slotsWithTurnaround(hold.slots)
+    : hold.slots
+}
+
 async function acquireBookingHoldTarget(
   client: ReturnType<typeof google.calendar>,
   calendarId: string,
@@ -742,7 +755,8 @@ async function acquireBookingHoldTarget(
     const currentEvent = await getOrCreateBookingHoldLedger(client, calendarId, target)
     const ledger = activeBookingHoldLedger(currentEvent, target)
     const conflict = Object.entries(ledger.holds).some(([existingBookingRef, hold]) => (
-      existingBookingRef !== bookingRef && holdSlotsConflict(target.slots, hold.slots)
+      existingBookingRef !== bookingRef
+      && holdSlotsConflict(target.slots, holdOccupancySlots(hold, target.resourceGroup, existingBookingRef))
     ))
 
     if (conflict) {
@@ -761,6 +775,7 @@ async function acquireBookingHoldTarget(
           [bookingRef]: {
             expiresAt: expiresAt.toISOString(),
             slots: target.slots,
+            occupancyVersion: 2,
           },
         },
       })
@@ -921,8 +936,8 @@ async function cleanupExpiredBookingHoldBusyEvents(
   }
 }
 
-async function getBusyTimesForRange(start: Date, end: Date, calendarIds: string[]) {
-  const config = await getCalendarConfig()
+async function getBusyTimesForRange(start: Date, end: Date, calendarIds: string[], dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies) {
+  const config = await dependencies.getConfig()
   if (!config) return null
 
   const ids = Array.from(new Set(calendarIds.filter(Boolean)))
@@ -1067,11 +1082,26 @@ function eventBoundaryToDate(boundary: calendar_v3.Schema$EventDateTime | undefi
   return isEnd ? null : null
 }
 
-function eventBusyRange(event: calendar_v3.Schema$Event) {
+export function bookingEventBusyRange(
+  event: calendar_v3.Schema$Event,
+  studioId?: string,
+  calendarStudioIds = new Set<string>(),
+  isStudioSpecificCalendar = false,
+) {
   const start = eventBoundaryToDate(event.start)
   const end = eventBoundaryToDate(event.end, true)
   if (!start || !end) return null
-  return { start: start.toISOString(), end: end.toISOString() }
+  const isTour = event.extendedProperties?.private?.source === 'vibeshack-tour-booking'
+  const eventStudio = eventStudioId(event)
+  const resourceGroups = eventResourceGroups(event)
+  const blocksTurnaround = !studioId || isTour || (eventStudio
+    ? eventStudio === studioId
+    : resourceGroups.length ? resourceGroups.includes(`studio:${studioId}`)
+      : isStudioSpecificCalendar ? calendarStudioIds.has(studioId) : true)
+  const busyEnd = blocksTurnaround && !isTour && event.end?.dateTime
+    ? addMinutes(end, STUDIO_TURNAROUND_MINUTES)
+    : end
+  return { start: start.toISOString(), end: busyEnd.toISOString(), blocksTurnaround }
 }
 
 function descriptionField(description: string | null | undefined, label: string) {
@@ -1135,17 +1165,20 @@ export async function getBusyTimesForDate(
   studioId?: string,
   excludedBookingRef?: string,
   initializeBookingHoldLedgers = false,
+  dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
 ) {
   if (!isValidBookingDate(date)) {
     throw new Error('Invalid date')
   }
 
-  const config = await getCalendarConfig(studioId)
+  const config = await dependencies.getConfig(studioId)
   if (!config) return null
 
   const daySlots = getTimeSlotsForDay(date)
-  const timeMin = daySlots[0].start.toISOString()
-  const timeMax = daySlots[daySlots.length - 1].end.toISOString()
+  const dayStart = daySlots[0].start
+  const dayEnd = daySlots[daySlots.length - 1].end
+  const timeMin = addMinutes(dayStart, -STUDIO_TURNAROUND_MINUTES).toISOString()
+  const timeMax = addMinutes(dayEnd, STUDIO_TURNAROUND_MINUTES).toISOString()
   try {
     await cleanupExpiredBookingHoldBusyEvents(
       config.client,
@@ -1179,50 +1212,58 @@ export async function getBusyTimesForDate(
       calendarContexts.set(resolved.calendarId, context)
     }
   } else {
-    calendarContexts.set(config.calendarId, {
-      calendarId: config.calendarId,
-      isStudioSpecificCalendar: config.isStudioSpecificCalendar,
-      studioIds: new Set<string>(),
-    })
+    // The all-room tour flow must see cleanup on every configured room calendar.
+    for (const calendarId of new Set([config.calendarId, ...dependencies.calendarIds()])) {
+      calendarContexts.set(calendarId, {
+        calendarId,
+        isStudioSpecificCalendar: false,
+        studioIds: new Set<string>(),
+      })
+    }
   }
 
-  const busyTimes: { start: string; end: string }[] = []
+  const busyTimes: BookingBusyRange[] = []
   for (const context of calendarContexts.values()) {
-    const response = await config.client.events.list({
-      calendarId: context.calendarId,
-      timeMin,
-      timeMax,
-      timeZone: BOOKING_TIME_ZONE,
-      singleEvents: true,
-      orderBy: 'startTime',
-      showDeleted: false,
-    })
+    let pageToken: string | undefined
+    do {
+      const response = await config.client.events.list({
+        calendarId: context.calendarId,
+        timeMin,
+        timeMax,
+        timeZone: BOOKING_TIME_ZONE,
+        singleEvents: true,
+        orderBy: 'startTime',
+        showDeleted: false,
+        maxResults: 2500,
+        pageToken,
+      })
 
-    busyTimes.push(...(response.data.items || [])
-      .filter((event) => eventBlocksStudio(
-        event,
-        studioId,
-        context.studioIds,
-        context.isStudioSpecificCalendar,
-        excludedBookingRef,
-      ))
-      .map(eventBusyRange)
-      .filter((range): range is { start: string; end: string } => Boolean(range)))
+      busyTimes.push(...(response.data.items || [])
+        .filter((event) => eventBlocksStudio(
+          event,
+          studioId,
+          context.studioIds,
+          context.isStudioSpecificCalendar,
+          excludedBookingRef,
+        ))
+        .map((event) => bookingEventBusyRange(event, studioId, context.studioIds, context.isStudioSpecificCalendar))
+        .filter((range): range is BookingBusyRange => Boolean(range)))
+      pageToken = response.data.nextPageToken || undefined
+    } while (pageToken)
   }
 
-  busyTimes.push(...await getBookingHoldBusyTimes(
-    config.client,
-    studioId,
-    date,
-    excludedBookingRef,
-    initializeBookingHoldLedgers,
-  ))
+  const holdDates = Array.from(new Set([bookingDateInPacific(new Date(timeMin)), date, bookingDateInPacific(dayEnd)]))
+  const heldRanges = await Promise.all(holdDates.map((holdDate) => getBookingHoldBusyTimes(
+    config.client, studioId, holdDate, excludedBookingRef,
+    initializeBookingHoldLedgers && holdDate === date,
+  )))
+  busyTimes.push(...heldRanges.flat())
 
   const tourCalendarId = getTourCalendarId()
   if (studioId && tourCalendarId !== config.calendarId) {
-    const tourBusyTimes = await getBusyTimesForRange(new Date(timeMin), new Date(timeMax), [tourCalendarId])
+    const tourBusyTimes = await getBusyTimesForRange(new Date(timeMin), new Date(timeMax), [tourCalendarId], dependencies)
     if (!tourBusyTimes) return null
-    busyTimes.push(...tourBusyTimes)
+    busyTimes.push(...tourBusyTimes.map((range) => ({ ...range, blocksTurnaround: true })))
   }
 
   return busyTimes
@@ -1249,18 +1290,21 @@ export function formatTourSlotRange(slot: string) {
   return `${formatTimeForDisplay(start)}-${formatTimeForDisplay(addMinutes(start, TOUR_DURATION_MINUTES))}`
 }
 
-export async function getTourAvailabilityForDate(date: string, excludedBookingRef?: string) {
+export async function getTourAvailabilityForDate(
+  date: string,
+  excludedBookingRef?: string,
+  dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
+) {
   if (!isValidBookingDate(date)) {
     return { verified: false, error: 'Invalid date', durationMinutes: TOUR_DURATION_MINUTES, slots: [] }
   }
 
   const allSlots = getTourSlotsForDay(date)
   const now = new Date()
-  const timeMin = allSlots[0].start
-  const timeMax = allSlots[allSlots.length - 1].end
 
   try {
-    const busyTimes = await getBusyTimesForRange(timeMin, timeMax, configuredCalendarIds())
+    // Tours have no cleanup of their own, but cannot occupy a booked room's cleanup.
+    const busyTimes = await getBusyTimesForDate(date, undefined, excludedBookingRef, false, dependencies)
     if (!busyTimes) {
       return {
         verified: false,
@@ -1273,12 +1317,6 @@ export async function getTourAvailabilityForDate(date: string, excludedBookingRe
         })),
       }
     }
-
-    const holdConfig = await getCalendarConfig()
-    if (!holdConfig) {
-      throw new Error('Calendar credentials are not configured')
-    }
-    busyTimes.push(...await getBookingHoldBusyTimes(holdConfig.client, undefined, date, excludedBookingRef))
 
     return {
       verified: true,
@@ -1338,6 +1376,7 @@ export async function getAvailabilityForDate(
   studioId?: string,
   excludedBookingRef?: string,
   initializeBookingHoldLedgers = false,
+  dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
 ) {
   if (!isValidBookingDate(date)) {
     return { verified: false, error: 'Invalid date', slots: [] }
@@ -1352,6 +1391,7 @@ export async function getAvailabilityForDate(
       studioId,
       excludedBookingRef,
       initializeBookingHoldLedgers,
+      dependencies,
     )
     if (!busyTimes) {
       return {
@@ -1368,15 +1408,11 @@ export async function getAvailabilityForDate(
     return {
       verified: true,
       slots: allSlots.map(({ start, end }) => {
-        const busy = busyTimes.some((busyTime) => {
-          const busyStart = new Date(busyTime.start)
-          const busyEnd = new Date(busyTime.end)
-          return start < busyEnd && end > busyStart
-        })
+        const available = bookingSlotFitsTurnaround(start, end, busyTimes)
         return {
           time: start.toISOString(),
           label: start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: BOOKING_TIME_ZONE }),
-          available: !busy && bookingStartIsInFuture(start, now),
+          available: available && bookingStartIsInFuture(start, now),
         }
       }),
     }
@@ -1397,6 +1433,7 @@ export async function getAvailabilityForDate(
 export async function assertCartSlotsAvailable(
   cartItems: BookingCartItem[],
   excludedBookingRef?: string,
+  dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
 ) {
   const byStudioDate = new Map<string, { studioId: string; date: string; slots: string[] }>()
   const requestedSlotKeys = new Set<string>()
@@ -1421,12 +1458,11 @@ export async function assertCartSlotsAvailable(
       if (!validSlots.has(slot)) {
         return { ok: false, status: 400, error: 'Selected slots do not match the booking date' }
       }
-
-      const resourceSlotKeys = studioResourceGroups(item.studioId)
-        .map((resourceGroup) => `${resourceGroup}|${item.date}|${slot}`)
-
+    }
+    for (const target of bookingHoldTargets([item])) {
+      const resourceSlotKeys = target.slots.map((slot) => `${target.resourceGroup}|${target.date}|${slot}`)
       if (resourceSlotKeys.some((requestedSlotKey) => requestedSlotKeys.has(requestedSlotKey))) {
-        return { ok: false, status: 409, error: 'Selected sessions overlap for the same studio resources.' }
+        return { ok: false, status: 409, error: 'Selected sessions overlap or do not leave 30 minutes for studio turnaround.' }
       }
 
       resourceSlotKeys.forEach((requestedSlotKey) => requestedSlotKeys.add(requestedSlotKey))
@@ -1439,7 +1475,7 @@ export async function assertCartSlotsAvailable(
   }
 
   for (const { studioId, date, slots } of Array.from(byStudioDate.values())) {
-    const availability = await getAvailabilityForDate(date, studioId, excludedBookingRef, true)
+    const availability = await getAvailabilityForDate(date, studioId, excludedBookingRef, true, dependencies)
     if (!availability.verified) {
       return { ok: false, status: 503, error: 'Live calendar availability is temporarily unavailable. Please try again shortly.' }
     }
@@ -1447,7 +1483,7 @@ export async function assertCartSlotsAvailable(
     const available = new Set(availability.slots.filter((slot) => slot.available).map((slot) => slot.time))
     for (const slot of slots) {
       if (!available.has(slot)) {
-        return { ok: false, status: 409, error: 'One or more selected slots are no longer available.' }
+        return { ok: false, status: 409, error: 'One or more selected slots are no longer available, including the required 30-minute studio turnaround.' }
       }
     }
   }
@@ -1617,6 +1653,7 @@ export async function addBookingEvents(
               `Phone: ${customer.phone || 'N/A'}`,
               `Date: ${dateStr}`,
               `Duration: ${formatBookingDuration(group.length)}`,
+              `Studio turnaround: ${STUDIO_TURNAROUND_MINUTES} minutes after the session, until ${formatTimeForDisplay(addMinutes(endTime, STUDIO_TURNAROUND_MINUTES))} PT. Not part of the booked session.`,
               `Studio amount before recurring discount: $${item.price}`,
               ...(item.addOns || []).map((addOn) => `Add-on: ${bookingAddOnDescription(addOn)}`),
               ...(referralInfo ? [
