@@ -125,7 +125,7 @@ export default function Footer() {
                   </li>
                 ))}
                 <li>
-                  <button type="button" disabled className="cursor-default text-left text-gray-500 text-sm">Employee login</button>
+                  <Link href="/employee/" prefetch={false} className="text-gray-500 text-sm hover:text-white hover:underline transition-colors duration-200">Employee login</Link>
                 </li>
               </ul>
             </div>
