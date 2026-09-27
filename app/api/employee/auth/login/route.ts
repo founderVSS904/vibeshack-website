@@ -1,19 +1,22 @@
-import { createHash } from 'node:crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { OAUTH_COOKIE, employeeCookieOptions, employeeOAuthClient, newOAuthAttempt, signEmployeeToken } from '@/lib/employee/auth'
+import { employeeOrigin } from '@/lib/employee/auth'
+import { employeeSupabase } from '@/lib/employee/supabase'
+import { employeeJson } from '@/lib/employee/http'
 import { rateLimit } from '@/lib/server/request-guards'
 export const dynamic = 'force-dynamic'
 export async function GET(req: NextRequest) {
   const limited = rateLimit(req, { key: 'employee-login', max: 15, windowMs: 600_000 })
   if (limited) return limited
   try {
-    const attempt = newOAuthAttempt()
-    const url = new URL(employeeOAuthClient().generateAuthUrl({ scope: ['openid', 'email', 'profile'], state: attempt.state, nonce: attempt.nonce, prompt: 'select_account' }))
-    url.searchParams.set('code_challenge', createHash('sha256').update(attempt.verifier).digest('base64url'))
-    url.searchParams.set('code_challenge_method', 'S256')
-    const response = NextResponse.redirect(url)
-    response.cookies.set(OAUTH_COOKIE, signEmployeeToken(attempt), employeeCookieOptions(600))
-    response.headers.set('Cache-Control', 'no-store')
+    const supabase = await employeeSupabase()
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${employeeOrigin()}/api/employee/auth/callback`, scopes: 'openid email profile', queryParams: { prompt: 'select_account' }, skipBrowserRedirect: true },
+    })
+    if (error || !data.url) throw new Error('Sign-in unavailable')
+    const response = NextResponse.redirect(data.url)
+    response.headers.set('Cache-Control', 'private, no-store')
+    response.headers.set('Referrer-Policy', 'no-referrer')
     return response
-  } catch { return NextResponse.json({ error: 'Employee sign-in needs administrator setup.' }, { status: 503 }) }
+  } catch { return employeeJson({ error: 'Employee sign-in needs administrator setup.' }, 503) }
 }

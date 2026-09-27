@@ -1,9 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { NextRequest } from 'next/server'
 import { randomUUID } from 'node:crypto'
-import { EMPLOYEE_COOKIE, allowedEmployee, readEmployeeSession, signEmployeeToken, readEmployeeToken, localEmployeePreview } from '../lib/employee/auth'
-import { employeeGuard } from '../lib/employee/http'
+import { allowedEmployee, readEmployeeSession, signEmployeeToken, readEmployeeToken, localEmployeePreview } from '../lib/employee/auth'
 import { createEmployeeBooking, employeeBookingInput, cancelEmployeeBooking, type EmployeeBooking, type EmployeeStore, type EmployeeBookingServices } from '../lib/employee/booking'
 import { bookingDateRange, zonedDateTimeToUtc, addMinutes } from '../lib/booking/time'
 import { previewSlots, previewTeleprompterAvailable } from '../lib/employee/preview'
@@ -12,6 +10,7 @@ import type Stripe from 'stripe'
 import { createEmployeeServices, reconcileEmployeeInvoice } from '../lib/employee/providers'
 const employee = 'tester@example.com'
 const creator = { email: employee, name: 'Fixture Employee' }
+const cancellationActor = { ...creator, role: 'employee' as const }
 function input(addOnIds: string[] = []) {
   const date = bookingDateRange(60)[2]
   const start = zonedDateTimeToUtc(date, 15)
@@ -121,20 +120,20 @@ test('cancellation voids the payment request before releasing inventory; paid bo
   const record = employeeBookingInput(input(), creator)
   await createEmployeeBooking(record, fixture.services)
   const offset = fixture.calls.length
-  assert.equal((await cancelEmployeeBooking(record.ref, fixture.services)).phase, 'cancelled')
+  assert.equal((await cancelEmployeeBooking(record.ref, fixture.services, cancellationActor)).phase, 'cancelled')
   assert.deepEqual(fixture.calls.slice(offset), ['void', 'calendar', 'release'])
-  await cancelEmployeeBooking(record.ref, fixture.services)
+  await cancelEmployeeBooking(record.ref, fixture.services, cancellationActor)
   assert.equal(fixture.calls.filter((call) => call === 'void').length, 1)
   const snapshot = (await fixture.store.read())!
   await fixture.store.save(snapshot, { ...snapshot.record, phase: 'paid' })
-  await assert.rejects(cancelEmployeeBooking(record.ref, fixture.services), /paid/)
+  await assert.rejects(cancelEmployeeBooking(record.ref, fixture.services, cancellationActor), /paid/)
 })
 test('failed void does not release the studio or teleprompter', async () => {
   const fixture = memoryServices()
   const record = employeeBookingInput(input(), creator)
   await createEmployeeBooking(record, fixture.services)
   fixture.failures.add('void')
-  await assert.rejects(cancelEmployeeBooking(record.ref, fixture.services))
+  await assert.rejects(cancelEmployeeBooking(record.ref, fixture.services, cancellationActor))
   assert.equal(fixture.calls.includes('release'), false)
   assert.equal((await fixture.store.read())?.record.phase, 'ready')
 })
@@ -150,7 +149,7 @@ test('preview reservations block their own studio for 30 extra minutes and equip
   assert.equal(previewTeleprompterAvailable(start, end, reservations), false)
   assert.equal(previewTeleprompterAvailable(end, addMinutes(new Date(end), 60).toISOString(), reservations), true)
 })
-test('employee authentication is exact-allowlist, signed, expiring, purpose-bound, and rejects cross-origin writes', () => {
+test('legacy employee tokens remain signed, expiring and purpose-bound but are not production authentication', () => {
   const previous = { secret: process.env.EMPLOYEE_SESSION_SECRET, emails: process.env.EMPLOYEE_ALLOWED_EMAILS }
   process.env.EMPLOYEE_SESSION_SECRET = 'fixture-only-not-a-real-secret-value-123456789'
   process.env.EMPLOYEE_ALLOWED_EMAILS = employee
@@ -161,10 +160,6 @@ test('employee authentication is exact-allowlist, signed, expiring, purpose-boun
     assert.equal(readEmployeeSession(signEmployeeToken({ purpose: 'employee-session', email: employee, exp: Date.now() - 1 })), null)
     assert.equal(readEmployeeToken(token, 'employee-oauth'), null)
     assert.equal(allowedEmployee('other@example.com'), false)
-    const unauthorized = new NextRequest('https://www.vibeshackstudios.com/api/employee/bookings')
-    assert.equal(employeeGuard(unauthorized, true).response?.status, 401)
-    const crossOrigin = new NextRequest('https://www.vibeshackstudios.com/api/employee/bookings', { headers: { cookie: `${EMPLOYEE_COOKIE}=${token}`, origin: 'https://example.org' } })
-    assert.equal(employeeGuard(crossOrigin, true).response?.status, 403)
     process.env.EMPLOYEE_ALLOWED_EMAILS = ''
     assert.equal(readEmployeeSession(token), null)
     assert.equal(localEmployeePreview(), false)

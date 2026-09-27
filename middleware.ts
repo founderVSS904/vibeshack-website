@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 
 function shouldSkipSlashRedirect(pathname: string) {
   return (
@@ -9,14 +10,37 @@ function shouldSkipSlashRedirect(pathname: string) {
   )
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  if (shouldSkipSlashRedirect(pathname) || pathname.endsWith('/')) {
-    return NextResponse.next()
+  if (!shouldSkipSlashRedirect(pathname) && !pathname.endsWith('/')) return NextResponse.redirect(new URL(`${pathname}/${req.nextUrl.search}`, req.url), 308)
+  let response = NextResponse.next({ request: req })
+  if (pathname === '/employee/' || pathname.startsWith('/employee/') || pathname.startsWith('/api/employee/')) {
+    response.headers.set('Cache-Control', 'private, no-store')
+    response.headers.set('Referrer-Policy', 'no-referrer')
+    const url = process.env.SUPABASE_URL
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY
+    if (url && key) {
+      try {
+        const supabase = createServerClient(url, key, {
+          cookieOptions: { httpOnly: true, secure: process.env.NODE_ENV === 'production' || req.nextUrl.protocol === 'https:', sameSite: 'lax', path: '/' },
+          cookies: {
+            getAll: () => req.cookies.getAll(),
+            setAll: (values, headers) => {
+              values.forEach(({ name, value }) => req.cookies.set(name, value))
+              response = NextResponse.next({ request: req })
+              values.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+              Object.entries(headers).forEach(([name, value]) => response.headers.set(name, value))
+              response.headers.set('Cache-Control', 'private, no-store')
+              response.headers.set('Referrer-Policy', 'no-referrer')
+            },
+          },
+        })
+        await supabase.auth.getClaims()
+      } catch { /* Protected routes independently deny unavailable or invalid sessions. */ }
+    }
   }
-
-  return NextResponse.redirect(new URL(`${pathname}/${req.nextUrl.search}`, req.url), 308)
+  return response
 }
 
 export const config = {

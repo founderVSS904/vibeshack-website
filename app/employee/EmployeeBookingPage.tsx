@@ -24,7 +24,7 @@ function monthDays(month: string) {
   const count = new Date(Date.UTC(year, number, 0)).getUTCDate()
   return [...Array.from({ length: offset }, () => ''), ...Array.from({ length: count }, (_, index) => `${month}-${String(index + 1).padStart(2, '0')}`)]
 }
-export default function EmployeeBookingPage({ email, preview = false, enabled }: { email: string; preview?: boolean; enabled: boolean }) {
+export default function EmployeeBookingPage({ email, preview = false, enabled, role = 'employee' }: { email: string; preview?: boolean; enabled: boolean; role?: 'superadmin' | 'employee' }) {
   const [step, setStep] = useState<EmployeeBookingStep>(1)
   const [reachedStep, setReachedStep] = useState<EmployeeBookingStep>(1)
   const [dates] = useState(() => bookingDateRange(60))
@@ -216,7 +216,7 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
     setStep(1); setReachedStep(1)
   }
   return <>
-    <EmployeeHeader email={email} preview={preview} />
+    <EmployeeHeader email={email} preview={preview} role={role} />
     <div id="employee-content" tabIndex={-1} className={`employee-workspace employee-workspace--step-${step}`}>
       {!enabled && <p className="employee-notice">Employee booking is not activated yet. You can review availability, but cannot create a reservation.</p>}
       {!result && <EmployeeBookingProgress step={step} canVisit={canVisit} onVisit={visitStep} />}

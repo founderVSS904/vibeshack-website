@@ -1,11 +1,13 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { EMPLOYEE_COOKIE, employeeAuthConfigured, localEmployeePreview, readEmployeeSession } from '@/lib/employee/auth'
+import { localEmployeePreview } from '@/lib/employee/auth'
+import { currentEmployee, employeeDestination } from '@/lib/employee/access'
+import { employeeSupabaseConfigured } from '@/lib/employee/supabase'
 import EmployeeSignIn from './EmployeeSignIn'
 export const dynamic = 'force-dynamic'
 export default async function EmployeeLogin({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  if (readEmployeeSession((await cookies()).get(EMPLOYEE_COOKIE)?.value)) redirect('/employee/book/')
-  const configured = employeeAuthConfigured()
+  const employee = await currentEmployee({ allowUnverifiedMfa: true })
+  if (employee) redirect(employeeDestination(employee))
+  const configured = employeeSupabaseConfigured()
   const params = await searchParams
-  return <EmployeeSignIn preview={localEmployeePreview()} configured={configured} failed={Boolean(params.error)} />
+  return <EmployeeSignIn preview={localEmployeePreview()} configured={configured} googleConfigured={process.env.EMPLOYEE_GOOGLE_ENABLED === '1'} failed={Boolean(params.error)} />
 }

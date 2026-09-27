@@ -7,7 +7,7 @@ import { employeeRequestSlots } from '@/lib/employee/scheduling-ui'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const guard = employeeGuard(req)
+  const guard = await employeeGuard(req)
   if (guard.response) return guard.response
   const params = req.nextUrl.searchParams
   const date = params.get('date') || ''

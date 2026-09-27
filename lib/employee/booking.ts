@@ -3,13 +3,13 @@ import type { BookingCartItem } from '../booking/calendar'
 import { buildCanonicalBookingCart, calculateBookingCheckoutPricing } from '../booking/checkout-pricing'
 import { bookingDateRange } from '../booking/time'
 import { isEmail, stripControlChars } from '../server/sanitize'
-import { employeeDisplayName, type EmployeeIdentity } from './identity'
+import { employeeDisplayName, employeeUserId, type EmployeeIdentity } from './identity'
 
 export class EmployeeBookingError extends Error {
   constructor(message: string, public status = 400) { super(message) }
 }
 export type EmployeeBooking = {
-  version: 1; ref: string; hash: string; createdAt: number; employee: string; employeeName?: string
+  version: 1; ref: string; hash: string; createdAt: number; employee: string; employeeName?: string; employeeId?: string
   cart: BookingCartItem[]; customer: { name: string; email: string; phone: string }; notes: string; total: number
   phase: 'new' | 'reserved' | 'ready' | 'paid' | 'cancelled'
   customerId?: string; invoiceId?: string; paymentUrl?: string; emailedAt?: number; internalNotifiedAt?: number
@@ -38,6 +38,8 @@ export function employeeBookingInput(raw: unknown, creator: EmployeeIdentity, no
   const employee = stripControlChars(creator.email, 254).toLowerCase()
   if (!isEmail(employee)) throw new EmployeeBookingError('Employee identity is invalid', 401)
   const employeeName = employeeDisplayName(creator.name)
+  const employeeId = employeeUserId(creator.id)
+  if (creator.id !== undefined && !employeeId) throw new EmployeeBookingError('Employee identity is invalid', 401)
   if (!raw || typeof raw !== 'object') throw new EmployeeBookingError('Invalid booking')
   const input = raw as Record<string, unknown>
   if (typeof input.requestId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.requestId)) throw new EmployeeBookingError('Invalid booking attempt')
@@ -53,7 +55,16 @@ export function employeeBookingInput(raw: unknown, creator: EmployeeIdentity, no
   const notes = stripControlChars(input.notes, 1000)
   const total = calculateBookingCheckoutPricing(cart).computedTotalCents
   const hash = createHash('sha256').update(JSON.stringify({ cart, customer, notes, total })).digest('hex')
-  return { version: 1, ref: `emp-${createHash('sha256').update(`${employee}:${input.requestId}`).digest('hex').slice(0, 40)}`, hash, createdAt: now.getTime(), employee, employeeName, cart, customer, notes, total, phase: 'new' }
+  return { version: 1, ref: `emp-${createHash('sha256').update(`${employeeId || employee}:${input.requestId}`).digest('hex').slice(0, 40)}`, hash, createdAt: now.getTime(), employee, employeeName, employeeId, cart, customer, notes, total, phase: 'new' }
+}
+export type EmployeeBookingActor = EmployeeIdentity & { role: 'superadmin' | 'employee' }
+export function employeeOwnsBooking(record: Pick<EmployeeBooking, 'employee' | 'employeeId'>, actor: EmployeeIdentity) {
+  // Once recorded, the stable account ID takes precedence over a mutable email.
+  if (record.employeeId !== undefined) return Boolean(employeeUserId(record.employeeId) && employeeUserId(actor.id) === employeeUserId(record.employeeId))
+  return record.employee.toLowerCase() === actor.email.toLowerCase()
+}
+export function employeeCanManageBooking(record: Pick<EmployeeBooking, 'employee' | 'employeeId'>, actor: EmployeeBookingActor) {
+  return actor.role === 'superadmin' || employeeOwnsBooking(record, actor)
 }
 export function validEmployeeRef(ref: string) { return /^emp-[a-f0-9]{40}$/.test(ref) }
 function conflict(error: unknown) { return [409, 412].includes(Number((error as { code?: number; response?: { status?: number } })?.response?.status || (error as { code?: number })?.code)) }
@@ -87,7 +98,7 @@ export async function createEmployeeBooking(input: EmployeeBooking, services: Em
     try { await store.create(input) } catch (error) { if (!conflict(error)) throw error }
   }
   return withEmployeeBooking(store, async (record, save) => {
-    if (record.hash !== input.hash || record.employee !== input.employee) throw new EmployeeBookingError('This attempt belongs to different booking details. Start a new booking.', 409)
+    if (record.hash !== input.hash || !employeeOwnsBooking(record, { id: input.employeeId, email: input.employee })) throw new EmployeeBookingError('This attempt belongs to different booking details. Start a new booking.', 409)
     if (record.phase === 'cancelled') throw new EmployeeBookingError('This booking was cancelled. Start a new booking.', 409)
     if (record.phase === 'ready' || record.phase === 'paid') return record
     // Stripe retains idempotency keys for at least 24 hours. Do not blindly
@@ -112,9 +123,14 @@ export async function createEmployeeBooking(input: EmployeeBooking, services: Em
 export function employeeBookingResult(record: EmployeeBooking) {
   return { ref: record.ref, phase: record.phase, paymentUrl: record.paymentUrl, emailed: Boolean(record.emailedAt), total: record.total }
 }
-export async function cancelEmployeeBooking(ref: string, services: EmployeeBookingServices) {
+export async function cancelEmployeeBooking(ref: string, services: EmployeeBookingServices, actor: EmployeeBookingActor) {
   if (!validEmployeeRef(ref)) throw new EmployeeBookingError('Invalid booking reference')
-  return withEmployeeBooking(await services.store(ref), async (record, save) => {
+  const store = await services.store(ref)
+  const snapshot = await store.read()
+  if (!snapshot) throw new EmployeeBookingError('Booking not found', 404)
+  if (!employeeCanManageBooking(snapshot.record, actor)) throw new EmployeeBookingError('You can only cancel bookings you created.', 403)
+  return withEmployeeBooking(store, async (record, save) => {
+    if (!employeeCanManageBooking(record, actor)) throw new EmployeeBookingError('You can only cancel bookings you created.', 403)
     if (record.phase === 'paid') throw new EmployeeBookingError('This booking has been paid. Review it in Stripe before cancellation.', 409)
     if (!record.invoiceId && record.phase !== 'cancelled') throw new EmployeeBookingError('Finish or recover the payment request before cancelling this booking.', 409)
     if (record.phase !== 'cancelled') { await services.voidInvoice(record); record.phase = 'cancelled'; await save(record) }
