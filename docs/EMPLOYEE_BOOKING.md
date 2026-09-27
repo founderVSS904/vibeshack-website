@@ -85,6 +85,39 @@ staff cancels it. Tay was asked to confirm this policy; no answer was received
 during implementation. Invoices request payment before the booked start time,
 but overdue invoices do not automatically release the room.
 
+## Employee creator attribution
+
+The booking creator comes from the authenticated server session, never from
+the booking form. Google sign-in requests the basic profile scope and captures
+the account's display name after ID-token, nonce and allowlist verification.
+The private booking record snapshots that name and the employee email when the
+reservation is first created. Retries preserve the original creator even if
+the account's display name changes later. Older sessions or profiles without a
+name remain attributable by email; the system does not invent a name.
+
+The private studio Calendar event shows `Booked by: Name (email)` from creation
+onward, with no guest attendees or Calendar update emails. New named bookings
+also store `bookedByName` and `bookedByEmail` as internal Stripe invoice metadata.
+These fields are excluded from invoice descriptions, line items, booking API
+results and all client/guest email templates. Legacy records retain their
+original invoice-creation parameters for safe idempotent retries.
+
+Tay confirmed the internal notification should go out **after the client pays**.
+After a signature-verified invoice webhook retrieves and validates the invoice,
+the booking is marked paid and Calendar is updated. A dedicated New Booking
+email then goes only to the existing internal address,
+`founder@vibeshackstudios.com`, including the Booked by line. No internal email
+is sent merely for an unpaid reservation or cancellation. Client invoice emails
+and the public checkout's confirmation, prep and invited-guest emails stay
+unchanged. The preview never sends mail or invents a signed-in employee.
+
+The internal email uses the existing Gmail transport and durable message
+delivery ledger. Verified rejections can retry; accepted messages are not
+repeated. Ambiguous SMTP outcomes require inspection instead of blind resend.
+A notification failure returns a retryable webhook error while retaining the
+paid reservation. Repeated webhooks resume notification delivery without
+recreating the reservation/invoice or resending the client's invoice email.
+
 ## Production setup still required
 
 No credentials, account permissions, Vercel settings, Google settings or Stripe
@@ -103,7 +136,7 @@ deployment environment before activating the feature:
 Use a dedicated Google sign-in OAuth client, not the calendar refresh-token
 client. Register this exact callback for the production origin:
 `https://www.vibeshackstudios.com/api/employee/auth/callback`.
-Approve only identity/email scopes. The existing Google Calendar integration
+Approve only identity, email and basic profile scopes. The existing Google Calendar integration
 continues to supply calendar access separately. Sessions use HTTP-only,
 Secure (HTTPS), SameSite=Lax cookies with an eight-hour expiry. OAuth attempts
 use a signed short-lived state cookie, PKCE, a nonce and verified Google ID

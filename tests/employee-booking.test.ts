@@ -11,6 +11,7 @@ import { buildCanonicalBookingCart } from '../lib/booking/checkout-pricing'
 import type Stripe from 'stripe'
 import { createEmployeeServices, reconcileEmployeeInvoice } from '../lib/employee/providers'
 const employee = 'tester@example.com'
+const creator = { email: employee, name: 'Fixture Employee' }
 function input(addOnIds: string[] = []) {
   const date = bookingDateRange(60)[2]
   const start = zonedDateTimeToUtc(date, 15)
@@ -31,42 +32,42 @@ function memoryServices() {
     async store() { return store },
     async available() { step('available') }, async hold() { step('hold') }, async calendar() { step('calendar') }, async release() { step('release') },
     async customer() { step('customer'); return 'cus_fixture' }, async invoice() { step('invoice'); return 'in_fixture' }, async finalize() { step('finalize'); return 'https://invoice.stripe.com/fixture' },
-    async send() { step('send') }, async voidInvoice() { step('void') },
+    async send() { step('send') }, async notifyPaid() { step('notifyPaid') }, async voidInvoice() { step('void') },
   }
   return { services, calls, failures, store }
 }
 test('staff pricing comes from the canonical catalog and teleprompter is per session', () => {
   const raw = input(['teleprompter', 'live-switching', 'remote-podcast'])
-  const record = employeeBookingInput(raw, employee)
+  const record = employeeBookingInput(raw, creator)
   assert.equal(record.total, 80_000) // 600 studio + 50 flat teleprompter + 150 switching
   assert.equal(record.cart[0].hours, 2)
   assert.equal(record.cart[0].reservationKind, 'employee')
   assert.equal(buildCanonicalBookingCart([raw.session])[0].reservationKind, undefined)
-  assert.throws(() => employeeBookingInput({ ...raw, customer: { name: 'Test', email: 'invalid' } }, employee), /valid email/)
-  assert.throws(() => employeeBookingInput({ ...raw, requestId: 'forged' }, employee), /attempt/)
+  assert.throws(() => employeeBookingInput({ ...raw, customer: { name: 'Test', email: 'invalid' } }, creator), /valid email/)
+  assert.throws(() => employeeBookingInput({ ...raw, requestId: 'forged' }, creator), /attempt/)
 })
 test('staff bookings reject past dates, stale slots, missing setup, and out-of-horizon dates', () => {
   const raw = input()
-  assert.throws(() => employeeBookingInput({ ...raw, session: { ...raw.session, setupId: '' } }, employee), /setup/)
-  assert.throws(() => employeeBookingInput(raw, employee, new Date('2099-01-01')), /future/)
-  assert.throws(() => employeeBookingInput({ ...raw, session: { ...raw.session, slots: [] } }, employee), /cart/)
+  assert.throws(() => employeeBookingInput({ ...raw, session: { ...raw.session, setupId: '' } }, creator), /setup/)
+  assert.throws(() => employeeBookingInput(raw, creator, new Date('2099-01-01')), /future/)
+  assert.throws(() => employeeBookingInput({ ...raw, session: { ...raw.session, slots: [] } }, creator), /cart/)
 })
 test('employee overnight booking is one session with one flat teleprompter fee; public input cannot opt in', () => {
   const raw = input(['teleprompter', 'live-switching'])
   const start = zonedDateTimeToUtc(raw.session.date, 23)
   raw.session.slots = Array.from({ length: 4 }, (_, index) => addMinutes(start, index * 30).toISOString())
-  const record = employeeBookingInput(raw, employee)
+  const record = employeeBookingInput(raw, creator)
   assert.equal(record.cart.length, 1)
   assert.equal(record.cart[0].hours, 2)
   assert.equal(record.total, 80_000)
   assert.equal(record.cart[0].addOns?.find((addon) => addon.id === 'teleprompter')?.amountCents, 5000)
   assert.throws(() => buildCanonicalBookingCart([{ ...raw.session, allowOvernight: true }]), /Invalid cart/)
   const changedDate = { ...raw, session: { ...raw.session, date: bookingDateRange(60)[3] } }
-  assert.throws(() => employeeBookingInput(changedDate, employee), /Invalid cart/)
+  assert.throws(() => employeeBookingInput(changedDate, creator), /Invalid cart/)
 })
 test('creation reserves the room before preparing or sending a payment request, and repeat submissions are idempotent', async () => {
   const fixture = memoryServices()
-  const record = employeeBookingInput(input(), employee)
+  const record = employeeBookingInput(input(), creator)
   const result = await createEmployeeBooking(record, fixture.services)
   assert.equal(result.phase, 'ready')
   assert.ok(result.emailedAt)
@@ -78,7 +79,7 @@ test('creation reserves the room before preparing or sending a payment request, 
 })
 test('concurrent submissions create only one invoice and one email', async () => {
   const fixture = memoryServices()
-  const record = employeeBookingInput(input(), employee)
+  const record = employeeBookingInput(input(), creator)
   const results = await Promise.allSettled([createEmployeeBooking(record, fixture.services), createEmployeeBooking(record, fixture.services)])
   assert.equal(results.filter((result) => result.status === 'fulfilled').length, 1)
   assert.equal(fixture.calls.filter((call) => call === 'invoice').length, 1)
@@ -88,7 +89,7 @@ test('invoice/email failures preserve the reservation and retries resume instead
   for (const failure of ['invoice', 'finalize', 'send']) {
     const fixture = memoryServices()
     fixture.failures.add(failure)
-    const record = employeeBookingInput(input(), employee)
+    const record = employeeBookingInput(input(), creator)
     await assert.rejects(createEmployeeBooking(record, fixture.services))
     const interrupted = (await fixture.store.read())!.record
     assert.equal(interrupted.phase, 'reserved')
@@ -105,19 +106,19 @@ test('invoice/email failures preserve the reservation and retries resume instead
 test('a conflicting attempt cannot mutate an existing reservation', async () => {
   const fixture = memoryServices()
   const raw = input()
-  await createEmployeeBooking(employeeBookingInput(raw, employee), fixture.services)
-  await assert.rejects(createEmployeeBooking(employeeBookingInput({ ...raw, notes: 'changed' }, employee), fixture.services), /different booking details/)
+  await createEmployeeBooking(employeeBookingInput(raw, creator), fixture.services)
+  await assert.rejects(createEmployeeBooking(employeeBookingInput({ ...raw, notes: 'changed' }, creator), fixture.services), /different booking details/)
 })
 test('late uncertain retries stop before the Stripe idempotency retention boundary', async () => {
   const fixture = memoryServices()
-  const record = employeeBookingInput(input(), employee)
+  const record = employeeBookingInput(input(), creator)
   record.createdAt = Date.now() - 24 * 3600_000
   await assert.rejects(createEmployeeBooking(record, fixture.services), /administrator review/)
   assert.deepEqual(fixture.calls, [])
 })
 test('cancellation voids the payment request before releasing inventory; paid bookings are protected', async () => {
   const fixture = memoryServices()
-  const record = employeeBookingInput(input(), employee)
+  const record = employeeBookingInput(input(), creator)
   await createEmployeeBooking(record, fixture.services)
   const offset = fixture.calls.length
   assert.equal((await cancelEmployeeBooking(record.ref, fixture.services)).phase, 'cancelled')
@@ -130,7 +131,7 @@ test('cancellation voids the payment request before releasing inventory; paid bo
 })
 test('failed void does not release the studio or teleprompter', async () => {
   const fixture = memoryServices()
-  const record = employeeBookingInput(input(), employee)
+  const record = employeeBookingInput(input(), creator)
   await createEmployeeBooking(record, fixture.services)
   fixture.failures.add('void')
   await assert.rejects(cancelEmployeeBooking(record.ref, fixture.services))
@@ -174,7 +175,7 @@ test('employee authentication is exact-allowlist, signed, expiring, purpose-boun
 })
 
 test('Stripe invoice adapter uses canonical amount, stable keys, manual collection and one hosted payment link', async () => {
-  const record = employeeBookingInput(input(['teleprompter']), employee)
+  const record = employeeBookingInput(input(['teleprompter']), creator)
   const requests: Array<{ action: string; data: Record<string, unknown>; key?: string }> = []
   let total = 0
   let status = 'draft'
@@ -202,6 +203,11 @@ test('Stripe invoice adapter uses canonical amount, stable keys, manual collecti
   assert.equal(create.data.collection_method, 'send_invoice')
   assert.equal(create.data.pending_invoice_items_behavior, 'exclude')
   assert.equal(create.data.due_date, Date.parse(record.cart[0].slots[0]) / 1000)
+  assert.deepEqual(create.data.metadata, { source: 'vibeshack-employee-booking', bookingRef: record.ref, bookedByName: creator.name, bookedByEmail: employee })
+  for (const request of requests) {
+    const { metadata: _internal, ...clientFields } = request.data
+    assert.doesNotMatch(JSON.stringify(clientFields), /Fixture Employee|tester@example\.com|Booked by/)
+  }
   assert.ok(requests.every((request) => request.key?.startsWith(`${record.ref}:`)))
   const itemCount = requests.filter(({ action }) => action === 'item').length
   await services.finalize(record)
@@ -210,7 +216,7 @@ test('Stripe invoice adapter uses canonical amount, stable keys, manual collecti
 
 test('invoice reconciliation validates identity and amount, is retryable, and never regresses paid inventory', async () => {
   const fixture = memoryServices()
-  const record = employeeBookingInput(input(), employee)
+  const record = employeeBookingInput(input(), creator)
   await createEmployeeBooking(record, fixture.services)
   const invoice = { id: 'in_fixture', metadata: { source: 'vibeshack-employee-booking', bookingRef: record.ref }, customer: 'cus_fixture', currency: 'usd', status: 'paid', total: record.total, amount_paid: record.total }
   const stripe = { invoices: { async retrieve() { return structuredClone(invoice) } } } as unknown as Stripe
@@ -224,8 +230,47 @@ test('invoice reconciliation validates identity and amount, is retryable, and ne
   fixture.failures.clear()
   await reconcileEmployeeInvoice(invoice.id, fixture.services, stripe)
   assert.equal((await fixture.store.read())?.record.phase, 'paid')
+  assert.ok((await fixture.store.read())?.record.internalNotifiedAt)
+  await reconcileEmployeeInvoice(invoice.id, fixture.services, stripe)
+  assert.equal(fixture.calls.filter((call) => call === 'notifyPaid').length, 1)
   invoice.status = 'void'
   await reconcileEmployeeInvoice(invoice.id, fixture.services, stripe)
   assert.equal((await fixture.store.read())?.record.phase, 'paid')
   assert.equal(fixture.calls.includes('release'), false)
+})
+
+test('staff email waits for verified payment and retries failures without recreating the booking or emailing the client', async () => {
+  const fixture = memoryServices()
+  const record = employeeBookingInput(input(), creator)
+  await createEmployeeBooking(record, fixture.services)
+  const invoice = { id: 'in_fixture', metadata: { source: 'vibeshack-employee-booking', bookingRef: record.ref }, customer: 'cus_fixture', currency: 'usd', status: 'open', total: record.total, amount_paid: 0 }
+  const stripe = { invoices: { async retrieve() { return structuredClone(invoice) } } } as unknown as Stripe
+  await reconcileEmployeeInvoice(invoice.id, fixture.services, stripe)
+  assert.equal(fixture.calls.includes('notifyPaid'), false)
+  invoice.status = 'paid'; invoice.amount_paid = record.total - 1
+  await assert.rejects(reconcileEmployeeInvoice(invoice.id, fixture.services, stripe), /manual review/)
+  assert.equal(fixture.calls.includes('notifyPaid'), false)
+  invoice.amount_paid = record.total
+  fixture.failures.add('notifyPaid')
+  await assert.rejects(reconcileEmployeeInvoice(invoice.id, fixture.services, stripe), /Fixture/)
+  const failed = (await fixture.store.read())!.record
+  assert.equal(failed.phase, 'paid')
+  assert.equal(failed.internalNotifiedAt, undefined)
+  assert.equal(failed.employeeName, creator.name)
+  fixture.failures.clear()
+  await reconcileEmployeeInvoice(invoice.id, fixture.services, stripe)
+  await reconcileEmployeeInvoice(invoice.id, fixture.services, stripe)
+  assert.ok((await fixture.store.read())?.record.internalNotifiedAt)
+  assert.equal(fixture.calls.filter((call) => call === 'notifyPaid').length, 2)
+  for (const action of ['hold', 'customer', 'invoice', 'finalize', 'send']) assert.equal(fixture.calls.filter((call) => call === action).length, 1, action)
+})
+
+test('booking creator is captured once and survives later profile-name changes on a retry', async () => {
+  const fixture = memoryServices()
+  const raw = input()
+  await createEmployeeBooking(employeeBookingInput(raw, creator), fixture.services)
+  const retry = employeeBookingInput(raw, { ...creator, name: 'Changed Profile Name' })
+  const result = await createEmployeeBooking(retry, fixture.services)
+  assert.equal(result.employeeName, creator.name)
+  assert.equal(result.employee, employee)
 })

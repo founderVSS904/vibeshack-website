@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { EMPLOYEE_COOKIE, OAUTH_COOKIE, SESSION_SECONDS, allowedEmployee, employeeCookieOptions, employeeOAuthClient, employeeOrigin, newOAuthAttempt, readEmployeeToken, signEmployeeToken } from '@/lib/employee/auth'
+import { employeeDisplayName } from '@/lib/employee/identity'
 export const dynamic = 'force-dynamic'
 export async function GET(req: NextRequest) {
   let email: string | undefined
+  let name: string | undefined
   try {
     const attempt = readEmployeeToken<ReturnType<typeof newOAuthAttempt>>(req.cookies.get(OAUTH_COOKIE)?.value, 'employee-oauth')
     const code = req.nextUrl.searchParams.get('code')
@@ -14,10 +16,11 @@ export async function GET(req: NextRequest) {
     const identity = ticket.getPayload()
     if (!identity?.email_verified || !identity.email || (identity as { nonce?: string }).nonce !== attempt.nonce || !allowedEmployee(identity.email)) throw new Error('Not authorized')
     email = identity.email.toLowerCase()
+    name = employeeDisplayName(identity.name)
   } catch { /* Never disclose provider errors, tokens, or account membership. */ }
   const response = NextResponse.redirect(`${employeeOrigin()}/employee/${email ? 'book/' : '?error=signin'}`)
   response.cookies.set(OAUTH_COOKIE, '', employeeCookieOptions(0))
-  if (email) response.cookies.set(EMPLOYEE_COOKIE, signEmployeeToken({ purpose: 'employee-session', email, exp: Date.now() + SESSION_SECONDS * 1000 }), employeeCookieOptions())
+  if (email) response.cookies.set(EMPLOYEE_COOKIE, signEmployeeToken({ purpose: 'employee-session', email, name, exp: Date.now() + SESSION_SECONDS * 1000 }), employeeCookieOptions())
   response.headers.set('Cache-Control', 'no-store')
   response.headers.set('Referrer-Policy', 'no-referrer')
   return response

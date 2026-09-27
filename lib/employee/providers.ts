@@ -7,6 +7,8 @@ import { bookingAddOnDescription } from '../booking/add-ons'
 import { getStudioSetup } from '../booking/studio-setups'
 import { addMinutes, BOOKING_TIME_ZONE, describeSlotRanges, formatDateForDisplay } from '../booking/time'
 import { EmployeeBookingError, withEmployeeBooking, validEmployeeRef, type EmployeeBooking, type EmployeeBookingServices, type EmployeeStore } from './booking'
+import { employeeCreatorLabel } from './identity'
+import { sendEmployeeBookingNotification } from './notification'
 
 const source = 'vibeshack-employee-booking'
 const stateSource = 'vibeshack-employee-booking-state'
@@ -59,7 +61,7 @@ export async function writeEmployeeCalendar(record: EmployeeBooking) {
       ...(item.addOns || []).map((addon) => `Add-on: ${bookingAddOnDescription(addon)}`),
       `Total: $${(record.total / 100).toFixed(2)}`, `Payment: ${record.phase === 'paid' ? 'Paid' : 'Pending'}`,
       ...(record.invoiceId ? [`Stripe invoice: ${record.invoiceId}`] : []),
-      `Booked by: ${record.employee}`, `Booking reference: ${record.ref}`, `Internal notes: ${record.notes || 'None'}`,
+      `Booked by: ${employeeCreatorLabel(record)}`, `Booking reference: ${record.ref}`, `Internal notes: ${record.notes || 'None'}`,
       'Employee reservation. Only this studio is reserved. Coordinate crew separately.',
     ].join('\n'),
     start: { dateTime: item.slots[0], timeZone: BOOKING_TIME_ZONE }, end: { dateTime: end.toISOString(), timeZone: BOOKING_TIME_ZONE },
@@ -94,7 +96,10 @@ export function createEmployeeServices(stripeClient: () => Stripe = getStripeCli
     return result.id
   },
   async invoice(record) {
-    const result = await stripeClient().invoices.create({ customer: record.customerId!, collection_method: 'send_invoice', due_date: Math.floor(Date.parse(record.cart[0].slots[0]) / 1000), auto_advance: false, pending_invoice_items_behavior: 'exclude', currency: 'usd', metadata: { source, bookingRef: record.ref }, description: 'Your VibeShack studio reservation. Please complete payment before your session. Contact the studio for booking changes. Your reservation is not automatically released if payment is late.' }, { idempotencyKey: key(record, 'invoice') })
+    // Names live only in internal metadata, never in customer-facing invoice fields.
+    // Records made before name capture keep their original idempotent parameters.
+    const metadata = { source, bookingRef: record.ref, ...(record.employeeName ? { bookedByName: record.employeeName, bookedByEmail: record.employee } : {}) }
+    const result = await stripeClient().invoices.create({ customer: record.customerId!, collection_method: 'send_invoice', due_date: Math.floor(Date.parse(record.cart[0].slots[0]) / 1000), auto_advance: false, pending_invoice_items_behavior: 'exclude', currency: 'usd', metadata, description: 'Your VibeShack studio reservation. Please complete payment before your session. Contact the studio for booking changes. Your reservation is not automatically released if payment is late.' }, { idempotencyKey: key(record, 'invoice') })
     return result.id
   },
   async finalize(record) {
@@ -112,6 +117,7 @@ export function createEmployeeServices(stripeClient: () => Stripe = getStripeCli
     return invoice.hosted_invoice_url
   },
   async send(record) { await stripeClient().invoices.sendInvoice(record.invoiceId!, {}, { idempotencyKey: key(record, 'send') }) },
+  notifyPaid: sendEmployeeBookingNotification,
   async voidInvoice(record) {
     const stripe = stripeClient()
     const invoice = await stripe.invoices.retrieve(record.invoiceId!)
@@ -137,6 +143,10 @@ export async function reconcileEmployeeInvoice(invoiceId: string, services = emp
     if (invoice.status === 'paid') {
       if (record.phase === 'cancelled' || invoice.amount_paid !== record.total) throw new Error('Paid booking needs manual review')
       record.phase = 'paid'; await save(record); await services.calendar(record)
+      if (!record.internalNotifiedAt) {
+        await services.notifyPaid(record)
+        record.internalNotifiedAt = Date.now(); await save(record)
+      }
     } else if (invoice.status === 'void' && record.phase !== 'paid') {
       record.phase = 'cancelled'; await save(record); await services.calendar(record); await services.release(record)
     }

@@ -1,10 +1,11 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
 import { google } from 'googleapis'
+import { employeeDisplayName, type EmployeeIdentity } from './identity'
 
 export const EMPLOYEE_COOKIE = 'vs_employee'
 export const OAUTH_COOKIE = 'vs_employee_oauth'
 export const SESSION_SECONDS = 8 * 60 * 60
-export type EmployeeSession = { email: string; exp: number; purpose: 'employee-session' }
+export type EmployeeSession = EmployeeIdentity & { exp: number; purpose: 'employee-session' }
 
 function secret() {
   const value = process.env.EMPLOYEE_SESSION_SECRET || ''
@@ -43,7 +44,7 @@ export function readEmployeeToken<T extends { exp: number; purpose: string }>(to
 }
 export function readEmployeeSession(token?: string) {
   const value = readEmployeeToken<EmployeeSession>(token, 'employee-session')
-  return value && typeof value.email === 'string' && allowedEmployee(value.email) ? value : null
+  return value && typeof value.email === 'string' && allowedEmployee(value.email) ? { ...value, name: employeeDisplayName(value.name) } : null
 }
 export function employeeCookieOptions(maxAge = SESSION_SECONDS) {
   return { httpOnly: true, secure: employeeOrigin().startsWith('https:'), sameSite: 'lax' as const, path: '/', maxAge }

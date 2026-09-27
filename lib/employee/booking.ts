@@ -3,15 +3,16 @@ import type { BookingCartItem } from '../booking/calendar'
 import { buildCanonicalBookingCart, calculateBookingCheckoutPricing } from '../booking/checkout-pricing'
 import { bookingDateRange } from '../booking/time'
 import { isEmail, stripControlChars } from '../server/sanitize'
+import { employeeDisplayName, type EmployeeIdentity } from './identity'
 
 export class EmployeeBookingError extends Error {
   constructor(message: string, public status = 400) { super(message) }
 }
 export type EmployeeBooking = {
-  version: 1; ref: string; hash: string; createdAt: number; employee: string
+  version: 1; ref: string; hash: string; createdAt: number; employee: string; employeeName?: string
   cart: BookingCartItem[]; customer: { name: string; email: string; phone: string }; notes: string; total: number
   phase: 'new' | 'reserved' | 'ready' | 'paid' | 'cancelled'
-  customerId?: string; invoiceId?: string; paymentUrl?: string; emailedAt?: number
+  customerId?: string; invoiceId?: string; paymentUrl?: string; emailedAt?: number; internalNotifiedAt?: number
   lease?: string; leaseUntil?: number
 }
 export type Snapshot = { record: EmployeeBooking; etag: string }
@@ -30,9 +31,13 @@ export interface EmployeeBookingServices {
   invoice(record: EmployeeBooking): Promise<string>
   finalize(record: EmployeeBooking): Promise<string>
   send(record: EmployeeBooking): Promise<void>
+  notifyPaid(record: EmployeeBooking): Promise<void>
   voidInvoice(record: EmployeeBooking): Promise<void>
 }
-export function employeeBookingInput(raw: unknown, employee: string, now = new Date()): EmployeeBooking {
+export function employeeBookingInput(raw: unknown, creator: EmployeeIdentity, now = new Date()): EmployeeBooking {
+  const employee = stripControlChars(creator.email, 254).toLowerCase()
+  if (!isEmail(employee)) throw new EmployeeBookingError('Employee identity is invalid', 401)
+  const employeeName = employeeDisplayName(creator.name)
   if (!raw || typeof raw !== 'object') throw new EmployeeBookingError('Invalid booking')
   const input = raw as Record<string, unknown>
   if (typeof input.requestId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.requestId)) throw new EmployeeBookingError('Invalid booking attempt')
@@ -48,7 +53,7 @@ export function employeeBookingInput(raw: unknown, employee: string, now = new D
   const notes = stripControlChars(input.notes, 1000)
   const total = calculateBookingCheckoutPricing(cart).computedTotalCents
   const hash = createHash('sha256').update(JSON.stringify({ cart, customer, notes, total })).digest('hex')
-  return { version: 1, ref: `emp-${createHash('sha256').update(`${employee}:${input.requestId}`).digest('hex').slice(0, 40)}`, hash, createdAt: now.getTime(), employee, cart, customer, notes, total, phase: 'new' }
+  return { version: 1, ref: `emp-${createHash('sha256').update(`${employee}:${input.requestId}`).digest('hex').slice(0, 40)}`, hash, createdAt: now.getTime(), employee, employeeName, cart, customer, notes, total, phase: 'new' }
 }
 export function validEmployeeRef(ref: string) { return /^emp-[a-f0-9]{40}$/.test(ref) }
 function conflict(error: unknown) { return [409, 412].includes(Number((error as { code?: number; response?: { status?: number } })?.response?.status || (error as { code?: number })?.code)) }

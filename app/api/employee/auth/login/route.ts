@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   if (limited) return limited
   try {
     const attempt = newOAuthAttempt()
-    const url = new URL(employeeOAuthClient().generateAuthUrl({ scope: ['openid', 'email'], state: attempt.state, nonce: attempt.nonce, prompt: 'select_account' }))
+    const url = new URL(employeeOAuthClient().generateAuthUrl({ scope: ['openid', 'email', 'profile'], state: attempt.state, nonce: attempt.nonce, prompt: 'select_account' }))
     url.searchParams.set('code_challenge', createHash('sha256').update(attempt.verifier).digest('base64url'))
     url.searchParams.set('code_challenge_method', 'S256')
     const response = NextResponse.redirect(url)
