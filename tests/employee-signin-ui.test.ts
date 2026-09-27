@@ -21,7 +21,7 @@ describe('employee sign-in design', () => {
     assert.match(html, /Keep me signed in/)
     assert.match(html, /Forgot password\?/)
     assert.match(html, /Sign In/)
-    assert.match(html, /Local preview\. Sign-in is not connected yet\./)
+    assert.doesNotMatch(html, /Local preview\. Sign-in is not connected yet\.|employee-signin-preview-note/)
     assert.match(html, /href="\/employee\/preview\/?"/)
     assert.doesNotMatch(html, /<form|type="submit"|action=|\/api\/employee\/auth\/login/)
     const source = readFileSync(new URL('../app/employee/EmployeeSignIn.tsx', import.meta.url), 'utf8')

@@ -26,7 +26,7 @@ export default function EmployeeSignIn({ preview, configured, failed = false }: 
         {failed && <p className={styles.error} role="alert">We couldn’t sign you in. Try again with an approved account.</p>}
         {preview ? <>
           {/* Design-only controls. No form, credential submission, storage, or authentication. */}
-          <div className={styles.controls} role="group" aria-label="Employee sign-in preview" aria-describedby="employee-signin-preview-note">
+          <div className={styles.controls} role="group" aria-label="Employee sign-in preview">
             <div className={styles.field}>
               <label className="sr-only" htmlFor="employee-signin-email">Email</label>
               <span className={styles.fieldIcon}><SignInIcon kind="email" /></span>
@@ -45,7 +45,6 @@ export default function EmployeeSignIn({ preview, configured, failed = false }: 
             <button type="button" className={styles.primary} onClick={() => setNotice('Password sign-in isn’t connected yet. Select Explore booking preview to view the booking screen.')}><span>Sign In</span><SignInIcon kind="arrow" /></button>
           </div>
           <div className={styles.preview}>
-            <p id="employee-signin-preview-note">Local preview. Sign-in is not connected yet.</p>
             <Link href="/employee/preview/">Explore booking preview <span aria-hidden="true">→</span></Link>
           </div>
           <p className={styles.status} role="status" aria-live="polite">{notice}</p>
