@@ -16,6 +16,6 @@ export async function GET(req: NextRequest) {
   } catch { /* Never disclose provider errors, tokens, or account membership. */ }
   const response = NextResponse.redirect(`${employeeOrigin()}${destination}`)
   response.headers.set('Cache-Control', 'private, no-store')
-  response.headers.set('Referrer-Policy', 'no-referrer')
+  response.headers.set('Referrer-Policy', 'strict-origin')
   return response
 }

@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     if (error || !data.url) throw new Error('Sign-in unavailable')
     const response = NextResponse.redirect(data.url)
     response.headers.set('Cache-Control', 'private, no-store')
-    response.headers.set('Referrer-Policy', 'no-referrer')
+    response.headers.set('Referrer-Policy', 'strict-origin')
     return response
   } catch { return employeeJson({ error: 'Employee sign-in needs administrator setup.' }, 503) }
 }
