@@ -177,6 +177,7 @@ test('Google OAuth uses only the canonical callback and requests basic identity 
   assert.equal(flow.redirectTo, 'https://example.invalid/api/employee/auth/callback')
   assert.equal(flow.scopes, 'openid email profile')
   assert.equal(response.headers.get('Cache-Control'), 'private, no-store')
+  assert.equal(response.headers.get('Referrer-Policy'), 'strict-origin')
 })
 
 test('OAuth callback exchanges code before accepting membership and ignores forged redirect/name parameters', async () => {
@@ -192,7 +193,9 @@ test('OAuth callback exchanges code before accepting membership and ignores forg
     employeeDestination: () => '/employee/book/',
   })
   const req = request('/api/employee/auth/callback?code=fixture-code&next=https://attacker.invalid&name=Forged')
-  assert.equal((await context.GET(req)).headers.get('location'), 'https://example.invalid/employee/book/')
+  const response = await context.GET(req)
+  assert.equal(response.headers.get('location'), 'https://example.invalid/employee/book/')
+  assert.equal(response.headers.get('Referrer-Policy'), 'strict-origin')
   assert.deepEqual(calls, ['exchange', 'accept'])
   calls.length = 0; exchangeError = true
   assert.match((await context.GET(req)).headers.get('location'), /error=signin$/)
@@ -237,11 +240,20 @@ test('email link GET does not consume tokens; same-origin POST alone verifies an
   assert.equal(consumed, 0)
   assert.match(html, /method="post"/)
   assert.doesNotMatch(html, /<script|onload=|autofocus/)
-  assert.equal(response.headers.get('Referrer-Policy'), 'no-referrer')
-  const post = (origin: string) => new NextRequest('https://example.invalid/api/employee/auth/confirm', { method: 'POST', headers: { origin, 'content-type': 'application/x-www-form-urlencoded' }, body: `token_hash=${'a'.repeat(64)}&type=invite` })
-  assert.equal((await context.POST(post('https://attacker.invalid'))).status, 403)
-  assert.equal(consumed, 0)
-  assert.equal((await context.POST(post('https://example.invalid'))).headers.get('location'), 'https://example.invalid/employee/security/')
+  // Native form POSTs preserve Origin under strict-origin without putting the
+  // confirmation token's path/query into Referer. Null Origin stays forbidden.
+  assert.equal(response.headers.get('Referrer-Policy'), 'strict-origin')
+  const post = (origin?: string) => new NextRequest('https://example.invalid/api/employee/auth/confirm', {
+    method: 'POST', headers: { ...(origin === undefined ? {} : { origin }), 'content-type': 'application/x-www-form-urlencoded' },
+    body: `token_hash=${'a'.repeat(64)}&type=invite`,
+  })
+  for (const origin of ['https://attacker.invalid', 'null', undefined]) {
+    assert.equal((await context.POST(post(origin))).status, 403, `Reject ${origin ?? 'missing'} Origin`)
+    assert.equal(consumed, 0)
+  }
+  const accepted = await context.POST(post('https://example.invalid'))
+  assert.equal(accepted.headers.get('location'), 'https://example.invalid/employee/security/')
+  assert.equal(accepted.headers.get('Referrer-Policy'), 'strict-origin')
   assert.equal(consumed, 1)
 })
 
@@ -268,6 +280,7 @@ test('signup verification links remain scanner-safe and require accepted employe
     const link = `/api/employee/auth/confirm?token_hash=${'b'.repeat(64)}&type=signup`
     const page = await context.GET(request(link))
     assert.equal(page.status, 200)
+    assert.equal(page.headers.get('Referrer-Policy'), 'strict-origin')
     const html = await page.text()
     assert.match(html, /method="post"/)
     assert.match(html, /name="type" value="signup"/)
@@ -283,15 +296,20 @@ test('signup verification links remain scanner-safe and require accepted employe
   }
 })
 
-test('revoked employees can sign out without a membership check, but cross-origin logout is rejected', async () => {
+test('native logout allows revoked employees to leave but rejects foreign, null and missing origins', async () => {
   let signedOut = 0
   const context = contextFor('app/api/employee/auth/logout/route.ts', ['POST'], {
     EMPLOYEE_COOKIE: 'vs_employee', employeeCookieOptions: () => ({ maxAge: 0 }),
     employeeSupabase: async () => ({ auth: { signOut: async () => { signedOut++; return { error: null } } } }),
   })
-  assert.equal((await context.POST(request('/api/employee/auth/logout', {}, 'https://attacker.invalid'))).status, 403)
-  assert.equal(signedOut, 0)
-  assert.equal((await context.POST(request('/api/employee/auth/logout', {}))).status, 303)
+  const post = (origin?: string) => new NextRequest('https://example.invalid/api/employee/auth/logout', {
+    method: 'POST', headers: { ...(origin === undefined ? {} : { origin }), 'content-type': 'application/x-www-form-urlencoded' }, body: '',
+  })
+  for (const origin of ['https://attacker.invalid', 'null', undefined]) {
+    assert.equal((await context.POST(post(origin))).status, 403, `Reject ${origin ?? 'missing'} Origin`)
+    assert.equal(signedOut, 0)
+  }
+  assert.equal((await context.POST(post('https://example.invalid'))).status, 303)
   assert.equal(signedOut, 1)
 })
 
@@ -352,11 +370,31 @@ test('middleware preserves slash redirects and refreshes employee cookies withou
   const redirect = await context.middleware(request('/pricing?fixture=1'))
   assert.equal(redirect.status, 308)
   assert.equal(redirect.headers.get('location'), 'https://example.invalid/pricing/?fixture=1')
-  await context.middleware(request('/pricing/')); assert.equal(refreshed, 0)
+  const publicResponse = await context.middleware(request('/pricing/'))
+  assert.equal(publicResponse.headers.get('Referrer-Policy'), null)
+  assert.equal(refreshed, 0)
   const response = await context.middleware(request('/employee/book/'))
   assert.equal(refreshed, 1)
   assert.equal(response.cookies.get('fixture-auth')?.value, 'refreshed')
   assert.equal(response.headers.get('Cache-Control'), 'private, no-store')
+  assert.equal(response.headers.get('Referrer-Policy'), 'strict-origin')
   assert.equal(response.headers.get('Pragma'), 'no-cache')
   assert.match(response.headers.get('set-cookie'), /HttpOnly/)
+})
+
+test('employee document middleware keeps native forms compatible when no session cookies refresh', async () => {
+  for (const configured of [false, true]) {
+    let checked = 0
+    const context = contextFor('middleware.ts', ['shouldSkipSlashRedirect', 'middleware'], {
+      process: { env: configured ? { SUPABASE_URL: 'https://fixture.supabase.invalid', SUPABASE_PUBLISHABLE_KEY: 'fixture-publishable' } : {} },
+      createServerClient: () => ({ auth: { getClaims: async () => { checked++ } } }),
+    })
+    for (const path of ['/employee/book/', '/employee/security/', '/api/employee/auth/confirm']) {
+      const response = await context.middleware(request(path))
+      assert.equal(response.headers.get('Referrer-Policy'), 'strict-origin', path)
+      assert.equal(response.headers.get('Cache-Control'), 'private, no-store', path)
+      assert.equal(response.headers.get('set-cookie'), null)
+    }
+    assert.equal(checked, configured ? 3 : 0)
+  }
 })

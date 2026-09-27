@@ -17,7 +17,8 @@ export async function middleware(req: NextRequest) {
   let response = NextResponse.next({ request: req })
   if (pathname === '/employee/' || pathname.startsWith('/employee/') || pathname.startsWith('/api/employee/')) {
     response.headers.set('Cache-Control', 'private, no-store')
-    response.headers.set('Referrer-Policy', 'no-referrer')
+    // Preserve Origin on native POSTs without exposing sign-in token paths or queries.
+    response.headers.set('Referrer-Policy', 'strict-origin')
     const url = process.env.SUPABASE_URL
     const key = process.env.SUPABASE_PUBLISHABLE_KEY
     if (url && key) {
@@ -32,7 +33,7 @@ export async function middleware(req: NextRequest) {
               values.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
               Object.entries(headers).forEach(([name, value]) => response.headers.set(name, value))
               response.headers.set('Cache-Control', 'private, no-store')
-              response.headers.set('Referrer-Policy', 'no-referrer')
+              response.headers.set('Referrer-Policy', 'strict-origin')
             },
           },
         })
