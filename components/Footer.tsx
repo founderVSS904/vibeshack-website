@@ -124,6 +124,9 @@ export default function Footer() {
                     <Link href={href} className="text-gray-500 text-sm hover:text-white hover:underline transition-colors duration-200">{label}</Link>
                   </li>
                 ))}
+                <li>
+                  <button type="button" disabled className="cursor-default text-left text-gray-500 text-sm">Employee login</button>
+                </li>
               </ul>
             </div>
 
@@ -172,7 +175,6 @@ export default function Footer() {
           <FooterMonogram />
           <p className="text-white text-xs tracking-[0.15em] uppercase font-bold mb-6">The Dream Factory</p>
           <p className="text-gray-500 text-xs mt-2">© 2026 VibeShack Studios · San Francisco</p>
-          <Link href="/employee/" className="mt-4 inline-block text-xs text-gray-400 hover:text-white">Employee login</Link>
 
         </div>
       </div>
