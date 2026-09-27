@@ -67,6 +67,7 @@
 .employee-app input:not([type=checkbox]):not([type=radio]):focus, .employee-app .employee-select select:focus { border-color: #a1a1aa !important; outline: 2px solid #d5d9e226 !important; outline-offset: 2px; box-shadow: none !important; }
 
 .employee-schedule { display: grid; grid-template-columns: 1fr 1fr; }
+.employee-card.employee-schedule { background: #000; border-color: #ffffff0d; }
 .employee-schedule, .employee-details, .employee-summary, .employee-result { scroll-margin-top: 104px; }
 .employee-schedule-shortcuts { grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 16px 24px; border-bottom: 1px solid #ffffff12; }
 .employee-schedule-shortcuts button { min-height: 44px; border-radius: 10px; border: 1px solid #ffffff26; padding: 9px 14px; color: #e4e4e7; font-size: 14px; }
@@ -81,11 +82,11 @@
 .employee-month button:disabled { opacity: .35; }
 .employee-month strong { font-size: 15px; font-weight: 500; text-align: center; }
 .employee-weekdays, .employee-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; text-align: center; }
-.employee-weekdays { font-size: 13px; color: var(--employee-muted); margin-bottom: 10px; }
+.employee-weekdays { font-size: 13px; color: #71717a; margin-bottom: 10px; }
 .employee-weekdays span { padding: 4px 0; }
-.employee-days button { height: 48px; position: relative; border-radius: 10px; font-size: 15px; font-weight: 500; color: #d4d4d8; border: 1px solid transparent; transition: background .15s; }
+.employee-days button { height: 48px; position: relative; border-radius: 10px; font-size: 15px; font-weight: 400; color: #d4d4d8; border: 1px solid transparent; transition: background .15s; }
 .employee-days button:not(:disabled):not(.selected):hover { background: #ffffff12; color: #fff; }
-.employee-days button:disabled { color: #57575f; }
+.employee-days button:disabled { color: #3f3f46; }
 .employee-app .selected { background: #fff !important; color: #141416 !important; border-color: #fff !important; font-weight: 600; }
 .employee-days i { position: absolute; bottom: 5px; left: calc(50% - 2px); width: 4px; height: 4px; background: currentColor; border-radius: 50%; }
 .employee-calendar-note { display: flex; align-items: center; gap: 8px; color: var(--employee-muted); font-size: 12px; margin-top: 24px !important; flex-wrap: wrap; }
@@ -95,20 +96,20 @@
 .employee-time-panel h2 { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; }
 .employee-time-panel h2 span { font-weight: 400; font-size: 14px; color: var(--employee-secondary); }
 .employee-app .employee-duration { margin: 24px 0 16px; color: var(--employee-secondary); }
-.employee-periods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 12px; background: #09090b; margin-bottom: 16px; }
+.employee-periods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 12px; background: #000; margin-bottom: 16px; }
 .employee-periods button { min-width: 0; min-height: 60px; padding: 9px 8px; color: var(--employee-secondary); border-radius: 9px; font-size: 14px; }
 .employee-periods strong, .employee-periods span { display: block; }
 .employee-periods strong { font-weight: 500; }
 .employee-periods span { margin-top: 3px; font-size: 12px; }
-.employee-periods button[aria-pressed=true] { background: #303035; color: #fff; }
+.employee-periods button[aria-pressed=true] { background: #1b1b1f; color: #fff; }
 .employee-periods button:hover:not(:disabled) { color: #fff; }
 .employee-times { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 4px; }
 .employee-time-options { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; margin-top: 8px; }
 .employee-start-date-note { font-size: 13px; color: var(--employee-secondary); margin-top: 8px !important; }
 .employee-times button small { display: block; font-size: 10px; margin-top: 2px; }
-.employee-times button { font-size: 14px; border: 1px solid #ffffff26; border-radius: 12px; background: #19191c; color: #d4d4d8; min-height: 48px; white-space: nowrap; }
-.employee-times button:disabled { color: #686871; background: #141416; border-color: #ffffff0d; text-decoration: line-through; }
-.employee-times button:not(:disabled):not(.selected):hover { background: #ffffff12; border-color: #ffffff4d; color: #fff; }
+.employee-times button { font-size: 14px; border: 1px solid #ffffff1a; border-radius: 12px; background: transparent; color: #a1a1aa; min-height: 48px; white-space: nowrap; }
+.employee-times button:disabled { color: #52525b; background: transparent; border-color: #ffffff0d; text-decoration: line-through; }
+.employee-times button:not(:disabled):not(.selected):hover { background: transparent; border-color: #ffffff4d; color: #fff; }
 .employee-time-help { font-size: 13px; color: var(--employee-muted); margin-top: 16px; line-height: 1.6; }
 .employee-time-help button { text-decoration: underline; text-underline-offset: 3px; margin-left: 8px; min-height: 44px; }
 .employee-text-button { font-size: 14px; color: #d4d4d8; padding: 10px 0; min-height: 44px; text-align: left; text-decoration: underline; text-underline-offset: 4px; }
@@ -366,7 +367,7 @@
 .employee-schedule-shortcuts button[aria-pressed=true] { border-color: #ffffff26; }
 .employee-calendar, .employee-time-panel { padding: 16px 20px; }
 .employee-month { margin: 0 0 8px; }
-.employee-month strong { font-size: 16px; font-weight: 600; }
+.employee-month strong { font-size: 14px; font-weight: 400; }
 .employee-weekdays, .employee-days { gap: 4px; }
 .employee-weekdays { margin-bottom: 6px; }
 .employee-days button { height: 44px; }
