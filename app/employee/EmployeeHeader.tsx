@@ -38,7 +38,8 @@ export default function EmployeeHeader({ email, preview, role = 'employee', acti
             toggleRef.current?.focus()
           }
         }} onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) event.currentTarget.removeAttribute('open')
+          // Safari can blur the summary without focusing a clicked menu button.
+          if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) event.currentTarget.removeAttribute('open')
         }}>
           <summary ref={toggleRef} aria-label="Account options">
             <svg className={styles.person} viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14" /><circle cx="16" cy="12" r="4" /><path d="M7 26v-1a9 9 0 0 1 18 0v1" /></svg>
