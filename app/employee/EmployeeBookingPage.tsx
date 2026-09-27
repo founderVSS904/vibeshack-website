@@ -1,6 +1,5 @@
 'use client'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { STUDIOS } from '@/lib/booking/catalog'
 import { getStudioSetup, getStudioSetups } from '@/lib/booking/studio-setups'
@@ -10,6 +9,7 @@ import { previewSlots, previewTeleprompterAvailable, type PreviewReservation } f
 import { EMPLOYEE_TIME_PERIODS, employeeResultStatus, employeeStartSlots, findNextEmployeeSession, sessionFits, timePeriod, type TimePeriod } from '@/lib/employee/scheduling-ui'
 import { canContinueEmployeeStep, canVisitEmployeeStep, EMPLOYEE_BOOKING_STEPS, type EmployeeBookingStep } from '@/lib/employee/booking-flow'
 import { EmployeeBookingIcon, EmployeeBookingProgress, EmployeeBookingSubmit, EmployeeSelect, EmployeeSessionDetails, EmployeeSessionRecap, EmployeeSetupPicker, EmployeeStepPanel } from './EmployeeBookingUI'
+import EmployeeHeader from './EmployeeHeader'
 
 type Slot = { time: string; label: string; available: boolean }
 type Result = { ref: string; phase: string; paymentUrl?: string; emailed: boolean; total: number }
@@ -216,7 +216,8 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
     setStep(1); setReachedStep(1)
   }
   return <>
-    <div className={`employee-workspace employee-workspace--step-${step}`}>
+    <EmployeeHeader email={email} preview={preview} />
+    <div id="employee-content" tabIndex={-1} className={`employee-workspace employee-workspace--step-${step}`}>
       {!enabled && <p className="employee-notice">Employee booking is not activated yet. You can review availability, but cannot create a reservation.</p>}
       {!result && <EmployeeBookingProgress step={step} canVisit={canVisit} onVisit={visitStep} />}
       <div className="employee-page-heading"><div>{step !== 1 && <span className="employee-eyebrow">VIBESHACK TEAM · BOOK A CLIENT</span>}<h1 ref={headingRef} tabIndex={-1}>{result ? 'Reservation details.' : stepCopy.title}</h1>{step !== 1 && <p>{result ? 'Your session and payment status, in one place.' : stepCopy.description}</p>}</div></div>
@@ -313,7 +314,7 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
         </aside>
         </EmployeeStepPanel>
       </form>
-      <footer className="employee-footer"><span>VibeShack Studios · Team workspace</span><div className="employee-footer-actions"><Link href="/employee/">Employee access</Link>{!preview && <form action="/api/employee/auth/logout" method="post"><button type="submit" title={email}>Sign out</button></form>}</div></footer>
+      <footer className="employee-footer"><span>VibeShack Studios · Team workspace</span></footer>
     </div>
   </>
 }

@@ -1,0 +1,43 @@
+.header { position: fixed; inset: 0 0 auto; z-index: 50; height: 80px; border-bottom: 1px solid #ffffff14; background: #000; color: #f5f5f7; }
+.inner { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; height: 100%; max-width: 1360px; padding: 0 32px; margin: auto; }
+.brand { display: flex; align-items: center; gap: 24px; }
+.logo { display: block; width: 119px; height: 34px; max-width: none; flex-shrink: 0; }
+.team { border-left: 1px solid #ffffff26; padding-left: 24px; font-size: 14px; color: #a1a1aa; }
+.navigation { align-self: stretch; display: flex; align-items: center; position: relative; font-size: 15px; font-weight: 600; white-space: nowrap; }
+.navigation::after { content: ''; position: absolute; bottom: -1px; inset-inline: 0; height: 2px; background: #f5f5f7; }
+.actions { justify-self: end; display: flex; align-items: center; gap: 24px; }
+.website { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; color: #a1a1aa; font-size: 14px; white-space: nowrap; text-decoration: none; }
+.website:hover, .account summary:hover { color: #fff; }
+.header svg { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.website svg { width: 14px; height: 14px; }
+.account { position: relative; padding-left: 24px; }
+.account::before { content: ''; position: absolute; width: 1px; height: 28px; left: 0; top: 8px; background: #ffffff26; }
+.account summary { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 44px; min-width: 44px; color: #d4d4d8; cursor: pointer; list-style: none; border-radius: 6px; }
+.account summary::-webkit-details-marker { display: none; }
+.person { width: 32px; height: 32px; }
+.chevron { width: 14px; height: 14px; }
+.panel { position: absolute; top: calc(100% + 12px); right: 0; width: 280px; max-width: calc(100vw - 32px); padding: 8px; border: 1px solid #ffffff26; border-radius: 16px; background: #141416; box-shadow: 0 16px 48px #0009; }
+.identity { padding: 12px; border-bottom: 1px solid #ffffff14; margin-bottom: 6px; }
+.identity strong { font-size: 14px; font-weight: 600; }
+.identity p { margin-top: 6px !important; color: #a1a1aa; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.menuAction { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; padding: 10px 12px; border: 0; border-radius: 8px; background: transparent; color: #f5f5f7; font-size: 14px; text-align: left; text-decoration: none; cursor: pointer; }
+.menuAction:hover { background: #ffffff0d; }
+@media (max-width: 1100px) { .inner { padding-inline: 24px; } }
+@media (max-width: 740px) {
+  .inner { grid-template-columns: 1fr auto; gap: 12px; padding-inline: 16px; }
+  .navigation { display: none; }
+  .brand { gap: 16px; }
+  .team { padding-left: 16px; }
+  .actions { gap: 12px; }
+  .account { padding-left: 12px; }
+}
+@media (max-width: 520px) {
+  .website { width: 44px; }
+  .website span { display: none; }
+  .website svg { width: 18px; height: 18px; }
+  .actions { gap: 4px; }
+  .account { padding-left: 4px; }
+  .account::before, .chevron { display: none; }
+  .brand { gap: 12px; }
+  .team { padding-left: 12px; font-size: 13px; }
+}

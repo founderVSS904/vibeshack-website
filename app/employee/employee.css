@@ -19,7 +19,7 @@
 .employee-app button, .employee-app a, .employee-app input, .employee-app select { outline-offset: 4px; }
 .employee-app :focus-visible { outline: 2px solid #d5d9e2 !important; box-shadow: none !important; }
 .employee-app button:disabled, .employee-app select:disabled { cursor: not-allowed; }
-.employee-workspace { max-width: 1568px; margin: auto; padding: 32px 32px 0; }
+.employee-workspace { max-width: 1568px; margin: auto; padding: 32px 32px 0; scroll-margin-top: 80px; }
 .employee-page-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin: 16px 0 36px; }
 .employee-eyebrow { font-size: 11px; letter-spacing: 2px; color: var(--employee-muted); display: block; margin-bottom: 12px; font-weight: 600; }
 .employee-page-heading p { font-size: 16px; color: var(--employee-secondary); margin-top: 14px; }

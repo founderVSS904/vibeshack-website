@@ -5,10 +5,29 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { EmployeeBookingProgress, EmployeeBookingSubmit, EmployeeSelect, EmployeeSessionDetails, EmployeeSessionRecap, EmployeeSetupPicker, EmployeeStepPanel } from '../app/employee/EmployeeBookingUI'
 import { EXECUTIVE_SETUPS, WING_SETUPS } from '../lib/booking/studio-setups'
 import EmployeeBookingPage from '../app/employee/EmployeeBookingPage'
+import EmployeeHeader from '../app/employee/EmployeeHeader'
 
 Object.assign(globalThis, { React })
 
 describe('employee booking presentation', () => {
+  test('preview account disclosure never offers authenticated actions or claims an employee identity', () => {
+    const html = renderToStaticMarkup(createElement(EmployeeHeader, { email: 'unused@example.com', preview: true }))
+    assert.match(html, /Local preview/)
+    assert.match(html, /No employee account is signed in/)
+    assert.match(html, /href="\/employee\/?"/)
+    assert.doesNotMatch(html, /unused@example.com|Sign out|<form|\/api\/employee\//)
+    assert.match(html, /href="\/" target="_blank" rel="noopener noreferrer"/)
+  })
+
+  test('authenticated account sign-out retains the existing POST endpoint outside the booking form', () => {
+    const html = renderToStaticMarkup(createElement(EmployeeBookingPage, { email: 'staff@example.com', enabled: false }))
+    assert.match(html, /staff@example.com/)
+    assert.match(html, /<form action="\/api\/employee\/auth\/logout" method="post">/)
+    assert.equal((html.match(/Sign out/g) || []).length, 1)
+    assert.ok(html.indexOf('</header>') < html.indexOf('class="employee-booking-grid'))
+    assert.doesNotMatch(html, /Local preview|No employee account is signed in/)
+  })
+
   test('styles a real native select without replacing its accessibility or validation', () => {
     const html = renderToStaticMarkup(createElement(EmployeeSelect, {
       'aria-label': 'Session length', required: true, disabled: true, value: 4, onChange: () => {},

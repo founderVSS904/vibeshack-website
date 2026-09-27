@@ -22,6 +22,14 @@ operators and cameras for overlapping staff-created sessions. Tours and
 unidentified manual busy events continue to block conservatively.
 
 The employee workspace now separates the workflow into three focused screens
+with a dedicated black team header: the approved logo and Team label, a current
+Book a client section, a website link opening in a separate tab, and an account
+disclosure. The disclosure identifies the local preview without implying a
+signed-in employee. Authenticated sessions show their verified email and the
+existing POST sign-out action. The standalone sign-in and public site navigation
+are unchanged. Account actions have moved out of the workspace footer.
+
+The booking flow stays
 on the same protected route. Session shows studio/date/time/duration and a
 compact, photo-free subtotal summary. Setup & extras gives catalog-photo radio
 cards more space and shows optional extras separately. Client & review pairs

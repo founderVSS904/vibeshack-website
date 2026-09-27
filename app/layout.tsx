@@ -271,7 +271,6 @@ export default function RootLayout({
         )}
       </head>
       <body className="bg-black text-white antialiased">
-        <a href="#main-content" className="sr-only z-[100] rounded-lg bg-brand-red font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:px-6 focus:py-3">Skip to content</a>
         <AttributionCapture />
         {hasValidGaId && <AnalyticsPageViews />}
         <SiteChrome position="header" />
