@@ -4,27 +4,32 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm test && NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
+    "build": "npm test && NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
     "start": "NODE_OPTIONS=\"--max-old-space-size=2048\" next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern .next --ignore-pattern node_modules",
     "test": "tsx --import ./tests/register-css.cjs --test tests/**/*.test.ts",
     "seo:audit": "node scripts/seo-audit.mjs",
     "typecheck": "tsc --noEmit --pretty false",
     "verify": "npm run lint && npm run typecheck && npm run build",
-    "security:audit": "npm audit --omit=dev --audit-level=high"
+    "security:audit": "npm audit --omit=dev --audit-level=high",
+    "prebuild": "node scripts/verify-employee-config.mjs && tsx scripts/verify-employee-booking.ts"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^5.6.1",
     "@stripe/stripe-js": "^8.11.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
     "googleapis": "^171.4.0",
     "next": "^15.5.25",
     "nodemailer": "^9.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "server-only": "^0.0.1",
     "sharp": "^0.35.4",
     "stripe": "^20.4.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@types/node": "^20.14.10",
     "@types/nodemailer": "^7.0.11",
     "@types/react": "^18.3.3",

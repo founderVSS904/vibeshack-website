@@ -2,11 +2,11 @@ import type { BookingCartItem } from './calendar'
 import type Stripe from 'stripe'
 import { REMOTE_PODCAST, bookingAddOnLabel, bookingAddOnTotalCents, priceBookingAddOns } from './add-ons'
 import { calculateRecurringDiscountCents, getStudioById } from './catalog'
-import { bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate } from './time'
+import { bookingHoursForSlotCount, bookingPriceCents, bookingSlotsMatchStartDate, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate } from './time'
 import { stripControlChars } from '../server/sanitize'
 import { getStudioSetup, validateBookingSetup } from './studio-setups'
 
-export function buildCanonicalBookingCart(rawCart: unknown): BookingCartItem[] {
+export function buildCanonicalBookingCart(rawCart: unknown, options: { allowOvernight?: boolean } = {}): BookingCartItem[] {
   if (!Array.isArray(rawCart) || rawCart.length > 20) throw new Error('Invalid cart item')
   return rawCart.map((rawItem) => {
     if (!rawItem || typeof rawItem !== 'object') throw new Error('Invalid cart item')
@@ -19,8 +19,8 @@ export function buildCanonicalBookingCart(rawCart: unknown): BookingCartItem[] {
     if (!studio || !isValidBookingDate(date) || !hasConsecutiveBookingSlots(slots)) {
       throw new Error('Invalid cart item')
     }
-    const canonicalSlots = slotIsoSetForDate(date)
-    if (!slots.every((slot) => canonicalSlots.has(slot))) throw new Error('Invalid cart item')
+    // Only trusted employee code opts in. Never read this permission from rawCart.
+    if (!bookingSlotsMatchStartDate(date, slots, options.allowOvernight)) throw new Error('Invalid cart item')
     return {
       studioId: studio.id,
       studioName: studio.name,

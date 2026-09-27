@@ -15,6 +15,7 @@ import { getStripeClient } from '@/lib/booking/stripe'
 import { SLOT_DURATION_MINUTES, addMinutes, bookingHoursForSlotCount, bookingPriceCents, describeSlotRanges, formatBookingDuration, formatDateForDisplay, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate } from '@/lib/booking/time'
 import { escapeHtml, isEmail, stripControlChars } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
+import { reconcileEmployeeInvoice } from '@/lib/employee/providers'
 
 const PAID_BOOKING_HOLD_RECOVERY_MS = 7 * 24 * 60 * 60 * 1000
 
@@ -554,6 +555,15 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Stripe webhook signature failed:', error)
     return NextResponse.json({ error: 'Webhook signature failed' }, { status: 400 })
+  }
+
+  if (event.type === 'invoice.paid' || event.type === 'invoice.voided') {
+    const invoice = event.data.object as Stripe.Invoice
+    if (invoice.metadata?.source === 'vibeshack-employee-booking') {
+      try { await reconcileEmployeeInvoice(invoice.id) }
+      catch { return NextResponse.json({ error: 'Employee invoice reconciliation needs a retry' }, { status: 500 }) }
+    }
+    return NextResponse.json({ received: true })
   }
 
   if (event.type === 'checkout.session.expired') {

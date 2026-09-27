@@ -1,0 +1,13 @@
+.page { max-width: 1120px; margin: 0 auto; padding: 124px 28px 64px; color: #f5f5f7; scroll-margin-top: 100px; }
+.eyebrow { color: #9999a2; font-size: 11px; letter-spacing: .16em; margin-bottom: 10px; }
+.page h1 { font-size: clamp(28px, 4vw, 38px); font-weight: 600; letter-spacing: -.035em; }
+.intro { margin: 12px 0 28px; color: #a1a1aa; font-size: 14px; }
+.list { list-style: none; padding: 0; border: 1px solid #252528; border-radius: 18px; overflow: hidden; background: #111113; }
+.list li { display: flex; justify-content: space-between; align-items: start; gap: 20px; padding: 22px 24px; border-bottom: 1px solid #252528; }
+.list li:last-child { border-bottom: 0; }
+.list strong { font-size: 15px; font-weight: 500; }
+.list p { color: #c8c8cd; font-size: 14px; margin: 6px 0; overflow-wrap: anywhere; }
+.list span, .list time { color: #93939e; font-size: 12px; overflow-wrap: anywhere; }
+.list time { flex-shrink: 0; }
+.empty { padding: 36px 24px; border: 1px solid #252528; border-radius: 18px; color: #a1a1aa; }
+@media(max-width:600px) { .page { padding: 140px 18px 40px; } .list li { flex-direction: column; gap: 12px; padding: 20px; } }

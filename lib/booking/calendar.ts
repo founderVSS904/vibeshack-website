@@ -16,7 +16,7 @@ import {
 } from './hold-cleanup'
 import { type ReferralInfo } from './referrals'
 import { primaryStudioResourceGroup, studioIdsThatAffectAvailability, studioResourceGroups, studiosShareResources } from './resources'
-import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingDateInPacific, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
+import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingDateInPacific, bookingSlotsMatchStartDate, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
 import { bookingSlotFitsTurnaround, slotsWithTurnaround, STUDIO_TURNAROUND_MINUTES, type BookingBusyRange } from './turnaround'
 import { SINGLE_UNIT_ADD_ONS, addOnConflict, addOnForResource, addOnResourceGroup, limitedAddOnIds, type AddOnAvailability } from './add-on-inventory'
 
@@ -29,8 +29,8 @@ export interface BookingCartItem {
   price: number
   addOns?: BookingAddOn[]
   setupId?: StudioSetupId
-  // Internal tour lock carts only. Canonical paid checkout never accepts this flag.
-  reservationKind?: 'tour'
+  // Internal tour/staff carts only. Canonical public checkout never accepts this flag.
+  reservationKind?: 'tour' | 'employee'
 }
 
 export interface CalendarConfig {
@@ -194,7 +194,7 @@ function resolveCalendarId(studioId?: string) {
   return { calendarId: getDefaultCalendarId(), isStudioSpecificCalendar: false }
 }
 
-async function getCalendarConfig(studioId?: string): Promise<CalendarConfig | null> {
+export async function getCalendarConfig(studioId?: string): Promise<CalendarConfig | null> {
   const credentials = readCalendarCredentials()
   if (!credentials) return null
 
@@ -252,7 +252,8 @@ function bookingHoldTargets(cartItems: BookingCartItem[]) {
   const targets = new Map<string, BookingHoldLedgerTarget>()
 
   for (const item of cartItems) {
-    for (const resourceGroup of [...studioResourceGroups(item.studioId), ...limitedAddOnIds(item.addOns).map(addOnResourceGroup)]) {
+    const roomGroups = item.reservationKind === 'employee' ? [`studio:${item.studioId}`] : studioResourceGroups(item.studioId)
+    for (const resourceGroup of [...roomGroups, ...limitedAddOnIds(item.addOns).map(addOnResourceGroup)]) {
       const slots = resourceGroup === `studio:${item.studioId}` && item.reservationKind !== 'tour'
         ? slotsWithTurnaround(item.slots)
         : item.slots
@@ -269,9 +270,9 @@ function bookingHoldTargets(cartItems: BookingCartItem[]) {
     .sort((first, second) => first.eventId.localeCompare(second.eventId))
 }
 
-function availabilityHoldTargets(studioId: string | undefined, date: string) {
+function availabilityHoldTargets(studioId: string | undefined, date: string, roomOnly = false) {
   const resourceGroups = studioId
-    ? studioResourceGroups(studioId)
+    ? (roomOnly ? [`studio:${studioId}`] : studioResourceGroups(studioId))
     : Array.from(new Set(STUDIOS.flatMap((studio) => studioResourceGroups(studio.id))))
 
   return resourceGroups
@@ -690,13 +691,14 @@ async function getBookingHoldBusyTimes(
   date: string,
   excludedBookingRef?: string,
   createMissing = false,
+  roomOnly = false,
 ) {
   if (!isValidBookingDate(date)) return []
 
   const calendarId = getHoldCalendarId()
   const busySlots = new Map<string, boolean>()
 
-  for (const target of availabilityHoldTargets(studioId, date)) {
+  for (const target of availabilityHoldTargets(studioId, date, roomOnly)) {
     const currentEvent = createMissing
       ? await getOrCreateBookingHoldLedger(client, calendarId, target)
       : await getExistingBookingHoldLedger(client, calendarId, target)
@@ -1040,6 +1042,7 @@ export function eventBlocksStudio(
   calendarStudioIds: Set<string>,
   isStudioSpecificCalendar: boolean,
   excludedBookingRef?: string,
+  roomOnly = false,
 ) {
   if (event.status === 'cancelled' || event.transparency === 'transparent') return false
 
@@ -1061,13 +1064,17 @@ export function eventBlocksStudio(
   if (!studioId) return true
 
   const eventStudio = eventStudioId(event)
+  // Only authenticated staff code writes this source. Public cart fields never
+  // reach it. Staff reservations occupy the room, not the podcast/stage pool.
+  if (privateProperties.source === 'vibeshack-employee-booking' && eventStudio) return eventStudio === studioId
+  if (roomOnly && eventStudio) return eventStudio === studioId
   const effectiveResourceGroups = new Set(eventResourceGroups(event))
   if (eventStudio) {
     studioResourceGroups(eventStudio).forEach((resourceGroup) => effectiveResourceGroups.add(resourceGroup))
   }
 
   if (effectiveResourceGroups.size) {
-    const targetResourceGroups = new Set(studioResourceGroups(studioId))
+    const targetResourceGroups = new Set(roomOnly ? [`studio:${studioId}`] : studioResourceGroups(studioId))
     return Array.from(effectiveResourceGroups).some((resourceGroup) => targetResourceGroups.has(resourceGroup))
   }
 
@@ -1173,6 +1180,7 @@ export async function getBusyTimesForDate(
   excludedBookingRef?: string,
   initializeBookingHoldLedgers = false,
   dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
+  roomOnly = false,
 ) {
   if (!isValidBookingDate(date)) {
     throw new Error('Invalid date')
@@ -1205,7 +1213,7 @@ export async function getBusyTimesForDate(
     studioIds: Set<string>
   }>()
 
-  const studioIdsToCheck = studioIdsThatAffectAvailability(studioId)
+  const studioIdsToCheck = roomOnly && studioId ? [studioId] : studioIdsThatAffectAvailability(studioId)
   if (studioIdsToCheck.length) {
     for (const affectedStudioId of studioIdsToCheck) {
       const resolved = resolveCalendarId(affectedStudioId)
@@ -1227,6 +1235,13 @@ export async function getBusyTimesForDate(
         studioIds: new Set<string>(),
       })
     }
+  }
+
+  // Read event identity on the tour/default calendar too. A free/busy-only
+  // fallback would make a staff reservation on that calendar block every room.
+  const tourCalendarId = getTourCalendarId()
+  if (studioId && !calendarContexts.has(tourCalendarId)) {
+    calendarContexts.set(tourCalendarId, { calendarId: tourCalendarId, isStudioSpecificCalendar: false, studioIds: new Set() })
   }
 
   const busyTimes: BookingBusyRange[] = []
@@ -1252,6 +1267,7 @@ export async function getBusyTimesForDate(
           context.studioIds,
           context.isStudioSpecificCalendar,
           excludedBookingRef,
+          roomOnly,
         ))
         .map((event) => bookingEventBusyRange(event, studioId, context.studioIds, context.isStudioSpecificCalendar))
         .filter((range): range is BookingBusyRange => Boolean(range)))
@@ -1263,15 +1279,9 @@ export async function getBusyTimesForDate(
   const heldRanges = await Promise.all(holdDates.map((holdDate) => getBookingHoldBusyTimes(
     config.client, studioId, holdDate, excludedBookingRef,
     initializeBookingHoldLedgers && holdDate === date,
+    roomOnly,
   )))
   busyTimes.push(...heldRanges.flat())
-
-  const tourCalendarId = getTourCalendarId()
-  if (studioId && tourCalendarId !== config.calendarId) {
-    const tourBusyTimes = await getBusyTimesForRange(new Date(timeMin), new Date(timeMax), [tourCalendarId], dependencies)
-    if (!tourBusyTimes) return null
-    busyTimes.push(...tourBusyTimes.map((range) => ({ ...range, blocksTurnaround: true })))
-  }
 
   return busyTimes
 }
@@ -1384,6 +1394,7 @@ export async function getAvailabilityForDate(
   excludedBookingRef?: string,
   initializeBookingHoldLedgers = false,
   dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
+  roomOnly = false,
 ) {
   if (!isValidBookingDate(date)) {
     return { verified: false, error: 'Invalid date', slots: [] }
@@ -1399,6 +1410,7 @@ export async function getAvailabilityForDate(
       excludedBookingRef,
       initializeBookingHoldLedgers,
       dependencies,
+      roomOnly,
     )
     if (!busyTimes) {
       return {
@@ -1460,11 +1472,8 @@ export async function assertCartSlotsAvailable(
       return { ok: false, status: 400, error: 'Invalid booking slots' }
     }
 
-    const validSlots = slotIsoSetForDate(item.date)
-    for (const slot of item.slots) {
-      if (!validSlots.has(slot)) {
-        return { ok: false, status: 400, error: 'Selected slots do not match the booking date' }
-      }
+    if (!bookingSlotsMatchStartDate(item.date, item.slots, item.reservationKind === 'employee')) {
+      return { ok: false, status: 400, error: 'Selected slots do not match the booking date' }
     }
     for (const target of bookingHoldTargets([item])) {
       const resourceSlotKeys = target.slots.map((slot) => `${target.resourceGroup}|${target.date}|${slot}`)
@@ -1477,14 +1486,18 @@ export async function assertCartSlotsAvailable(
       resourceSlotKeys.forEach((requestedSlotKey) => requestedSlotKeys.add(requestedSlotKey))
     }
 
-    const groupKey = `${item.studioId}|${item.date}`
-    const group = byStudioDate.get(groupKey) || { studioId: item.studioId, date: item.date, slots: [] }
-    group.slots.push(...item.slots)
-    byStudioDate.set(groupKey, group)
+    for (const slot of item.slots) {
+      const date = bookingDateInPacific(new Date(slot))
+      const groupKey = `${item.studioId}|${date}`
+      const group = byStudioDate.get(groupKey) || { studioId: item.studioId, date, slots: [] }
+      group.slots.push(slot)
+      byStudioDate.set(groupKey, group)
+    }
   }
 
   for (const { studioId, date, slots } of Array.from(byStudioDate.values())) {
-    const availability = await getAvailabilityForDate(date, studioId, excludedBookingRef, true, dependencies)
+    const roomOnly = cartItems.every((item) => item.reservationKind === 'employee')
+    const availability = await getAvailabilityForDate(date, studioId, excludedBookingRef, true, dependencies, roomOnly)
     if (!availability.verified) {
       return { ok: false, status: 503, error: 'Live calendar availability is temporarily unavailable. Please try again shortly.' }
     }
@@ -1519,10 +1532,11 @@ export async function getAddOnAvailabilityForSlots(
   slots: string[],
   excludedBookingRef?: string,
   dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
+  allowOvernight = false,
 ) {
   const availability: AddOnAvailability = Object.fromEntries(SINGLE_UNIT_ADD_ONS.map(({ id }) => [id, false]))
   if (!isValidBookingDate(date) || !hasConsecutiveBookingSlots(slots, 1)
-    || !slots.every((slot) => slotIsoSetForDate(date).has(slot))) {
+    || !bookingSlotsMatchStartDate(date, slots, allowOvernight)) {
     return { verified: false, availability, error: 'Invalid add-on session' }
   }
   try {
@@ -1553,11 +1567,13 @@ export async function getAddOnAvailabilityForSlots(
       } while (pageToken)
     }
     for (const { id } of SINGLE_UNIT_ADD_ONS) {
-      const target = bookingHoldLedgerTarget(addOnResourceGroup(id), date)
-      const event = await getExistingBookingHoldLedger(config.client, getHoldCalendarId(), target)
-      if (event && Object.entries(activeBookingHoldLedger(event, target).holds).some(([ref, hold]) => (
-        ref !== excludedBookingRef && holdSlotsConflict(slots, hold.slots)
-      ))) blocked.add(id)
+      for (const slotDate of new Set(slots.map((slot) => bookingDateInPacific(new Date(slot))))) {
+        const target = bookingHoldLedgerTarget(addOnResourceGroup(id), slotDate)
+        const event = await getExistingBookingHoldLedger(config.client, getHoldCalendarId(), target)
+        if (event && Object.entries(activeBookingHoldLedger(event, target).holds).some(([ref, hold]) => (
+          ref !== excludedBookingRef && holdSlotsConflict(slots, hold.slots)
+        ))) blocked.add(id)
+      }
       availability[id] = !blocked.has(id)
     }
     return { verified: true, availability }
@@ -1570,7 +1586,7 @@ async function assertCartAddOnsAvailable(cart: BookingCartItem[], excludedBookin
   for (const item of cart) {
     const selected = limitedAddOnIds(item.addOns)
     if (!selected.length) continue
-    const result = await getAddOnAvailabilityForSlots(item.date, item.slots, excludedBookingRef, dependencies)
+    const result = await getAddOnAvailabilityForSlots(item.date, item.slots, excludedBookingRef, dependencies, item.reservationKind === 'employee')
     if (!result.verified) return { ok: false, status: 503, error: result.error || 'Equipment availability could not be verified.' }
     const unavailable = selected.filter((id) => result.availability[id] !== true)
     if (unavailable.length) return addOnConflict(unavailable)

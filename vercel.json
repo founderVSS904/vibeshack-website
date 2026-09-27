@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm test && NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
+  "buildCommand": "npm run build",
   "devCommand": "next dev",
   "installCommand": "npm install",
   "framework": "nextjs",

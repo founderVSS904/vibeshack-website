@@ -123,7 +123,7 @@ export function zonedDateHourToUtc(date: string, hour: number) {
   return zonedDateTimeToUtc(date, hour)
 }
 
-function nextDateString(date: string) {
+export function nextDateString(date: string) {
   const [year, month, day] = date.split('-').map(Number)
   const next = new Date(Date.UTC(year, month - 1, day + 1))
   const pad = (value: number) => String(value).padStart(2, '0')
@@ -144,6 +144,20 @@ export function getTimeSlotsForDay(date: string) {
   return slots
 }
 
+// Start on the chosen civil date, but allow the longest supported session to
+// finish the following day. Real half-hours also work across DST transitions.
+export function getBookingWindowForDay(date: string) {
+  return [...getTimeSlotsForDay(date), ...getTimeSlotsForDay(nextDateString(date)).slice(0, MAX_BOOKING_SLOTS - 1)]
+}
+
+export function bookingSlotsMatchStartDate(date: string, slots: string[], allowOvernight = false) {
+  if (!slots.length || !slotIsoSetForDate(date).has(slots[0])) return false
+  const valid = allowOvernight
+    ? new Set(getBookingWindowForDay(date).map(({ start }) => start.toISOString()))
+    : slotIsoSetForDate(date)
+  return slots.every((slot) => valid.has(slot))
+}
+
 export function formatDateForDisplay(date: string) {
   return zonedDateHourToUtc(date, 12).toLocaleDateString('en-US', {
     weekday: 'long',
@@ -161,6 +175,13 @@ export function formatTimeForDisplay(date: Date) {
     hour12: true,
     timeZone: BOOKING_TIME_ZONE,
   })
+}
+
+export function formatTimeRelativeToDate(value: Date, startDate: string) {
+  const time = formatTimeForDisplay(value)
+  if (bookingDateInPacific(value) === startDate) return time
+  const date = value.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: BOOKING_TIME_ZONE })
+  return `${time} (${date})`
 }
 
 export function addHours(date: Date, hours: number) {
@@ -204,7 +225,7 @@ export function describeSlotRanges(slots: string[]) {
     .map((group) => {
       const start = new Date(group[0])
       const end = addMinutes(new Date(group[group.length - 1]), SLOT_DURATION_MINUTES)
-      return `${formatTimeForDisplay(start)}-${formatTimeForDisplay(end)}`
+      return `${formatTimeForDisplay(start)}-${formatTimeRelativeToDate(end, bookingDateInPacific(start))}`
     })
     .join(', ')
 }

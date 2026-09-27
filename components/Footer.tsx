@@ -124,6 +124,9 @@ export default function Footer() {
                     <Link href={href} className="text-gray-500 text-sm hover:text-white hover:underline transition-colors duration-200">{label}</Link>
                   </li>
                 ))}
+                <li>
+                  <Link href="/employee/" prefetch={false} className="text-gray-500 text-sm hover:text-white hover:underline transition-colors duration-200">Employee login</Link>
+                </li>
               </ul>
             </div>
 

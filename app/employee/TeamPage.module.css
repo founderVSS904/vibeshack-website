@@ -1,0 +1,79 @@
+.workspace { max-width: 1360px; margin: auto; padding: 36px 32px 48px; scroll-margin-top: 80px; }
+.workspace:focus { outline: none !important; }
+.heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 32px; }
+.workspace .heading h1 { font-size: 32px; line-height: 1.2; letter-spacing: -1px; font-weight: 600; }
+.workspace .heading p { margin-top: 10px; color: #a1a1aa; font-size: 15px; }
+.accessLabel { color: #a1a1aa; border: 1px solid #ffffff24; border-radius: 999px; padding: 6px 12px; font-size: 12px; white-space: nowrap; }
+.inviteCard { padding: 24px; border: 1px solid #ffffff20; border-radius: 18px; background: #141416; }
+.inviteIntro { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.inviteIntro h2, .sectionHeading h2 { font-size: 18px; font-weight: 600; }
+.inviteIntro p { color: #a1a1aa; font-size: 14px; }
+.inviteForm { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto; gap: 20px; align-items: end; }
+.inviteForm label { color: #c5c5ce; font-size: 14px; min-width: 0; }
+.inviteForm input { margin-top: 8px; }
+.primary { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; border: 0; border-radius: 12px; padding: 12px 20px; background: #f5f5f7; color: #141416; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.primary:hover:not(:disabled) { background: #dedee4; }
+.primary:disabled { opacity: .5; }
+.note { margin-top: 16px !important; color: #a1a1aa; font-size: 12px; line-height: 1.6; }
+.notice, .error { padding: 16px 20px; border: 1px solid #ffffff24; border-radius: 12px; background: #141416; margin-top: 20px !important; font-size: 14px; line-height: 1.6; }
+.notice { color: #c8dfce; }
+.error { color: #ffc0b8; }
+.error button { text-decoration: underline; text-underline-offset: 4px; min-height: 44px; color: inherit; }
+.members { margin-top: 36px; }
+.sectionHeading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.sectionHeading > span { font-size: 13px; color: #a1a1aa; }
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table thead th { padding: 12px 16px; border-bottom: 1px solid #ffffff24; color: #a1a1aa; font-size: 12px; font-weight: 400; text-align: left; }
+.table tbody th, .table td { border-bottom: 1px solid #ffffff14; padding: 20px 16px; text-align: left; vertical-align: top; }
+.member { min-width: 220px; }
+.member > div { display: inline-block; vertical-align: middle; max-width: calc(100% - 56px); }
+.member strong { display: block; font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.member div > span { display: block; margin-top: 4px; color: #a1a1aa; font-size: 13px; font-weight: 400; overflow-wrap: anywhere; }
+.avatar { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; width: 36px; height: 36px; margin-right: 12px; border-radius: 50%; background: #242428; font-size: 14px; font-weight: 500; color: #d4d4d8; }
+.status { display: inline-flex; align-items: center; gap: 7px; min-height: 24px; color: #c1c1c9; font-size: 12px; white-space: nowrap; }
+.status::before { content: ''; width: 5px; height: 5px; background: #81818b; border-radius: 50%; }
+.status[data-status=active]::before { background: #9dcaa7; }
+.status[data-status=invited]::before { background: #d7c391; }
+.date, .protected { color: #a1a1aa; font-size: 13px; }
+.actions { width: 220px; }
+.rowActions { display: flex; gap: 8px 16px; flex-wrap: wrap; justify-content: flex-end; margin-top: -10px; }
+.rowActions button { min-height: 44px; font-size: 13px; color: #d4d4d8; text-decoration: underline; text-underline-offset: 4px; }
+.rowActions button:disabled { opacity: .5; }
+.protected { display: block; text-align: right; }
+.confirmation { margin-top: 8px; padding: 12px; border: 1px solid #ffffff24; border-radius: 10px; background: #19191c; min-width: 220px; }
+.confirmation p { font-size: 13px; color: #f5f5f7; line-height: 1.5; }
+.confirmation > span { display: block; color: #a1a1aa; font-size: 12px; margin-top: 6px; }
+.confirmation > div { display: grid; gap: 4px; margin-top: 8px; }
+.confirmation button { min-height: 44px; padding: 8px; border-radius: 6px; background: #ffffff0a; font-size: 12px; }
+.confirmation button:first-child { color: #ffc0b8; }
+.empty { padding: 36px 0; color: #a1a1aa; font-size: 14px; }
+.footer { margin-top: 24px !important; font-size: 12px; line-height: 1.6; color: #898993; }
+@media (max-width: 1100px) { .workspace { padding-inline: 24px; } .table tbody th, .table td { padding-inline: 10px; } .actions { width: 180px; } }
+@media (max-width: 850px) {
+  .inviteIntro { display: block; }
+  .inviteIntro p { margin-top: 8px; }
+  .inviteForm { grid-template-columns: 1fr 1fr; }
+  .inviteForm .primary { grid-column: 1 / -1; justify-self: end; }
+  .table, .table tbody { display: block; }
+  .table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+  .table tr { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; border: 1px solid #ffffff20; border-radius: 14px; padding: 20px; margin-top: 12px; background: #111113; }
+  .table tbody th, .table td { padding: 0; border: 0; min-width: 0; }
+  .table td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; color: #898993; margin-bottom: 6px; }
+  .member, .actions { grid-column: 1 / -1; width: auto; }
+  .table .member { padding-bottom: 8px; }
+  .rowActions { justify-content: flex-start; margin-top: 0; }
+  .protected { text-align: left; }
+  .confirmation { min-width: 0; }
+}
+@media (max-width: 540px) {
+  .workspace { padding: 24px 16px 40px; }
+  .heading { display: block; margin-bottom: 24px; }
+  .workspace .heading h1 { font-size: 28px; }
+  .workspace .heading p { font-size: 14px; }
+  .accessLabel { display: inline-block; margin-top: 16px; }
+  .inviteCard { padding: 20px 16px; }
+  .inviteForm { grid-template-columns: 1fr; gap: 16px; }
+  .inviteForm .primary { width: 100%; }
+  .inviteIntro p { font-size: 13px; }
+  .table tr { padding: 18px 16px; }
+}
