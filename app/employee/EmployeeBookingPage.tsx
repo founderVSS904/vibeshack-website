@@ -136,10 +136,6 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
     setResult(null); setAttempted(false); setStart(''); setName(''); setClientEmail(''); setPhone(''); setNotes(''); setAddOnIds([]); setPlatform(''); setError(''); setCopied(false); setCancelPrompt(false); requestId.current = ''; setRefresh((value) => value + 1)
   }
   return <>
-    <header className="employee-topbar">
-      <div className="employee-brand-group"><Link href="/" className="employee-wordmark">VibeShack<span>STUDIOS</span></Link><span className="employee-badge">Employee booking</span></div>
-      <div className="employee-account"><Link href="/">Back to website ↗</Link><span className="employee-avatar" aria-hidden="true">{preview ? 'VS' : email.slice(0, 2).toUpperCase()}</span>{!preview && <form action="/api/employee/auth/logout" method="post"><button type="submit" title={email}>Sign out</button></form>}</div>
-    </header>
     <div className="employee-workspace">
       {!enabled && <p className="employee-notice">Employee booking is not activated yet. You can review availability, but cannot create a reservation.</p>}
       <div className="employee-page-heading"><div><span className="employee-eyebrow">VIBESHACK TEAM</span><h1>Book for a client.</h1><p>Reserve their studio now. Send a payment link for later.</p></div><span className="employee-timezone">◷ All times Pacific</span></div>
@@ -202,7 +198,7 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
           <div className="employee-reservation-note"><span aria-hidden="true">◇</span><p><strong>Reserved, not paid.</strong> The room stays reserved until a team member cancels. {end && <>Turnaround ends at {formatTimeForDisplay(addMinutes(end, 30))}.</>}</p></div>
         </aside>
       </form>
-      <footer className="employee-footer"><span>VibeShack Studios · Team workspace</span><Link href="/employee/">Employee access</Link></footer>
+      <footer className="employee-footer"><span>VibeShack Studios · Team workspace</span><div className="employee-footer-actions"><Link href="/employee/">Employee access</Link>{!preview && <form action="/api/employee/auth/logout" method="post"><button type="submit" title={email}>Sign out</button></form>}</div></footer>
     </div>
   </>
 }

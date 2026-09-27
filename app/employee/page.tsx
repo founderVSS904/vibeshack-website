@@ -8,7 +8,6 @@ export default async function EmployeeLogin({ searchParams }: { searchParams: Pr
   const configured = employeeAuthConfigured()
   const params = await searchParams
   return <>
-    <header className="employee-topbar"><Link href="/" className="employee-wordmark">VibeShack<span>STUDIOS</span></Link><Link href="/">Back to website ↗</Link></header>
     <div className="employee-login">
       <div className="employee-login-icon" aria-hidden="true">VS</div><span className="employee-eyebrow">FOR THE TEAM</span>
       <h1>Good to have you back.</h1><p>Reserve a studio for your client.<br />They can take care of payment later.</p>
