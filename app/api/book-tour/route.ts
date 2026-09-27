@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { randomUUID } from 'node:crypto'
 import { reserveTourBooking, formatTourSlotRange } from '@/lib/booking/calendar'
 import { getStudioById } from '@/lib/booking/catalog'
 import { formatDateForDisplay, isValidBookingDate } from '@/lib/booking/time'
-import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
+import { jsonBodyErrorResponse, readJsonBody } from '@/lib/server/request-guards'
+import { distributedRateLimit } from '@/lib/server/distributed-rate-limit'
 import { escapeHtml, isEmail, stripControlChars } from '@/lib/server/sanitize'
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -81,7 +83,7 @@ async function sendTourEmails(tour: {
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = rateLimit(req, { key: 'tour-booking', max: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS })
+    const limited = await distributedRateLimit(req, { key: 'tour-booking', max: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS })
     if (limited) return limited
 
     const body = await readJsonBody(req, MAX_BODY_BYTES)
@@ -94,6 +96,9 @@ export async function POST(req: NextRequest) {
     const notes = stripControlChars(body.notes, 1200)
     const honeypot = stripControlChars(body.company, 120)
     const startedAt = Number(body.startedAt || 0)
+    // Older open pages may omit this field. Give those requests fresh authority
+    // instead of falling back to identifying a prior guest by email and time.
+    const requestId = body.requestId === undefined ? randomUUID() : body.requestId
 
     if (honeypot) {
       return NextResponse.json({ ok: true })
@@ -107,6 +112,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Name and valid email are required' }, { status: 400 })
     }
 
+    if (typeof requestId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) {
+      return NextResponse.json({ error: 'Refresh the page and try your tour request again.' }, { status: 400 })
+    }
+
     if (!isValidBookingDate(date) || !slot || Number.isNaN(Date.parse(slot))) {
       return NextResponse.json({ error: 'Choose a valid tour date and time' }, { status: 400 })
     }
@@ -117,20 +126,30 @@ export async function POST(req: NextRequest) {
     }
 
     const studioName = studio?.name || 'Not sure yet'
-    const tour = { name, email, phone, date, slot, studioId: studio?.id, studioName, notes }
+    const tour = { name, email, phone, date, slot, studioId: studio?.id, studioName, notes, requestId: requestId.toLowerCase() }
 
-    const reservation = await reserveTourBooking(tour)
-    if (!reservation.ok) return NextResponse.json({ error: reservation.error }, { status: reservation.status })
+    const reservation = await reserveTourBooking(tour, async () => {
+      const limited = await distributedRateLimit(req, { key: 'tour-booking-recipient', max: 3, windowMs: 60 * 60_000, subject: email })
+      if (!limited) return null
+      const body = await limited.json()
+      return { ok: false, status: limited.status, error: body.error as string, headers: {
+        'Retry-After': limited.headers.get('Retry-After') || '30',
+        'Cache-Control': 'private, no-store',
+      } }
+    })
+    if (!reservation.ok) return NextResponse.json({ error: reservation.error }, { status: reservation.status, headers: reservation.headers })
 
     try {
       if (!reservation.alreadyReserved) await sendTourEmails(tour)
-    } catch (error) {
-      console.error('Tour confirmation email failed:', error)
+    } catch {
+      console.error('Tour confirmation email failed')
     }
 
     return NextResponse.json({
       ok: true,
-      created: !reservation.alreadyReserved,
+      // Older open pages need this boolean to recognize a receipt. Keep it
+      // constant so it never discloses whether a reservation was a retry.
+      created: true,
       tour: {
         date,
         time: formatTourSlotRange(slot),
@@ -141,7 +160,7 @@ export async function POST(req: NextRequest) {
     const bodyError = jsonBodyErrorResponse(error)
     if (bodyError) return bodyError
 
-    console.error('Tour booking error:', error)
+    console.error('Tour booking failed')
     return NextResponse.json({ error: 'Tour booking failed. Please try again or email founder@vibeshackstudios.com.' }, { status: 500 })
   }
 }

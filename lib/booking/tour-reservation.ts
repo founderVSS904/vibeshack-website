@@ -19,13 +19,18 @@ export interface TourReservationDependencies {
   insert: (tour: TourBookingDetails) => Promise<void>
   release: (cart: BookingCartItem[], ref: string) => Promise<void>
   exists: (tour: TourBookingDetails) => Promise<boolean>
+  beforeCreate?: () => Promise<TourReservationResult | null>
   now?: () => Date
 }
 
-export interface TourReservationResult { ok: boolean; status: number; error: string; alreadyReserved?: boolean }
+export interface TourReservationResult { ok: boolean; status: number; error: string; alreadyReserved?: boolean; headers?: Record<string, string> }
 
 export async function reserveTour(tour: TourBookingDetails, dependencies: TourReservationDependencies): Promise<TourReservationResult> {
   if (await dependencies.exists(tour)) return { ok: true, status: 200, error: '', alreadyReserved: true }
+  // A proven retry performs no new booking or email. Apply creation limits
+  // only after checking its random authority, before availability or writes.
+  const blocked = await dependencies.beforeCreate?.()
+  if (blocked) return blocked
   const initialAvailability = await dependencies.availability(tour.date, tour.slot, '')
   if (!initialAvailability.ok) return initialAvailability
   const ref = `tour-${randomUUID()}`

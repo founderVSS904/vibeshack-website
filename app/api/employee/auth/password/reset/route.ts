@@ -4,14 +4,15 @@ import { employeeAdmin } from '@/lib/employee/supabase'
 import { employeeJson } from '@/lib/employee/http'
 import { sendEmployeeAccessLink } from '@/lib/employee/invitations'
 import { isEmail, stripControlChars } from '@/lib/server/sanitize'
-import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
+import { jsonBodyErrorResponse, readJsonBody } from '@/lib/server/request-guards'
+import { distributedRateLimit, rateLimitSubjectHash } from '@/lib/server/distributed-rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 export async function POST(req: NextRequest) {
   if (req.headers.get('origin') !== employeeOrigin()) return employeeJson({ error: 'Invalid request origin' }, 403)
-  const limited = rateLimit(req, { key: 'employee-password-reset', max: 5, windowMs: 600_000 })
+  const limited = await distributedRateLimit(req, { key: 'employee-password-reset', max: 5, windowMs: 600_000 })
   if (limited) return limited
   let email = ''
   try {
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
       const admin = employeeAdmin()
       const { data: member, error } = await admin.from('employee_members').select('email,name,status').eq('email', email).maybeSingle()
       if (!error && member && ['invited', 'active'].includes(member.status)) {
-        const claim = await admin.rpc('employee_claim_signin_email', { p_email: email })
+        const claim = await admin.rpc('employee_claim_recovery_email', { p_email: email, p_subject_hash: rateLimitSubjectHash('employee-recovery', email) })
         if (!claim.error && claim.data === true) await sendEmployeeAccessLink(email, member.name || '', 'recovery')
       }
     } catch { /* Unknown, disabled and unavailable accounts receive the same response. */ }

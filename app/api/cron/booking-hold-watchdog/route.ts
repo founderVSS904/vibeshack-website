@@ -129,7 +129,6 @@ async function markFailure(failure: WatchdogFailure) {
   } catch (error) {
     console.error('Booking hold watchdog could not record a failure in Stripe:', {
       sessionId: failure.sessionId,
-      error,
     })
   }
 }
@@ -182,7 +181,6 @@ async function sendFailureAlert(failures: WatchdogFailure[], stats: WatchdogStat
     } catch (error) {
       console.error('Booking hold watchdog could not reserve an alert cooldown:', {
         sessionId: failure.sessionId,
-        error,
       })
     }
   }
@@ -226,7 +224,6 @@ async function sendFailureAlert(failures: WatchdogFailure[], stats: WatchdogStat
       // the failure is logged without opening a repeat-email window.
       console.error('Booking hold watchdog could not finalize an alert marker:', {
         sessionId: sessionReservations[index].sessionId,
-        error: result.reason,
       })
     }
   })
@@ -272,7 +269,10 @@ export async function GET(req: NextRequest) {
         }
         failures.push(failure)
         await markFailure(failure)
-        console.error('Booking hold watchdog reconciliation failed:', failure)
+        console.error('Booking hold watchdog reconciliation failed:', {
+          sessionId: failure.sessionId,
+          bookingRef: failure.bookingRef,
+        })
       }
     }
 
@@ -295,7 +295,7 @@ export async function GET(req: NextRequest) {
         alertSent = await sendFailureAlert(failures, stats)
       } catch (error) {
         alertError = errorMessage(error)
-        console.error('Booking hold watchdog alert failed:', error)
+        console.error('Booking hold watchdog alert failed')
       }
     }
 
@@ -312,7 +312,7 @@ export async function GET(req: NextRequest) {
       headers: { 'Cache-Control': 'no-store' },
     })
   } catch (error) {
-    console.error('Booking hold watchdog scan failed:', error)
+    console.error('Booking hold watchdog scan failed')
     const failure: WatchdogFailure = {
       sessionId: '',
       bookingRef: '',
@@ -325,7 +325,7 @@ export async function GET(req: NextRequest) {
       alertSent = await sendFailureAlert([failure], stats)
     } catch (sendError) {
       alertError = errorMessage(sendError)
-      console.error('Booking hold watchdog scan alert failed:', sendError)
+      console.error('Booking hold watchdog scan alert failed')
     }
     return NextResponse.json({
       ok: false,

@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getBookingConfirmation } from '@/lib/booking/confirmation'
 import { verifyCheckoutManagementToken } from '@/lib/booking/checkout-management'
 import { getStripeClient } from '@/lib/booking/stripe'
-import { rateLimit } from '@/lib/server/request-guards'
+import { distributedRateLimit } from '@/lib/server/distributed-rate-limit'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const limited = rateLimit(req, { key: 'booking-confirmation', max: 40, windowMs: 60_000 })
+  const limited = await distributedRateLimit(req, { key: 'booking-confirmation', max: 40, windowMs: 60_000 })
   if (limited) {
     limited.headers.set('Cache-Control', 'no-store, max-age=0')
     return limited

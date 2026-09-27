@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
+import { distributedRateLimit } from '@/lib/server/distributed-rate-limit'
+import { jsonBodyErrorResponse, readJsonBody } from '@/lib/server/request-guards'
 import { escapeHtml, isEmail, stripControlChars } from '@/lib/server/sanitize'
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -9,7 +10,7 @@ const MAX_BODY_BYTES = 12 * 1024
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = rateLimit(req, { key: 'contact', max: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS })
+    const limited = await distributedRateLimit(req, { key: 'contact', max: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS })
     if (limited) return limited
 
     const body = await readJsonBody(req, MAX_BODY_BYTES)
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
     const bodyError = jsonBodyErrorResponse(err)
     if (bodyError) return bodyError
 
-    console.error('Contact form error:', err)
+    console.error('Contact form failed')
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
   }
 }

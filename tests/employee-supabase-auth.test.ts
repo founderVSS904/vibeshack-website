@@ -6,7 +6,7 @@ import ts from 'typescript'
 import { NextRequest, NextResponse } from 'next/server'
 import { employeeDisplayName } from '../lib/employee/identity'
 import { escapeHtml, isEmail, stripControlChars } from '../lib/server/sanitize'
-import { jsonBodyErrorResponse, readJsonBody } from '../lib/server/request-guards'
+import { jsonBodyErrorResponse, readJsonBody, readTextBody } from '../lib/server/request-guards'
 
 // Execute actual route/helper declarations in isolated contexts with synthetic
 // Auth, database and email providers. No credentials or network are available.
@@ -24,8 +24,9 @@ function contextFor(file: string, names: string[], bindings: Record<string, unkn
     Date, Buffer, URL, URLSearchParams, NextRequest, NextResponse, encodeURIComponent,
     employeeDisplayName, escapeHtml, isEmail, stripControlChars,
     employeeOrigin: () => 'https://example.invalid', rateLimit: () => null,
+    distributedRateLimit: async () => null, rateLimitSubjectHash: () => 'f'.repeat(64),
     employeeJson: (value: unknown, status = 200) => NextResponse.json(value, { status, headers: { 'Cache-Control': 'private, no-store' } }),
-    readJsonBody, jsonBodyErrorResponse,
+    readJsonBody, readTextBody, jsonBodyErrorResponse,
     ...bindings,
   })
   vm.runInContext(names.map((name) => sourceFunction(name, file)).join('\n'), context)
@@ -213,7 +214,10 @@ test(`${route} gives the same recovery response for unknown, disabled and approv
         assert.equal(email, employee.email)
         return { maybeSingle: async () => ({ data: status ? { email, name: employee.name, status } : null, error: databaseError }) }
       } }) }),
-      rpc: async (name: string) => { assert.equal(name, 'employee_claim_signin_email'); return { data: claimed, error: null } },
+      rpc: async (name: string, args: { p_email: string; p_subject_hash: string }) => {
+        assert.equal(name, 'employee_claim_recovery_email'); assert.equal(args.p_email, employee.email)
+        assert.equal(args.p_subject_hash, 'f'.repeat(64)); return { data: claimed, error: null }
+      },
     }),
     sendEmployeeAccessLink: async (email: string, _name: string, kind: string) => { assert.equal(email, employee.email); assert.equal(kind, 'recovery'); sends++; if (sendError) throw new Error('Private provider failure') },
   })
@@ -231,7 +235,7 @@ test(`${route} gives the same recovery response for unknown, disabled and approv
 function passwordFixture({ providerError = false, providerThrows = false, denied = false, limited = false } = {}) {
   const calls: string[] = []
   const context = contextFor('app/api/employee/auth/password/route.ts', ['POST'], {
-    rateLimit: () => limited ? NextResponse.json({ error: 'Too many requests' }, { status: 429 }) : null,
+    distributedRateLimit: async () => limited ? NextResponse.json({ error: 'Too many requests' }, { status: 429 }) : null,
     employeeSupabase: async () => ({ auth: {
       signInWithPassword: async (input: { email: string; password: string }) => {
         calls.push('signin')
@@ -305,7 +309,7 @@ test('password recovery blocks unsafe origins and oversized input before any loo
   assert.equal((await context.POST(request('/api/employee/auth/password/reset', { email: 'invalid' }))).status, 200)
   assert.equal(called, false)
   const throttled = contextFor('app/api/employee/auth/password/reset/route.ts', ['POST'], {
-    rateLimit: () => NextResponse.json({ error: 'Too many requests' }, { status: 429 }),
+    distributedRateLimit: async () => NextResponse.json({ error: 'Too many requests' }, { status: 429 }),
     employeeAdmin: () => { called = true; throw new Error('Should not query') },
   })
   assert.equal((await throttled.POST(request('/api/employee/auth/password/reset', { email: employee.email }))).status, 429)
@@ -530,5 +534,60 @@ test('employee document middleware keeps native forms compatible when no session
       assert.equal(response.headers.get('set-cookie'), null)
     }
     assert.equal(checked, configured ? 3 : 0)
+  }
+})
+
+test('both recovery URLs consume the same durable IP bucket before account lookup', async () => {
+  let attempts = 0
+  let lookups = 0
+  const options: Array<{ key: string; max: number; windowMs: number }> = []
+  const bindings = {
+    distributedRateLimit: async (_req: NextRequest, limit: { key: string; max: number; windowMs: number }) => {
+      options.push(limit); attempts++
+      return attempts > limit.max ? NextResponse.json({ error: 'Too many requests' }, { status: 429 }) : null
+    },
+    employeeAdmin: () => ({ from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => { lookups++; return { data: null, error: null } } }) }) }) }),
+  }
+  const routes = ['email', 'password/reset'].map((route) => contextFor(`app/api/employee/auth/${route}/route.ts`, ['POST'], bindings))
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const response = await routes[attempt % 2].POST(request('/api/employee/auth/password/reset', { email: employee.email }))
+    assert.equal(response.status, attempt < 5 ? 200 : 429)
+  }
+  assert.equal(lookups, 5)
+  assert.equal(new Set(options.map((item) => item.key)).size, 1)
+  assert.ok(options.every((item) => item.max === 5 && item.windowMs === 600_000))
+})
+
+test('password auth applies durable IP and short account caps before the identity provider', async () => {
+  const limits: Array<{ key: string; max: number; windowMs: number; subject?: string }> = []
+  let providerCalls = 0
+  const context = contextFor('app/api/employee/auth/password/route.ts', ['POST'], {
+    distributedRateLimit: async (_req: NextRequest, options: { key: string; max: number; windowMs: number; subject?: string }) => {
+      limits.push(options)
+      return options.subject ? NextResponse.json({ error: 'Too many requests' }, { status: 429 }) : null
+    },
+    employeeSupabase: () => { providerCalls++; throw new Error('Provider must not be reached') },
+  })
+  const response = await context.POST(request('/api/employee/auth/password', { email: ` ${employee.email.toUpperCase()} `, password: 'synthetic-password' }))
+  assert.equal(response.status, 429); assert.equal(providerCalls, 0)
+  assert.equal(limits.length, 2)
+  assert.equal(limits[0].subject, undefined); assert.equal(limits[0].max, 10); assert.equal(limits[0].windowMs, 600_000)
+  assert.equal(limits[1].subject, employee.email); assert.equal(limits[1].max, 20); assert.equal(limits[1].windowMs, 60_000)
+})
+
+test('failed durable limits stop password, recovery and token confirmation before any provider or body work', async () => {
+  for (const route of ['password', 'password/reset', 'email', 'confirm']) {
+    let providers = 0
+    let bodyReads = 0
+    const context = contextFor(`app/api/employee/auth/${route}/route.ts`, route === 'confirm' ? ['validToken', 'GET', 'POST'] : ['POST'], {
+      distributedRateLimit: async () => NextResponse.json({ error: 'Temporarily unavailable' }, { status: 503 }),
+      readJsonBody: () => { bodyReads++; throw new Error('Body must not be read') },
+      readTextBody: () => { bodyReads++; throw new Error('Body must not be read') },
+      employeeSupabase: () => { providers++; throw new Error('Provider must not be reached') },
+      employeeAdmin: () => { providers++; throw new Error('Provider must not be reached') },
+      sendEmployeeAccessLink: () => { providers++; throw new Error('Provider must not be reached') },
+    })
+    assert.equal((await context.POST(request(`/api/employee/auth/${route}`, { email: employee.email }))).status, 503)
+    assert.equal(providers, 0, route); assert.equal(bodyReads, 0, route)
   }
 })
