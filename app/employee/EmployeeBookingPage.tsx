@@ -7,7 +7,8 @@ import { getStudioSetup, getStudioSetups } from '@/lib/booking/studio-setups'
 import { BOOKING_ADD_ONS, bookingAddOnRateLabel, bookingAddOnTotalCents, priceBookingAddOns, type BookingAddOnId } from '@/lib/booking/add-ons'
 import { addMinutes, bookingDateRange, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay } from '@/lib/booking/time'
 import { previewSlots, previewTeleprompterAvailable, type PreviewReservation } from '@/lib/employee/preview'
-import { EmployeeBookingIcon, EmployeeSelect, EmployeeSessionDetails } from './EmployeeBookingUI'
+import { employeeResultStatus, findNextEmployeeSession, sessionFits, timePeriod, type TimePeriod } from '@/lib/employee/scheduling-ui'
+import { EmployeeBookingIcon, EmployeeMobileReview, EmployeeSelect, EmployeeSessionDetails, EmployeeSetupPicker } from './EmployeeBookingUI'
 
 type Slot = { time: string; label: string; available: boolean }
 type Result = { ref: string; phase: string; paymentUrl?: string; emailed: boolean; total: number }
@@ -33,7 +34,11 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
   const setups = getStudioSetups(studioId)
   const [start, setStart] = useState('')
   const [count, setCount] = useState(4)
-  const [overnight, setOvernight] = useState(false)
+  const [period, setPeriod] = useState<TimePeriod>('morning')
+  const [showUnavailable, setShowUnavailable] = useState(false)
+  const [searching, setSearching] = useState(false)
+  const [searchMessage, setSearchMessage] = useState('')
+  const searchController = useRef<AbortController | null>(null)
   const [addOnIds, setAddOnIds] = useState<BookingAddOnId[]>([])
   const [platform, setPlatform] = useState('')
   const [name, setName] = useState('')
@@ -53,6 +58,10 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
   const requestId = useRef('')
   const submitLock = useRef(false)
   const resultRef = useRef<HTMLDivElement>(null)
+  const summaryRef = useRef<HTMLElement>(null)
+  const scheduleRef = useRef<HTMLElement>(null)
+  const detailsRef = useRef<HTMLElement>(null)
+  const clientRef = useRef<HTMLElement>(null)
   const availabilityKey = `${studioId}:${date}`
   const inventoryKey = `${date}:${start}:${count}`
   const daySlots = useMemo(() => getTimeSlotsForDay(date), [date])
@@ -63,11 +72,56 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
   const total = Math.round(studio.price * count / 2 * 100) + bookingAddOnTotalCents(addOns)
   const currentAvailability = availability.key === availabilityKey
   const availableSet = new Set(currentAvailability ? availability.slots.filter((slot) => slot.available).map((slot) => slot.time) : [])
-  const canFit = (index: number, duration = count) => index >= 0 && index + duration <= daySlots.length && daySlots.slice(index, index + duration).every((slot) => availableSet.has(slot.start.toISOString()))
+  const canFit = (index: number, duration = count) => sessionFits(daySlots, availableSet, index, duration)
   const sessionReady = currentAvailability && canFit(startIndex) && (!setups.length || Boolean(setup))
   const teleprompterReady = inventory.key === inventoryKey && inventory.available
   const locked = busy || attempted || Boolean(result)
-  const ready = sessionReady && (!addOnIds.includes('teleprompter') || teleprompterReady) && name.trim() && clientEmail.trim() && enabled
+  const ready = sessionReady && !searching && (!addOnIds.includes('teleprompter') || teleprompterReady) && name.trim() && clientEmail.trim() && enabled
+  const dateLabel = new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })
+  const timeLabel = start && end ? `${formatTimeForDisplay(new Date(start))} – ${formatTimeForDisplay(end)}` : 'Choose a start time'
+  const periodSlots = daySlots.map((slot, index) => ({ ...slot, index })).filter((slot) => timePeriod(slot.start) === period)
+  const visibleSlots = periodSlots.filter((slot) => showUnavailable || canFit(slot.index))
+  const nextAction = !enabled ? 'Employee booking is not activated yet.' : searching ? 'Finding your next opening…' : !currentAvailability ? 'Checking studio availability…' : availability.error ? availability.error : !start ? 'Choose a start time to continue.' : !canFit(startIndex) ? 'This time is no longer available. Choose another start time.' : !sessionReady ? 'Choose a studio setup to continue.' : addOnIds.includes('teleprompter') && !teleprompterReady ? 'The teleprompter is unavailable or still being checked. Choose another time or remove it.' : !name.trim() || !clientEmail.trim() ? 'Add the client’s name and email to continue.' : preview ? 'Preview only. No reservation, email, or payment will be created outside this page.' : 'No payment is collected now.'
+  const status = result ? employeeResultStatus(result.phase, result.emailed, preview) : null
+
+  function focusSection(section: HTMLElement | null) {
+    section?.focus({ preventScroll: true })
+    section?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' })
+  }
+  function stopSearch() {
+    searchController.current?.abort()
+    searchController.current = null
+    setSearching(false); setSearchMessage('')
+  }
+  function chooseDate(value: string) {
+    stopSearch(); setDate(value); setMonth(value.slice(0, 7)); setStart('')
+  }
+  async function nextAvailable() {
+    if (searchController.current) { stopSearch(); return }
+    const controller = new AbortController()
+    searchController.current = controller
+    setSearching(true); setSearchMessage('Checking the next 7 days, including overnight hours…')
+    try {
+      const found = await findNextEmployeeSession(dates.slice(0, 7), count, async (day) => {
+        if (preview) return previewSlots(day, studioId, reservations)
+        const response = await fetch(`/api/employee/availability?${new URLSearchParams({ date: day, studio: studioId })}`, { cache: 'no-store', signal: controller.signal })
+        const data = await response.json()
+        if (!response.ok || !data.verified) throw new Error(response.status === 401 ? 'Your sign-in has expired. Please sign in again.' : 'Could not verify the next opening. Please try again.')
+        return data.slots
+      }, controller.signal)
+      if (controller.signal.aborted) return
+      if (!found) { setSearchMessage('No opening for this session length in the next 7 days. Choose a later date or a shorter session.'); return }
+      setDate(found.date); setMonth(found.date.slice(0, 7)); setStart(found.start); setPeriod(timePeriod(new Date(found.start)))
+      setAvailability({ key: `${studioId}:${found.date}`, slots: found.slots })
+      setSearchMessage('Next available session selected. All times Pacific.')
+    } catch (failure) {
+      if (!controller.signal.aborted) setSearchMessage(failure instanceof Error ? failure.message : 'Could not find an opening. Please try again.')
+    } finally {
+      if (searchController.current === controller) { searchController.current = null; setSearching(false) }
+    }
+  }
+
+  useEffect(() => () => searchController.current?.abort(), [])
 
   useEffect(() => {
     const refreshAvailability = () => setRefresh((value) => value + 1)
@@ -134,7 +188,9 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
     finally { submitLock.current = false; setBusy(false) }
   }
   function newBooking() {
+    stopSearch()
     setResult(null); setAttempted(false); setStart(''); setName(''); setClientEmail(''); setPhone(''); setNotes(''); setAddOnIds([]); setPlatform(''); setError(''); setCopied(false); setCancelPrompt(false); requestId.current = ''; setRefresh((value) => value + 1)
+    focusSection(scheduleRef.current)
   }
   return <>
     <div className="employee-workspace">
@@ -144,68 +200,81 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
         <fieldset disabled={locked} className="employee-main-fields">
           <div className="employee-card employee-studio-strip">
             <div className="employee-room-thumb"><Image src={studio.heroImage} alt={studio.name} fill sizes="76px" /></div>
-            <label className="employee-studio-label"><span>Studio</span><EmployeeSelect variant="studio" aria-label="Studio" value={studioId} onChange={(event) => { setStudioId(event.target.value); setSetupId(''); setStart('') }}>{STUDIOS.map((room) => <option key={room.id} value={room.id}>{room.name}</option>)}</EmployeeSelect></label>
+            <label className="employee-studio-label"><span>Studio</span><EmployeeSelect variant="studio" aria-label="Studio" value={studioId} onChange={(event) => { stopSearch(); setStudioId(event.target.value); setSetupId(''); setStart('') }}>{STUDIOS.map((room) => <option key={room.id} value={room.id}>{room.name}</option>)}</EmployeeSelect></label>
             <div className="employee-studio-rate"><strong>{money(studio.price * 100)}<small>/hr</small></strong><span>{studio.type === 'podcast' ? 'Podcast studio' : 'Studio rental'}</span></div>
           </div>
-          <section className="employee-card employee-schedule" aria-label="Choose session date and time">
+          <section className="employee-card employee-schedule" ref={scheduleRef} tabIndex={-1} aria-label="Choose session date and time">
+            <div className="employee-schedule-shortcuts" role="group" aria-label="Quick date selection">
+              <button type="button" aria-pressed={date === dates[0]} onClick={() => chooseDate(dates[0])}>Today</button>
+              <button type="button" aria-pressed={date === dates[1]} onClick={() => chooseDate(dates[1])}>Tomorrow</button>
+              <button type="button" onClick={nextAvailable} aria-describedby="employee-search-message">{searching ? 'Cancel search' : 'Next available'} <span aria-hidden="true">↗</span></button>
+              <span>All times Pacific</span>
+              <p id="employee-search-message" role="status">{searchMessage}</p>
+            </div>
             <div className="employee-calendar"><h2>Select a date</h2><div className="employee-month"><button type="button" aria-label="Previous month" disabled={month <= dates[0].slice(0, 7)} onClick={() => setMonth(moveMonth(month, -1))}><span aria-hidden="true">←</span> Prev</button><strong>{new Date(`${month}-15T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</strong><button type="button" aria-label="Next month" disabled={month >= dates.at(-1)!.slice(0, 7)} onClick={() => setMonth(moveMonth(month, 1))}>Next <span aria-hidden="true">→</span></button></div>
               <div className="employee-weekdays" aria-hidden="true">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((label) => <span key={label}>{label}</span>)}</div>
-              <div className="employee-days">{monthDays(month).map((day, index) => day ? <button type="button" key={day} aria-label={formatDateForDisplay(day)} aria-current={day === dates[0] ? 'date' : undefined} aria-pressed={date === day} className={date === day ? 'selected' : ''} disabled={!dates.includes(day)} onClick={() => { setDate(day); setStart('') }}>{Number(day.slice(-2))}{day === dates[0] && <i />}</button> : <span key={`blank-${index}`} />)}</div>
+              <div className="employee-days">{monthDays(month).map((day, index) => day ? <button type="button" key={day} aria-label={formatDateForDisplay(day)} aria-current={day === dates[0] ? 'date' : undefined} aria-pressed={date === day} className={date === day ? 'selected' : ''} disabled={!dates.includes(day)} onClick={() => chooseDate(day)}>{Number(day.slice(-2))}{day === dates[0] && <i />}</button> : <span key={`blank-${index}`} />)}</div>
               <p className="employee-calendar-note"><span /> Today <span className="employee-legend-square" /> Selected date</p>
             </div>
-            <div className="employee-time-panel"><h2>Start time <span>{new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })}</span></h2>
-              <label className="employee-duration">Session length<EmployeeSelect aria-label="Session length" value={count} onChange={(event) => { setCount(Number(event.target.value)); setStart('') }}>{Array.from({ length: 15 }, (_, index) => index + 2).map((slots) => <option key={slots} value={slots}>{formatBookingDuration(slots)}</option>)}</EmployeeSelect></label>
-              <div className="employee-times" role="group" aria-label="Available start times" aria-busy={!currentAvailability}>{daySlots.map((slot, index) => {
-                const hour = Number(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hourCycle: 'h23', timeZone: 'America/Los_Angeles' }).format(slot.start))
-                if (!overnight && (hour < 8 || hour >= 22)) return null
+            <div className="employee-time-panel"><h2>Start time <span>{dateLabel}</span></h2>
+              <label className="employee-duration">Session length<EmployeeSelect aria-label="Session length" value={count} onChange={(event) => { stopSearch(); setCount(Number(event.target.value)); setStart('') }}>{Array.from({ length: 15 }, (_, index) => index + 2).map((slots) => <option key={slots} value={slots}>{formatBookingDuration(slots)}</option>)}</EmployeeSelect></label>
+              <div className="employee-periods" role="group" aria-label="Time of day">{(['morning', 'afternoon', 'evening'] as const).map((value) => <button type="button" key={value} aria-pressed={period === value} onClick={() => setPeriod(value)}>{value[0].toUpperCase() + value.slice(1)}</button>)}</div>
+              {period === 'overnight' && <p className="employee-overnight-label">Overnight · 10 PM to 8 AM</p>}
+              <div className="employee-times" role="group" aria-label="Available start times" aria-busy={!currentAvailability || searching}>{visibleSlots.map((slot) => {
                 const iso = slot.start.toISOString()
-                return <button type="button" key={iso} disabled={!canFit(index)} aria-pressed={start === iso} className={start === iso ? 'selected' : ''} onClick={() => setStart(iso)}>{formatTimeForDisplay(slot.start)}</button>
+                return <button type="button" key={iso} disabled={!canFit(slot.index) || searching} aria-pressed={start === iso} className={start === iso ? 'selected' : ''} onClick={() => { setStart(iso); setSearchMessage('') }}>{formatTimeForDisplay(slot.start)}</button>
               })}</div>
-              <div className="employee-time-help" aria-live="polite">{!currentAvailability ? 'Checking availability…' : availability.error ? <><span>{availability.error}</span><button type="button" onClick={() => setRefresh((value) => value + 1)}>Retry</button></> : 'Unavailable times include booked sessions and turnaround.'}</div>
-              <button type="button" className="employee-text-button" onClick={() => setOvernight(!overnight)}>{overnight ? 'Show daytime hours' : 'Show overnight hours'} <span aria-hidden="true">↗</span></button>
+              <div className="employee-time-help" aria-live="polite">{!currentAvailability ? 'Checking availability…' : availability.error ? <><span>{availability.error}</span><button type="button" onClick={() => setRefresh((value) => value + 1)}>Retry</button></> : !periodSlots.some((slot) => canFit(slot.index)) ? `No ${period} start times fit ${formatBookingDuration(count)}. Try another time of day or date.` : 'Available times include room turnaround.'}</div>
+              <div className="employee-time-options"><button type="button" className="employee-text-button" aria-pressed={period === 'overnight'} onClick={() => setPeriod(period === 'overnight' ? 'morning' : 'overnight')}>{period === 'overnight' ? 'Daytime hours' : 'Overnight hours'}</button><button type="button" className="employee-text-button" aria-pressed={showUnavailable} onClick={() => setShowUnavailable(!showUnavailable)}>{showUnavailable ? 'Hide unavailable' : 'Show unavailable'}</button></div>
             </div>
-            <div className="employee-turnaround"><EmployeeBookingIcon name="clock" /><p><strong>Room to reset.</strong> We reserve 30 minutes after the session for studio turnaround, at no extra charge.</p></div>
+            <div className="employee-turnaround" role="status"><EmployeeBookingIcon name="clock" />{start && end ? <div><strong>{dateLabel} · {timeLabel}</strong><p>{result?.phase === 'cancelled' ? 'This reservation has been cancelled.' : result || (currentAvailability && canFit(startIndex)) ? <>Turnaround ends at {formatTimeForDisplay(addMinutes(end, 30))}. The extra 30 minutes are included.</> : 'Checking this time. It may no longer be available.'}</p></div> : <p><strong>Room to reset.</strong> We reserve 30 minutes after the session for studio turnaround, at no extra charge.</p>}</div>
           </section>
-          <section className="employee-card employee-details"><div className="employee-section-heading"><h2>Session details</h2><span>Make it their own</span></div>
-            {setups.length > 0 && <label>Studio setup<EmployeeSelect required value={setupId} onChange={(event) => setSetupId(event.target.value)}><option value="">Choose a setup</option>{setups.map((option) => <option value={option.id} key={option.id}>{option.label}</option>)}</EmployeeSelect></label>}
+          <section className="employee-card employee-details" ref={detailsRef} tabIndex={-1} aria-label="Session details"><div className="employee-section-heading"><h2>Session details</h2><span>Make it their own</span></div>
+            {setups.length > 0 && <EmployeeSetupPicker options={setups} value={setupId} onChange={setSetupId} />}
             <div className="employee-addons">{BOOKING_ADD_ONS.map((addon) => {
               const selected = addOnIds.includes(addon.id)
               const unavailable = addon.id === 'teleprompter' && !teleprompterReady
-              return <label key={addon.id} className={selected ? 'employee-addon is-selected' : 'employee-addon'}><input type="checkbox" checked={selected} disabled={unavailable && !selected} onChange={() => setAddOnIds((ids) => selected ? ids.filter((id) => id !== addon.id) : [...ids, addon.id])} /><span><strong>{addon.name}</strong><small>{unavailable ? start ? 'Unavailable or not yet verified' : 'Choose a time to check' : bookingAddOnRateLabel(addon)}</small></span></label>
+              return <label key={addon.id} className={selected ? 'employee-addon is-selected' : 'employee-addon'}><input type="checkbox" checked={selected} disabled={unavailable && !selected} onChange={() => setAddOnIds((ids) => selected ? ids.filter((id) => id !== addon.id) : [...ids, addon.id])} /><span><strong>{addon.name}</strong><small>{bookingAddOnRateLabel(addon)}</small>{unavailable && <small className="employee-addon-availability">{start ? 'Unavailable or not yet verified' : 'Choose a time to check'}</small>}</span></label>
             })}</div>
             {addOnIds.includes('remote-podcast') && <label>Remote platform <span className="employee-optional">Optional</span><input value={platform} onChange={(event) => setPlatform(event.target.value)} placeholder="Riverside, Zoom, or another platform" maxLength={60} /></label>}
             <p className="employee-quiet-note">Only this studio is reserved. Coordinate operators and cameras separately for overlapping employee bookings.</p>
           </section>
-          <section className="employee-card employee-details"><div className="employee-section-heading"><h2>Client details</h2><span>Who’s coming in?</span></div>
+          <section className="employee-card employee-details" ref={clientRef} tabIndex={-1} aria-label="Client details"><div className="employee-section-heading"><h2>Client details</h2><span>Who’s coming in?</span></div>
             <div className="employee-client-grid"><label>Full name<input required autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Client’s full name" maxLength={120} /></label><label>Email address<input required type="email" autoComplete="email" value={clientEmail} onChange={(event) => setClientEmail(event.target.value)} placeholder="client@example.com" maxLength={254} /></label><label>Phone number <span className="employee-optional">Optional</span><input type="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="(415) 555-0123" maxLength={40} /></label><label>Internal note <span className="employee-optional">Optional</span><input value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Anything the team should know" maxLength={1000} /></label></div>
-            <div className="employee-payment-note"><span aria-hidden="true">↗</span><div><strong>Payment link sent automatically</strong><p>The client receives a secure Stripe invoice. No card or upfront payment needed here.</p></div></div>
+            <div className="employee-payment-note"><span aria-hidden="true">↗</span><div><strong>{preview ? 'Try the booking flow' : 'Payment link sent automatically'}</strong><p>{preview ? 'Use sample client details. This preview does not send invoices or create real bookings.' : 'The client receives a secure Stripe invoice. No card or upfront payment needed here.'}</p></div></div>
           </section>
         </fieldset>
         <aside className="employee-summary-column">
-          <section className="employee-card employee-summary"><div className="employee-section-heading"><h2>Your session</h2><span className="employee-small-badge">{result?.phase === 'cancelled' ? 'Cancelled' : result ? 'Reserved' : 'New booking'}</span></div>
+          <section className="employee-card employee-summary" ref={summaryRef} tabIndex={-1} aria-label="Review your session"><div className="employee-section-heading"><h2>Your session</h2>{preview && <span className="employee-small-badge">Preview</span>}</div>
             <div className="employee-session-photo"><Image src={setup?.image || studio.heroImage} alt={setup?.alt || studio.name} fill sizes="(max-width: 1100px) 90vw, 360px" priority /></div>
             <h3>{studio.name}</h3><p className="employee-summary-subtitle">{studio.type === 'podcast' ? 'Podcast session' : 'Studio rental'}</p>
             <EmployeeSessionDetails
-              date={new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })}
-              time={start && end ? `${formatTimeForDisplay(new Date(start))} – ${formatTimeForDisplay(end)}` : 'Choose a start time'}
+              date={dateLabel}
+              time={timeLabel}
               duration={formatBookingDuration(count)}
               setup={setup?.label || (setups.length ? 'Choose a setup' : 'Standard studio setup')}
               rate={`${money(studio.price * 100)}/hr`}
-              addOns={addOns.map((addon) => ({ id: addon.id, name: addon.name, price: addon.amountCents ? money(addon.amountCents) : 'Included' }))}
+              addOns={[]}
             />
-            <div className="employee-total"><span>Session total</span><strong>{money(result?.total || total)}</strong></div>
-            {!result && <><button className="employee-primary" type="submit" disabled={busy || (!ready && !attempted)}>{busy ? 'Creating reservation…' : attempted ? 'Retry this booking' : preview ? 'Try creating a booking' : 'Create booking & send link'}<span aria-hidden="true">→</span></button><p className="employee-summary-help">{!start ? 'Choose a start time to continue.' : !sessionReady ? 'Complete your setup and select an available session.' : !name.trim() || !clientEmail.trim() ? 'Add the client’s name and email to continue.' : 'No payment is collected now.'}</p></>}
+            <dl className="employee-price-breakdown"><div><dt>Studio · {formatBookingDuration(count)}</dt><dd>{money(Math.round(studio.price * count / 2 * 100))}</dd></div>{addOns.map((addon) => <div key={addon.id}><dt>{addon.name}</dt><dd>{addon.amountCents ? money(addon.amountCents) : 'No charge'}</dd></div>)}</dl>
+            {!result && <div className="employee-summary-edit" aria-label="Edit booking details"><button type="button" disabled={locked} onClick={() => focusSection(scheduleRef.current)}>Edit time</button><button type="button" disabled={locked} onClick={() => focusSection(detailsRef.current)}>Edit extras</button><button type="button" disabled={locked} onClick={() => focusSection(clientRef.current)}>Edit client</button></div>}
+            <div className="employee-total"><span>Session total</span><strong>{money(result?.total ?? total)}</strong></div>
+            {!result && <><button className="employee-primary" type="submit" disabled={busy || (!ready && !attempted)} aria-describedby="employee-next-action">{busy ? 'Creating reservation…' : attempted ? 'Retry this booking' : preview ? 'Create preview booking' : 'Reserve & send payment link'}<span aria-hidden="true">→</span></button><p className="employee-summary-help" id="employee-next-action" role="status">{nextAction}</p></>}
             {error && <p className="employee-notice" role="alert">{error}</p>}
-            {result && <div className="employee-result" ref={resultRef} tabIndex={-1} role="status"><span className="employee-result-check" aria-hidden="true">✓</span><h3>{result.phase === 'cancelled' ? 'Reservation cancelled.' : preview ? 'Preview booking created.' : 'Studio reserved.'}</h3><p>{result.phase === 'cancelled' ? 'The room and selected equipment are available again. The payment link is no longer payable.' : preview ? 'Nothing was sent or charged. This room is now reserved in this preview only.' : `The payment request was sent to ${clientEmail}.`}</p>
+            {result && status && <div className="employee-result" ref={resultRef} tabIndex={-1} role="status"><span className="employee-result-check" aria-hidden="true">✓</span><h3>{result.phase === 'cancelled' ? 'Reservation cancelled.' : preview ? 'Preview booking created.' : 'Studio reserved.'}</h3>
+              <dl className="employee-result-status"><div><dt>Reservation</dt><dd>{status.reservation}</dd></div><div><dt>Payment</dt><dd>{status.payment}</dd></div><div><dt>Payment request</dt><dd>{status.delivery}</dd></div></dl>
+              <p>{result.phase === 'cancelled' ? 'The room and selected equipment are available again. The payment link is no longer payable.' : preview ? 'Nothing was sent or charged. This room is now reserved in this preview only.' : result.emailed ? `Stripe accepted the email request for ${clientEmail}. Delivery to their inbox is not confirmed here.` : 'The studio is reserved, but the payment email has not been sent.'}</p>
+              <p className="employee-result-client">{name}<br />{clientEmail}</p>
               {result.paymentUrl && result.phase !== 'cancelled' && <button type="button" className="employee-secondary" onClick={async () => { try { await navigator.clipboard.writeText(result.paymentUrl!); setCopied(true) } catch { setError('Could not copy the link. Please use the invoice in Stripe.') } }}>{copied ? 'Payment link copied ✓' : 'Copy payment link'}</button>}
               <button type="button" className="employee-primary" onClick={newBooking} disabled={busy}>Create another booking →</button>
-              {result.phase !== 'cancelled' && <button type="button" className="employee-text-button" disabled={busy} onClick={() => setCancelPrompt(!cancelPrompt)}>Cancel unpaid reservation</button>}
-              {cancelPrompt && <div className="employee-notice"><p>Release this studio and disable the payment link?</p><button type="button" className="employee-secondary" onClick={cancel} disabled={busy}>{busy ? 'Cancelling…' : 'Yes, cancel reservation'}</button></div>}
+              {result.phase !== 'cancelled' && result.phase !== 'paid' && <button type="button" className="employee-text-button" disabled={busy} aria-expanded={cancelPrompt} onClick={() => setCancelPrompt(!cancelPrompt)}>Cancel unpaid reservation</button>}
+              {cancelPrompt && <div className="employee-notice"><p>{preview ? 'Release this sample studio and equipment reservation?' : 'Release this studio and disable the payment link?'}</p><button type="button" className="employee-secondary" onClick={cancel} disabled={busy}>{busy ? 'Cancelling…' : 'Yes, cancel reservation'}</button><button type="button" className="employee-text-button" onClick={() => setCancelPrompt(false)} disabled={busy}>Keep reservation</button></div>}
             </div>}
           </section>
-          <div className="employee-reservation-note"><span aria-hidden="true">◇</span><p><strong>Reserved, not paid.</strong> The room stays reserved until a team member cancels. {end && <>Turnaround ends at {formatTimeForDisplay(addMinutes(end, 30))}.</>}</p></div>
+          {result?.phase !== 'cancelled' && result?.phase !== 'paid' && <div className="employee-reservation-note"><span aria-hidden="true">◇</span><p><strong>Reserve now. Payment later.</strong> {preview ? 'Preview reservations reset when you reload.' : 'Unpaid reservations stay reserved until a team member cancels.'} {end && <>Turnaround ends at {formatTimeForDisplay(addMinutes(end, 30))}.</>}</p></div>}
         </aside>
       </form>
+      {!result && <EmployeeMobileReview total={money(total)} detail={start ? dateLabel : 'Choose a session'} onReview={() => focusSection(summaryRef.current)} />}
       <footer className="employee-footer"><span>VibeShack Studios · Team workspace</span><div className="employee-footer-actions"><Link href="/employee/">Employee access</Link>{!preview && <form action="/api/employee/auth/logout" method="post"><button type="submit" title={email}>Sign out</button></form>}</div></footer>
     </div>
   </>

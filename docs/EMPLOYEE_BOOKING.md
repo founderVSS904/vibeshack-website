@@ -24,10 +24,35 @@ unidentified manual busy events continue to block conservatively.
 The employee workspace keeps its one-page grouped cards, with the customer
 checkout's larger type scale, full weekday labels, neutral selection/focus
 states, rounded 48px controls, icon-led summary rows, and red booking action.
-Studio, duration and setup selectors share EmployeeSelect, which preserves
-native select semantics and mobile pickers. At narrower widths the summary
-and then calendar/time panels stack without shrinking essential text.
+Studio and duration selectors share EmployeeSelect, which preserves native
+select semantics and mobile pickers. Setup choices are required native radio
+cards with the existing catalog photos. At narrower widths the summary and
+then calendar/time panels stack without shrinking essential text.
 This presentation change does not alter employee or public booking rules.
+
+The faster-booking follow-up adds Today/Tomorrow shortcuts and a cancellable
+Next available search across the next seven days, including overnight hours.
+The search uses verified employee availability, the selected duration and the
+same consecutive-slot fit test. A verification failure stops the search; it
+never guesses availability. Studio/date/duration changes cancel pending
+searches so late responses cannot change a newer choice. Teleprompter inventory
+is still independently checked for the resulting session.
+
+Time buttons are grouped by Pacific morning/afternoon/evening/overnight, with
+unavailable starts hidden by default and an explicit show toggle. No nested
+time-list scrolling is needed. The selected range and turnaround end appear
+directly below the scheduler. The summary uses a smaller image, stronger date
+and time, a studio subtotal and itemized add-ons, and edit shortcuts that focus
+the relevant section. Teleprompter pricing remains visible before availability
+is known. The narrow-screen review bar only moves focus to the summary; it
+cannot submit. It hides while editing inputs or when the virtual keyboard
+reduces the viewport, and includes safe-area spacing.
+
+Result status separates reservation, payment and email-request acceptance.
+Acceptance is not claimed as inbox delivery. Preview success always says that
+nothing was sent or charged, with no fake payment link. Paid results do not
+offer unpaid cancellation. Broader history, in-place rescheduling and real
+account activation remain outside this local UI follow-up.
 
 Pending-payment policy currently defaults to keeping the reservation until
 staff cancels it. Tay was asked to confirm this policy; no answer was received

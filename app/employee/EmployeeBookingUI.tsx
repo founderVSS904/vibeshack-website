@@ -1,4 +1,7 @@
-import React, { type SelectHTMLAttributes } from 'react'
+'use client'
+import Image from 'next/image'
+import React, { useEffect, useState, type SelectHTMLAttributes } from 'react'
+import type { StudioSetup } from '@/lib/booking/studio-setups'
 
 type IconName = 'calendar' | 'clock' | 'duration' | 'setup' | 'rate' | 'plus' | 'chevron'
 
@@ -42,4 +45,39 @@ export function EmployeeSessionDetails({ date, time, duration, setup, rate, addO
     {rows.map(({ label, value, icon }) => <div key={label}><dt><EmployeeBookingIcon name={icon} /><span>{label}</span></dt><dd>{value}</dd></div>)}
     {addOns.map((addOn) => <div key={addOn.id}><dt><EmployeeBookingIcon name="plus" /><span>{addOn.name}</span></dt><dd>{addOn.price}</dd></div>)}
   </dl>
+}
+
+export function EmployeeSetupPicker({ options, value, onChange }: { options: readonly StudioSetup[]; value: string; onChange: (id: string) => void }) {
+  return <fieldset className="employee-setup-picker"><legend>Studio setup</legend>
+    <div className="employee-setup-options">{options.map((option) => <label key={option.id} className={`employee-setup-option${value === option.id ? ' is-selected' : ''}`}>
+      <input type="radio" name="studio-setup" value={option.id} checked={value === option.id} onChange={() => onChange(option.id)} required />
+      <span className="employee-setup-photo"><Image src={option.image} alt="" fill sizes="(max-width: 480px) 80px, (max-width: 1100px) 30vw, 220px" /></span>
+      <span className="employee-setup-caption"><strong>{option.label}</strong><span>{option.chairs} {option.chairs === 1 ? 'seat' : 'seats'}</span></span>
+      <span className="employee-setup-check" aria-hidden="true">{value === option.id ? '✓' : ''}</span>
+    </label>)}</div>
+  </fieldset>
+}
+
+export function EmployeeMobileReview({ total, detail, onReview }: { total: string; detail: string; onReview: () => void }) {
+  const [keyboardOpen, setKeyboardOpen] = useState(false)
+  useEffect(() => {
+    const update = () => {
+      const target = document.activeElement
+      const editing = target instanceof HTMLElement && target.matches('input:not([type=radio]):not([type=checkbox]), textarea, select, [contenteditable=true]')
+      const reducedViewport = Boolean(window.visualViewport && window.visualViewport.height < window.innerHeight * .75)
+      setKeyboardOpen(editing || reducedViewport)
+    }
+    document.addEventListener('focusin', update)
+    document.addEventListener('focusout', update)
+    window.visualViewport?.addEventListener('resize', update)
+    return () => {
+      document.removeEventListener('focusin', update)
+      document.removeEventListener('focusout', update)
+      window.visualViewport?.removeEventListener('resize', update)
+    }
+  }, [])
+  return <div className={`employee-mobile-review${keyboardOpen ? ' is-hidden' : ''}`} role="region" aria-label="Booking review shortcut">
+    <div><span>Session total</span><strong>{total}</strong><small>{detail}</small></div>
+    <button type="button" className="employee-primary" onClick={onReview}>Review booking <span aria-hidden="true">↑</span></button>
+  </div>
 }
