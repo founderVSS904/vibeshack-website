@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
 import React, { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { EmployeeMobileReview, EmployeeSelect, EmployeeSessionDetails, EmployeeSetupPicker } from '../app/employee/EmployeeBookingUI'
+import { EmployeeBookingProgress, EmployeeBookingSubmit, EmployeeSelect, EmployeeSessionDetails, EmployeeSessionRecap, EmployeeSetupPicker, EmployeeStepPanel } from '../app/employee/EmployeeBookingUI'
 import { EXECUTIVE_SETUPS, WING_SETUPS } from '../lib/booking/studio-setups'
 import EmployeeBookingPage from '../app/employee/EmployeeBookingPage'
 
@@ -41,22 +41,23 @@ describe('employee booking presentation', () => {
     assert.match(html, /role="group" aria-label="Available start times"/)
     assert.match(html, /employee-select--studio/)
     assert.match(html, /aria-label="Session length"/)
-    assert.match(html, /Only this studio is reserved/)
     assert.match(html, /30 minutes after the session/)
-    assert.match(html, /Create preview booking/)
-    assert.match(html, /autoComplete="name"/)
-    assert.match(html, /autoComplete="email"/)
+    assert.match(html, /Continue to setup/)
+    assert.doesNotMatch(html, /type="submit"/)
+    assert.doesNotMatch(html, /autoComplete="name"|autoComplete="email"/)
+    assert.doesNotMatch(html, /name="studio-setup"|Optional extras|Final review/)
+    assert.equal((html.match(/aria-label="Session length"/g) || []).length, 1)
     assert.doesNotMatch(html, /One session at a time across all podcast studios/)
   })
 
-  test('exposes quick dates, time groups and edit shortcuts without replacing the calendar', () => {
+  test('exposes quick dates and time groups with a compact summary on the first step', () => {
     const html = renderToStaticMarkup(createElement(EmployeeBookingPage, { email: '', preview: true, enabled: true }))
-    for (const text of ['Today', 'Tomorrow', 'Next available', 'Morning', 'Afternoon', 'Evening', 'Overnight hours', 'Show unavailable', 'Edit time', 'Edit extras', 'Edit client']) assert.ok(html.includes(text), text)
+    for (const text of ['Today', 'Tomorrow', 'Next available', 'Morning', 'Afternoon', 'Evening', 'Overnight hours', 'Show unavailable']) assert.ok(html.includes(text), text)
     assert.match(html, /aria-label="Quick date selection"/)
     assert.match(html, /aria-label="Time of day"/)
-    assert.match(html, /aria-label="Review your session"/)
+    assert.match(html, /aria-label="Session at a glance"/)
     assert.match(html, /id="employee-search-message" role="status"/)
-    assert.match(html, /aria-describedby="employee-next-action"/)
+    assert.match(html, /aria-describedby="employee-session-help"/)
   })
 
   test('setup photos use native required radios with a single selection and real catalog assets', () => {
@@ -72,28 +73,40 @@ describe('employee booking presentation', () => {
     }
   })
 
-  test('teleprompter rate is visible before a start time is chosen and its availability remains disabled', () => {
-    const html = renderToStaticMarkup(createElement(EmployeeBookingPage, { email: '', preview: true, enabled: true }))
-    assert.match(html, /type="checkbox" disabled=""\/><span><strong>Teleprompter<\/strong><small>\$50\/session<\/small>/)
-    assert.match(html, /Choose a time to check/)
-    assert.match(html, /Studio · /)
-    assert.match(html, /Use sample client details/)
+  test('inactive steps are unmounted, not merely visually hidden required controls', () => {
+    const requiredField = createElement('input', { type: 'email', required: true, name: 'client-email' })
+    assert.equal(renderToStaticMarkup(createElement(EmployeeStepPanel, { active: 1, step: 3 }, requiredField)), '')
+    assert.equal(renderToStaticMarkup(createElement(EmployeeStepPanel, { active: 2, step: 3 }, requiredField)), '')
+    assert.match(renderToStaticMarkup(createElement(EmployeeStepPanel, { active: 3, step: 3 }, requiredField)), /type="email" required=""/)
   })
 
-  test('mobile review is a navigation button, never a second booking submission', () => {
-    const html = renderToStaticMarkup(createElement(EmployeeMobileReview, { total: '$800', detail: 'Sun, Sep 27', onReview: () => {} }))
-    assert.match(html, /role="region" aria-label="Booking review shortcut"/)
-    assert.match(html, /<button type="button"/)
-    assert.match(html, /Review booking/)
-    assert.match(html, /\$800/)
+  test('progress marks the current step and disables unreached steps without submitting', () => {
+    const html = renderToStaticMarkup(createElement(EmployeeBookingProgress, { step: 1, canVisit: (step) => step === 1, onVisit: () => {} }))
+    assert.match(html, /aria-label="Booking steps"/)
+    assert.equal((html.match(/aria-current="step"/g) || []).length, 1)
+    assert.equal((html.match(/disabled=""/g) || []).length, 2)
+    assert.equal((html.match(/type="button"/g) || []).length, 3)
     assert.doesNotMatch(html, /type="submit"/)
   })
 
   test('production action describes the real side effects while preview action stays explicitly simulated', () => {
-    const production = renderToStaticMarkup(createElement(EmployeeBookingPage, { email: 'staff@example.test', enabled: true }))
+    const props = { busy: false, attempted: false, disabled: false, help: 'No payment collected now.' }
+    const production = renderToStaticMarkup(createElement(EmployeeBookingSubmit, { ...props, preview: false }))
     assert.match(production, /Reserve &amp; send payment link/)
     assert.doesNotMatch(production, /Create preview booking/)
+    const preview = renderToStaticMarkup(createElement(EmployeeBookingSubmit, { ...props, preview: true }))
+    assert.match(preview, /Create preview booking/)
+    const retry = renderToStaticMarkup(createElement(EmployeeBookingSubmit, { ...props, attempted: true, preview: false }))
+    assert.match(retry, /Retry this booking/)
     const disabled = renderToStaticMarkup(createElement(EmployeeBookingPage, { email: '', enabled: false }))
     assert.match(disabled, /Employee booking is not activated yet/)
+  })
+
+  test('later steps use a small text recap without repeating the room photo or full pricing', () => {
+    const html = renderToStaticMarkup(createElement(EmployeeSessionRecap, { studio: 'The Executive', date: 'Sun, Sep 27', time: '3:00 PM – 5:00 PM', duration: '2 hours', onEdit: () => {}, locked: false }))
+    for (const text of ['The Executive', 'Sun, Sep 27', '3:00 PM – 5:00 PM', '2 hours', 'Change session']) assert.ok(html.includes(text))
+    assert.doesNotMatch(html, /<img|type="submit"|Final review/)
+    const locked = renderToStaticMarkup(createElement(EmployeeSessionRecap, { studio: 'The Executive', date: 'Sun, Sep 27', time: '3:00 PM – 5:00 PM', duration: '2 hours', onEdit: () => {}, locked: true }))
+    assert.match(locked, /disabled=""/)
   })
 })

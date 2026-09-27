@@ -187,7 +187,6 @@
 .employee-result .employee-primary { margin-top: 12px; }
 .employee-result-status { margin: 16px 0; padding: 12px 0; border-block: 1px solid #ffffff1a; }
 .employee-result .employee-result-client { color: #f5f5f7; }
-.employee-mobile-review { display: none; }
 .employee-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-top: 1px solid #ffffff12; padding: 24px 0; margin-top: 40px; color: var(--employee-muted); font-size: 12px; }
 .employee-footer-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px 20px; }
 .employee-footer-actions a, .employee-footer-actions button { display: inline-flex; align-items: center; min-height: 44px; }
@@ -206,17 +205,10 @@
 @media (max-width: 1100px) {
   .employee-booking-grid { grid-template-columns: 1fr; gap: 24px; }
   .employee-summary-column { position: static; }
-  .employee-workspace { padding-inline: 24px; padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)); }
+  .employee-workspace { padding-inline: 24px; }
   .employee-summary { padding: 28px; }
   .employee-session-photo { aspect-ratio: 2.4; }
   .employee-timezone { white-space: normal; text-align: right; }
-  .employee-mobile-review { display: flex; align-items: center; justify-content: space-between; gap: 20px; position: fixed; z-index: 40; bottom: 0; inset-inline: 0; padding: 14px max(24px, env(safe-area-inset-right, 0px)) calc(14px + env(safe-area-inset-bottom, 0px)); background: #141416f5; border-top: 1px solid #ffffff26; backdrop-filter: blur(16px); }
-  .employee-mobile-review.is-hidden { display: none; }
-  .employee-mobile-review > div { display: grid; min-width: 0; }
-  .employee-mobile-review span, .employee-mobile-review small { color: var(--employee-secondary); font-size: 12px; line-height: 1.4; }
-  .employee-mobile-review strong { font-size: 24px; font-weight: 600; line-height: 1.3; }
-  .employee-mobile-review button { width: auto; flex-shrink: 0; }
-  .employee-mobile-review button span { color: inherit; font-size: 18px; }
 }
 @media (max-width: 740px) {
   .employee-schedule { grid-template-columns: 1fr; }
@@ -227,7 +219,7 @@
   .employee-session-photo { aspect-ratio: 2.8; }
 }
 @media (max-width: 480px) {
-  .employee-workspace { padding: 24px 16px calc(112px + env(safe-area-inset-bottom, 0px)); }
+  .employee-workspace { padding: 24px 16px 0; }
   .employee-page-heading { margin: 12px 0 28px; }
   .employee-app h1 { font-size: 34px; letter-spacing: -1.2px; }
   .employee-page-heading p { font-size: 15px; }
@@ -249,8 +241,6 @@
   .employee-setup-photo { width: 80px; aspect-ratio: auto; min-height: 92px; align-self: stretch; flex-shrink: 0; }
   .employee-setup-caption { padding: 14px 30px 14px 12px; }
   .employee-setup-check { bottom: calc(50% - 9px); right: 8px; }
-  .employee-mobile-review { gap: 12px; padding-inline: 16px; }
-  .employee-mobile-review button { font-size: 14px; padding-inline: 12px; gap: 6px; }
   .employee-studio-strip { gap: 10px 14px; padding: 18px; }
   .employee-room-thumb { width: 56px; height: 48px; }
   .employee-studio-label { flex-basis: calc(100% - 70px); }
@@ -269,5 +259,89 @@
   .employee-select > svg { display: none; }
   .employee-app input:not([type=checkbox]):not([type=radio]):focus, .employee-app .employee-select select:focus { outline-color: Highlight !important; }
   .employee-setup-option.is-selected, .employee-periods button[aria-pressed=true], .employee-schedule-shortcuts button[aria-pressed=true] { border: 2px solid Highlight; }
+}
+/* Each stage gets its own surface. The full review only appears at step 3. */
+.employee-workspace { max-width: 1360px; }
+.employee-workspace--step-2, .employee-workspace--step-3 { max-width: 1160px; }
+.employee-progress { margin: 12px 0 40px; }
+.employee-progress ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); list-style: none; padding: 0; margin: 0; gap: 24px; }
+.employee-progress button { width: 100%; min-height: 60px; display: flex; align-items: center; gap: 12px; padding: 0 0 16px; border-bottom: 1px solid #ffffff26; color: var(--employee-secondary); text-align: left; font-size: 15px; }
+.employee-progress button[aria-current=step] { border-color: #f5f5f7; color: #fff; }
+.employee-progress button:disabled { color: #85858f; }
+.employee-step-number { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #ffffff40; border-radius: 50%; font-size: 13px; flex-shrink: 0; }
+.employee-progress button[aria-current=step] .employee-step-number { background: #fff; color: #141416; border-color: #fff; }
+.employee-page-heading h1 { scroll-margin-top: 112px; }
+.employee-page-heading h1:focus { outline: none !important; }
+.employee-booking-grid--step-1 { grid-template-columns: minmax(0, 1fr) 280px; gap: 32px; }
+.employee-booking-grid--step-2 { grid-template-columns: 1fr; }
+.employee-booking-grid--step-3 { grid-template-columns: minmax(0, 1fr) 400px; gap: 32px; }
+.employee-booking-grid--complete { grid-template-columns: minmax(0, 720px); justify-content: center; }
+.employee-booking-grid--complete .employee-summary-column { position: static; }
+.employee-compact-summary { padding: 24px; position: sticky; top: 104px; }
+.employee-compact-summary h3 { font-size: 20px; font-weight: 600; line-height: 1.4; margin-top: 24px; }
+.employee-compact-summary dl { display: grid; gap: 18px; margin: 24px 0 0; }
+.employee-compact-summary dt { color: var(--employee-secondary); font-size: 13px; margin-bottom: 4px; }
+.employee-compact-summary dd { font-size: 16px; margin: 0; line-height: 1.5; }
+.employee-compact-summary .employee-total { margin-top: 24px; border-top: 1px solid #ffffff1a; }
+.employee-compact-summary .employee-total strong { font-size: 26px; }
+.employee-compact-summary .employee-primary { font-size: 14px; padding-inline: 10px; }
+.employee-session-recap { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-block: 1px solid #ffffff26; padding: 20px 0; margin: 0 0 32px; }
+.employee-session-recap strong { font-size: 16px; font-weight: 500; }
+.employee-session-recap p { font-size: 14px; color: var(--employee-secondary); margin-top: 6px; }
+.employee-session-recap button { flex-shrink: 0; min-height: 44px; color: #dedee4; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+.employee-extras-step { padding: 32px; }
+.employee-extras-step .employee-setup-picker legend { font-size: 20px; font-weight: 600; margin-bottom: 24px; }
+.employee-extras-step .employee-setup-options { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.employee-extras-step .employee-setup-option { flex-direction: column; align-items: stretch; }
+.employee-extras-step .employee-setup-photo { width: 100%; aspect-ratio: 1.65; min-height: 0; }
+.employee-extras-step .employee-setup-caption { padding: 18px 40px 18px 16px; }
+.employee-extras-step .employee-setup-caption strong { font-size: 16px; }
+.employee-extras-step .employee-setup-check { right: 14px; bottom: 20px; }
+.employee-extras-heading { margin-top: 36px; padding-top: 28px; border-top: 1px solid #ffffff1a; }
+.employee-extras-heading p, .employee-standard-setup p { font-size: 14px; color: var(--employee-secondary); margin-top: 8px; }
+.employee-step-actions { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.employee-step-actions > div { max-width: 380px; text-align: right; }
+.employee-step-actions .employee-primary { width: auto; min-width: 240px; margin-left: auto; }
+.employee-step-actions p { color: var(--employee-secondary); font-size: 14px; margin-top: 12px; }
+.employee-step-actions .employee-step-total { margin: 0 0 14px; color: #f5f5f7; }
+.employee-step-total strong { margin-left: 12px; font-size: 20px; }
+.employee-back-button { justify-self: start; }
+.employee-booking-grid--step-3 .employee-client-grid { grid-template-columns: 1fr; }
+.employee-booking-grid--step-3 .employee-summary-column { position: static; }
+.employee-booking-grid--step-3 .employee-summary-edit { justify-content: flex-start; gap: 24px; }
+
+@media (max-width: 1100px) {
+  .employee-booking-grid--step-1 { grid-template-columns: 1fr; }
+  .employee-compact-summary { position: static; }
+  .employee-compact-summary dl { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .employee-compact-summary .employee-primary { max-width: 320px; margin-left: auto; }
+  .employee-compact-summary .employee-summary-help { text-align: right; }
+  .employee-booking-grid--step-3 { grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; }
+  .employee-booking-grid--step-3.employee-booking-grid--complete { grid-template-columns: minmax(0, 720px); }
+}
+@media (max-width: 900px) {
+  .employee-booking-grid--step-3 { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .employee-progress { margin: 4px 0 28px; }
+  .employee-progress ol { gap: 12px; }
+  .employee-progress button { flex-direction: column; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.4; padding-bottom: 14px; }
+  .employee-progress button > span:last-child { min-height: 40px; }
+  .employee-page-heading { margin-bottom: 28px; }
+  .employee-session-recap { align-items: flex-start; flex-direction: column; gap: 4px; margin-bottom: 24px; }
+  .employee-session-recap p span { display: block; margin-top: 4px; }
+  .employee-extras-step { padding: 24px 18px; }
+  .employee-extras-step .employee-setup-options { grid-template-columns: 1fr; }
+  .employee-step-actions { flex-direction: column-reverse; align-items: stretch; gap: 12px; }
+  .employee-step-actions > div { max-width: none; text-align: left; }
+  .employee-step-actions .employee-primary { width: 100%; min-width: 0; }
+  .employee-compact-summary { padding: 24px 18px; }
+  .employee-compact-summary dl { grid-template-columns: 1fr; gap: 16px; }
+  .employee-compact-summary .employee-primary { max-width: none; }
+  .employee-compact-summary .employee-summary-help { text-align: center; }
+}
+@media (forced-colors: active) {
+  .employee-progress button[aria-current=step] { border-bottom: 3px solid Highlight; }
+  .employee-progress button[aria-current=step] .employee-step-number { border-color: Highlight; }
 }
 @media (prefers-reduced-motion: reduce) { .employee-app * { transition: none !important; scroll-behavior: auto !important; } }

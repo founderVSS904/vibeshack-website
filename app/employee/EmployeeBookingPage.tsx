@@ -8,7 +8,8 @@ import { BOOKING_ADD_ONS, bookingAddOnRateLabel, bookingAddOnTotalCents, priceBo
 import { addMinutes, bookingDateRange, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay } from '@/lib/booking/time'
 import { previewSlots, previewTeleprompterAvailable, type PreviewReservation } from '@/lib/employee/preview'
 import { employeeResultStatus, findNextEmployeeSession, sessionFits, timePeriod, type TimePeriod } from '@/lib/employee/scheduling-ui'
-import { EmployeeBookingIcon, EmployeeMobileReview, EmployeeSelect, EmployeeSessionDetails, EmployeeSetupPicker } from './EmployeeBookingUI'
+import { canContinueEmployeeStep, canVisitEmployeeStep, EMPLOYEE_BOOKING_STEPS, type EmployeeBookingStep } from '@/lib/employee/booking-flow'
+import { EmployeeBookingIcon, EmployeeBookingProgress, EmployeeBookingSubmit, EmployeeSelect, EmployeeSessionDetails, EmployeeSessionRecap, EmployeeSetupPicker, EmployeeStepPanel } from './EmployeeBookingUI'
 
 type Slot = { time: string; label: string; available: boolean }
 type Result = { ref: string; phase: string; paymentUrl?: string; emailed: boolean; total: number }
@@ -24,6 +25,8 @@ function monthDays(month: string) {
   return [...Array.from({ length: offset }, () => ''), ...Array.from({ length: count }, (_, index) => `${month}-${String(index + 1).padStart(2, '0')}`)]
 }
 export default function EmployeeBookingPage({ email, preview = false, enabled }: { email: string; preview?: boolean; enabled: boolean }) {
+  const [step, setStep] = useState<EmployeeBookingStep>(1)
+  const [reachedStep, setReachedStep] = useState<EmployeeBookingStep>(1)
   const [dates] = useState(() => bookingDateRange(60))
   const [studioId, setStudioId] = useState(STUDIOS[0].id)
   const studio = STUDIOS.find((item) => item.id === studioId)!
@@ -58,10 +61,9 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
   const requestId = useRef('')
   const submitLock = useRef(false)
   const resultRef = useRef<HTMLDivElement>(null)
-  const summaryRef = useRef<HTMLElement>(null)
-  const scheduleRef = useRef<HTMLElement>(null)
-  const detailsRef = useRef<HTMLElement>(null)
   const clientRef = useRef<HTMLElement>(null)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const mounted = useRef(false)
   const availabilityKey = `${studioId}:${date}`
   const inventoryKey = `${date}:${start}:${count}`
   const daySlots = useMemo(() => getTimeSlotsForDay(date), [date])
@@ -73,9 +75,11 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
   const currentAvailability = availability.key === availabilityKey
   const availableSet = new Set(currentAvailability ? availability.slots.filter((slot) => slot.available).map((slot) => slot.time) : [])
   const canFit = (index: number, duration = count) => sessionFits(daySlots, availableSet, index, duration)
-  const sessionReady = currentAvailability && canFit(startIndex) && (!setups.length || Boolean(setup))
+  const slotReady = currentAvailability && canFit(startIndex) && !searching
+  const sessionReady = slotReady && (!setups.length || Boolean(setup))
   const teleprompterReady = inventory.key === inventoryKey && inventory.available
   const locked = busy || attempted || Boolean(result)
+  const extrasReady = (!setups.length || Boolean(setup)) && (!addOnIds.includes('teleprompter') || teleprompterReady)
   const ready = sessionReady && !searching && (!addOnIds.includes('teleprompter') || teleprompterReady) && name.trim() && clientEmail.trim() && enabled
   const dateLabel = new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })
   const timeLabel = start && end ? `${formatTimeForDisplay(new Date(start))} – ${formatTimeForDisplay(end)}` : 'Choose a start time'
@@ -83,6 +87,20 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
   const visibleSlots = periodSlots.filter((slot) => showUnavailable || canFit(slot.index))
   const nextAction = !enabled ? 'Employee booking is not activated yet.' : searching ? 'Finding your next opening…' : !currentAvailability ? 'Checking studio availability…' : availability.error ? availability.error : !start ? 'Choose a start time to continue.' : !canFit(startIndex) ? 'This time is no longer available. Choose another start time.' : !sessionReady ? 'Choose a studio setup to continue.' : addOnIds.includes('teleprompter') && !teleprompterReady ? 'The teleprompter is unavailable or still being checked. Choose another time or remove it.' : !name.trim() || !clientEmail.trim() ? 'Add the client’s name and email to continue.' : preview ? 'Preview only. No reservation, email, or payment will be created outside this page.' : 'No payment is collected now.'
   const status = result ? employeeResultStatus(result.phase, result.emailed, preview) : null
+  const stepCopy = EMPLOYEE_BOOKING_STEPS[step - 1]
+  const sessionHelp = searching ? 'Finding your next opening…' : !currentAvailability ? 'Checking availability…' : availability.error || (!start ? 'Choose a start time to continue.' : !canFit(startIndex) ? 'This time is no longer available. Choose another start time.' : 'Your selections carry through to the next step.')
+  const extrasHelp = !slotReady ? 'Your session needs an available time. Return to Session to check it.' : setups.length && !setup ? 'Choose a studio setup to continue.' : !extrasReady ? 'The teleprompter is unavailable or still being checked. Remove it or choose another time.' : 'Extras are optional. Nothing is reserved until the final step.'
+  const canVisit = (target: EmployeeBookingStep) => canVisitEmployeeStep(step, target, reachedStep, slotReady, extrasReady, locked)
+
+  function visitStep(target: EmployeeBookingStep) {
+    if (canVisit(target)) { stopSearch(); setStep(target) }
+  }
+  function continueStep() {
+    if (!canContinueEmployeeStep(step, slotReady, extrasReady, locked)) return
+    const next = (step + 1) as EmployeeBookingStep
+    setReachedStep((previous) => Math.max(previous, next) as EmployeeBookingStep)
+    setStep(next)
+  }
 
   function focusSection(section: HTMLElement | null) {
     section?.focus({ preventScroll: true })
@@ -122,6 +140,10 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
   }
 
   useEffect(() => () => searchController.current?.abort(), [])
+  useEffect(() => {
+    if (mounted.current) focusSection(headingRef.current)
+    else mounted.current = true
+  }, [step])
 
   useEffect(() => {
     const refreshAvailability = () => setRefresh((value) => value + 1)
@@ -155,7 +177,7 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (submitLock.current || (!ready && !attempted) || result) return
+    if (step !== 3 || submitLock.current || (!ready && !attempted) || result) return
     submitLock.current = true; setBusy(true); setAttempted(true); setError('')
     if (!requestId.current) requestId.current = crypto.randomUUID()
     try {
@@ -190,20 +212,24 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
   function newBooking() {
     stopSearch()
     setResult(null); setAttempted(false); setStart(''); setName(''); setClientEmail(''); setPhone(''); setNotes(''); setAddOnIds([]); setPlatform(''); setError(''); setCopied(false); setCancelPrompt(false); requestId.current = ''; setRefresh((value) => value + 1)
-    focusSection(scheduleRef.current)
+    setStep(1); setReachedStep(1)
   }
   return <>
-    <div className="employee-workspace">
+    <div className={`employee-workspace employee-workspace--step-${step}`}>
       {!enabled && <p className="employee-notice">Employee booking is not activated yet. You can review availability, but cannot create a reservation.</p>}
-      <div className="employee-page-heading"><div><span className="employee-eyebrow">VIBESHACK TEAM</span><h1>Book for a client.</h1><p>Reserve their studio now. Send a payment link for later.</p></div><span className="employee-timezone">◷ All times Pacific</span></div>
-      <form onSubmit={submit} className="employee-booking-grid">
+      {!result && <EmployeeBookingProgress step={step} canVisit={canVisit} onVisit={visitStep} />}
+      <div className="employee-page-heading"><div><span className="employee-eyebrow">VIBESHACK TEAM · BOOK A CLIENT</span><h1 ref={headingRef} tabIndex={-1}>{result ? 'Reservation details.' : stepCopy.title}</h1><p>{result ? 'Your session and payment status, in one place.' : stepCopy.description}</p></div></div>
+      {step > 1 && !result && <EmployeeSessionRecap studio={studio.name} date={dateLabel} time={timeLabel} duration={formatBookingDuration(count)} onEdit={() => visitStep(1)} locked={locked} />}
+      <form onSubmit={submit} className={`employee-booking-grid employee-booking-grid--step-${step}${result ? ' employee-booking-grid--complete' : ''}`}>
+        {!result && <>
         <fieldset disabled={locked} className="employee-main-fields">
+          <EmployeeStepPanel step={1} active={step}>
           <div className="employee-card employee-studio-strip">
             <div className="employee-room-thumb"><Image src={studio.heroImage} alt={studio.name} fill sizes="76px" /></div>
             <label className="employee-studio-label"><span>Studio</span><EmployeeSelect variant="studio" aria-label="Studio" value={studioId} onChange={(event) => { stopSearch(); setStudioId(event.target.value); setSetupId(''); setStart('') }}>{STUDIOS.map((room) => <option key={room.id} value={room.id}>{room.name}</option>)}</EmployeeSelect></label>
             <div className="employee-studio-rate"><strong>{money(studio.price * 100)}<small>/hr</small></strong><span>{studio.type === 'podcast' ? 'Podcast studio' : 'Studio rental'}</span></div>
           </div>
-          <section className="employee-card employee-schedule" ref={scheduleRef} tabIndex={-1} aria-label="Choose session date and time">
+          <section className="employee-card employee-schedule" aria-label="Choose session date and time">
             <div className="employee-schedule-shortcuts" role="group" aria-label="Quick date selection">
               <button type="button" aria-pressed={date === dates[0]} onClick={() => chooseDate(dates[0])}>Today</button>
               <button type="button" aria-pressed={date === dates[1]} onClick={() => chooseDate(dates[1])}>Tomorrow</button>
@@ -227,10 +253,14 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
               <div className="employee-time-help" aria-live="polite">{!currentAvailability ? 'Checking availability…' : availability.error ? <><span>{availability.error}</span><button type="button" onClick={() => setRefresh((value) => value + 1)}>Retry</button></> : !periodSlots.some((slot) => canFit(slot.index)) ? `No ${period} start times fit ${formatBookingDuration(count)}. Try another time of day or date.` : 'Available times include room turnaround.'}</div>
               <div className="employee-time-options"><button type="button" className="employee-text-button" aria-pressed={period === 'overnight'} onClick={() => setPeriod(period === 'overnight' ? 'morning' : 'overnight')}>{period === 'overnight' ? 'Daytime hours' : 'Overnight hours'}</button><button type="button" className="employee-text-button" aria-pressed={showUnavailable} onClick={() => setShowUnavailable(!showUnavailable)}>{showUnavailable ? 'Hide unavailable' : 'Show unavailable'}</button></div>
             </div>
-            <div className="employee-turnaround" role="status"><EmployeeBookingIcon name="clock" />{start && end ? <div><strong>{dateLabel} · {timeLabel}</strong><p>{result?.phase === 'cancelled' ? 'This reservation has been cancelled.' : result || (currentAvailability && canFit(startIndex)) ? <>Turnaround ends at {formatTimeForDisplay(addMinutes(end, 30))}. The extra 30 minutes are included.</> : 'Checking this time. It may no longer be available.'}</p></div> : <p><strong>Room to reset.</strong> We reserve 30 minutes after the session for studio turnaround, at no extra charge.</p>}</div>
+            <div className="employee-turnaround" role="status"><EmployeeBookingIcon name="clock" />{start && end ? <div><strong>{dateLabel} · {timeLabel}</strong><p>{currentAvailability && canFit(startIndex) ? <>Turnaround ends at {formatTimeForDisplay(addMinutes(end, 30))}. The extra 30 minutes are included.</> : 'Checking this time. It may no longer be available.'}</p></div> : <p><strong>Room to reset.</strong> We reserve 30 minutes after the session for studio turnaround, at no extra charge.</p>}</div>
           </section>
-          <section className="employee-card employee-details" ref={detailsRef} tabIndex={-1} aria-label="Session details"><div className="employee-section-heading"><h2>Session details</h2><span>Make it their own</span></div>
+          </EmployeeStepPanel>
+          <EmployeeStepPanel step={2} active={step}>
+          <section className="employee-card employee-details employee-extras-step" aria-label="Setup and extras">
             {setups.length > 0 && <EmployeeSetupPicker options={setups} value={setupId} onChange={setSetupId} />}
+            {!setups.length && <div className="employee-standard-setup"><h2>Standard studio setup</h2><p>Your studio’s standard arrangement is included.</p></div>}
+            <div className="employee-extras-heading"><h2>Optional extras</h2><p>Add only what your client needs.</p></div>
             <div className="employee-addons">{BOOKING_ADD_ONS.map((addon) => {
               const selected = addOnIds.includes(addon.id)
               const unavailable = addon.id === 'teleprompter' && !teleprompterReady
@@ -239,14 +269,21 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
             {addOnIds.includes('remote-podcast') && <label>Remote platform <span className="employee-optional">Optional</span><input value={platform} onChange={(event) => setPlatform(event.target.value)} placeholder="Riverside, Zoom, or another platform" maxLength={60} /></label>}
             <p className="employee-quiet-note">Only this studio is reserved. Coordinate operators and cameras separately for overlapping employee bookings.</p>
           </section>
+          <div className="employee-step-actions"><button type="button" className="employee-text-button" onClick={() => visitStep(1)}>← Back to session</button><div><p className="employee-step-total">Session total<strong>{money(total)}</strong></p><button type="button" className="employee-primary" disabled={!canContinueEmployeeStep(step, slotReady, extrasReady, locked)} onClick={continueStep} aria-describedby="employee-extras-help">Continue to client <span aria-hidden="true">→</span></button><p id="employee-extras-help" role="status">{extrasHelp}</p></div></div>
+          </EmployeeStepPanel>
+          <EmployeeStepPanel step={3} active={step}>
           <section className="employee-card employee-details" ref={clientRef} tabIndex={-1} aria-label="Client details"><div className="employee-section-heading"><h2>Client details</h2><span>Who’s coming in?</span></div>
             <div className="employee-client-grid"><label>Full name<input required autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Client’s full name" maxLength={120} /></label><label>Email address<input required type="email" autoComplete="email" value={clientEmail} onChange={(event) => setClientEmail(event.target.value)} placeholder="client@example.com" maxLength={254} /></label><label>Phone number <span className="employee-optional">Optional</span><input type="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="(415) 555-0123" maxLength={40} /></label><label>Internal note <span className="employee-optional">Optional</span><input value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Anything the team should know" maxLength={1000} /></label></div>
             <div className="employee-payment-note"><span aria-hidden="true">↗</span><div><strong>{preview ? 'Try the booking flow' : 'Payment link sent automatically'}</strong><p>{preview ? 'Use sample client details. This preview does not send invoices or create real bookings.' : 'The client receives a secure Stripe invoice. No card or upfront payment needed here.'}</p></div></div>
           </section>
+          <button type="button" className="employee-text-button employee-back-button" disabled={locked} onClick={() => visitStep(2)}>← Back to setup & extras</button>
+          </EmployeeStepPanel>
         </fieldset>
+        {step === 1 && <aside className="employee-card employee-compact-summary" aria-label="Session at a glance"><h2>Your session</h2><h3>{studio.name}</h3><p className="employee-summary-subtitle">{money(studio.price * 100)}/hr</p><dl><div><dt>Date</dt><dd>{dateLabel}</dd></div><div><dt>Time</dt><dd>{timeLabel}</dd></div><div><dt>Duration</dt><dd>{formatBookingDuration(count)}</dd></div></dl><div className="employee-total"><span>Studio subtotal</span><strong>{money(Math.round(studio.price * count / 2 * 100))}</strong></div><button type="button" className="employee-primary" onClick={continueStep} disabled={!canContinueEmployeeStep(step, slotReady, extrasReady, locked)} aria-describedby="employee-session-help">Continue to setup <span aria-hidden="true">→</span></button><p className="employee-summary-help" id="employee-session-help" role="status">{sessionHelp}</p></aside>}
+        </>}
+        <EmployeeStepPanel step={3} active={step}>
         <aside className="employee-summary-column">
-          <section className="employee-card employee-summary" ref={summaryRef} tabIndex={-1} aria-label="Review your session"><div className="employee-section-heading"><h2>Your session</h2>{preview && <span className="employee-small-badge">Preview</span>}</div>
-            <div className="employee-session-photo"><Image src={setup?.image || studio.heroImage} alt={setup?.alt || studio.name} fill sizes="(max-width: 1100px) 90vw, 360px" priority /></div>
+          <section className="employee-card employee-summary" aria-label="Review your session"><div className="employee-section-heading"><h2>{result ? 'Your session' : 'Final review'}</h2>{preview && <span className="employee-small-badge">Preview</span>}</div>
             <h3>{studio.name}</h3><p className="employee-summary-subtitle">{studio.type === 'podcast' ? 'Podcast session' : 'Studio rental'}</p>
             <EmployeeSessionDetails
               date={dateLabel}
@@ -257,9 +294,9 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
               addOns={[]}
             />
             <dl className="employee-price-breakdown"><div><dt>Studio · {formatBookingDuration(count)}</dt><dd>{money(Math.round(studio.price * count / 2 * 100))}</dd></div>{addOns.map((addon) => <div key={addon.id}><dt>{addon.name}</dt><dd>{addon.amountCents ? money(addon.amountCents) : 'No charge'}</dd></div>)}</dl>
-            {!result && <div className="employee-summary-edit" aria-label="Edit booking details"><button type="button" disabled={locked} onClick={() => focusSection(scheduleRef.current)}>Edit time</button><button type="button" disabled={locked} onClick={() => focusSection(detailsRef.current)}>Edit extras</button><button type="button" disabled={locked} onClick={() => focusSection(clientRef.current)}>Edit client</button></div>}
+            {!result && <div className="employee-summary-edit" aria-label="Edit booking details"><button type="button" disabled={locked} onClick={() => visitStep(1)}>Edit session</button><button type="button" disabled={locked} onClick={() => visitStep(2)}>Edit setup & extras</button></div>}
             <div className="employee-total"><span>Session total</span><strong>{money(result?.total ?? total)}</strong></div>
-            {!result && <><button className="employee-primary" type="submit" disabled={busy || (!ready && !attempted)} aria-describedby="employee-next-action">{busy ? 'Creating reservation…' : attempted ? 'Retry this booking' : preview ? 'Create preview booking' : 'Reserve & send payment link'}<span aria-hidden="true">→</span></button><p className="employee-summary-help" id="employee-next-action" role="status">{nextAction}</p></>}
+            {!result && <EmployeeBookingSubmit preview={preview} busy={busy} attempted={attempted} disabled={busy || (!ready && !attempted)} help={nextAction} />}
             {error && <p className="employee-notice" role="alert">{error}</p>}
             {result && status && <div className="employee-result" ref={resultRef} tabIndex={-1} role="status"><span className="employee-result-check" aria-hidden="true">✓</span><h3>{result.phase === 'cancelled' ? 'Reservation cancelled.' : preview ? 'Preview booking created.' : 'Studio reserved.'}</h3>
               <dl className="employee-result-status"><div><dt>Reservation</dt><dd>{status.reservation}</dd></div><div><dt>Payment</dt><dd>{status.payment}</dd></div><div><dt>Payment request</dt><dd>{status.delivery}</dd></div></dl>
@@ -273,8 +310,8 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
           </section>
           {result?.phase !== 'cancelled' && result?.phase !== 'paid' && <div className="employee-reservation-note"><span aria-hidden="true">◇</span><p><strong>Reserve now. Payment later.</strong> {preview ? 'Preview reservations reset when you reload.' : 'Unpaid reservations stay reserved until a team member cancels.'} {end && <>Turnaround ends at {formatTimeForDisplay(addMinutes(end, 30))}.</>}</p></div>}
         </aside>
+        </EmployeeStepPanel>
       </form>
-      {!result && <EmployeeMobileReview total={money(total)} detail={start ? dateLabel : 'Choose a session'} onReview={() => focusSection(summaryRef.current)} />}
       <footer className="employee-footer"><span>VibeShack Studios · Team workspace</span><div className="employee-footer-actions"><Link href="/employee/">Employee access</Link>{!preview && <form action="/api/employee/auth/logout" method="post"><button type="submit" title={email}>Sign out</button></form>}</div></footer>
     </div>
   </>

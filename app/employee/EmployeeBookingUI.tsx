@@ -1,7 +1,8 @@
 'use client'
 import Image from 'next/image'
-import React, { useEffect, useState, type SelectHTMLAttributes } from 'react'
+import React, { type ReactNode, type SelectHTMLAttributes } from 'react'
 import type { StudioSetup } from '@/lib/booking/studio-setups'
+import { EMPLOYEE_BOOKING_STEPS, type EmployeeBookingStep } from '@/lib/employee/booking-flow'
 
 type IconName = 'calendar' | 'clock' | 'duration' | 'setup' | 'rate' | 'plus' | 'chevron'
 
@@ -51,33 +52,31 @@ export function EmployeeSetupPicker({ options, value, onChange }: { options: rea
   return <fieldset className="employee-setup-picker"><legend>Studio setup</legend>
     <div className="employee-setup-options">{options.map((option) => <label key={option.id} className={`employee-setup-option${value === option.id ? ' is-selected' : ''}`}>
       <input type="radio" name="studio-setup" value={option.id} checked={value === option.id} onChange={() => onChange(option.id)} required />
-      <span className="employee-setup-photo"><Image src={option.image} alt="" fill sizes="(max-width: 480px) 80px, (max-width: 1100px) 30vw, 220px" /></span>
+      <span className="employee-setup-photo"><Image src={option.image} alt="" fill sizes="(max-width: 600px) 85vw, (max-width: 900px) 42vw, 350px" /></span>
       <span className="employee-setup-caption"><strong>{option.label}</strong><span>{option.chairs} {option.chairs === 1 ? 'seat' : 'seats'}</span></span>
       <span className="employee-setup-check" aria-hidden="true">{value === option.id ? '✓' : ''}</span>
     </label>)}</div>
   </fieldset>
 }
 
-export function EmployeeMobileReview({ total, detail, onReview }: { total: string; detail: string; onReview: () => void }) {
-  const [keyboardOpen, setKeyboardOpen] = useState(false)
-  useEffect(() => {
-    const update = () => {
-      const target = document.activeElement
-      const editing = target instanceof HTMLElement && target.matches('input:not([type=radio]):not([type=checkbox]), textarea, select, [contenteditable=true]')
-      const reducedViewport = Boolean(window.visualViewport && window.visualViewport.height < window.innerHeight * .75)
-      setKeyboardOpen(editing || reducedViewport)
-    }
-    document.addEventListener('focusin', update)
-    document.addEventListener('focusout', update)
-    window.visualViewport?.addEventListener('resize', update)
-    return () => {
-      document.removeEventListener('focusin', update)
-      document.removeEventListener('focusout', update)
-      window.visualViewport?.removeEventListener('resize', update)
-    }
-  }, [])
-  return <div className={`employee-mobile-review${keyboardOpen ? ' is-hidden' : ''}`} role="region" aria-label="Booking review shortcut">
-    <div><span>Session total</span><strong>{total}</strong><small>{detail}</small></div>
-    <button type="button" className="employee-primary" onClick={onReview}>Review booking <span aria-hidden="true">↑</span></button>
-  </div>
+export function EmployeeStepPanel({ step, active, children }: { step: EmployeeBookingStep; active: EmployeeBookingStep; children?: ReactNode }) {
+  // Inactive fields must not participate in tab order or native form validation.
+  // Draft values live in the parent, so unmounting a step does not discard them.
+  return step === active ? <>{children}</> : null
+}
+
+export function EmployeeBookingProgress({ step, canVisit, onVisit }: { step: EmployeeBookingStep; canVisit: (target: EmployeeBookingStep) => boolean; onVisit: (target: EmployeeBookingStep) => void }) {
+  return <nav className="employee-progress" aria-label="Booking steps"><ol>{EMPLOYEE_BOOKING_STEPS.map((item) => <li key={item.number}>
+    <button type="button" aria-current={step === item.number ? 'step' : undefined} disabled={!canVisit(item.number)} onClick={() => onVisit(item.number)}>
+      <span className="employee-step-number" aria-hidden="true">{item.number < step ? '✓' : item.number}</span><span>{item.label}</span>
+    </button>
+  </li>)}</ol></nav>
+}
+
+export function EmployeeSessionRecap({ studio, date, time, duration, onEdit, locked }: { studio: string; date: string; time: string; duration: string; onEdit: () => void; locked: boolean }) {
+  return <section className="employee-session-recap" aria-label="Selected session"><div><strong>{studio}</strong><p>{date} · {time} <span>· {duration}</span></p></div><button type="button" onClick={onEdit} disabled={locked}>Change session</button></section>
+}
+
+export function EmployeeBookingSubmit({ preview, busy, attempted, disabled, help }: { preview: boolean; busy: boolean; attempted: boolean; disabled: boolean; help: string }) {
+  return <><button className="employee-primary" type="submit" disabled={disabled} aria-describedby="employee-next-action">{busy ? 'Creating reservation…' : attempted ? 'Retry this booking' : preview ? 'Create preview booking' : 'Reserve & send payment link'}<span aria-hidden="true">→</span></button><p className="employee-summary-help" id="employee-next-action" role="status">{help}</p></>
 }

@@ -5,8 +5,8 @@ Local implementation, September 26, 2026. Not deployed or activated.
 ## Routes and behavior
 
 - `/employee/`: invite-only Google sign-in, linked from the website footer.
-- `/employee/book/`: authenticated one-page calendar, time, setup, extras,
-  client details and session summary. No payment fields for staff.
+- `/employee/book/`: authenticated three-step booking flow: Session, Setup &
+  extras, and Client & review. No payment fields for staff.
 - `/employee/preview/`: development-only browser-memory preview. Requires
   `EMPLOYEE_LOCAL_PREVIEW=1`, `NODE_ENV=development`, and no `VERCEL` environment.
   It never authenticates API calls or creates provider records. Production
@@ -21,14 +21,27 @@ continues to use the existing shared podcast/stage rules. Staff must coordinate
 operators and cameras for overlapping staff-created sessions. Tours and
 unidentified manual busy events continue to block conservatively.
 
-The employee workspace keeps its one-page grouped cards, with the customer
-checkout's larger type scale, full weekday labels, neutral selection/focus
-states, rounded 48px controls, icon-led summary rows, and red booking action.
-Studio and duration selectors share EmployeeSelect, which preserves native
-select semantics and mobile pickers. Setup choices are required native radio
-cards with the existing catalog photos. At narrower widths the summary and
-then calendar/time panels stack without shrinking essential text.
-This presentation change does not alter employee or public booking rules.
+The employee workspace now separates the workflow into three focused screens
+on the same protected route. Session shows studio/date/time/duration and a
+compact, photo-free subtotal summary. Setup & extras gives catalog-photo radio
+cards more space and shows optional extras separately. Client & review pairs
+contact details with the full itemized summary and final booking action. Later
+steps use a small text recap rather than repeating the full room-photo card.
+
+An ordered progress navigation shows the current step and allows return to
+visited steps. Continue validates the current session and, at step two, setup
+and limited-equipment availability. Re-entering review rechecks these gates.
+Draft state stays in the parent component while inactive panels unmount, so
+Back preserves all selections/client data without hidden required controls
+participating in tab order or validation. Step transitions focus the new
+heading. An early-step Enter/submit cannot create a reservation; the submit
+handler explicitly requires step three. Busy, uncertain-retry and completed
+states lock navigation. Create another booking resets progress to step one.
+
+The black palette, readable labels, neutral selection/focus, rounded controls
+and red actions remain consistent. Studio/duration use native selects; setup
+uses required native radios. Mobile panels stack, with normal in-flow actions
+instead of a floating review bar. Public and employee booking rules are unchanged.
 
 The faster-booking follow-up adds Today/Tomorrow shortcuts and a cancellable
 Next available search across the next seven days, including overnight hours.
@@ -41,12 +54,9 @@ is still independently checked for the resulting session.
 Time buttons are grouped by Pacific morning/afternoon/evening/overnight, with
 unavailable starts hidden by default and an explicit show toggle. No nested
 time-list scrolling is needed. The selected range and turnaround end appear
-directly below the scheduler. The summary uses a smaller image, stronger date
-and time, a studio subtotal and itemized add-ons, and edit shortcuts that focus
-the relevant section. Teleprompter pricing remains visible before availability
-is known. The narrow-screen review bar only moves focus to the summary; it
-cannot submit. It hides while editing inputs or when the virtual keyboard
-reduces the viewport, and includes safe-area spacing.
+directly below the scheduler. Final review emphasizes date/time, studio subtotal
+and itemized add-ons, with edit shortcuts back to Session or Setup & extras.
+Teleprompter pricing remains visible even when its availability is not verified.
 
 Result status separates reservation, payment and email-request acceptance.
 Acceptance is not claimed as inbox delivery. Preview success always says that
