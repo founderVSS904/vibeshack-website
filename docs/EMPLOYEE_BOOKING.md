@@ -28,6 +28,14 @@ cards more space and shows optional extras separately. Client & review pairs
 contact details with the full itemized summary and final booking action. Later
 steps use a small text recap rather than repeating the full room-photo card.
 
+The Session step uses a shorter heading and progress row, with studio and
+session length together above the calendar. Calendar, time choices and the
+subtotal/Continue summary fit alongside one another on laptop screens. The
+summary omits the repeated room name and hourly rate. All four time ranges
+share one row except on very narrow phones, where they wrap into two rows.
+Smaller screens stack naturally; no fixed-height clipping or nested scrolling
+hides extra calendar weeks, daylight-saving time slots or validation messages.
+
 An ordered progress navigation shows the current step and allows return to
 visited steps. Continue validates the current session and, at step two, setup
 and limited-equipment availability. Re-entering review rechecks these gates.

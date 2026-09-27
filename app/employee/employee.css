@@ -344,6 +344,101 @@
   .employee-compact-summary .employee-primary { max-width: none; }
   .employee-compact-summary .employee-summary-help { text-align: center; }
 }
+/* Keep session choices in the first laptop viewport without clipping taller states. */
+.employee-workspace--step-1 { padding-top: 16px; }
+.employee-workspace--step-1 .employee-progress { margin: 0 0 16px; }
+.employee-workspace--step-1 .employee-progress button { min-height: 44px; padding-bottom: 10px; font-size: 14px; }
+.employee-workspace--step-1 .employee-step-number { width: 24px; height: 24px; font-size: 12px; }
+.employee-workspace--step-1 .employee-page-heading { margin: 0 0 20px; }
+.employee-workspace--step-1 h1 { font-size: 28px; letter-spacing: -.8px; line-height: 1.2; }
+.employee-booking-grid--step-1 { gap: 24px; grid-template-columns: minmax(0, 1fr) 264px; }
+.employee-studio-strip { grid-column: 1 / -1; padding: 12px 20px; gap: 16px; border-bottom: 1px solid #ffffff12; }
+.employee-room-thumb { width: 44px; height: 44px; border-radius: 8px; }
+.employee-app .employee-studio-label { display: flex; align-items: center; gap: 12px; }
+.employee-studio-label > span:first-child { font-size: 14px; }
+.employee-studio-label .employee-select { flex: 1; }
+.employee-app .employee-duration { display: flex; align-items: center; gap: 12px; margin: 0; white-space: nowrap; font-size: 14px; }
+.employee-duration .employee-select { width: 194px; margin: 0; }
+.employee-app .employee-duration select { min-height: 44px; padding-block: 9px; }
+.employee-studio-rate { padding-left: 16px; border-left: 1px solid #ffffff1a; }
+.employee-schedule-shortcuts { padding: 10px 20px; }
+.employee-schedule-shortcuts button { border-color: transparent; }
+.employee-schedule-shortcuts button[aria-pressed=true] { border-color: #ffffff26; }
+.employee-calendar, .employee-time-panel { padding: 16px 20px; }
+.employee-month { margin: 0 0 8px; }
+.employee-month strong { font-size: 16px; font-weight: 600; }
+.employee-weekdays, .employee-days { gap: 4px; }
+.employee-weekdays { margin-bottom: 6px; }
+.employee-days button { height: 44px; }
+.employee-start-date-note { margin-top: 14px !important; }
+.employee-calendar-note { margin-top: 8px !important; }
+.employee-periods { grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 16px 0 12px; gap: 2px; padding: 3px; }
+.employee-periods button { min-height: 56px; padding: 8px 2px; font-size: 14px; }
+.employee-periods span { font-size: 12px; white-space: nowrap; }
+.employee-times { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.employee-times button { min-height: 44px; }
+.employee-times button small { font-size: 12px; margin-top: 0; }
+.employee-time-help { margin-top: 10px; }
+.employee-time-options { margin-top: 0; }
+.employee-turnaround { padding: 12px 20px; font-size: 13px; }
+.employee-turnaround > div > strong { font-size: 14px; margin-bottom: 2px; }
+.employee-compact-summary { padding: 20px; }
+.employee-compact-summary dl { margin-top: 20px; gap: 16px; }
+.employee-compact-summary dt { font-size: 14px; }
+.employee-compact-summary .employee-total { margin-top: 20px; padding: 18px 0; }
+.employee-compact-summary .employee-summary-help { margin-top: 10px !important; }
+.employee-workspace--step-1 .employee-footer { margin-top: 24px; }
+
+@media (max-width: 1100px) {
+  .employee-booking-grid--step-1 { grid-template-columns: 1fr; }
+  .employee-compact-summary { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 0 32px; }
+  .employee-compact-summary h2, .employee-compact-summary dl { grid-column: 1; }
+  .employee-compact-summary dl { grid-row: 2 / 4; margin-top: 16px; }
+  .employee-compact-summary .employee-total { grid-column: 2; grid-row: 1; margin: 0; border: 0; padding: 0 0 12px; }
+  .employee-compact-summary .employee-primary { grid-column: 2; grid-row: 2; max-width: none; }
+  .employee-compact-summary .employee-summary-help { grid-column: 2; grid-row: 3; }
+}
+@media (max-width: 740px) {
+  .employee-studio-strip { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; }
+  .employee-app .employee-studio-label { display: block; }
+  .employee-studio-label > span:first-child { font-size: 13px; }
+  .employee-studio-rate { grid-column: 3; grid-row: 1; padding: 0; border: 0; }
+  .employee-app .employee-duration { grid-column: 1 / -1; padding-top: 12px; border-top: 1px solid #ffffff12; justify-content: space-between; }
+  .employee-duration .employee-select { width: min(194px, 62%); }
+  .employee-calendar, .employee-time-panel { padding: 16px 20px; }
+  .employee-compact-summary { display: block; }
+  .employee-compact-summary dl { margin-top: 20px; }
+  .employee-compact-summary .employee-total { margin-top: 20px; padding: 18px 0; border-top: 1px solid #ffffff1a; }
+}
+@media (max-width: 600px) {
+  .employee-workspace--step-1 .employee-progress ol { gap: 12px; }
+  .employee-workspace--step-1 .employee-progress button { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; }
+  .employee-workspace--step-1 .employee-progress button > span:last-child { min-height: 0; }
+  .employee-workspace--step-1 h1 { font-size: 26px; }
+  .employee-workspace--step-1 .employee-page-heading { margin-bottom: 16px; }
+  .employee-schedule-shortcuts { padding: 10px 16px; gap: 4px; }
+  .employee-schedule-shortcuts button { padding-inline: 10px; }
+  .employee-schedule-shortcuts > span { margin: 4px 0 0; width: 100%; }
+}
+@media (max-width: 480px) {
+  .employee-studio-strip, .employee-calendar, .employee-time-panel, .employee-turnaround { padding-inline: 16px; }
+  .employee-studio-strip { grid-template-columns: minmax(0, 1fr) auto; }
+  .employee-room-thumb { display: none; }
+  .employee-studio-rate { grid-column: 2; }
+  .employee-studio-rate strong { font-size: 16px; }
+  .employee-app .employee-duration { display: block; }
+  .employee-duration .employee-select { width: 100%; margin-top: 8px; }
+  .employee-schedule-shortcuts button { padding-inline: 6px; }
+  .employee-schedule-shortcuts button > span { display: none; }
+  .employee-periods button { font-size: 13px; }
+  .employee-periods span { white-space: normal; }
+  .employee-periods { align-items: stretch; }
+  .employee-times button { font-size: 14px; }
+}
+@media (max-width: 360px) {
+  .employee-periods { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .employee-periods span { white-space: nowrap; }
+}
 @media (forced-colors: active) {
   .employee-progress button[aria-current=step] { border-bottom: 3px solid Highlight; }
   .employee-progress button[aria-current=step] .employee-step-number { border-color: Highlight; }

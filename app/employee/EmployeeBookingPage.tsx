@@ -219,18 +219,19 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
     <div className={`employee-workspace employee-workspace--step-${step}`}>
       {!enabled && <p className="employee-notice">Employee booking is not activated yet. You can review availability, but cannot create a reservation.</p>}
       {!result && <EmployeeBookingProgress step={step} canVisit={canVisit} onVisit={visitStep} />}
-      <div className="employee-page-heading"><div><span className="employee-eyebrow">VIBESHACK TEAM · BOOK A CLIENT</span><h1 ref={headingRef} tabIndex={-1}>{result ? 'Reservation details.' : stepCopy.title}</h1><p>{result ? 'Your session and payment status, in one place.' : stepCopy.description}</p></div></div>
+      <div className="employee-page-heading"><div>{step !== 1 && <span className="employee-eyebrow">VIBESHACK TEAM · BOOK A CLIENT</span>}<h1 ref={headingRef} tabIndex={-1}>{result ? 'Reservation details.' : stepCopy.title}</h1>{step !== 1 && <p>{result ? 'Your session and payment status, in one place.' : stepCopy.description}</p>}</div></div>
       {step > 1 && !result && <EmployeeSessionRecap studio={studio.name} date={dateLabel} time={timeLabel} duration={formatBookingDuration(count)} onEdit={() => visitStep(1)} locked={locked} />}
       <form onSubmit={submit} className={`employee-booking-grid employee-booking-grid--step-${step}${result ? ' employee-booking-grid--complete' : ''}`}>
         {!result && <>
         <fieldset disabled={locked} className="employee-main-fields">
           <EmployeeStepPanel step={1} active={step}>
-          <div className="employee-card employee-studio-strip">
+          <section className="employee-card employee-schedule" aria-label="Choose session date and time">
+          <div className="employee-studio-strip">
             <div className="employee-room-thumb"><Image src={studio.heroImage} alt={studio.name} fill sizes="76px" /></div>
             <label className="employee-studio-label"><span>Studio</span><EmployeeSelect variant="studio" aria-label="Studio" value={studioId} onChange={(event) => { stopSearch(); setStudioId(event.target.value); setSetupId(''); setStart('') }}>{STUDIOS.map((room) => <option key={room.id} value={room.id}>{room.name}</option>)}</EmployeeSelect></label>
-            <div className="employee-studio-rate"><strong>{money(studio.price * 100)}<small>/hr</small></strong><span>{studio.type === 'podcast' ? 'Podcast studio' : 'Studio rental'}</span></div>
+            <label className="employee-duration">Session length<EmployeeSelect aria-label="Session length" value={count} onChange={(event) => { stopSearch(); setCount(Number(event.target.value)); setStart('') }}>{Array.from({ length: 15 }, (_, index) => index + 2).map((slots) => <option key={slots} value={slots}>{formatBookingDuration(slots)}</option>)}</EmployeeSelect></label>
+            <div className="employee-studio-rate"><strong>{money(studio.price * 100)}<small>/hr</small></strong></div>
           </div>
-          <section className="employee-card employee-schedule" aria-label="Choose session date and time">
             <div className="employee-schedule-shortcuts" role="group" aria-label="Quick date selection">
               <button type="button" aria-pressed={date === dates[0]} onClick={() => chooseDate(dates[0])}>Today</button>
               <button type="button" aria-pressed={date === dates[1]} onClick={() => chooseDate(dates[1])}>Tomorrow</button>
@@ -238,13 +239,13 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
               <span>Open 24 hours · Pacific time</span>
               <p id="employee-search-message" role="status">{searchMessage}</p>
             </div>
-            <div className="employee-calendar"><h2>Select a date</h2><p className="employee-start-date-note">Choose the date your session starts.</p><div className="employee-month"><button type="button" aria-label="Previous month" disabled={month <= dates[0].slice(0, 7)} onClick={() => setMonth(moveMonth(month, -1))}><span aria-hidden="true">←</span> Prev</button><strong>{new Date(`${month}-15T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</strong><button type="button" aria-label="Next month" disabled={month >= dates.at(-1)!.slice(0, 7)} onClick={() => setMonth(moveMonth(month, 1))}>Next <span aria-hidden="true">→</span></button></div>
+            <div className="employee-calendar"><h2 className="sr-only">Select a date</h2><div className="employee-month"><button type="button" aria-label="Previous month" disabled={month <= dates[0].slice(0, 7)} onClick={() => setMonth(moveMonth(month, -1))}><span aria-hidden="true">←</span> Prev</button><strong>{new Date(`${month}-15T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</strong><button type="button" aria-label="Next month" disabled={month >= dates.at(-1)!.slice(0, 7)} onClick={() => setMonth(moveMonth(month, 1))}>Next <span aria-hidden="true">→</span></button></div>
               <div className="employee-weekdays" aria-hidden="true">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((label) => <span key={label}>{label}</span>)}</div>
               <div className="employee-days">{monthDays(month).map((day, index) => day ? <button type="button" key={day} aria-label={formatDateForDisplay(day)} aria-current={day === dates[0] ? 'date' : undefined} aria-pressed={date === day} className={date === day ? 'selected' : ''} disabled={!dates.includes(day)} onClick={() => chooseDate(day)}>{Number(day.slice(-2))}{day === dates[0] && <i />}</button> : <span key={`blank-${index}`} />)}</div>
+              <p className="employee-start-date-note">Choose the date your session starts.</p>
               <p className="employee-calendar-note"><span /> Today <span className="employee-legend-square" /> Selected date</p>
             </div>
             <div className="employee-time-panel"><h2>Start time <span>{dateLabel}</span></h2>
-              <label className="employee-duration">Session length<EmployeeSelect aria-label="Session length" value={count} onChange={(event) => { stopSearch(); setCount(Number(event.target.value)); setStart('') }}>{Array.from({ length: 15 }, (_, index) => index + 2).map((slots) => <option key={slots} value={slots}>{formatBookingDuration(slots)}</option>)}</EmployeeSelect></label>
               <div className="employee-periods" role="group" aria-label="Time of day">{EMPLOYEE_TIME_PERIODS.map(({ id, label, range }) => <button type="button" key={id} aria-pressed={period === id} onClick={() => setPeriod(id)}><strong>{label}</strong><span>{range}</span></button>)}</div>
               <div className="employee-times" role="group" aria-label="Available start times" aria-busy={!currentAvailability || searching}>{visibleSlots.map((slot) => {
                 const iso = slot.start.toISOString()
@@ -279,7 +280,7 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
           <button type="button" className="employee-text-button employee-back-button" disabled={locked} onClick={() => visitStep(2)}>← Back to setup & extras</button>
           </EmployeeStepPanel>
         </fieldset>
-        {step === 1 && <aside className="employee-card employee-compact-summary" aria-label="Session at a glance"><h2>Your session</h2><h3>{studio.name}</h3><p className="employee-summary-subtitle">{money(studio.price * 100)}/hr</p><dl><div><dt>Date</dt><dd>{dateLabel}</dd></div><div><dt>Time</dt><dd>{timeLabel}</dd></div><div><dt>Duration</dt><dd>{formatBookingDuration(count)}</dd></div></dl><div className="employee-total"><span>Studio subtotal</span><strong>{money(Math.round(studio.price * count / 2 * 100))}</strong></div><button type="button" className="employee-primary" onClick={continueStep} disabled={!canContinueEmployeeStep(step, slotReady, extrasReady, locked)} aria-describedby="employee-session-help">Continue to setup <span aria-hidden="true">→</span></button><p className="employee-summary-help" id="employee-session-help" role="status">{sessionHelp}</p></aside>}
+        {step === 1 && <aside className="employee-card employee-compact-summary" aria-label="Session at a glance"><h2>Your session</h2><dl><div><dt>Date</dt><dd>{dateLabel}</dd></div><div><dt>Time</dt><dd>{timeLabel}</dd></div><div><dt>Duration</dt><dd>{formatBookingDuration(count)}</dd></div></dl><div className="employee-total"><span>Studio subtotal</span><strong>{money(Math.round(studio.price * count / 2 * 100))}</strong></div><button type="button" className="employee-primary" onClick={continueStep} disabled={!canContinueEmployeeStep(step, slotReady, extrasReady, locked)} aria-describedby="employee-session-help">Continue to setup <span aria-hidden="true">→</span></button><p className="employee-summary-help" id="employee-session-help" role="status">{sessionHelp}</p></aside>}
         </>}
         <EmployeeStepPanel step={3} active={step}>
         <aside className="employee-summary-column">
