@@ -40,7 +40,6 @@ export default function EmployeeSignIn({ preview, configured, googleConfigured =
           <div className={styles.field}><input id="employee-signin-email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} placeholder="you@company.com" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} disabled={busy} /></div>
           <button type="submit" className={styles.primary} disabled={busy}>{busy ? 'Requesting link…' : 'Email me a sign-in link'}<span aria-hidden="true">→</span></button>
         </form>
-        <p className={styles.accessNote}>Invite-only access. No password to remember.</p>
         {preview && <div className={styles.preview}><p>No account access or emails are created in this preview.</p><Link href="/employee/preview/">Explore booking preview <span aria-hidden="true">→</span></Link><Link href="/employee/preview/team/">Explore team preview <span aria-hidden="true">→</span></Link></div>}
         <p className={styles.status} role="status" aria-live="polite">{notice}</p>
         {error && <p className={styles.error} role="alert">{error}</p>}

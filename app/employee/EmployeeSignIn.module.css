@@ -19,7 +19,6 @@
 .primary:hover:not(:disabled) { background: #005be0; }
 .primary:disabled { opacity: .6; cursor: wait; }
 .primary span { font-size: 18px; }
-.accessNote { margin: 20px 0 0; font-size: 12px; line-height: 1.6; color: #a1a1aa; }
 .preview { margin-top: 24px; padding-top: 20px; border-top: 1px solid #ffffff1a; font-size: 12px; line-height: 1.6; color: #a1a1aa; }
 .preview p { margin: 0 0 8px; }
 .preview a { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; color: #7eb9ff; }
