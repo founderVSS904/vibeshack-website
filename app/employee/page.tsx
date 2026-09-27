@@ -5,7 +5,7 @@ import { employeeSupabaseConfigured } from '@/lib/employee/supabase'
 import EmployeeSignIn from './EmployeeSignIn'
 export const dynamic = 'force-dynamic'
 export default async function EmployeeLogin({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const employee = await currentEmployee({ allowUnverifiedMfa: true })
+  const employee = await currentEmployee()
   if (employee) redirect(employeeDestination(employee))
   const configured = employeeSupabaseConfigured()
   const params = await searchParams

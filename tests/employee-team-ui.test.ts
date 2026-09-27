@@ -5,7 +5,6 @@ import React, { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import EmployeeHeader from '../app/employee/EmployeeHeader'
 import TeamPage from '../app/employee/TeamPage'
-import SecurityPage from '../app/employee/SecurityPage'
 
 Object.assign(globalThis, { React })
 
@@ -15,7 +14,7 @@ test('employee navigation does not expose Superadmin controls and mobile links r
   assert.match(employee, /aria-current="page">Bookings/)
   assert.doesNotMatch(employee, /href="\/employee\/(team|activity|security)/)
   const owner = renderToStaticMarkup(createElement(EmployeeHeader, { email: 'owner@example.test', preview: false, role: 'superadmin', active: 'team' }))
-  for (const path of ['team', 'activity', 'security']) assert.ok(owner.includes('/employee/' + path), path)
+  for (const path of ['team', 'activity', 'password']) assert.ok(owner.includes('/employee/' + path), path)
   assert.match(owner, /aria-label="Workspace navigation"/)
   assert.match(owner, /aria-current="page">Team/)
 })
@@ -43,16 +42,4 @@ test('real team screen starts with loading state and no preview membership data'
   assert.match(source, /redirect\('\/employee\/'\)/)
   const preview = readFileSync(new URL('../app/employee/preview/team/page.tsx', import.meta.url), 'utf8')
   assert.match(preview, /if \(!localEmployeePreview\(\)\) notFound\(\)/)
-})
-
-test('security screen does not invent an authenticator or expose a setup key before enrollment', () => {
-  const html = renderToStaticMarkup(createElement(SecurityPage, { email: 'owner@example.test' }))
-  assert.match(html, /Checking account security/)
-  assert.doesNotMatch(html, /security-code|setup key|data:image|<code>/)
-  const verified = renderToStaticMarkup(createElement(SecurityPage, { email: 'owner@example.test', mfaVerified: true }))
-  assert.match(verified, /Your account is protected/)
-  assert.match(verified, /Continue to workspace/)
-  assert.doesNotMatch(verified, /Set up authenticator|security-code|<code>/)
-  const page = readFileSync(new URL('../app/employee/security/page.tsx', import.meta.url), 'utf8')
-  assert.match(page, /currentEmployee\(\{ allowUnverifiedMfa: true \}\)/)
 })
