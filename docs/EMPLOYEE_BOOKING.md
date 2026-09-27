@@ -123,7 +123,7 @@ Open `http://localhost:3011/employee/preview/`. Use fictional client data.
 Reservations exist only in that tab's memory and disappear on reload. The local
 preview explicitly says nothing is emailed or charged.
 
-The sign-in screen at `/employee/` uses a standalone white layout with the red
+The sign-in screen at `/employee/` uses a standalone black layout with the red
 VS monogram. In local preview mode only, it displays the requested email and
 password design. Those controls do not submit, store, log, or authenticate
 credentials. Sign In and Forgot password show explanatory notices; Keep me
