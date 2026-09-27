@@ -7,6 +7,7 @@ import { getStudioSetup, getStudioSetups } from '@/lib/booking/studio-setups'
 import { BOOKING_ADD_ONS, bookingAddOnRateLabel, bookingAddOnTotalCents, priceBookingAddOns, type BookingAddOnId } from '@/lib/booking/add-ons'
 import { addMinutes, bookingDateRange, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay } from '@/lib/booking/time'
 import { previewSlots, previewTeleprompterAvailable, type PreviewReservation } from '@/lib/employee/preview'
+import { EmployeeBookingIcon, EmployeeSelect, EmployeeSessionDetails } from './EmployeeBookingUI'
 
 type Slot = { time: string; label: string; available: boolean }
 type Result = { ref: string; phase: string; paymentUrl?: string; emailed: boolean; total: number }
@@ -143,18 +144,18 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
         <fieldset disabled={locked} className="employee-main-fields">
           <div className="employee-card employee-studio-strip">
             <div className="employee-room-thumb"><Image src={studio.heroImage} alt={studio.name} fill sizes="76px" /></div>
-            <label className="employee-studio-label"><span>Studio</span><select aria-label="Studio" value={studioId} onChange={(event) => { setStudioId(event.target.value); setSetupId(''); setStart('') }}>{STUDIOS.map((room) => <option key={room.id} value={room.id}>{room.name}</option>)}</select></label>
+            <label className="employee-studio-label"><span>Studio</span><EmployeeSelect variant="studio" aria-label="Studio" value={studioId} onChange={(event) => { setStudioId(event.target.value); setSetupId(''); setStart('') }}>{STUDIOS.map((room) => <option key={room.id} value={room.id}>{room.name}</option>)}</EmployeeSelect></label>
             <div className="employee-studio-rate"><strong>{money(studio.price * 100)}<small>/hr</small></strong><span>{studio.type === 'podcast' ? 'Podcast studio' : 'Studio rental'}</span></div>
           </div>
           <section className="employee-card employee-schedule" aria-label="Choose session date and time">
-            <div className="employee-calendar"><h2>Select a date</h2><div className="employee-month"><button type="button" aria-label="Previous month" disabled={month <= dates[0].slice(0, 7)} onClick={() => setMonth(moveMonth(month, -1))}>‹</button><strong>{new Date(`${month}-15T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</strong><button type="button" aria-label="Next month" disabled={month >= dates.at(-1)!.slice(0, 7)} onClick={() => setMonth(moveMonth(month, 1))}>›</button></div>
-              <div className="employee-weekdays" aria-hidden="true">{['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((label, index) => <span key={index}>{label}</span>)}</div>
-              <div className="employee-days">{monthDays(month).map((day, index) => day ? <button type="button" key={day} aria-label={formatDateForDisplay(day)} aria-pressed={date === day} className={date === day ? 'selected' : ''} disabled={!dates.includes(day)} onClick={() => { setDate(day); setStart('') }}>{Number(day.slice(-2))}{day === dates[0] && <i />}</button> : <span key={`blank-${index}`} />)}</div>
+            <div className="employee-calendar"><h2>Select a date</h2><div className="employee-month"><button type="button" aria-label="Previous month" disabled={month <= dates[0].slice(0, 7)} onClick={() => setMonth(moveMonth(month, -1))}><span aria-hidden="true">←</span> Prev</button><strong>{new Date(`${month}-15T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</strong><button type="button" aria-label="Next month" disabled={month >= dates.at(-1)!.slice(0, 7)} onClick={() => setMonth(moveMonth(month, 1))}>Next <span aria-hidden="true">→</span></button></div>
+              <div className="employee-weekdays" aria-hidden="true">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((label) => <span key={label}>{label}</span>)}</div>
+              <div className="employee-days">{monthDays(month).map((day, index) => day ? <button type="button" key={day} aria-label={formatDateForDisplay(day)} aria-current={day === dates[0] ? 'date' : undefined} aria-pressed={date === day} className={date === day ? 'selected' : ''} disabled={!dates.includes(day)} onClick={() => { setDate(day); setStart('') }}>{Number(day.slice(-2))}{day === dates[0] && <i />}</button> : <span key={`blank-${index}`} />)}</div>
               <p className="employee-calendar-note"><span /> Today <span className="employee-legend-square" /> Selected date</p>
             </div>
-            <div className="employee-time-panel"><h2>Start time <span>{new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}</span></h2>
-              <label className="employee-duration">Session length<select aria-label="Session length" value={count} onChange={(event) => { setCount(Number(event.target.value)); setStart('') }}>{Array.from({ length: 15 }, (_, index) => index + 2).map((slots) => <option key={slots} value={slots}>{formatBookingDuration(slots)}</option>)}</select></label>
-              <div className="employee-times" aria-label="Available start times" aria-busy={!currentAvailability}>{daySlots.map((slot, index) => {
+            <div className="employee-time-panel"><h2>Start time <span>{new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })}</span></h2>
+              <label className="employee-duration">Session length<EmployeeSelect aria-label="Session length" value={count} onChange={(event) => { setCount(Number(event.target.value)); setStart('') }}>{Array.from({ length: 15 }, (_, index) => index + 2).map((slots) => <option key={slots} value={slots}>{formatBookingDuration(slots)}</option>)}</EmployeeSelect></label>
+              <div className="employee-times" role="group" aria-label="Available start times" aria-busy={!currentAvailability}>{daySlots.map((slot, index) => {
                 const hour = Number(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hourCycle: 'h23', timeZone: 'America/Los_Angeles' }).format(slot.start))
                 if (!overnight && (hour < 8 || hour >= 22)) return null
                 const iso = slot.start.toISOString()
@@ -163,10 +164,10 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
               <div className="employee-time-help" aria-live="polite">{!currentAvailability ? 'Checking availability…' : availability.error ? <><span>{availability.error}</span><button type="button" onClick={() => setRefresh((value) => value + 1)}>Retry</button></> : 'Unavailable times include booked sessions and turnaround.'}</div>
               <button type="button" className="employee-text-button" onClick={() => setOvernight(!overnight)}>{overnight ? 'Show daytime hours' : 'Show overnight hours'} <span aria-hidden="true">↗</span></button>
             </div>
-            <div className="employee-turnaround"><span aria-hidden="true">◷</span><p><strong>Room to reset.</strong> We reserve 30 minutes after the session for studio turnaround, at no extra charge.</p></div>
+            <div className="employee-turnaround"><EmployeeBookingIcon name="clock" /><p><strong>Room to reset.</strong> We reserve 30 minutes after the session for studio turnaround, at no extra charge.</p></div>
           </section>
           <section className="employee-card employee-details"><div className="employee-section-heading"><h2>Session details</h2><span>Make it their own</span></div>
-            {setups.length > 0 && <label>Studio setup<select required value={setupId} onChange={(event) => setSetupId(event.target.value)}><option value="">Choose a setup</option>{setups.map((option) => <option value={option.id} key={option.id}>{option.label}</option>)}</select></label>}
+            {setups.length > 0 && <label>Studio setup<EmployeeSelect required value={setupId} onChange={(event) => setSetupId(event.target.value)}><option value="">Choose a setup</option>{setups.map((option) => <option value={option.id} key={option.id}>{option.label}</option>)}</EmployeeSelect></label>}
             <div className="employee-addons">{BOOKING_ADD_ONS.map((addon) => {
               const selected = addOnIds.includes(addon.id)
               const unavailable = addon.id === 'teleprompter' && !teleprompterReady
@@ -182,9 +183,16 @@ export default function EmployeeBookingPage({ email, preview = false, enabled }:
         </fieldset>
         <aside className="employee-summary-column">
           <section className="employee-card employee-summary"><div className="employee-section-heading"><h2>Your session</h2><span className="employee-small-badge">{result?.phase === 'cancelled' ? 'Cancelled' : result ? 'Reserved' : 'New booking'}</span></div>
-            <div className="employee-session-photo"><Image src={setup?.image || studio.heroImage} alt={setup?.alt || studio.name} fill sizes="(max-width: 960px) 90vw, 360px" priority /></div>
+            <div className="employee-session-photo"><Image src={setup?.image || studio.heroImage} alt={setup?.alt || studio.name} fill sizes="(max-width: 1100px) 90vw, 360px" priority /></div>
             <h3>{studio.name}</h3><p className="employee-summary-subtitle">{studio.type === 'podcast' ? 'Podcast session' : 'Studio rental'}</p>
-            <dl><div><dt>Date</dt><dd>{new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })}</dd></div><div><dt>Time</dt><dd>{start && end ? `${formatTimeForDisplay(new Date(start))} – ${formatTimeForDisplay(end)}` : 'Choose a start time'}</dd></div><div><dt>Duration</dt><dd>{formatBookingDuration(count)}</dd></div><div><dt>Setup</dt><dd>{setup?.label || (setups.length ? 'Choose a setup' : 'Standard studio setup')}</dd></div><div><dt>Studio rate</dt><dd>{money(studio.price * 100)}/hr</dd></div>{addOns.map((addon) => <div key={addon.id}><dt>{addon.name}</dt><dd>{addon.amountCents ? money(addon.amountCents) : 'Included'}</dd></div>)}</dl>
+            <EmployeeSessionDetails
+              date={new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })}
+              time={start && end ? `${formatTimeForDisplay(new Date(start))} – ${formatTimeForDisplay(end)}` : 'Choose a start time'}
+              duration={formatBookingDuration(count)}
+              setup={setup?.label || (setups.length ? 'Choose a setup' : 'Standard studio setup')}
+              rate={`${money(studio.price * 100)}/hr`}
+              addOns={addOns.map((addon) => ({ id: addon.id, name: addon.name, price: addon.amountCents ? money(addon.amountCents) : 'Included' }))}
+            />
             <div className="employee-total"><span>Session total</span><strong>{money(result?.total || total)}</strong></div>
             {!result && <><button className="employee-primary" type="submit" disabled={busy || (!ready && !attempted)}>{busy ? 'Creating reservation…' : attempted ? 'Retry this booking' : preview ? 'Try creating a booking' : 'Create booking & send link'}<span aria-hidden="true">→</span></button><p className="employee-summary-help">{!start ? 'Choose a start time to continue.' : !sessionReady ? 'Complete your setup and select an available session.' : !name.trim() || !clientEmail.trim() ? 'Add the client’s name and email to continue.' : 'No payment is collected now.'}</p></>}
             {error && <p className="employee-notice" role="alert">{error}</p>}

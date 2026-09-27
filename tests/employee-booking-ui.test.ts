@@ -1,0 +1,50 @@
+import assert from 'node:assert/strict'
+import { describe, test } from 'node:test'
+import React, { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { EmployeeSelect, EmployeeSessionDetails } from '../app/employee/EmployeeBookingUI'
+import EmployeeBookingPage from '../app/employee/EmployeeBookingPage'
+
+Object.assign(globalThis, { React })
+
+describe('employee booking presentation', () => {
+  test('styles a real native select without replacing its accessibility or validation', () => {
+    const html = renderToStaticMarkup(createElement(EmployeeSelect, {
+      'aria-label': 'Session length', required: true, disabled: true, value: 4, onChange: () => {},
+    }, createElement('option', { value: 2 }, '1 hour'), createElement('option', { value: 4 }, '2 hours')))
+    assert.match(html, /employee-select--default/)
+    assert.match(html, /<select aria-label="Session length" required="" disabled="">/)
+    assert.match(html, /<option value="4" selected="">2 hours<\/option>/)
+    assert.match(html, /aria-hidden="true" focusable="false"/)
+    assert.doesNotMatch(html, /<button|role="combobox"/)
+  })
+
+  test('keeps date, time, duration, setup, price and add-ons in separate readable rows', () => {
+    const html = renderToStaticMarkup(createElement(EmployeeSessionDetails, {
+      date: 'Sun, Sep 27', time: '3:00 PM – 5:00 PM', duration: '2 hours',
+      setup: '2 black office chairs with desk', rate: '$300/hr',
+      addOns: [{ id: 'teleprompter', name: 'Teleprompter', price: '$50' }, { id: 'remote-podcast', name: 'Remote podcast', price: 'Included' }],
+    }))
+    assert.equal((html.match(/<dt>/g) || []).length, 7)
+    assert.equal((html.match(/<dd>/g) || []).length, 7)
+    for (const text of ['Date', 'Time', 'Duration', 'Setup', 'Studio rate', 'Sun, Sep 27', '3:00 PM – 5:00 PM', '2 hours', '$300/hr', 'Teleprompter', '$50', 'Included']) assert.ok(html.includes(text), text)
+    assert.equal((html.match(/aria-hidden="true"/g) || []).length, 7)
+  })
+
+  test('retains employee-specific controls and rules while using clear calendar labels', () => {
+    const html = renderToStaticMarkup(createElement(EmployeeBookingPage, { email: '', preview: true, enabled: true }))
+    for (const day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']) assert.ok(html.includes(`>${day}</span>`), day)
+    assert.match(html, /aria-label="Previous month"/)
+    assert.match(html, /aria-label="Next month"/)
+    assert.match(html, /aria-current="date"/)
+    assert.match(html, /role="group" aria-label="Available start times"/)
+    assert.match(html, /employee-select--studio/)
+    assert.match(html, /aria-label="Session length"/)
+    assert.match(html, /Only this studio is reserved/)
+    assert.match(html, /30 minutes after the session/)
+    assert.match(html, /Try creating a booking/)
+    assert.match(html, /autoComplete="name"/)
+    assert.match(html, /autoComplete="email"/)
+    assert.doesNotMatch(html, /One session at a time across all podcast studios/)
+  })
+})

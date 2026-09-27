@@ -21,6 +21,14 @@ continues to use the existing shared podcast/stage rules. Staff must coordinate
 operators and cameras for overlapping staff-created sessions. Tours and
 unidentified manual busy events continue to block conservatively.
 
+The employee workspace keeps its one-page grouped cards, with the customer
+checkout's larger type scale, full weekday labels, neutral selection/focus
+states, rounded 48px controls, icon-led summary rows, and red booking action.
+Studio, duration and setup selectors share EmployeeSelect, which preserves
+native select semantics and mobile pickers. At narrower widths the summary
+and then calendar/time panels stack without shrinking essential text.
+This presentation change does not alter employee or public booking rules.
+
 Pending-payment policy currently defaults to keeping the reservation until
 staff cancels it. Tay was asked to confirm this policy; no answer was received
 during implementation. Invoices request payment before the booked start time,
