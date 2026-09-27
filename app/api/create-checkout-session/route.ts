@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { distributedRateLimit } from '@/lib/server/distributed-rate-limit'
 import { acquireBookingHolds, assertCartSlotsAvailable, releaseBookingHolds } from '@/lib/booking/calendar'
 import { getRecurringOptionById } from '@/lib/booking/catalog'
 import { buildBookingCheckoutLineItems, buildCanonicalBookingCart, calculateBookingCheckoutPricing } from '@/lib/booking/checkout-pricing'
@@ -8,7 +9,7 @@ import { bookingCheckoutExpirations } from '@/lib/booking/checkout-lifecycle'
 import { createCheckoutManagementToken } from '@/lib/booking/checkout-management'
 import { buildReferralInfo, REFERRAL_COOKIE } from '@/lib/booking/referrals'
 import { getStripeClient } from '@/lib/booking/stripe'
-import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
+import { jsonBodyErrorResponse, readJsonBody } from '@/lib/server/request-guards'
 import { isEmail, parseEmailList, stripControlChars } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
 import { BookingSetupSelectionError } from '@/lib/booking/studio-setups'
@@ -96,7 +97,7 @@ function availabilityFailure(result: { status: number; error: string; unavailabl
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = rateLimit(req, {
+    const limited = await distributedRateLimit(req, {
       key: 'checkout-session',
       max: CHECKOUT_RATE_LIMIT_MAX,
       windowMs: CHECKOUT_RATE_LIMIT_WINDOW_MS,
@@ -205,7 +206,7 @@ export async function POST(req: NextRequest) {
       try {
         await releaseBookingHolds(cart, bookingRef)
       } catch (cleanupError) {
-        console.error('Booking hold cleanup failed after checkout error:', cleanupError)
+        console.error('Booking hold cleanup failed after checkout error')
       }
       throw error
     }
@@ -220,7 +221,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid booking selection' }, { status: 400 })
     }
 
-    console.error('Stripe checkout error:', err)
+    console.error('Stripe checkout failed')
     return NextResponse.json({ error: 'Payment session failed' }, { status: 500 })
   }
 }

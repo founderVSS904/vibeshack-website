@@ -7,6 +7,14 @@ interface RateLimitOptions {
 }
 
 const buckets = new Map<string, { count: number; resetAt: number }>()
+const MAX_BUCKETS = 10_000
+
+function tooManyRequests(retryAfterSeconds: number) {
+  return NextResponse.json({ error: 'Too many requests. Please try again later.' }, {
+    status: 429,
+    headers: { 'Retry-After': String(retryAfterSeconds), 'Cache-Control': 'private, no-store' },
+  })
+}
 
 export function getClientIp(req: NextRequest) {
   const forwardedFor = req.headers.get('x-forwarded-for')
@@ -25,6 +33,11 @@ export function rateLimit(req: NextRequest, { key, max, windowMs }: RateLimitOpt
   const current = buckets.get(bucketKey)
 
   if (!current || current.resetAt <= now) {
+    if (!current && buckets.size >= MAX_BUCKETS) {
+      for (const [key, bucket] of buckets) if (bucket.resetAt <= now) buckets.delete(key)
+      // Keep active limits intact instead of evicting them to admit more keys.
+      if (buckets.size >= MAX_BUCKETS) return tooManyRequests(60)
+    }
     buckets.set(bucketKey, { count: 1, resetAt: now + windowMs })
     return null
   }
@@ -33,33 +46,42 @@ export function rateLimit(req: NextRequest, { key, max, windowMs }: RateLimitOpt
   if (current.count <= max) return null
 
   const retryAfterSeconds = Math.max(1, Math.ceil((current.resetAt - now) / 1000))
-  return NextResponse.json(
-    { error: 'Too many requests. Please try again later.' },
-    {
-      status: 429,
-      headers: {
-        'Retry-After': String(retryAfterSeconds),
-      },
-    },
-  )
+  return tooManyRequests(retryAfterSeconds)
+}
+
+export async function readTextBody(req: Request, maxBytes: number) {
+  const contentLength = Number(req.headers.get('content-length') || 0)
+  if (Number.isFinite(contentLength) && contentLength > maxBytes) {
+    void req.body?.cancel().catch(() => {})
+    throw new Error('REQUEST_TOO_LARGE')
+  }
+  if (!req.body) return ''
+  const reader = req.body.getReader()
+  const chunks: Uint8Array[] = []
+  let bytes = 0
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      bytes += value.byteLength
+      if (bytes > maxBytes) {
+        void reader.cancel().catch(() => {})
+        throw new Error('REQUEST_TOO_LARGE')
+      }
+      chunks.push(value)
+    }
+    return Buffer.concat(chunks, bytes).toString('utf8')
+  } finally {
+    reader.releaseLock()
+  }
 }
 
 export async function readJsonBody(req: NextRequest, maxBytes: number) {
   const contentType = req.headers.get('content-type') || ''
-  if (!contentType.toLowerCase().includes('application/json')) {
+  if (contentType.split(';', 1)[0].trim().toLowerCase() !== 'application/json') {
     throw new Error('UNSUPPORTED_MEDIA_TYPE')
   }
-
-  const contentLength = Number(req.headers.get('content-length') || 0)
-  if (Number.isFinite(contentLength) && contentLength > maxBytes) {
-    throw new Error('REQUEST_TOO_LARGE')
-  }
-
-  const raw = await req.text()
-  if (Buffer.byteLength(raw, 'utf8') > maxBytes) {
-    throw new Error('REQUEST_TOO_LARGE')
-  }
-
+  const raw = await readTextBody(req, maxBytes)
   try {
     return JSON.parse(raw)
   } catch {

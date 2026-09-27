@@ -16,6 +16,7 @@ import { SLOT_DURATION_MINUTES, addMinutes, bookingHoursForSlotCount, bookingPri
 import { escapeHtml, isEmail, stripControlChars } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
 import { reconcileEmployeeInvoice } from '@/lib/employee/providers'
+import { jsonBodyErrorResponse, readTextBody } from '@/lib/server/request-guards'
 
 const PAID_BOOKING_HOLD_RECOVERY_MS = 7 * 24 * 60 * 60 * 1000
 
@@ -134,7 +135,7 @@ async function getStripeReceiptUrl(session: Stripe.Checkout.Session) {
       return charge.receipt_url || ''
     }
   } catch (error) {
-    console.error('Stripe receipt lookup failed:', error)
+    console.error('Stripe receipt lookup failed')
   }
 
   return ''
@@ -145,7 +146,7 @@ async function getCurrentSessionMetadata(session: Stripe.Checkout.Session) {
     const currentSession = await getStripeClient().checkout.sessions.retrieve(session.id)
     return (currentSession.metadata || {}) as Record<string, string>
   } catch (error) {
-    console.error('Stripe session metadata lookup failed:', error)
+    console.error('Stripe session metadata lookup failed')
     return (session.metadata || {}) as Record<string, string>
   }
 }
@@ -363,7 +364,7 @@ async function sendConfirmationEmail(
         }, { identity })
         if (label === 'Booking confirmation') await markSessionFulfillmentStep(sessionId, 'vbsConfirmationSentAt')
       } catch (error) {
-        console.error(`${label} email delivery failed:`, error)
+        console.error(`${label} email delivery failed`)
         deliveryFailures.push(key)
       }
     }
@@ -541,7 +542,6 @@ async function sendConfirmationEmail(
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.text()
   const signature = req.headers.get('stripe-signature')
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
@@ -549,11 +549,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Webhook signature required' }, { status: 400 })
   }
 
+  let body: string
+  try {
+    body = await readTextBody(req, 256 * 1024)
+  } catch (error) {
+    return jsonBodyErrorResponse(error) || NextResponse.json({ error: 'Invalid webhook body' }, { status: 400 })
+  }
+
   let event: Stripe.Event
   try {
     event = getStripeClient().webhooks.constructEvent(body, signature, webhookSecret)
   } catch (error) {
-    console.error('Stripe webhook signature failed:', error)
+    console.error('Stripe webhook signature failed')
     return NextResponse.json({ error: 'Webhook signature failed' }, { status: 400 })
   }
 
@@ -587,7 +594,7 @@ export async function POST(req: NextRequest) {
       try {
         await releaseBookingHolds(cartItems, bookingRef)
       } catch (error) {
-        console.error('Expired checkout hold cleanup failed:', error)
+        console.error('Expired checkout hold cleanup failed')
         return NextResponse.json({ error: 'Expired checkout hold cleanup failed' }, { status: 500 })
       }
     }
@@ -670,7 +677,7 @@ export async function POST(req: NextRequest) {
         }
       } catch (error) {
         holdRenewalError = 'The paid booking resource hold could not be renewed.'
-        console.error('Paid booking hold renewal failed:', error)
+        console.error('Paid booking hold renewal failed')
       }
     }
     const fulfillmentErrors: string[] = []
@@ -707,7 +714,7 @@ export async function POST(req: NextRequest) {
           }
         }
       } catch (error) {
-        console.error('Post-payment availability check failed:', error)
+        console.error('Post-payment availability check failed')
       }
 
       needsAttention = needsAttention || Boolean(conflictReason)
@@ -727,7 +734,7 @@ export async function POST(req: NextRequest) {
         })
         calendarSynced = true
       } catch (error) {
-        console.error('Calendar event creation failed:', error)
+        console.error('Calendar event creation failed')
         fulfillmentErrors.push('calendar')
       }
 
@@ -736,7 +743,7 @@ export async function POST(req: NextRequest) {
           await releaseBookingHolds(cartItems, bookingRef)
           await markSessionFulfillmentStep(session.id, 'vbsBookingHoldReleasedAt')
         } catch (error) {
-          console.error('Confirmed checkout hold cleanup failed:', error)
+          console.error('Confirmed checkout hold cleanup failed')
           fulfillmentErrors.push('booking hold cleanup')
         }
       }
@@ -745,7 +752,7 @@ export async function POST(req: NextRequest) {
         await releaseBookingHolds(cartItems, bookingRef)
         await markSessionFulfillmentStep(session.id, 'vbsBookingHoldReleasedAt')
       } catch (error) {
-        console.error('Confirmed checkout hold retry cleanup failed:', error)
+        console.error('Confirmed checkout hold retry cleanup failed')
         fulfillmentErrors.push('booking hold cleanup')
       }
     }
@@ -762,7 +769,7 @@ export async function POST(req: NextRequest) {
         ), { identity: createHash('sha256').update(`attention:${session.id}`).digest('hex').slice(0, 40) })
         await markSessionFulfillmentStep(session.id, 'vbsDoubleBookingAlertedAt')
       } catch (alertError) {
-        console.error('Double booking alert email failed:', alertError)
+        console.error('Double booking alert email failed')
         fulfillmentErrors.push('booking attention alert')
       }
     }
@@ -771,7 +778,7 @@ export async function POST(req: NextRequest) {
       try {
         await sendConfirmationEmail(cartItems, customer, session.amount_total || 0, teamEmails, referralInfo, attributionDetails, receiptUrl, session.id, Boolean(currentMetadata.vbsConfirmationSentAt))
       } catch (error) {
-        console.error('Booking email failed:', error)
+        console.error('Booking email failed')
         fulfillmentErrors.push('email')
       }
     }

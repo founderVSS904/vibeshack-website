@@ -164,8 +164,6 @@ export async function GET(req: NextRequest) {
       } catch (error) {
         console.error('Booking reminder failed:', {
           bookingRef: group.bookingRef,
-          customerEmail: group.customerEmail,
-          error,
         })
         failures.push(group.bookingRef || group.customerEmail)
         continue

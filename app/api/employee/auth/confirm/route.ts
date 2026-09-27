@@ -4,7 +4,8 @@ import { employeeSupabase } from '@/lib/employee/supabase'
 import { acceptEmployeeIdentity, employeeDestination } from '@/lib/employee/access'
 import { employeeJson } from '@/lib/employee/http'
 import { escapeHtml } from '@/lib/server/sanitize'
-import { rateLimit } from '@/lib/server/request-guards'
+import { readTextBody } from '@/lib/server/request-guards'
+import { distributedRateLimit } from '@/lib/server/distributed-rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,15 +33,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   if (req.headers.get('origin') !== employeeOrigin()) return employeeJson({ error: 'Invalid request origin' }, 403)
-  const limited = rateLimit(req, { key: 'employee-email-confirm', max: 15, windowMs: 600_000 })
+  const limited = await distributedRateLimit(req, { key: 'employee-email-confirm', max: 15, windowMs: 600_000 })
   if (limited) return limited
   let destination = '/employee/?error=signin'
   let supabase: Awaited<ReturnType<typeof employeeSupabase>> | undefined
   let authenticated = false
   try {
-    if (Number(req.headers.get('content-length') || 0) > 4096) throw new Error('Invalid confirmation')
-    const raw = await req.text()
-    if (Buffer.byteLength(raw, 'utf8') > 4096) throw new Error('Invalid confirmation')
+    const raw = await readTextBody(req, 4096)
     const form = new URLSearchParams(raw)
     const token = form.get('token_hash')
     const type = form.get('type')

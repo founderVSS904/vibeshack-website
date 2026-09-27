@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { distributedRateLimit } from '@/lib/server/distributed-rate-limit'
 import { releaseBookingHolds } from '@/lib/booking/calendar'
 import { checkoutHoldReleaseAction } from '@/lib/booking/checkout-lifecycle'
 import { verifyCheckoutManagementToken } from '@/lib/booking/checkout-management'
@@ -7,7 +8,7 @@ import {
   parseBookingCartItems,
 } from '@/lib/booking/checkout-metadata'
 import { getStripeClient } from '@/lib/booking/stripe'
-import { jsonBodyErrorResponse, rateLimit, readJsonBody } from '@/lib/server/request-guards'
+import { jsonBodyErrorResponse, readJsonBody } from '@/lib/server/request-guards'
 import { stripControlChars } from '@/lib/server/sanitize'
 
 const CANCEL_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -24,7 +25,7 @@ function completedResponse(sessionId: string) {
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = rateLimit(req, {
+    const limited = await distributedRateLimit(req, {
       key: 'cancel-checkout-session',
       max: CANCEL_RATE_LIMIT_MAX,
       windowMs: CANCEL_RATE_LIMIT_WINDOW_MS,
@@ -104,7 +105,7 @@ export async function POST(req: NextRequest) {
         },
       })
     } catch (error) {
-      console.error('Released checkout hold could not be marked in Stripe:', error)
+      console.error('Released checkout hold could not be marked in Stripe')
     }
 
     return NextResponse.json({ released: true })
@@ -112,7 +113,7 @@ export async function POST(req: NextRequest) {
     const bodyError = jsonBodyErrorResponse(error)
     if (bodyError) return bodyError
 
-    console.error('Checkout cancellation failed:', error)
+    console.error('Checkout cancellation failed')
     return NextResponse.json({
       error: 'We could not reopen this time yet. Please try again.',
     }, { status: 500 })

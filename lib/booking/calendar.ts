@@ -59,6 +59,7 @@ export interface TourBookingDetails {
   studioId?: string
   studioName?: string
   notes?: string
+  requestId?: string
   reservationRef?: string
 }
 
@@ -741,7 +742,7 @@ async function releaseAcquiredBookingHolds(
       bookingRef,
     )
   } catch (error) {
-    console.error('Partial booking hold cleanup failed:', error)
+    console.error('Partial booking hold cleanup failed')
   }
 }
 
@@ -1205,7 +1206,7 @@ export async function getBusyTimesForDate(
     // Availability below reads full event metadata and ignores expired hold
     // events itself. Cleanup is helpful housekeeping, but a failed deletion
     // must not make every otherwise-open booking time disappear.
-    console.error('Expired booking hold housekeeping failed:', error)
+    console.error('Expired booking hold housekeeping failed')
   }
   const calendarContexts = new Map<string, {
     calendarId: string
@@ -1352,7 +1353,7 @@ export async function getTourAvailabilityForDate(
       }),
     }
   } catch (error) {
-    console.error('tour availability calendar error', error)
+    console.error('Tour availability could not be verified')
     return {
       verified: false,
       error: 'Tour availability could not be verified',
@@ -1436,7 +1437,7 @@ export async function getAvailabilityForDate(
       }),
     }
   } catch (error) {
-    console.error('availability calendar error', error)
+    console.error('Calendar availability could not be verified')
     return {
       verified: false,
       error: 'Calendar availability could not be verified',
@@ -1863,33 +1864,39 @@ function tourCalendarEventId(tour: TourBookingDetails) {
 }
 
 async function existingTourReservation(tour: TourBookingDetails) {
+  if (!tour.requestId) return false
   const config = await getCalendarConfig()
   if (!config) throw new Error('Calendar credentials are not configured')
-  // Find a committed retry by guest and exact time, including bookings from
-  // the previous implementation. Cancelled tours do not prevent rebooking.
+  // Only the browser that knows this random request ID can recognize a retry.
+  // Email and time alone must not disclose whether a guest has a reservation.
   let pageToken: string | undefined
   do {
     const response = await config.client.events.list({
       calendarId: getTourCalendarId(),
       timeMin: new Date(tour.slot).toISOString(),
       timeMax: addMinutes(new Date(tour.slot), TOUR_DURATION_MINUTES).toISOString(),
-      privateExtendedProperty: ['source=vibeshack-tour-booking', `guestEmail=${tour.email}`],
+      privateExtendedProperty: ['source=vibeshack-tour-booking', `requestId=${tour.requestId}`, `guestEmail=${tour.email}`],
       singleEvents: true, showDeleted: false, pageToken,
     })
     if ((response.data.items || []).some((event) => event.status !== 'cancelled'
-      && event.start?.dateTime && Date.parse(event.start.dateTime) === Date.parse(tour.slot))) return true
+      && event.extendedProperties?.private?.source === 'vibeshack-tour-booking'
+      && event.extendedProperties?.private?.requestId === tour.requestId
+      && event.extendedProperties?.private?.guestEmail === tour.email
+      && event.start?.dateTime && Date.parse(event.start.dateTime) === Date.parse(tour.slot)
+      && bookingDateInPacific(new Date(event.start.dateTime)) === tour.date)) return true
     pageToken = response.data.nextPageToken || undefined
   } while (pageToken)
   return false
 }
 
-export async function reserveTourBooking(tour: TourBookingDetails) {
+export async function reserveTourBooking(tour: TourBookingDetails, beforeCreate?: Parameters<typeof reserveTour>[1]['beforeCreate']) {
   return reserveTour(tour, {
     acquire: (cart, ref, expiry) => acquireBookingHolds(cart, ref, expiry, false),
     availability: assertTourSlotAvailable,
     insert: addTourEvent,
     release: releaseBookingHolds,
     exists: existingTourReservation,
+    beforeCreate,
   })
 }
 
@@ -1936,6 +1943,7 @@ export async function addTourEvent(tour: TourBookingDetails, dependencies: Booki
           bookingType: 'tour',
           reservationRef: tour.reservationRef || '',
           guestEmail: tour.email,
+          requestId: tour.requestId || '',
           studioId: tour.studioId || '',
           studioName,
         },

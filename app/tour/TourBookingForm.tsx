@@ -42,6 +42,7 @@ export default function TourBookingForm() {
   const [confirmed, setConfirmed] = useState<{ date: string; time: string; studioName: string } | null>(null)
   const [tourDates, setTourDates] = useState<string[]>([])
   const availabilityReqRef = useRef(0)
+  const submissionRef = useRef<{ key: string; requestId: string; tracked: boolean } | null>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -142,6 +143,11 @@ export default function TourBookingForm() {
     setError('')
 
     try {
+      const submissionKey = JSON.stringify([studioId, selectedDate, selectedSlot, name, email.trim().toLowerCase(), phone, notes])
+      if (submissionRef.current?.key !== submissionKey) {
+        submissionRef.current = { key: submissionKey, requestId: crypto.randomUUID(), tracked: false }
+      }
+      const submission = submissionRef.current
       const response = await fetch('/api/book-tour/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -155,6 +161,7 @@ export default function TourBookingForm() {
           notes,
           company,
           startedAt,
+          requestId: submission.requestId,
         }),
       })
       const data = await response.json()
@@ -165,7 +172,10 @@ export default function TourBookingForm() {
       }
       if (isConfirmedTourResponse(data)) {
         setConfirmed(data.tour)
-        if (!company.trim() && data.created) trackSuccessfulLead('tour')
+        if (!company.trim() && !submission.tracked) {
+          submission.tracked = true
+          trackSuccessfulLead('tour')
+        }
       }
     } catch {
       setError('Connection error. Please try again.')

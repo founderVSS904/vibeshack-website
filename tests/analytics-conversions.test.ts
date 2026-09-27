@@ -72,12 +72,10 @@ describe('conversion measurement boundaries', () => {
     for (const response of [null, undefined, {}, { ok: true }, { ok: true, tour: {} }, { ok: false, tour: { date: '2026-09-12', time: '10:00-10:30 AM', studioName: 'The Executive' } }]) {
       assert.equal(isConfirmedTourResponse(response), false)
     }
-    for (const created of [true, false]) {
-      const response = { ok: true, created, tour: { date: '2026-09-12', time: '10:00-10:30 AM', studioName: 'The Executive' } }
-      assert.equal(isConfirmedTourResponse(response), true)
-      const events: string[] = []
-      recordSuccessfulLead('tour', response.created, (event) => { events.push(event); return true })
-      assert.equal(events.length, created ? 1 : 0)
-    }
+    const response = { ok: true, tour: { date: '2026-09-12', time: '10:00-10:30 AM', studioName: 'The Executive' } }
+    assert.equal(isConfirmedTourResponse(response), true)
+    const events: string[] = []
+    recordSuccessfulLead('tour', isConfirmedTourResponse(response), (event) => { events.push(event); return true })
+    assert.equal(events.length, 1)
   })
 })

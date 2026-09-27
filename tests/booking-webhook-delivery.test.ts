@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import vm from 'node:vm'
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import ts from 'typescript'
 import { test } from 'node:test'
 import { deliverMessage, type DeliveryRecord, type DeliveryStore } from '../lib/booking/delivery'
@@ -45,6 +45,8 @@ function fixture(failedSubject = '', rejectedResult = false) {
   const cart = [{ studioId: 'canvas-rental', studioName: 'Canvas Rental', date: '2026-09-12', slots: ['2026-09-12T15:00:00.000Z', '2026-09-12T15:30:00.000Z'], price: 100 }]
   const context = vm.createContext({
     Date, Promise, Response, createHash,
+    readTextBody: async (req: { text: () => Promise<string> }) => req.text(),
+    jsonBodyErrorResponse: () => null,
     console: { error: () => undefined },
     process: { env: { STRIPE_WEBHOOK_SECRET: 'fixture', GMAIL_USER: 'fixture@example.invalid', GMAIL_APP_PASSWORD: 'fixture' } },
     require: (name: string) => {
@@ -123,10 +125,10 @@ test('tour POST does not resend confirmations when an already committed reservat
   let emails = 0
   let alreadyReserved = false
   const context = vm.createContext({
-    Date, Number, Response,
+    Date, Number, Response, randomUUID,
     console: { error: () => undefined },
     RATE_LIMIT_MAX: 6, RATE_LIMIT_WINDOW_MS: 600_000, MAX_BODY_BYTES: 10_240, MIN_FORM_AGE_MS: 1500,
-    rateLimit: () => null,
+    distributedRateLimit: async () => null,
     readJsonBody: async () => ({ name: 'Fixture Guest', email: 'guest@example.invalid', date: '2026-09-12', slot: '2026-09-12T15:00:00.000Z' }),
     stripControlChars: (value: unknown) => String(value ?? ''),
     isEmail: () => true, isValidBookingDate: () => true,
@@ -139,11 +141,12 @@ test('tour POST does not resend confirmations when an already committed reservat
   vm.runInContext(`${actualFunction('POST', 'app/api/book-tour/route.ts')}\nglobalThis.run = POST`, context)
   const created = await context.run({}) as Response
   assert.equal(created.status, 200)
-  assert.equal((await created.json()).created, true)
+  const receipt = await created.json()
+  assert.equal(receipt.created, true)
   assert.equal(emails, 1)
   alreadyReserved = true
   const retried = await context.run({}) as Response
   assert.equal(retried.status, 200)
-  assert.equal((await retried.json()).created, false)
+  assert.deepEqual(await retried.json(), receipt)
   assert.equal(emails, 1)
 })

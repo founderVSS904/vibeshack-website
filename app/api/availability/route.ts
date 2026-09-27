@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAvailabilityForDate } from '@/lib/booking/calendar'
 import { getStudioById } from '@/lib/booking/catalog'
 import { isValidBookingDate } from '@/lib/booking/time'
-import { rateLimit } from '@/lib/server/request-guards'
+import { distributedRateLimit } from '@/lib/server/distributed-rate-limit'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const limited = rateLimit(req, { key: 'availability', max: 120, windowMs: 60 * 1000 })
+  const limited = await distributedRateLimit(req, { key: 'availability', max: 120, windowMs: 60 * 1000 })
   if (limited) return limited
 
   const { searchParams } = new URL(req.url)
