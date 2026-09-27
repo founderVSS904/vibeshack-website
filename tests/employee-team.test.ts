@@ -123,8 +123,8 @@ test('invitation email uses only the approved recipient, canonical confirmation 
   assert.equal(closed, true)
 })
 
-test('existing Google users can receive invitations and provider signup token types are preserved', async () => {
-  for (const scenario of ['existing', 'signup']) {
+test('existing Google users get password setup links and authorized missing identities can receive an invitation', async () => {
+  for (const scenario of ['existing', 'missing']) {
     const types: string[] = []
     let mail: any
     const invitationModule = load('lib/employee/invitations.ts', {
@@ -132,14 +132,29 @@ test('existing Google users can receive invitations and provider signup token ty
       nodemailer: { createTransport: () => ({ sendMail: async (value: unknown) => { mail = value; return { accepted: ['employee@example.test'] } }, close() {} }) },
       './supabase': { employeeAdmin: () => ({ auth: { admin: { generateLink: async ({ type }: { type: string }) => {
         types.push(type)
-        if (scenario === 'existing' && types.length === 1) return { data: {}, error: { code: 'email_exists' } }
-        return { data: { properties: { hashed_token: 'synthetic-single-use-token', verification_type: scenario === 'existing' ? 'magiclink' : 'signup' } }, error: null }
+        if (types.length === 1) return { data: {}, error: { code: scenario === 'existing' ? 'email_exists' : 'user_not_found' } }
+        return { data: { properties: { hashed_token: 'synthetic-single-use-token', verification_type: scenario === 'existing' ? 'recovery' : 'invite' } }, error: null }
       } } } }) },
       './auth': { employeeOrigin: () => 'https://www.example.test' },
       '../server/sanitize': { escapeHtml },
     }, { GMAIL_USER: 'sender@example.test', GMAIL_APP_PASSWORD: 'synthetic-fixture-only' })
-    await invitationModule.sendEmployeeAccessLink('employee@example.test', 'Fixture', scenario === 'existing' ? 'invite' : 'magiclink')
-    assert.equal(types.join(','), scenario === 'existing' ? 'invite,magiclink' : 'magiclink')
-    assert.equal(mail.text.includes(`type=${scenario === 'existing' ? 'magiclink' : 'signup'}`), true)
+    await invitationModule.sendEmployeeAccessLink('employee@example.test', 'Fixture', scenario === 'existing' ? 'invite' : 'recovery')
+    assert.equal(types.join(','), scenario === 'existing' ? 'invite,recovery' : 'recovery,invite')
+    assert.equal(mail.text.includes(`type=${scenario === 'existing' ? 'recovery' : 'invite'}`), true)
+  }
+})
+
+test('password invitations reject unexpected provider token types before sending mail', async () => {
+  for (const verification_type of ['magiclink', 'signup', 'email_change']) {
+    let sent = false
+    const invitationModule = load('lib/employee/invitations.ts', {
+      'server-only': {},
+      nodemailer: { createTransport: () => ({ sendMail: async () => { sent = true; return { accepted: ['employee@example.test'] } }, close() {} }) },
+      './supabase': { employeeAdmin: () => ({ auth: { admin: { generateLink: async () => ({ data: { properties: { hashed_token: 'synthetic-single-use-token', verification_type } }, error: null }) } } }) },
+      './auth': { employeeOrigin: () => 'https://www.example.test' },
+      '../server/sanitize': { escapeHtml },
+    }, { GMAIL_USER: 'sender@example.test', GMAIL_APP_PASSWORD: 'synthetic-fixture-only' })
+    await assert.rejects(invitationModule.sendEmployeeAccessLink('employee@example.test', 'Fixture', 'recovery'))
+    assert.equal(sent, false)
   }
 })

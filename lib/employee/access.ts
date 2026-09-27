@@ -6,7 +6,7 @@ export type CurrentEmployee = {
   id: string; email: string; name?: string; role: 'superadmin' | 'employee'; status: 'active'; mfaVerified: boolean
 }
 
-export async function currentEmployee({ allowUnverifiedMfa = false }: { allowUnverifiedMfa?: boolean } = {}): Promise<CurrentEmployee | null> {
+export async function currentEmployee(): Promise<CurrentEmployee | null> {
   if (!employeeSupabaseConfigured()) return null
   try {
     const supabase = await employeeSupabase()
@@ -20,12 +20,11 @@ export async function currentEmployee({ allowUnverifiedMfa = false }: { allowUnv
     if (member.role !== 'employee' && member.role !== 'superadmin') return null
     if (member.role === 'superadmin' && member.email !== 'founder@vibeshackstudios.com') return null
     const mfaVerified = verified.claims.aal === 'aal2'
-    if (member.role === 'superadmin' && !mfaVerified && !allowUnverifiedMfa) return null
     return { id: identity.user.id, email: member.email, name: employeeDisplayName(member.name) || employeeDisplayName(identity.user.user_metadata?.full_name || identity.user.user_metadata?.name), role: member.role, status: 'active', mfaVerified }
   } catch { return null }
 }
 
-// Only a successfully exchanged OAuth code or email token reaches this function.
+// Only a verified password, OAuth code, or email token reaches this function.
 // The service-only SQL function checks the confirmed Auth user and invitation.
 export async function acceptEmployeeIdentity() {
   const supabase = await employeeSupabase()
@@ -33,11 +32,11 @@ export async function acceptEmployeeIdentity() {
   if (error || !data.user?.email_confirmed_at) throw new Error('Employee identity was not verified')
   const accepted = await employeeAdmin().rpc('employee_accept_identity', { p_user_id: data.user.id })
   if (accepted.error) throw new Error('Employee access is not available')
-  const employee = await currentEmployee({ allowUnverifiedMfa: true })
+  const employee = await currentEmployee()
   if (!employee) throw new Error('Employee access is not available')
   return employee
 }
 
 export function employeeDestination(employee: CurrentEmployee) {
-  return employee.role === 'superadmin' && !employee.mfaVerified ? '/employee/security/' : '/employee/book/'
+  return employee.status === 'active' ? '/employee/book/' : '/employee/'
 }

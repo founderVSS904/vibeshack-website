@@ -47,7 +47,7 @@ export default function EmployeeHeader({ email, preview, role = 'employee', acti
           <div className={styles.panel}>
             <div className={styles.identity}><strong>{preview ? 'Local preview' : role === 'superadmin' ? 'Superadmin' : 'Signed in'}</strong><p>{preview ? 'You’re exploring the team workspace. No employee account is signed in.' : email}</p></div>
             <nav className={styles.mobileNavigation} aria-label="Workspace navigation">{links.map((link) => <Link key={link.id} className={styles.menuAction} href={link.href} aria-current={active === link.id ? 'page' : undefined}>{link.label}{active === link.id && <span aria-hidden="true">✓</span>}</Link>)}</nav>
-            {!preview && role === 'superadmin' && <Link className={styles.menuAction} href="/employee/security/">Account security</Link>}
+            {!preview && <Link className={styles.menuAction} href="/employee/password/">Reset password</Link>}
             {preview ? <Link className={styles.menuAction} href="/employee/">Employee sign in <span aria-hidden="true">→</span></Link> : <form action="/api/employee/auth/logout" method="post"><button className={styles.menuAction} type="submit">Sign out <span aria-hidden="true">→</span></button></form>}
           </div>
         </details>

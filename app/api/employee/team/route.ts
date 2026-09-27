@@ -36,7 +36,7 @@ async function manage(req: NextRequest, invite: boolean) {
     }
     if (action === 'invite' || action === 'resend') {
       try {
-        await sendEmployeeAccessLink(data.email, data.name, action === 'invite' ? 'invite' : 'magiclink')
+        await sendEmployeeAccessLink(data.email, data.name, action === 'invite' ? 'invite' : 'recovery')
       } catch {
         await admin.from('employee_activity').insert({ actor_user_id: guard.employee.id, actor_email: guard.employee.email, action: 'invitation.delivery_unconfirmed', target_email: data.email })
         return employeeJson({ error: 'Access is invited, but email delivery could not be confirmed. Check the inbox before resending after one minute.' }, 503)

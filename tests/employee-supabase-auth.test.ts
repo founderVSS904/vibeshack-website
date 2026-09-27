@@ -6,6 +6,7 @@ import ts from 'typescript'
 import { NextRequest, NextResponse } from 'next/server'
 import { employeeDisplayName } from '../lib/employee/identity'
 import { escapeHtml, isEmail, stripControlChars } from '../lib/server/sanitize'
+import { jsonBodyErrorResponse, readJsonBody } from '../lib/server/request-guards'
 
 // Execute actual route/helper declarations in isolated contexts with synthetic
 // Auth, database and email providers. No credentials or network are available.
@@ -20,11 +21,11 @@ function sourceFunction(name: string, file: string) {
 }
 function contextFor(file: string, names: string[], bindings: Record<string, unknown> = {}) {
   const context = vm.createContext({
-    Date, Buffer, URL, URLSearchParams, NextResponse, encodeURIComponent,
+    Date, Buffer, URL, URLSearchParams, NextRequest, NextResponse, encodeURIComponent,
     employeeDisplayName, escapeHtml, isEmail, stripControlChars,
     employeeOrigin: () => 'https://example.invalid', rateLimit: () => null,
     employeeJson: (value: unknown, status = 200) => NextResponse.json(value, { status, headers: { 'Cache-Control': 'private, no-store' } }),
-    readJsonBody: async (req: NextRequest) => req.json(), jsonBodyErrorResponse: () => null,
+    readJsonBody, jsonBodyErrorResponse,
     ...bindings,
   })
   vm.runInContext(names.map((name) => sourceFunction(name, file)).join('\n'), context)
@@ -116,19 +117,17 @@ for (const [label, mutate] of [
   })
 }
 
-test('founder must have verified aal2 for protected access, while aal1 can reach only MFA setup', async () => {
+test('verified active founder can use protected access at aal1 without an authenticator gate', async () => {
   const fixture = accessFixture()
   fixture.state.user.email = founder.email
   fixture.state.member.email = founder.email
   fixture.state.member.role = 'superadmin'
+  const signedIn = await fixture.run()
+  assert.equal(signedIn.role, 'superadmin')
+  assert.equal(signedIn.email, founder.email)
+  assert.equal(fixture.destination(signedIn), '/employee/book/')
+  fixture.state.member.status = 'disabled'
   assert.equal(await fixture.run(), null)
-  const pending = await fixture.run({ allowUnverifiedMfa: true })
-  assert.equal(pending.mfaVerified, false)
-  assert.equal(fixture.destination(pending), '/employee/security/')
-  fixture.state.claims.aal = 'aal2'
-  const verified = await fixture.run()
-  assert.equal(verified.mfaVerified, true)
-  assert.equal(fixture.destination(verified), '/employee/book/')
 })
 
 test('employee identity acceptance runs the service RPC only for a verified authenticated user', async () => {
@@ -148,7 +147,7 @@ test('employee identity acceptance runs the service RPC only for a verified auth
   assert.equal(accepted, 1)
 })
 
-test('employee guard rejects old cookie-only auth, cross-origin writes, staff administration and founder aal1 actions', async () => {
+test('employee guard rejects legacy cookies and unauthorized roles while allowing active founder aal1 actions', async () => {
   let identity: typeof employee | null = null
   const context = contextFor('lib/employee/http.ts', ['employeeGuard'], { currentEmployee: async () => identity })
   const legacy = new NextRequest('https://example.invalid/api/employee/bookings', { headers: { cookie: 'vs_employee=legacy-signed-fixture' } })
@@ -157,11 +156,7 @@ test('employee guard rejects old cookie-only auth, cross-origin writes, staff ad
   assert.equal((await context.employeeGuard(request('/api/employee/bookings', {}, 'https://attacker.invalid'), true)).response.status, 403)
   assert.equal((await context.employeeGuard(legacy, false, { superadmin: true })).response.status, 403)
   identity = founder
-  const blocked = await context.employeeGuard(legacy)
-  assert.equal(blocked.response.status, 403)
-  assert.equal((await blocked.response.json()).code, 'MFA_REQUIRED')
-  assert.ok((await context.employeeGuard(legacy, false, { allowUnverifiedMfa: true })).employee)
-  identity = { ...founder, mfaVerified: true }
+  assert.ok((await context.employeeGuard(legacy)).employee)
   assert.ok((await context.employeeGuard(legacy, false, { superadmin: true })).employee)
 })
 
@@ -205,56 +200,236 @@ test('OAuth callback exchanges code before accepting membership and ignores forg
   assert.deepEqual(calls, ['exchange', 'accept', 'signout'])
 })
 
-test('email sign-in gives the same response for unknown/disabled/active emails and sends only after the distributed claim', async () => {
+for (const route of ['email', 'password/reset']) {
+test(`${route} gives the same recovery response for unknown, disabled and approved emails`, async () => {
   let status: string | null = null
   let claimed = false
   let sends = 0
-  const context = contextFor('app/api/employee/auth/email/route.ts', ['POST'], {
+  let databaseError = false
+  let sendError = false
+  const context = contextFor(`app/api/employee/auth/${route}/route.ts`, ['POST'], {
     employeeAdmin: () => ({
       from: () => ({ select: () => ({ eq: (_key: string, email: string) => {
         assert.equal(email, employee.email)
-        return { maybeSingle: async () => ({ data: status ? { email, name: employee.name, status } : null, error: null }) }
+        return { maybeSingle: async () => ({ data: status ? { email, name: employee.name, status } : null, error: databaseError }) }
       } }) }),
       rpc: async (name: string) => { assert.equal(name, 'employee_claim_signin_email'); return { data: claimed, error: null } },
     }),
-    sendEmployeeAccessLink: async (email: string, _name: string, kind: string) => { assert.equal(email, employee.email); assert.equal(kind, 'magiclink'); sends++ },
+    sendEmployeeAccessLink: async (email: string, _name: string, kind: string) => { assert.equal(email, employee.email); assert.equal(kind, 'recovery'); sends++; if (sendError) throw new Error('Private provider failure') },
   })
-  const run = () => context.POST(request('/api/employee/auth/email', { email: employee.email.toUpperCase() }))
+  const run = () => context.POST(request(`/api/employee/auth/${route}`, { email: employee.email.toUpperCase() }))
   const unknown = await (await run()).json()
   status = 'disabled'; assert.deepEqual(await (await run()).json(), unknown)
   status = 'active'; assert.deepEqual(await (await run()).json(), unknown); assert.equal(sends, 0)
   claimed = true; assert.deepEqual(await (await run()).json(), unknown); assert.equal(sends, 1)
+  status = 'invited'; assert.deepEqual(await (await run()).json(), unknown); assert.equal(sends, 2)
+  databaseError = true; assert.deepEqual(await (await run()).json(), unknown); assert.equal(sends, 2)
+  databaseError = false; sendError = true; assert.deepEqual(await (await run()).json(), unknown); assert.equal(sends, 3)
+})
+}
+
+function passwordFixture({ providerError = false, providerThrows = false, denied = false, limited = false } = {}) {
+  const calls: string[] = []
+  const context = contextFor('app/api/employee/auth/password/route.ts', ['POST'], {
+    rateLimit: () => limited ? NextResponse.json({ error: 'Too many requests' }, { status: 429 }) : null,
+    employeeSupabase: async () => ({ auth: {
+      signInWithPassword: async (input: { email: string; password: string }) => {
+        calls.push('signin')
+        assert.equal(input.email, employee.email)
+        assert.equal(input.password, '  Fixture password 123!  ')
+        if (providerThrows) throw new Error('Private provider detail')
+        return { data: { user: { id: employee.id } }, error: providerError ? { message: 'Private invalid credentials' } : null }
+      },
+      signOut: async () => { calls.push('signout'); return { error: null } },
+    } }),
+    acceptEmployeeIdentity: async () => { calls.push('accept'); if (denied) throw new Error('Private disabled member detail'); return founder },
+    employeeDestination: () => '/employee/book/',
+  })
+  return { calls, run: (req = request('/api/employee/auth/password', { email: ` ${employee.email.toUpperCase()} `, password: '  Fixture password 123!  ', role: 'superadmin', next: 'https://attacker.invalid' })) => context.POST(req) as Promise<NextResponse> }
+}
+
+test('email/password sign-in preserves password bytes and grants only accepted membership with a canonical destination', async () => {
+  const fixture = passwordFixture()
+  const response = await fixture.run()
+  assert.equal(response.status, 200)
+  assert.deepEqual(await response.json(), { ok: true, redirect: '/employee/book/' })
+  assert.deepEqual(fixture.calls, ['signin', 'accept'])
 })
 
-test('email link GET does not consume tokens; same-origin POST alone verifies and accepts membership', async () => {
+test('bad credentials, provider failures and denied membership return the same generic password error', async () => {
+  let error: unknown
+  for (const options of [{ providerError: true }, { providerThrows: true }, { denied: true }]) {
+    const fixture = passwordFixture(options)
+    const response = await fixture.run()
+    assert.equal(response.status, 401)
+    const body = await response.json()
+    if (error === undefined) error = body
+    else assert.deepEqual(body, error)
+    assert.doesNotMatch(JSON.stringify(body), /Private|Fixture password|disabled member/)
+    assert.deepEqual(fixture.calls, options.denied ? ['signin', 'accept', 'signout'] : ['signin'])
+  }
+})
+
+test('password sign-in rejects unsafe origins, invalid payloads, oversized bodies and throttled requests before authentication', async () => {
+  const fixture = passwordFixture()
+  for (const origin of ['https://attacker.invalid', 'null', undefined]) {
+    const req = new NextRequest('https://example.invalid/api/employee/auth/password', {
+      method: 'POST', headers: { ...(origin === undefined ? {} : { origin }), 'content-type': 'application/json' },
+      body: JSON.stringify({ email: employee.email, password: 'synthetic' }),
+    })
+    assert.equal((await fixture.run(req)).status, 403)
+  }
+  for (const body of [{ email: 'invalid', password: 'synthetic' }, { email: employee.email, password: '' }, { email: employee.email, password: 'x'.repeat(129) }, { email: employee.email, password: 123 }]) {
+    assert.equal((await fixture.run(request('/api/employee/auth/password', body))).status, 400)
+  }
+  assert.equal((await fixture.run(request('/api/employee/auth/password', { email: employee.email, password: 'synthetic', padding: 'x'.repeat(4096) }))).status, 413)
+  assert.deepEqual(fixture.calls, [])
+  const throttled = passwordFixture({ limited: true })
+  assert.equal((await throttled.run()).status, 429)
+  assert.deepEqual(throttled.calls, [])
+})
+
+test('password recovery blocks unsafe origins and oversized input before any lookup or mail', async () => {
+  let called = false
+  const context = contextFor('app/api/employee/auth/password/reset/route.ts', ['POST'], {
+    employeeAdmin: () => { called = true; throw new Error('Should not query') },
+    sendEmployeeAccessLink: () => { called = true; throw new Error('Should not send') },
+  })
+  for (const origin of ['https://attacker.invalid', 'null', undefined]) {
+    const req = new NextRequest('https://example.invalid/api/employee/auth/password/reset', {
+      method: 'POST', headers: { ...(origin === undefined ? {} : { origin }), 'content-type': 'application/json' }, body: JSON.stringify({ email: employee.email }),
+    })
+    assert.equal((await context.POST(req)).status, 403)
+  }
+  assert.equal((await context.POST(request('/api/employee/auth/password/reset', { email: employee.email, padding: 'x'.repeat(2048) }))).status, 413)
+  assert.equal((await context.POST(request('/api/employee/auth/password/reset', { email: 'invalid' }))).status, 200)
+  assert.equal(called, false)
+  const throttled = contextFor('app/api/employee/auth/password/reset/route.ts', ['POST'], {
+    rateLimit: () => NextResponse.json({ error: 'Too many requests' }, { status: 429 }),
+    employeeAdmin: () => { called = true; throw new Error('Should not query') },
+  })
+  assert.equal((await throttled.POST(request('/api/employee/auth/password/reset', { email: employee.email }))).status, 429)
+  assert.equal(called, false)
+})
+
+test('legacy magiclink GET does not consume tokens; same-origin POST still verifies and accepts membership', async () => {
   let consumed = 0
   const context = contextFor('app/api/employee/auth/confirm/route.ts', ['validToken', 'GET', 'POST'], {
     employeeSupabase: async () => ({ auth: { verifyOtp: async (input: { type: string; token_hash: string }) => {
-      assert.equal(input.type, 'invite'); assert.equal(input.token_hash, 'a'.repeat(64)); consumed++; return { error: null }
+      assert.equal(input.type, 'magiclink'); assert.equal(input.token_hash, 'a'.repeat(64)); consumed++; return { error: null }
     } } }),
     acceptEmployeeIdentity: async () => founder,
-    employeeDestination: () => '/employee/security/',
+    employeeDestination: () => '/employee/book/',
   })
-  const response = await context.GET(request(`/api/employee/auth/confirm?token_hash=${'a'.repeat(64)}&type=invite`))
+  const response = await context.GET(request(`/api/employee/auth/confirm?token_hash=${'a'.repeat(64)}&type=magiclink`))
   const html = await response.text()
   assert.equal(consumed, 0)
   assert.match(html, /method="post"/)
   assert.doesNotMatch(html, /<script|onload=|autofocus/)
+  assert.doesNotMatch(html, /name="(?:password|confirm_password)"/)
   // Native form POSTs preserve Origin under strict-origin without putting the
   // confirmation token's path/query into Referer. Null Origin stays forbidden.
   assert.equal(response.headers.get('Referrer-Policy'), 'strict-origin')
   const post = (origin?: string) => new NextRequest('https://example.invalid/api/employee/auth/confirm', {
     method: 'POST', headers: { ...(origin === undefined ? {} : { origin }), 'content-type': 'application/x-www-form-urlencoded' },
-    body: `token_hash=${'a'.repeat(64)}&type=invite`,
+    body: `token_hash=${'a'.repeat(64)}&type=magiclink`,
   })
   for (const origin of ['https://attacker.invalid', 'null', undefined]) {
     assert.equal((await context.POST(post(origin))).status, 403, `Reject ${origin ?? 'missing'} Origin`)
     assert.equal(consumed, 0)
   }
   const accepted = await context.POST(post('https://example.invalid'))
-  assert.equal(accepted.headers.get('location'), 'https://example.invalid/employee/security/')
+  assert.equal(accepted.headers.get('location'), 'https://example.invalid/employee/book/')
   assert.equal(accepted.headers.get('Referrer-Policy'), 'strict-origin')
   assert.equal(consumed, 1)
+})
+
+function confirmationFixture(type: 'invite' | 'recovery', { tokenError = false, denied = false, updateError = false } = {}) {
+  const calls: string[] = []
+  let updatedPassword = ''
+  const context = contextFor('app/api/employee/auth/confirm/route.ts', ['validToken', 'GET', 'POST'], {
+    employeeSupabase: async () => ({ auth: {
+      verifyOtp: async (input: { type: string; token_hash: string }) => {
+        assert.equal(input.type, type); assert.equal(input.token_hash, 'c'.repeat(64))
+        calls.push('verify')
+        return { error: tokenError ? { message: 'Private expired token' } : null }
+      },
+      updateUser: async (input: { password: string }) => {
+        calls.push('password')
+        updatedPassword = input.password
+        return { error: updateError ? { message: 'Private password provider failure' } : null }
+      },
+      signOut: async () => { calls.push('signout'); return { error: null } },
+    } }),
+    acceptEmployeeIdentity: async () => { calls.push('accept'); if (denied) throw new Error('Private disabled member'); return founder },
+    employeeDestination: () => '/employee/book/',
+  })
+  return {
+    calls, password: () => updatedPassword,
+    get: () => context.GET(request(`/api/employee/auth/confirm?token_hash=${'c'.repeat(64)}&type=${type}`)) as Promise<NextResponse>,
+    post: (password = 'Fixture password 123!', confirmation = password, origin: string | undefined = 'https://example.invalid') => context.POST(new NextRequest('https://example.invalid/api/employee/auth/confirm', {
+      method: 'POST', headers: { ...(origin === undefined ? {} : { origin }), 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ token_hash: 'c'.repeat(64), type, password, confirm_password: confirmation }).toString(),
+    })) as Promise<NextResponse>,
+  }
+}
+
+for (const type of ['invite', 'recovery'] as const) {
+  test(`${type} GET is scanner-safe and POST sets a password only after token and membership verification`, async () => {
+    const fixture = confirmationFixture(type)
+    const page = await fixture.get()
+    assert.equal(page.status, 200)
+    assert.equal(page.headers.get('Referrer-Policy'), 'strict-origin')
+    const html = await page.text()
+    assert.match(html, /method="post"/)
+    assert.match(html, /name="password"/)
+    assert.match(html, /name="confirm_password"/)
+    assert.doesNotMatch(html, /<script|onload=/)
+    assert.deepEqual(fixture.calls, [])
+    const response = await fixture.post()
+    assert.equal(response.status, 303)
+    assert.equal(response.headers.get('location'), 'https://example.invalid/employee/book/')
+    assert.deepEqual(fixture.calls, ['verify', 'accept', 'password'])
+    assert.equal(fixture.password(), 'Fixture password 123!')
+  })
+}
+
+test('password setup retains its unconsumed token and clears password values when validation needs a retry', async () => {
+  for (const [password, confirmation] of [['short77', 'short77'], ['x'.repeat(129), 'x'.repeat(129)], ['Fixture password', 'Different password'], ['', '']]) {
+    const fixture = confirmationFixture('recovery')
+    const response = await fixture.post(password, confirmation)
+    assert.equal(response.status, 200)
+    const html = await response.text()
+    assert.match(html, /name="token_hash" value="c{64}"/)
+    assert.match(html, /name="password"/)
+    assert.doesNotMatch(html, /name="(?:password|confirm_password)"[^>]*value=/)
+    if (password) assert.equal(html.includes(password), false)
+    assert.deepEqual(fixture.calls, [])
+  }
+  for (const length of [8, 128]) {
+    const fixture = confirmationFixture('recovery')
+    const password = 'x'.repeat(length)
+    assert.equal((await fixture.post(password)).headers.get('location'), 'https://example.invalid/employee/book/')
+    assert.equal(fixture.password(), password)
+  }
+})
+
+test('password setup failures never disclose tokens and revoke the local session after denied membership or password update', async () => {
+  for (const options of [{ tokenError: true }, { denied: true }, { updateError: true }]) {
+    const fixture = confirmationFixture('recovery', options)
+    const response = await fixture.post()
+    assert.equal(response.status, 303)
+    assert.equal(response.headers.get('location'), 'https://example.invalid/employee/password/?error=reset')
+    assert.equal(response.headers.get('location')?.includes('c'.repeat(64)), false)
+    const body = await response.text()
+    assert.doesNotMatch(body, /Private|Fixture password/)
+    if (options.tokenError) {
+      assert.equal(fixture.calls.includes('accept'), false)
+      assert.equal(fixture.calls.includes('password'), false)
+    } else {
+      assert.deepEqual(fixture.calls, options.denied ? ['verify', 'accept', 'signout'] : ['verify', 'accept', 'password', 'signout'])
+    }
+  }
 })
 
 test('signup verification links remain scanner-safe and require accepted employee membership', async () => {
@@ -285,6 +460,7 @@ test('signup verification links remain scanner-safe and require accepted employe
     assert.match(html, /method="post"/)
     assert.match(html, /name="type" value="signup"/)
     assert.doesNotMatch(html, /<script|onload=/)
+    assert.doesNotMatch(html, /name="(?:password|confirm_password)"/)
     assert.deepEqual(calls, [])
     const response = await context.POST(new NextRequest('https://example.invalid/api/employee/auth/confirm', {
       method: 'POST', headers: { origin: 'https://example.invalid', 'content-type': 'application/x-www-form-urlencoded' },
@@ -311,48 +487,6 @@ test('native logout allows revoked employees to leave but rejects foreign, null 
   }
   assert.equal((await context.POST(post('https://example.invalid'))).status, 303)
   assert.equal(signedOut, 1)
-})
-
-test('aal1 cannot replace an existing verified authenticator by enrolling a new one', async () => {
-  let enrolled = false
-  const context = contextFor('app/api/employee/auth/mfa/enroll/route.ts', ['POST'], {
-    employeeGuard: async () => ({ employee: founder }),
-    employeeSupabase: async () => ({ auth: { mfa: {
-      listFactors: async () => ({ data: { totp: [{ id: 'owned' }], all: [] }, error: null }),
-      enroll: async () => { enrolled = true; throw new Error('Should not enroll') },
-    } } }),
-  })
-  assert.equal((await context.POST(request('/api/employee/auth/mfa/enroll', {}))).status, 403)
-  assert.equal(enrolled, false)
-})
-
-test('MFA challenge rejects another account factor before calling the provider', async () => {
-  let challenged = false
-  const context = contextFor('app/api/employee/auth/mfa/challenge/route.ts', ['POST'], {
-    employeeGuard: async () => ({ employee: founder }),
-    employeeSupabase: async () => ({ auth: { mfa: {
-      listFactors: async () => ({ data: { all: [] }, error: null }),
-      challenge: async () => { challenged = true; throw new Error('Should not challenge') },
-    } } }),
-  })
-  assert.equal((await context.POST(request('/api/employee/auth/mfa/challenge', { factorId: employee.id }))).status, 400)
-  assert.equal(challenged, false)
-})
-
-test('MFA verification grants access only after refreshed signed claims actually report aal2', async () => {
-  let verified = false
-  const context = contextFor('app/api/employee/auth/mfa/verify/route.ts', ['POST'], {
-    employeeGuard: async () => ({ employee: founder }),
-    currentEmployee: async () => ({ ...founder, mfaVerified: verified }),
-    employeeSupabase: async () => ({ auth: { mfa: {
-      listFactors: async () => ({ data: { all: [{ id: employee.id, factor_type: 'totp' }] }, error: null }),
-      verify: async () => ({ error: null }),
-    } } }),
-  })
-  const run = () => context.POST(request('/api/employee/auth/mfa/verify', { factorId: employee.id, challengeId: employee.id, code: '123456' }))
-  assert.equal((await run()).status, 403)
-  verified = true
-  assert.deepEqual(await (await run()).json(), { ok: true, redirect: '/employee/book/' })
 })
 
 test('middleware preserves slash redirects and refreshes employee cookies without affecting public pages', async () => {
@@ -389,7 +523,7 @@ test('employee document middleware keeps native forms compatible when no session
       process: { env: configured ? { SUPABASE_URL: 'https://fixture.supabase.invalid', SUPABASE_PUBLISHABLE_KEY: 'fixture-publishable' } : {} },
       createServerClient: () => ({ auth: { getClaims: async () => { checked++ } } }),
     })
-    for (const path of ['/employee/book/', '/employee/security/', '/api/employee/auth/confirm']) {
+    for (const path of ['/employee/book/', '/employee/password/', '/api/employee/auth/confirm']) {
       const response = await context.middleware(request(path))
       assert.equal(response.headers.get('Referrer-Policy'), 'strict-origin', path)
       assert.equal(response.headers.get('Cache-Control'), 'private, no-store', path)
