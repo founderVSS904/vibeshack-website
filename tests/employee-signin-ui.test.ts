@@ -31,12 +31,11 @@ describe('employee sign-in design', () => {
     assert.doesNotMatch(html, /<input|<form|\/employee\/preview|\/api\/employee\/auth\/login/)
   })
 
-  test('configured sign-in provides Google and invitation-only passwordless email access', () => {
+  test('configured sign-in provides Google and passwordless email access', () => {
     const html = renderToStaticMarkup(createElement(EmployeeSignIn, { preview: false, configured: true }))
     assert.match(html, /href="\/api\/employee\/auth\/login"/)
     assert.match(html, /aria-label="Email sign in"/)
     assert.match(html, /autoComplete="email"/)
-    assert.match(html, /Invite-only access\. No password to remember\./)
     assert.doesNotMatch(html, /type="password"|\/employee\/preview/)
   })
 
