@@ -52,7 +52,8 @@ describe('employee booking presentation', () => {
 
   test('exposes quick dates and time groups with a compact summary on the first step', () => {
     const html = renderToStaticMarkup(createElement(EmployeeBookingPage, { email: '', preview: true, enabled: true }))
-    for (const text of ['Today', 'Tomorrow', 'Next available', 'Morning', 'Afternoon', 'Evening', 'Overnight hours', 'Show unavailable']) assert.ok(html.includes(text), text)
+    for (const text of ['Today', 'Tomorrow', 'Next available', 'Night', 'Morning', 'Afternoon', 'Evening', '12 AM–6 AM', '6 AM–12 PM', '12 PM–6 PM', '6 PM–12 AM', 'Open 24 hours', 'Choose the date your session starts.', 'Show unavailable']) assert.ok(html.includes(text), text)
+    assert.doesNotMatch(html, /Overnight hours|Daytime hours/)
     assert.match(html, /aria-label="Quick date selection"/)
     assert.match(html, /aria-label="Time of day"/)
     assert.match(html, /aria-label="Session at a glance"/)

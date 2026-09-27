@@ -95,13 +95,17 @@
 .employee-time-panel h2 { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; }
 .employee-time-panel h2 span { font-weight: 400; font-size: 14px; color: var(--employee-secondary); }
 .employee-app .employee-duration { margin: 24px 0 16px; color: var(--employee-secondary); }
-.employee-periods { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: #09090b; margin-bottom: 16px; }
-.employee-periods button { flex: 1; min-width: 0; min-height: 44px; padding: 8px 4px; color: var(--employee-secondary); border-radius: 9px; font-size: 14px; }
+.employee-periods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 12px; background: #09090b; margin-bottom: 16px; }
+.employee-periods button { min-width: 0; min-height: 60px; padding: 9px 8px; color: var(--employee-secondary); border-radius: 9px; font-size: 14px; }
+.employee-periods strong, .employee-periods span { display: block; }
+.employee-periods strong { font-weight: 500; }
+.employee-periods span { margin-top: 3px; font-size: 12px; }
 .employee-periods button[aria-pressed=true] { background: #303035; color: #fff; }
 .employee-periods button:hover:not(:disabled) { color: #fff; }
 .employee-times { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 4px; }
 .employee-time-options { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; margin-top: 8px; }
-.employee-overnight-label { font-size: 14px; color: var(--employee-secondary); margin-bottom: 12px !important; }
+.employee-start-date-note { font-size: 13px; color: var(--employee-secondary); margin-top: 8px !important; }
+.employee-times button small { display: block; font-size: 10px; margin-top: 2px; }
 .employee-times button { font-size: 14px; border: 1px solid #ffffff26; border-radius: 12px; background: #19191c; color: #d4d4d8; min-height: 48px; white-space: nowrap; }
 .employee-times button:disabled { color: #686871; background: #141416; border-color: #ffffff0d; text-decoration: line-through; }
 .employee-times button:not(:disabled):not(.selected):hover { background: #ffffff12; border-color: #ffffff4d; color: #fff; }

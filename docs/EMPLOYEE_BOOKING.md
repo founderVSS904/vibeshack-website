@@ -156,6 +156,26 @@ page-view and attribution capture components.
 
 ## Local review and safe testing
 
+### 24-hour employee calendar
+
+The Session step exposes Night (12 AM to 6 AM), Morning (6 AM to 12 PM),
+Afternoon (12 PM to 6 PM), and Evening (6 PM to 12 AM) with equal prominence.
+The calendar date is the session's starting date. Sessions remain 1 to 8 hours,
+in half-hour increments, and may continue past midnight. End times and
+turnaround times show their next-day date. Repeated fall-back start times are
+distinguished with PDT/PST labels.
+
+Employee availability verifies the selected date plus enough next-day slots
+for the longest session. Server-side canonicalization allows overnight slots
+only through the authenticated employee path. Room checks and global equipment
+ledgers cover both dates, and the studio's 30-minute turnaround crosses midnight
+as needed. One overnight session still has one flat teleprompter charge. Public
+checkout validation and its existing same-day limit are unchanged.
+
+`/api/employee/add-on-availability` requires employee authentication and uses
+the same start-date horizon, slot count, and midnight continuation rules.
+The local preview simulates those rules with in-memory reservations only.
+
 Run from the feature checkout:
 
 ```sh

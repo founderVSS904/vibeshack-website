@@ -51,6 +51,19 @@ test('staff bookings reject past dates, stale slots, missing setup, and out-of-h
   assert.throws(() => employeeBookingInput(raw, employee, new Date('2099-01-01')), /future/)
   assert.throws(() => employeeBookingInput({ ...raw, session: { ...raw.session, slots: [] } }, employee), /cart/)
 })
+test('employee overnight booking is one session with one flat teleprompter fee; public input cannot opt in', () => {
+  const raw = input(['teleprompter', 'live-switching'])
+  const start = zonedDateTimeToUtc(raw.session.date, 23)
+  raw.session.slots = Array.from({ length: 4 }, (_, index) => addMinutes(start, index * 30).toISOString())
+  const record = employeeBookingInput(raw, employee)
+  assert.equal(record.cart.length, 1)
+  assert.equal(record.cart[0].hours, 2)
+  assert.equal(record.total, 80_000)
+  assert.equal(record.cart[0].addOns?.find((addon) => addon.id === 'teleprompter')?.amountCents, 5000)
+  assert.throws(() => buildCanonicalBookingCart([{ ...raw.session, allowOvernight: true }]), /Invalid cart/)
+  const changedDate = { ...raw, session: { ...raw.session, date: bookingDateRange(60)[3] } }
+  assert.throws(() => employeeBookingInput(changedDate, employee), /Invalid cart/)
+})
 test('creation reserves the room before preparing or sending a payment request, and repeat submissions are idempotent', async () => {
   const fixture = memoryServices()
   const record = employeeBookingInput(input(), employee)

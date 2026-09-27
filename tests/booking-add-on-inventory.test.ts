@@ -9,7 +9,7 @@ import {
 import { addOnAvailabilityState, addOnRequestSlots, limitedAddOnIds } from '../lib/booking/add-on-inventory'
 import { buildCanonicalBookingCart } from '../lib/booking/checkout-pricing'
 import { getStudioSetups } from '../lib/booking/studio-setups'
-import { addMinutes, getTimeSlotsForDay, zonedDateTimeToUtc } from '../lib/booking/time'
+import { addMinutes, getTimeSlotsForDay, nextDateString, zonedDateTimeToUtc } from '../lib/booking/time'
 
 const date = '2099-09-25'
 const iso = (hour: number, minute = 0) => zonedDateTimeToUtc(date, hour, minute).toISOString()
@@ -19,6 +19,13 @@ function cart(studioId = 'canvas-rental', hour = 15, count = 4, addOnIds = ['tel
     studioId, date, setupId: getStudioSetups(studioId)[0]?.id, addOnIds,
     slots: Array.from({ length: count }, (_, i) => addMinutes(new Date(iso(hour)), i * 30).toISOString()),
   }])
+}
+function employeeCart(day: string, studioId: string, hour: number, minute = 0, count = 4, addOnIds = ['teleprompter']) {
+  const start = zonedDateTimeToUtc(day, hour, minute)
+  return buildCanonicalBookingCart([{
+    studioId, date: day, setupId: getStudioSetups(studioId)[0]?.id, addOnIds,
+    slots: Array.from({ length: count }, (_, i) => addMinutes(start, i * 30).toISOString()),
+  }], { allowOvernight: true }).map((item) => ({ ...item, reservationKind: 'employee' as const }))
 }
 function reserved(): calendar_v3.Schema$Event {
   return {
@@ -75,6 +82,73 @@ function memoryCalendar(initial: calendar_v3.Schema$Event[] = []) {
     getAddOnAvailabilityForSlots(date, cart('canvas-rental', hour, count)[0].slots, excludedRef, dependencies)
   return { stored, events, dependencies, available }
 }
+
+test('overnight employee holds occupy both dates, with room turnaround but no equipment buffer', async () => {
+  const fixture = memoryCalendar()
+  const overnight = employeeCart(date, 'the-executive', 23)
+  const next = nextDateString(date)
+  assert.equal((await assertCartSlotsAvailable(overnight, undefined, fixture.dependencies)).ok, true)
+  assert.equal((await acquireBookingHolds(overnight, 'overnight', expiry(), false, fixture.dependencies)).ok, true)
+  for (const [hour, minute, available] of [[0, 0, false], [1, 0, false], [1, 30, true]] as const) {
+    const slots = await getAvailabilityForDate(next, 'the-executive', undefined, false, fixture.dependencies, true)
+    assert.equal(slots.slots.find((slot) => slot.time === zonedDateTimeToUtc(next, hour, minute).toISOString())?.available, available)
+  }
+  const wing = employeeCart(next, 'the-wing', 0, 0, 2, [])
+  assert.equal((await assertCartSlotsAvailable(wing, undefined, fixture.dependencies)).ok, true)
+  assert.equal((await assertCartSlotsAvailable(employeeCart(next, 'the-wing', 0), undefined, fixture.dependencies)).status, 409)
+  assert.equal((await assertCartSlotsAvailable(employeeCart(next, 'the-wing', 1), undefined, fixture.dependencies)).ok, true)
+  const own = await getAddOnAvailabilityForSlots(date, overnight[0].slots, 'overnight', fixture.dependencies, true)
+  assert.equal(own.availability.teleprompter, true)
+  await releaseBookingHolds(overnight, 'overnight', fixture.dependencies)
+  assert.equal((await assertCartSlotsAvailable(overnight, undefined, fixture.dependencies)).ok, true)
+  assert.equal((await assertCartSlotsAvailable(employeeCart(next, 'the-executive', 0), undefined, fixture.dependencies)).ok, true)
+})
+
+test('an overnight booking checks next-day equipment ledgers and calendar conflicts', async () => {
+  const next = nextDateString(date)
+  const overnight = employeeCart(date, 'the-executive', 23)
+  const fixture = memoryCalendar()
+  await acquireBookingHolds(employeeCart(next, 'the-wing', 0), 'next-day', expiry(), false, fixture.dependencies)
+  assert.equal((await getAddOnAvailabilityForSlots(date, overnight[0].slots, undefined, fixture.dependencies, true)).availability.teleprompter, false)
+  const conflict = await assertCartSlotsAvailable(overnight, undefined, fixture.dependencies)
+  assert.equal(conflict.status, 409)
+  assert.deepEqual('unavailableAddOnIds' in conflict && conflict.unavailableAddOnIds, ['teleprompter'])
+  // The public inventory API still refuses sessions spanning two dates.
+  assert.equal((await getAddOnAvailabilityForSlots(date, overnight[0].slots, undefined, fixture.dependencies)).verified, false)
+  const event: calendar_v3.Schema$Event = {
+    id: 'next-day-room', status: 'confirmed', start: { dateTime: zonedDateTimeToUtc(next, 0).toISOString() }, end: { dateTime: zonedDateTimeToUtc(next, 2).toISOString() },
+    extendedProperties: { private: { source: 'vibeshack-employee-booking', studioId: 'the-executive', addOnIds: '' } },
+  }
+  const calendarFixture = memoryCalendar([event])
+  assert.equal((await assertCartSlotsAvailable(employeeCart(date, 'the-executive', 23, 0, 4, []), undefined, calendarFixture.dependencies)).status, 409)
+  assert.equal((await assertCartSlotsAvailable(employeeCart(date, 'the-wing', 23, 0, 4, []), undefined, calendarFixture.dependencies)).ok, true)
+})
+
+test('overnight inventory fails closed when a next-day ledger cannot be read', async () => {
+  const fixture = memoryCalendar()
+  const overnight = employeeCart(date, 'the-executive', 23)
+  await acquireBookingHolds(employeeCart(nextDateString(date), 'the-wing', 0), 'next-day', expiry(), false, fixture.dependencies)
+  const get = fixture.events.get
+  fixture.events.get = async (request) => {
+    const event = fixture.stored.get(request.eventId)
+    const ledger = JSON.parse(event?.description || '{}')
+    if (ledger.date === nextDateString(date) && ledger.resourceGroup === 'add-on:teleprompter') throw new Error('Fixture next-day read failure')
+    return get(request)
+  }
+  const result = await getAddOnAvailabilityForSlots(date, overnight[0].slots, undefined, fixture.dependencies, true)
+  assert.equal(result.verified, false)
+  assert.equal(result.availability.teleprompter, false)
+})
+
+test('simultaneous overnight and next-day equipment reservations have one winner', async () => {
+  const fixture = memoryCalendar()
+  const carts = [employeeCart(date, 'the-executive', 23), employeeCart(nextDateString(date), 'the-wing', 0)]
+  const results = await Promise.all(carts.map((items, index) => acquireBookingHolds(items, `overnight-race-${index}`, expiry(), false, fixture.dependencies)))
+  assert.equal(results.filter((result) => result.ok).length, 1)
+  const loser = results.findIndex((result) => !result.ok)
+  assert.equal(results[loser].status, 409)
+  for (const event of fixture.stored.values()) assert.equal(JSON.parse(event.description || '{}').holds?.[`overnight-race-${loser}`], undefined)
+})
 
 test('employee room-only reservations still lock the single teleprompter globally', async () => {
   const fixture = memoryCalendar()

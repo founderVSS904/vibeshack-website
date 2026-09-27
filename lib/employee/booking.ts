@@ -37,7 +37,7 @@ export function employeeBookingInput(raw: unknown, employee: string, now = new D
   const input = raw as Record<string, unknown>
   if (typeof input.requestId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.requestId)) throw new EmployeeBookingError('Invalid booking attempt')
   let cart: BookingCartItem[]
-  try { cart = buildCanonicalBookingCart([input.session]) } catch (error) { throw new EmployeeBookingError(error instanceof Error ? error.message : 'Invalid session') }
+  try { cart = buildCanonicalBookingCart([input.session], { allowOvernight: true }) } catch (error) { throw new EmployeeBookingError(error instanceof Error ? error.message : 'Invalid session') }
   const item = cart[0]
   if (!bookingDateRange(60, now).includes(item.date) || Date.parse(item.slots[0]) <= now.getTime()) throw new EmployeeBookingError('Choose a future time within the next 60 days')
   // This marker is applied here, behind employee authorization. Never trust a browser flag.

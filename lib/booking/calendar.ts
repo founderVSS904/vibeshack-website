@@ -16,7 +16,7 @@ import {
 } from './hold-cleanup'
 import { type ReferralInfo } from './referrals'
 import { primaryStudioResourceGroup, studioIdsThatAffectAvailability, studioResourceGroups, studiosShareResources } from './resources'
-import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingDateInPacific, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, slotIsoSetForDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
+import { BOOKING_TIME_ZONE, SLOT_DURATION_MINUTES, addHours, addMinutes, bookingDateInPacific, bookingSlotsMatchStartDate, bookingStartIsInFuture, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, getTimeSlotsForDay, groupConsecutiveSlotIsos, hasConsecutiveBookingSlots, isValidBookingDate, zonedDateHourToUtc, zonedDateTimeToUtc } from './time'
 import { bookingSlotFitsTurnaround, slotsWithTurnaround, STUDIO_TURNAROUND_MINUTES, type BookingBusyRange } from './turnaround'
 import { SINGLE_UNIT_ADD_ONS, addOnConflict, addOnForResource, addOnResourceGroup, limitedAddOnIds, type AddOnAvailability } from './add-on-inventory'
 
@@ -1472,11 +1472,8 @@ export async function assertCartSlotsAvailable(
       return { ok: false, status: 400, error: 'Invalid booking slots' }
     }
 
-    const validSlots = slotIsoSetForDate(item.date)
-    for (const slot of item.slots) {
-      if (!validSlots.has(slot)) {
-        return { ok: false, status: 400, error: 'Selected slots do not match the booking date' }
-      }
+    if (!bookingSlotsMatchStartDate(item.date, item.slots, item.reservationKind === 'employee')) {
+      return { ok: false, status: 400, error: 'Selected slots do not match the booking date' }
     }
     for (const target of bookingHoldTargets([item])) {
       const resourceSlotKeys = target.slots.map((slot) => `${target.resourceGroup}|${target.date}|${slot}`)
@@ -1489,10 +1486,13 @@ export async function assertCartSlotsAvailable(
       resourceSlotKeys.forEach((requestedSlotKey) => requestedSlotKeys.add(requestedSlotKey))
     }
 
-    const groupKey = `${item.studioId}|${item.date}`
-    const group = byStudioDate.get(groupKey) || { studioId: item.studioId, date: item.date, slots: [] }
-    group.slots.push(...item.slots)
-    byStudioDate.set(groupKey, group)
+    for (const slot of item.slots) {
+      const date = bookingDateInPacific(new Date(slot))
+      const groupKey = `${item.studioId}|${date}`
+      const group = byStudioDate.get(groupKey) || { studioId: item.studioId, date, slots: [] }
+      group.slots.push(slot)
+      byStudioDate.set(groupKey, group)
+    }
   }
 
   for (const { studioId, date, slots } of Array.from(byStudioDate.values())) {
@@ -1532,10 +1532,11 @@ export async function getAddOnAvailabilityForSlots(
   slots: string[],
   excludedBookingRef?: string,
   dependencies: BookingCalendarDependencies = defaultBookingCalendarDependencies,
+  allowOvernight = false,
 ) {
   const availability: AddOnAvailability = Object.fromEntries(SINGLE_UNIT_ADD_ONS.map(({ id }) => [id, false]))
   if (!isValidBookingDate(date) || !hasConsecutiveBookingSlots(slots, 1)
-    || !slots.every((slot) => slotIsoSetForDate(date).has(slot))) {
+    || !bookingSlotsMatchStartDate(date, slots, allowOvernight)) {
     return { verified: false, availability, error: 'Invalid add-on session' }
   }
   try {
@@ -1566,11 +1567,13 @@ export async function getAddOnAvailabilityForSlots(
       } while (pageToken)
     }
     for (const { id } of SINGLE_UNIT_ADD_ONS) {
-      const target = bookingHoldLedgerTarget(addOnResourceGroup(id), date)
-      const event = await getExistingBookingHoldLedger(config.client, getHoldCalendarId(), target)
-      if (event && Object.entries(activeBookingHoldLedger(event, target).holds).some(([ref, hold]) => (
-        ref !== excludedBookingRef && holdSlotsConflict(slots, hold.slots)
-      ))) blocked.add(id)
+      for (const slotDate of new Set(slots.map((slot) => bookingDateInPacific(new Date(slot))))) {
+        const target = bookingHoldLedgerTarget(addOnResourceGroup(id), slotDate)
+        const event = await getExistingBookingHoldLedger(config.client, getHoldCalendarId(), target)
+        if (event && Object.entries(activeBookingHoldLedger(event, target).holds).some(([ref, hold]) => (
+          ref !== excludedBookingRef && holdSlotsConflict(slots, hold.slots)
+        ))) blocked.add(id)
+      }
       availability[id] = !blocked.has(id)
     }
     return { verified: true, availability }
@@ -1583,7 +1586,7 @@ async function assertCartAddOnsAvailable(cart: BookingCartItem[], excludedBookin
   for (const item of cart) {
     const selected = limitedAddOnIds(item.addOns)
     if (!selected.length) continue
-    const result = await getAddOnAvailabilityForSlots(item.date, item.slots, excludedBookingRef, dependencies)
+    const result = await getAddOnAvailabilityForSlots(item.date, item.slots, excludedBookingRef, dependencies, item.reservationKind === 'employee')
     if (!result.verified) return { ok: false, status: 503, error: result.error || 'Equipment availability could not be verified.' }
     const unavailable = selected.filter((id) => result.availability[id] !== true)
     if (unavailable.length) return addOnConflict(unavailable)
