@@ -29,7 +29,7 @@ function fixture(initial: EmployeeBooking) {
     async store() { return store },
     async available() { calls.push('available') }, async hold() { calls.push('hold') }, async calendar() { calls.push('calendar') }, async release() { calls.push('release') },
     async customer() { calls.push('customer'); return 'cus_fixture' }, async invoice() { calls.push('invoice'); return 'in_fixture' }, async finalize() { calls.push('finalize'); return 'https://example.invalid/invoice' },
-    async send() { calls.push('send') }, async notifyPaid() { calls.push('notify') }, async voidInvoice() { calls.push('void') },
+    async send() { calls.push('send') }, async markInvoicePaid() { calls.push('markInvoicePaid'); return 'out-of-band' as const }, async notifyPaid() { calls.push('notify') }, async voidInvoice() { calls.push('void') },
   }
   return { services, store, calls }
 }
@@ -143,4 +143,40 @@ test('history only permits cancellation for unpaid invoices outside an active le
   const records = [base, { ...ready(), phase: 'paid' as const }, { ...ready(), phase: 'cancelled' as const }, { ...ready(), invoiceId: undefined }, { ...ready(), leaseUntil: Date.now() + 60_000 }]
   const result = await employeeBookingHistory(employee, undefined, async () => ({ events: records.map(event) }))
   assert.deepEqual(result.items.filter((item) => item.canCancel).map((item) => item.ref), [base.ref])
+})
+
+test('history shows each payment choice with the same cancel and mark-paid rules as the server', async () => {
+  const base = ready()
+  const noInvoice = (): EmployeeBooking => ({ ...ready(), invoiceId: undefined })
+  const records: Record<string, EmployeeBooking> = {
+    stripe: base,
+    external: { ...noInvoice(), payment: 'external' },
+    prepaid: { ...noInvoice(), payment: 'prepaid', phase: 'paid', paidMethod: 'zelle', paidNote: 'Private payment note', paidBy: 'Fixture Employee (first@example.invalid)' },
+    none: { ...noInvoice(), payment: 'none', phase: 'paid', paidMethod: 'none' },
+    externalPaid: { ...noInvoice(), payment: 'external', phase: 'paid', paidMethod: 'bank', paidBy: 'Other Fixture (other@example.invalid)' },
+    stripeMarked: { ...ready(), phase: 'paid', paidMethod: 'cash' },
+  }
+  const invalid = { ...ready(), payment: 'bogus' } as unknown as EmployeeBooking
+  const badMethod = { ...ready(), paidMethod: 'paypal' } as unknown as EmployeeBooking
+  const source: EmployeeHistorySource = async () => ({ events: [...Object.values(records), invalid, badMethod].map(event) })
+  const own = await employeeBookingHistory(employee, undefined, source)
+  const team = await employeeBookingHistory(superadmin, undefined, source)
+  const view = (page: typeof own) => Object.fromEntries(Object.entries(records).map(([name, record]) => {
+    const item = page.items.find((entry) => entry.ref === record.ref)!
+    return [name, [item.payment, item.paymentLabel, item.canCancel, item.canMarkPaid]]
+  }))
+  assert.equal(own.items.length, 6)
+  assert.deepEqual(view(own), {
+    stripe: ['stripe', 'Payment link sent', true, true], external: ['external', 'Awaiting payment', true, true],
+    prepaid: ['prepaid', 'Paid by Zelle', false, false], none: ['none', 'No charge', true, false],
+    externalPaid: ['external', 'Paid by bank transfer', false, false], stripeMarked: ['stripe', 'Paid in cash', false, false],
+  })
+  assert.deepEqual(view(team), {
+    stripe: ['stripe', 'Payment link sent', true, true], external: ['external', 'Awaiting payment', true, true],
+    prepaid: ['prepaid', 'Paid by Zelle', true, false], none: ['none', 'No charge', true, false],
+    externalPaid: ['external', 'Paid by bank transfer', true, false], stripeMarked: ['stripe', 'Paid in cash', false, false],
+  })
+  assert.doesNotMatch(JSON.stringify(team), /Private payment note|paidBy|paidNote/)
+  const leased = await employeeBookingHistory(employee, undefined, async () => ({ events: [event({ ...records.external, leaseUntil: Date.now() + 60_000 })] }))
+  assert.deepEqual([leased.items[0].canCancel, leased.items[0].canMarkPaid], [false, false])
 })

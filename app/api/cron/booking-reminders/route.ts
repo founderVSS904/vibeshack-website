@@ -9,6 +9,7 @@ import { BOOKING_TIME_ZONE, formatDateForDisplay, formatTimeForDisplay } from '@
 import { escapeHtml } from '@/lib/server/sanitize'
 import { siteUrl } from '@/lib/seo/site'
 import { bookingSetupEmailHtml } from '@/lib/booking/setup-communication'
+import { employeeFollowupsForCron } from '@/lib/employee/followups'
 
 export const dynamic = 'force-dynamic'
 
@@ -172,6 +173,10 @@ export async function GET(req: NextRequest) {
     sent += 1
   }
 
+  // Staff-only follow-ups run last and report separately. They never change the
+  // public reminder counts or status.
+  const employeeFollowups = await employeeFollowupsForCron(dryRun)
+
   return NextResponse.json({
     ok: true,
     dryRun,
@@ -179,5 +184,6 @@ export async function GET(req: NextRequest) {
     events: events.length,
     sent: dryRun ? 0 : sent,
     failures,
+    employeeFollowups,
   }, { status: failures.length ? 500 : 200 })
 }

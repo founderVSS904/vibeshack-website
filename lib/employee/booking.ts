@@ -3,7 +3,8 @@ import type { BookingCartItem } from '../booking/calendar'
 import { buildCanonicalBookingCart, calculateBookingCheckoutPricing } from '../booking/checkout-pricing'
 import { bookingDateRange } from '../booking/time'
 import { isEmail, stripControlChars } from '../server/sanitize'
-import { employeeDisplayName, employeeUserId, type EmployeeIdentity } from './identity'
+import { employeeCreatorLabel, employeeDisplayName, employeeUserId, type EmployeeIdentity } from './identity'
+import { EMPLOYEE_PAYMENT_MODES, EMPLOYEE_RECORDED_METHODS, employeePaymentLabel, employeePaymentMode, type EmployeePaidMethod, type EmployeePaymentMode, type EmployeeRecordedMethod } from './payment'
 
 export class EmployeeBookingError extends Error {
   constructor(message: string, public status = 400) { super(message) }
@@ -13,6 +14,8 @@ export type EmployeeBooking = {
   cart: BookingCartItem[]; customer: { name: string; email: string; phone: string }; notes: string; total: number
   phase: 'new' | 'reserved' | 'ready' | 'paid' | 'cancelled'
   customerId?: string; invoiceId?: string; paymentUrl?: string; emailedAt?: number; internalNotifiedAt?: number
+  // Absent payment means the original Stripe invoice flow. paidBy is the staff label that recorded the payment.
+  payment?: EmployeePaymentMode; paidMethod?: EmployeePaidMethod; paidNote?: string; paidAt?: number; paidBy?: string; unpaidReminderAt?: number
   lease?: string; leaseUntil?: number
 }
 export type Snapshot = { record: EmployeeBooking; etag: string }
@@ -31,10 +34,48 @@ export interface EmployeeBookingServices {
   invoice(record: EmployeeBooking): Promise<string>
   finalize(record: EmployeeBooking): Promise<string>
   send(record: EmployeeBooking): Promise<void>
+  markInvoicePaid(record: EmployeeBooking): Promise<'out-of-band' | 'online'>
   notifyPaid(record: EmployeeBooking): Promise<void>
   voidInvoice(record: EmployeeBooking): Promise<void>
 }
-export function employeeBookingInput(raw: unknown, creator: EmployeeIdentity, now = new Date()): EmployeeBooking {
+export type EmployeePaymentInput = { mode: EmployeePaymentMode; method?: EmployeeRecordedMethod; note?: string }
+function recordedMethod(value: unknown, message: string) {
+  if (!EMPLOYEE_RECORDED_METHODS.includes(value as EmployeeRecordedMethod)) throw new EmployeeBookingError(message)
+  return value as EmployeeRecordedMethod
+}
+function paymentNote(value: unknown) {
+  const note = stripControlChars(value, 201)
+  if (value !== undefined && (typeof value !== 'string' || note.length > 200)) throw new EmployeeBookingError('Keep the payment note to 200 characters or fewer')
+  return note || undefined
+}
+function plainObject(value: unknown) { return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null }
+// Pages opened before payment choices existed send none and keep the Stripe invoice flow.
+export function employeePaymentInput(raw: unknown): EmployeePaymentInput {
+  if (raw === undefined) return { mode: 'stripe' }
+  const input = plainObject(raw)
+  const mode = input?.mode as EmployeePaymentMode
+  if (!input || !EMPLOYEE_PAYMENT_MODES.includes(mode) || Object.keys(input).some((key) => !['mode', 'method', 'note'].includes(key))) throw new EmployeeBookingError('Choose how this booking will be paid')
+  if (mode !== 'prepaid') {
+    if (input.method !== undefined || input.note !== undefined) throw new EmployeeBookingError('Choose how this booking will be paid')
+    return { mode }
+  }
+  const method = recordedMethod(input.method, 'Choose how the client already paid')
+  const note = paymentNote(input.note)
+  return note ? { mode, method, note } : { mode, method }
+}
+export function employeePaidInput(raw: unknown) {
+  const input = plainObject(raw) || {}
+  const method = recordedMethod(input.method, 'Choose how the client paid')
+  const note = paymentNote(input.note)
+  return note ? { method, note } : { method }
+}
+function paymentFields(payment: EmployeePaymentInput): Partial<EmployeeBooking> {
+  if (payment.mode === 'stripe') return {}
+  if (payment.mode === 'external') return { payment: 'external' }
+  if (payment.mode === 'none') return { payment: 'none', paidMethod: 'none' }
+  return { payment: 'prepaid', paidMethod: payment.method, ...(payment.note ? { paidNote: payment.note } : {}) }
+}
+export function employeeBookingInput(raw: unknown, creator: EmployeeIdentity & { role?: EmployeeBookingActor['role'] }, now = new Date()): EmployeeBooking {
   const employee = stripControlChars(creator.email, 254).toLowerCase()
   if (!isEmail(employee)) throw new EmployeeBookingError('Employee identity is invalid', 401)
   const employeeName = employeeDisplayName(creator.name)
@@ -53,9 +94,12 @@ export function employeeBookingInput(raw: unknown, creator: EmployeeIdentity, no
   const customer = { name: stripControlChars(customerInput?.name, 120), email: stripControlChars(customerInput?.email, 254).toLowerCase(), phone: stripControlChars(customerInput?.phone, 40) }
   if (!customer.name || !isEmail(customer.email)) throw new EmployeeBookingError('Enter the client’s name and a valid email address')
   const notes = stripControlChars(input.notes, 1000)
+  const payment = employeePaymentInput(input.payment)
+  if (payment.mode === 'none' && creator.role !== 'superadmin') throw new EmployeeBookingError('Only an administrator can book a session with no charge', 403)
   const total = calculateBookingCheckoutPricing(cart).computedTotalCents
-  const hash = createHash('sha256').update(JSON.stringify({ cart, customer, notes, total })).digest('hex')
-  return { version: 1, ref: `emp-${createHash('sha256').update(`${employeeId || employee}:${input.requestId}`).digest('hex').slice(0, 40)}`, hash, createdAt: now.getTime(), employee, employeeName, employeeId, cart, customer, notes, total, phase: 'new' }
+  // Stripe attempts keep the original hash, so retries from open pages still match.
+  const hash = createHash('sha256').update(JSON.stringify({ cart, customer, notes, total, ...(payment.mode === 'stripe' ? {} : { payment }) })).digest('hex')
+  return { version: 1, ref: `emp-${createHash('sha256').update(`${employeeId || employee}:${input.requestId}`).digest('hex').slice(0, 40)}`, hash, createdAt: now.getTime(), employee, employeeName, employeeId, cart, customer, notes, total, ...paymentFields(payment), phase: 'new' }
 }
 export type EmployeeBookingActor = EmployeeIdentity & { role: 'superadmin' | 'employee' }
 export function employeeOwnsBooking(record: Pick<EmployeeBooking, 'employee' | 'employeeId'>, actor: EmployeeIdentity) {
@@ -65,6 +109,28 @@ export function employeeOwnsBooking(record: Pick<EmployeeBooking, 'employee' | '
 }
 export function employeeCanManageBooking(record: Pick<EmployeeBooking, 'employee' | 'employeeId'>, actor: EmployeeBookingActor) {
   return actor.role === 'superadmin' || employeeOwnsBooking(record, actor)
+}
+// One cancellation rule for the server and the Bookings list. Money that moved
+// outside the website is refunded outside it, so only a superadmin may release it.
+function cancellationBlock(record: EmployeeBooking, actor: EmployeeBookingActor) {
+  const mode = employeePaymentMode(record)
+  if (mode === 'stripe') {
+    if (record.phase === 'paid') return new EmployeeBookingError('This booking has been paid. Review it in Stripe before cancellation.', 409)
+    return record.invoiceId ? null : new EmployeeBookingError('Finish or recover the payment request before cancelling this booking.', 409)
+  }
+  if (record.phase === 'new') return new EmployeeBookingError('Finish or recover this booking before cancelling it.', 409)
+  if (mode === 'none' || (mode === 'external' && record.phase !== 'paid') || actor.role === 'superadmin') return null
+  return new EmployeeBookingError('Only an administrator can cancel a paid booking. Any refund is handled outside the website.', 403)
+}
+export function employeeCanCancel(record: EmployeeBooking, actor: EmployeeBookingActor, now = Date.now()) {
+  return record.phase !== 'cancelled' && (record.leaseUntil || 0) <= now && employeeCanManageBooking(record, actor) && !cancellationBlock(record, actor)
+}
+function markableUnpaid(record: EmployeeBooking) {
+  const mode = employeePaymentMode(record)
+  return record.phase === 'ready' && (mode === 'external' || (mode === 'stripe' && Boolean(record.invoiceId)))
+}
+export function employeeCanMarkPaid(record: EmployeeBooking, actor: EmployeeBookingActor, now = Date.now()) {
+  return markableUnpaid(record) && (record.leaseUntil || 0) <= now && employeeCanManageBooking(record, actor)
 }
 export function validEmployeeRef(ref: string) { return /^emp-[a-f0-9]{40}$/.test(ref) }
 function conflict(error: unknown) { return [409, 412].includes(Number((error as { code?: number; response?: { status?: number } })?.response?.status || (error as { code?: number })?.code)) }
@@ -111,17 +177,32 @@ export async function createEmployeeBooking(input: EmployeeBooking, services: Em
       await services.calendar({ ...record, phase: 'reserved' })
       record.phase = 'reserved'; await save(record)
     }
-    if (!record.customerId) { record.customerId = await services.customer(record); await save(record) }
-    if (!record.invoiceId) { record.invoiceId = await services.invoice(record); await save(record) }
-    if (!record.paymentUrl) { record.paymentUrl = await services.finalize(record); await save(record) }
-    await services.calendar(record)
-    if (!record.emailedAt) { await services.send(record); record.emailedAt = Date.now(); await save(record) }
-    record.phase = 'ready'; await save(record)
-    return record
+    const mode = employeePaymentMode(record)
+    if (mode === 'stripe') {
+      if (!record.customerId) { record.customerId = await services.customer(record); await save(record) }
+      if (!record.invoiceId) { record.invoiceId = await services.invoice(record); await save(record) }
+      if (!record.paymentUrl) { record.paymentUrl = await services.finalize(record); await save(record) }
+      await services.calendar({ ...record, phase: 'ready' })
+      if (!record.emailedAt) { await services.send(record); record.emailedAt = Date.now(); await save(record) }
+      record.phase = 'ready'; await save(record)
+      return record
+    }
+    // Staff-billed, prepaid and no-charge bookings never call Stripe or email the client.
+    const next: EmployeeBooking = mode === 'external' ? { ...record, phase: 'ready' } : { ...record, phase: 'paid', paidAt: Date.now(), paidBy: employeeCreatorLabel(record) }
+    await services.calendar(next)
+    await save(next)
+    if (next.phase === 'paid') await notifyStaff(next, save, services)
+    return next
   })
 }
+// Best effort once a booking is paid. A failed send leaves internalNotifiedAt unset
+// for the hourly follow-up, and the delivery ledger prevents a repeat email.
+async function notifyStaff(record: EmployeeBooking, save: (record: EmployeeBooking) => Promise<void>, services: EmployeeBookingServices) {
+  try { await services.notifyPaid(record); record.internalNotifiedAt = Date.now(); await save(record) }
+  catch { console.error('Employee booking notification deferred:', { bookingRef: record.ref }) }
+}
 export function employeeBookingResult(record: EmployeeBooking) {
-  return { ref: record.ref, phase: record.phase, paymentUrl: record.paymentUrl, emailed: Boolean(record.emailedAt), total: record.total }
+  return { ref: record.ref, phase: record.phase, paymentUrl: record.paymentUrl, emailed: Boolean(record.emailedAt), total: record.total, payment: employeePaymentMode(record), paymentLabel: employeePaymentLabel(record) }
 }
 export async function cancelEmployeeBooking(ref: string, services: EmployeeBookingServices, actor: EmployeeBookingActor) {
   if (!validEmployeeRef(ref)) throw new EmployeeBookingError('Invalid booking reference')
@@ -131,11 +212,38 @@ export async function cancelEmployeeBooking(ref: string, services: EmployeeBooki
   if (!employeeCanManageBooking(snapshot.record, actor)) throw new EmployeeBookingError('You can only cancel bookings you created.', 403)
   return withEmployeeBooking(store, async (record, save) => {
     if (!employeeCanManageBooking(record, actor)) throw new EmployeeBookingError('You can only cancel bookings you created.', 403)
-    if (record.phase === 'paid') throw new EmployeeBookingError('This booking has been paid. Review it in Stripe before cancellation.', 409)
-    if (!record.invoiceId && record.phase !== 'cancelled') throw new EmployeeBookingError('Finish or recover the payment request before cancelling this booking.', 409)
-    if (record.phase !== 'cancelled') { await services.voidInvoice(record); record.phase = 'cancelled'; await save(record) }
+    if (record.phase !== 'cancelled') {
+      const blocked = cancellationBlock(record, actor)
+      if (blocked) throw blocked
+      if (employeePaymentMode(record) === 'stripe') await services.voidInvoice(record)
+      record.phase = 'cancelled'; await save(record)
+    }
     await services.calendar(record)
     await services.release(record)
     return record
+  })
+}
+export type EmployeeMarkPaidOutcome = 'marked' | 'already-paid' | 'paid-online'
+export async function markEmployeeBookingPaid(ref: string, raw: unknown, services: EmployeeBookingServices, actor: EmployeeBookingActor): Promise<{ record: EmployeeBooking; outcome: EmployeeMarkPaidOutcome }> {
+  if (!validEmployeeRef(ref)) throw new EmployeeBookingError('Invalid booking reference')
+  const payment = employeePaidInput(raw)
+  const store = await services.store(ref)
+  const snapshot = await store.read()
+  if (!snapshot) throw new EmployeeBookingError('Booking not found', 404)
+  if (!employeeCanManageBooking(snapshot.record, actor)) throw new EmployeeBookingError('You can only update bookings you created.', 403)
+  return withEmployeeBooking(store, async (record, save) => {
+    if (!employeeCanManageBooking(record, actor)) throw new EmployeeBookingError('You can only update bookings you created.', 403)
+    if (record.phase === 'paid') return { record, outcome: 'already-paid' as const }
+    if (record.phase === 'cancelled') throw new EmployeeBookingError('This booking was cancelled, so it cannot be marked as paid.', 409)
+    if (!markableUnpaid(record)) throw new EmployeeBookingError('This booking is still being set up. Finish it before marking it as paid.', 409)
+    // Closing the Stripe invoice first means the client cannot also pay it online.
+    const online = employeePaymentMode(record) === 'stripe' && await services.markInvoicePaid(record) === 'online'
+    const paid: EmployeeBooking = online
+      ? { ...record, phase: 'paid', paidMethod: 'stripe', paidAt: Date.now() }
+      : { ...record, phase: 'paid', paidMethod: payment.method, ...(payment.note ? { paidNote: payment.note } : {}), paidAt: Date.now(), paidBy: employeeCreatorLabel({ employee: actor.email.toLowerCase(), employeeName: actor.name }) }
+    await services.calendar(paid)
+    await save(paid)
+    await notifyStaff(paid, save, services)
+    return { record: paid, outcome: online ? 'paid-online' as const : 'marked' as const }
   })
 }

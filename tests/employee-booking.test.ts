@@ -31,7 +31,7 @@ function memoryServices() {
     async store() { return store },
     async available() { step('available') }, async hold() { step('hold') }, async calendar() { step('calendar') }, async release() { step('release') },
     async customer() { step('customer'); return 'cus_fixture' }, async invoice() { step('invoice'); return 'in_fixture' }, async finalize() { step('finalize'); return 'https://invoice.stripe.com/fixture' },
-    async send() { step('send') }, async notifyPaid() { step('notifyPaid') }, async voidInvoice() { step('void') },
+    async send() { step('send') }, async markInvoicePaid() { step('markInvoicePaid'); return 'out-of-band' as const }, async notifyPaid() { step('notifyPaid') }, async voidInvoice() { step('void') },
   }
   return { services, calls, failures, store }
 }

@@ -9,6 +9,7 @@ import { addMinutes, BOOKING_TIME_ZONE, describeSlotRanges, formatDateForDisplay
 import { EmployeeBookingError, withEmployeeBooking, validEmployeeRef, type EmployeeBooking, type EmployeeBookingServices, type EmployeeStore } from './booking'
 import { employeeCreatorLabel } from './identity'
 import { sendEmployeeBookingNotification } from './notification'
+import { employeePaymentDetails, employeePaymentLabel, employeePaymentValid } from './payment'
 
 const source = 'vibeshack-employee-booking'
 const stateSource = 'vibeshack-employee-booking-state'
@@ -30,7 +31,7 @@ export async function employeeStore(ref: string): Promise<EmployeeStore> {
         const event = (await config.client.events.get({ calendarId, eventId })).data
         if (!event.etag || event.extendedProperties?.private?.source !== stateSource) throw new Error('Invalid employee booking state')
         const record = JSON.parse(event.description || '') as EmployeeBooking
-        if (record.version !== 1 || record.ref !== ref || record.cart?.length !== 1 || record.cart[0].reservationKind !== 'employee' || !Number.isSafeInteger(record.total) || record.total <= 0) throw new Error('Invalid employee booking record')
+        if (record.version !== 1 || record.ref !== ref || record.cart?.length !== 1 || record.cart[0].reservationKind !== 'employee' || !Number.isSafeInteger(record.total) || record.total <= 0 || !employeePaymentValid(record)) throw new Error('Invalid employee booking record')
         return { record, etag: event.etag }
       } catch (error) { if (googleStatus(error) === 404) return null; throw error }
     },
@@ -53,13 +54,13 @@ export async function writeEmployeeCalendar(record: EmployeeBooking) {
   }
   const end = addMinutes(new Date(item.slots[item.slots.length - 1]), 30)
   const body: calendar_v3.Schema$Event = {
-    id: eventId, summary: `${item.studioName} - ${record.customer.name} (${record.phase === 'paid' ? 'Paid' : 'Payment pending'})`,
+    id: eventId, summary: `${item.studioName} - ${record.customer.name} (${employeePaymentLabel(record)})`,
     description: [
       `Studio: ${item.studioName}`, `Client: ${record.customer.name}`, `Email: ${record.customer.email}`, `Phone: ${record.customer.phone || 'Not provided'}`,
       `Setup: ${getStudioSetup(item.studioId, item.setupId)?.label || 'Standard studio setup'}`,
       `Session: ${describeSlotRanges(item.slots)}`, 'Studio turnaround: 30 minutes after the session.',
       ...(item.addOns || []).map((addon) => `Add-on: ${bookingAddOnDescription(addon)}`),
-      `Total: $${(record.total / 100).toFixed(2)}`, `Payment: ${record.phase === 'paid' ? 'Paid' : 'Pending'}`,
+      `Total: $${(record.total / 100).toFixed(2)}`, ...employeePaymentDetails(record).map(([label, value]) => `${label}: ${value}`),
       ...(record.invoiceId ? [`Stripe invoice: ${record.invoiceId}`] : []),
       `Booked by: ${employeeCreatorLabel(record)}`, `Booking reference: ${record.ref}`, `Internal notes: ${record.notes || 'None'}`,
       'Employee reservation. Only this studio is reserved. Coordinate crew separately.',
@@ -77,6 +78,11 @@ export async function writeEmployeeCalendar(record: EmployeeBooking) {
 function key(record: EmployeeBooking, action: string) { return `${record.ref}:${action}` }
 function assertInvoice(invoice: Stripe.Invoice, record: EmployeeBooking) {
   if (invoice.metadata?.bookingRef !== record.ref || invoice.metadata?.source !== source || invoice.customer !== record.customerId || invoice.currency !== 'usd') throw new Error('Invoice identity mismatch')
+}
+// Stripe removed paid_out_of_band in API version 2025-03-31. Keep the legacy flag
+// and treat a paid invoice with nothing collected through Stripe as paid outside it.
+function paidOutOfBand(invoice: Stripe.Invoice) {
+  return invoice.status === 'paid' && ((invoice as { paid_out_of_band?: boolean }).paid_out_of_band === true || invoice.amount_paid === 0)
 }
 export function createEmployeeServices(stripeClient: () => Stripe = getStripeClient): EmployeeBookingServices { return {
   store: employeeStore,
@@ -117,6 +123,22 @@ export function createEmployeeServices(stripeClient: () => Stripe = getStripeCli
     return invoice.hosted_invoice_url
   },
   async send(record) { await stripeClient().invoices.sendInvoice(record.invoiceId!, {}, { idempotencyKey: key(record, 'send') }) },
+  async markInvoicePaid(record) {
+    const stripe = stripeClient()
+    const invoice = await stripe.invoices.retrieve(record.invoiceId!)
+    assertInvoice(invoice, record)
+    if (invoice.total === record.total && ['open', 'paid'].includes(invoice.status || '')) {
+      try {
+        // Replaying this booking's key returns its earlier out-of-band result. If
+        // Stripe collected the payment first, Stripe refuses the request instead.
+        if ((await stripe.invoices.pay(invoice.id, { paid_out_of_band: true }, { idempotencyKey: key(record, 'paid-out-of-band') })).status === 'paid') return 'out-of-band'
+      } catch (error) { if ((error as { statusCode?: number })?.statusCode !== 400) throw error }
+      const current = await stripe.invoices.retrieve(invoice.id)
+      assertInvoice(current, record)
+      if (current.status === 'paid' && current.total === record.total && current.amount_paid === record.total && !paidOutOfBand(current)) return 'online'
+    }
+    throw new EmployeeBookingError('This invoice needs administrator review in Stripe before it can be marked as paid.', 409)
+  },
   notifyPaid: sendEmployeeBookingNotification,
   async voidInvoice(record) {
     const stripe = stripeClient()
@@ -141,7 +163,10 @@ export async function reconcileEmployeeInvoice(invoiceId: string, services = emp
     assertInvoice(invoice, record)
     if (record.invoiceId !== invoice.id || invoice.total !== record.total) throw new Error('Employee invoice does not match reservation')
     if (invoice.status === 'paid') {
-      if (record.phase === 'cancelled' || invoice.amount_paid !== record.total) throw new Error('Paid booking needs manual review')
+      const outside = paidOutOfBand(invoice)
+      if (record.phase === 'cancelled' || (!outside && invoice.amount_paid !== record.total)) throw new Error('Paid booking needs manual review')
+      // Never replace a payment staff already recorded. Otherwise note who collected it.
+      if (!record.paidMethod) Object.assign(record, { paidMethod: outside ? 'other' : 'stripe', paidAt: (invoice.status_transitions?.paid_at || 0) * 1000 || Date.now() })
       record.phase = 'paid'; await save(record); await services.calendar(record)
       if (!record.internalNotifiedAt) {
         await services.notifyPaid(record)
