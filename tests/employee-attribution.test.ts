@@ -4,8 +4,9 @@ import fs from 'node:fs'
 import { test } from 'node:test'
 import vm from 'node:vm'
 import ts from 'typescript'
-import { createEmployeeBooking, employeeBookingInput, employeeBookingResult, type EmployeeBooking, type EmployeeBookingServices, type EmployeeStore } from '../lib/employee/booking'
+import { createEmployeeBooking, employeeBookingInput, employeeBookingResult, EmployeeBookingError, markEmployeeBookingPaid, type EmployeeBooking, type EmployeeBookingServices, type EmployeeStore } from '../lib/employee/booking'
 import { employeeCreatorLabel, employeeDisplayName } from '../lib/employee/identity'
+import { employeePaymentDetails, employeePaymentLabel } from '../lib/employee/payment'
 import { addMinutes, bookingDateRange, zonedDateTimeToUtc } from '../lib/booking/time'
 
 // Run the production boundary functions with only synthetic identity/provider
@@ -88,7 +89,7 @@ test('an interrupted booking retry preserves its original creator name even if t
     async calendar(record) { attributed.push(employeeCreatorLabel(record)) },
     async customer() { return 'cus_fixture' }, async invoice() { return 'in_fixture' },
     async finalize() { if (shouldFail) throw new Error('Synthetic interrupted invoice'); return 'https://example.invalid/invoice' },
-    async send() {}, async notifyPaid() {},
+    async send() {}, async markInvoicePaid() { return 'out-of-band' as const }, async notifyPaid() {},
   }
   const raw = rawBooking()
   await assert.rejects(createEmployeeBooking(employeeBookingInput(raw, creator), services), /interrupted invoice/)
@@ -107,7 +108,7 @@ for (const existing of [false, true]) {
     if (existing) delete record.employeeName // Records created before name capture remain readable.
     const calls: Array<{ method: string; data: { sendUpdates: string; requestBody: Record<string, unknown> } }> = []
     const context = vm.createContext({
-      Date, createHash, addMinutes, employeeCreatorLabel,
+      Date, createHash, addMinutes, employeeCreatorLabel, employeePaymentLabel, employeePaymentDetails,
       source: 'vibeshack-employee-booking', BOOKING_TIME_ZONE: 'America/Los_Angeles',
       googleStatus: (error: { code?: number }) => error.code,
       getStudioSetup: () => ({ label: 'Fixture setup' }), describeSlotRanges: () => '3:00 PM-5:00 PM',
@@ -133,7 +134,88 @@ for (const existing of [false, true]) {
 test('booking results exclude the internal creator fields', () => {
   const record = employeeBookingInput(rawBooking(), creator)
   const result = employeeBookingResult(record)
-  assert.deepEqual(Object.keys(result).sort(), ['emailed', 'paymentUrl', 'phase', 'ref', 'total'])
+  assert.deepEqual(Object.keys(result).sort(), ['emailed', 'payment', 'paymentLabel', 'paymentUrl', 'phase', 'ref', 'total'])
   assert.equal(JSON.stringify(result).includes(creator.name), false)
   assert.equal(JSON.stringify(result).includes(creator.email), false)
+})
+
+async function calendarBody(record: EmployeeBooking) {
+  const calls: Array<{ sendUpdates: string; requestBody: { summary: string; description: string; attendees?: unknown; extendedProperties: { private: Record<string, string> } } }> = []
+  const context = vm.createContext({
+    Date, createHash, addMinutes, employeeCreatorLabel, employeePaymentLabel, employeePaymentDetails,
+    source: 'vibeshack-employee-booking', BOOKING_TIME_ZONE: 'America/Los_Angeles',
+    googleStatus: (error: { code?: number }) => error.code,
+    getStudioSetup: () => ({ label: 'Fixture setup' }), describeSlotRanges: () => '3:00 PM-5:00 PM',
+    getCalendarConfig: async () => ({ calendarId: 'fixture-calendar', client: { events: {
+      get: async () => { throw Object.assign(new Error('Synthetic not found'), { code: 404 }) },
+      insert: async (data: (typeof calls)[number]) => { calls.push(data) },
+    } } }),
+  })
+  vm.runInContext(actualFunction('writeEmployeeCalendar', 'lib/employee/providers.ts'), context)
+  await context.writeEmployeeCalendar(record)
+  assert.equal(calls.length, 1)
+  assert.equal(calls[0].sendUpdates, 'none')
+  assert.equal(Object.hasOwn(calls[0].requestBody, 'attendees'), false)
+  return calls[0].requestBody
+}
+
+test('private Calendar shows the payment label, note, and who marked it paid while keeping paymentStatus', async () => {
+  const record: EmployeeBooking = { ...employeeBookingInput(rawBooking(), creator), phase: 'paid', payment: 'external', paidMethod: 'zelle', paidNote: 'Ref 42', paidBy: 'Other Staff (other@example.invalid)' }
+  const paid = await calendarBody(record)
+  assert.match(paid.summary, / - Fixture Client \(Paid by Zelle\)$/)
+  assert.ok(paid.description.includes('Payment: Paid by Zelle\nPayment note: Ref 42\nMarked paid by: Other Staff (other@example.invalid)\nBooked by: Fixture Employee (staff@example.invalid)'))
+  assert.equal(paid.extendedProperties.private.paymentStatus, 'paid')
+  const waiting = await calendarBody({ ...employeeBookingInput(rawBooking(), creator), phase: 'ready', payment: 'external' })
+  assert.match(waiting.summary, /\(Awaiting payment\)$/)
+  assert.ok(waiting.description.includes('Payment: Awaiting payment\nBooked by:'))
+  assert.equal(waiting.extendedProperties.private.paymentStatus, 'pending')
+  const own = await calendarBody({ ...record, paidBy: 'Fixture Employee (staff@example.invalid)' })
+  assert.equal(own.description.includes('Marked paid by'), false)
+})
+
+test('mark-paid API records the authenticated actor and ignores attribution supplied in the request body', async () => {
+  const stored: EmployeeBooking = { ...employeeBookingInput(rawBooking(), creator), phase: 'ready', payment: 'external' }
+  let record = structuredClone(stored)
+  let revision = 0
+  const store: EmployeeStore = {
+    async read() { return { record: structuredClone(record), etag: String(revision) } },
+    async create() { throw new Error('Unexpected create') },
+    async save(snapshot, next) { assert.equal(snapshot.etag, String(revision)); record = structuredClone(next); revision++ },
+  }
+  const services = { async store() { return store }, async calendar() {}, async notifyPaid() {}, async markInvoicePaid() { throw new Error('Unexpected Stripe call') } }
+  let response: { value: Record<string, unknown>; status?: number } | undefined
+  const context = vm.createContext({
+    process: { env: { EMPLOYEE_BOOKING_ENABLED: '1' } },
+    employeeGuard: () => ({ employee: { email: 'marker@example.invalid', name: 'Actual Marker', role: 'superadmin' } }),
+    readJsonBody: async () => ({ ref: stored.ref, method: 'cash', note: 'Front desk', paidBy: 'Forged Marker', employee: 'forged@example.invalid', role: 'superadmin' }),
+    markEmployeeBookingPaid, employeeBookingResult, EmployeeBookingError, employeeServices: services,
+    employeeJson: (value: Record<string, unknown>, status?: number) => { response = { value, status }; return response },
+    jsonBodyErrorResponse: () => null,
+  })
+  vm.runInContext(actualFunction('POST', 'app/api/employee/bookings/paid/route.ts'), context)
+  await context.POST({})
+  assert.equal(response?.status, undefined)
+  assert.equal(response?.value.outcome, 'marked')
+  assert.equal(response?.value.paymentLabel, 'Paid in cash')
+  assert.doesNotMatch(JSON.stringify(response), /Front desk|Marker|marker@example/)
+  assert.equal(record.paidBy, 'Actual Marker (marker@example.invalid)')
+  assert.equal(record.employee, creator.email)
+})
+
+test('booking API refuses a no-charge booking from an employee on the server', async () => {
+  let created = false
+  let response: { value: { error?: string }; status?: number } | undefined
+  const context = vm.createContext({
+    process: { env: { EMPLOYEE_BOOKING_ENABLED: '1' } },
+    employeeGuard: () => ({ employee: { ...creator, role: 'employee' } }),
+    readJsonBody: async () => ({ ...rawBooking(), payment: { mode: 'none' }, role: 'superadmin' }), employeeBookingInput, employeeBookingResult, EmployeeBookingError,
+    createEmployeeBooking: async () => { created = true },
+    employeeServices: {}, employeeJson: (value: { error?: string }, status?: number) => { response = { value, status }; return response },
+    jsonBodyErrorResponse: () => null,
+  })
+  vm.runInContext(actualFunction('POST', 'app/api/employee/bookings/route.ts'), context)
+  await context.POST({})
+  assert.equal(created, false)
+  assert.equal(response?.status, 403)
+  assert.match(response?.value.error || '', /administrator/)
 })

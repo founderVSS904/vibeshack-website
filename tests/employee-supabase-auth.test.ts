@@ -4,7 +4,7 @@ import vm from 'node:vm'
 import { test } from 'node:test'
 import ts from 'typescript'
 import { NextRequest, NextResponse } from 'next/server'
-import { employeeDisplayName } from '../lib/employee/identity'
+import { employeeDisplayName, employeeUserId } from '../lib/employee/identity'
 import { escapeHtml, isEmail, stripControlChars } from '../lib/server/sanitize'
 import { jsonBodyErrorResponse, readJsonBody, readTextBody } from '../lib/server/request-guards'
 
@@ -129,6 +129,42 @@ test('verified active founder can use protected access at aal1 without an authen
   assert.equal(fixture.destination(signedIn), '/employee/book/')
   fixture.state.member.status = 'disabled'
   assert.equal(await fixture.run(), null)
+})
+
+test('background staff mail resolves a creator only while the team account is active', async () => {
+  const state = { configured: true, error: null as unknown, thrown: false, member: { email: employee.email, status: 'active' } as { email: string; status: string } | null }
+  const lookups: string[][] = []
+  const context = contextFor('lib/employee/access.ts', ['activeEmployeeEmail'], {
+    employeeUserId, employeeSupabaseConfigured: () => state.configured,
+    employeeAdmin: () => ({ from: (table: string) => {
+      assert.equal(table, 'employee_members')
+      return { select: (columns: string) => ({ eq: (key: string, value: string) => {
+        lookups.push([columns, key, value])
+        if (state.thrown) throw new Error('Synthetic registry outage')
+        return { maybeSingle: async () => ({ data: structuredClone(state.member), error: state.error }) }
+      } }) }
+    } }),
+  })
+  const run = (creator: { id?: string; email: string }) => context.activeEmployeeEmail(creator)
+  assert.equal(await run({ id: employee.id.toUpperCase(), email: 'old-address@example.invalid' }), employee.email)
+  assert.equal(await run({ email: 'Employee@Example.invalid' }), employee.email)
+  assert.deepEqual(lookups, [['email,status', 'user_id', employee.id], ['email,status', 'email', 'employee@example.invalid']])
+  for (const status of ['disabled', 'invited']) { state.member = { email: employee.email, status }; assert.equal(await run(employee), null, status) }
+  state.member = { email: 'not-an-address', status: 'active' }
+  assert.equal(await run(employee), null)
+  state.member = null
+  assert.equal(await run(employee), null)
+  state.member = { email: employee.email, status: 'active' }; state.error = { message: 'Synthetic query failure' }
+  assert.equal(await run(employee), null)
+  state.error = null; state.thrown = true
+  assert.equal(await run(employee), null)
+  // A malformed saved ID never falls back to the email, and an unconfigured registry is not queried.
+  state.thrown = false
+  const before = lookups.length
+  assert.equal(await run({ id: 'forged', email: employee.email }), null)
+  state.configured = false
+  assert.equal(await run(employee), null)
+  assert.equal(lookups.length, before)
 })
 
 test('employee identity acceptance runs the service RPC only for a verified authenticated user', async () => {

@@ -4,7 +4,7 @@ import { test } from 'node:test'
 import { DELIVERY_LEASE_MS, type DeliveryRecord, type DeliveryStore } from '../lib/booking/delivery'
 import { addMinutes, zonedDateTimeToUtc } from '../lib/booking/time'
 import type { EmployeeBooking } from '../lib/employee/booking'
-import { createEmployeeBookingNotifier, employeeBookingNotification } from '../lib/employee/notification'
+import { createEmployeeBookingNotifier, createEmployeeUnpaidReminder, employeeBookingNotification, employeeUnpaidReminder } from '../lib/employee/notification'
 
 function booking(): EmployeeBooking {
   const start = zonedDateTimeToUtc('2026-09-27', 23)
@@ -43,7 +43,7 @@ function fixture(outcome: 'accepted' | 'rejected' | 'uncertain' = 'accepted') {
       stored = structuredClone(record); revision++
     },
   }
-  const notify = createEmployeeBookingNotifier({
+  const dependencies: Parameters<typeof createEmployeeBookingNotifier>[0] = {
     async store(identity) { identities.push(identity); return store },
     now: () => now,
     async send(message) {
@@ -52,9 +52,11 @@ function fixture(outcome: 'accepted' | 'rejected' | 'uncertain' = 'accepted') {
       if (outcome === 'rejected') return { accepted: [], rejected: [message.to] }
       return { accepted: [message.to], rejected: [] }
     },
-  })
+  }
+  const notify = createEmployeeBookingNotifier(dependencies)
+  const remind = createEmployeeUnpaidReminder(dependencies)
   return {
-    notify, messages, identities, store,
+    notify, remind, messages, identities, store, dependencies,
     accept: () => { outcome = 'accepted' },
     failSentSave: () => { failSentSave = true },
     advance: () => { now = new Date(now.getTime() + DELIVERY_LEASE_MS + 1) },
@@ -69,15 +71,15 @@ test('staff notification identifies the creator internally with overnight sessio
   assert.equal(message.subject, 'New Booking: Test Client - The Executive - September 27, 2026')
   assert.match(message.html, /<strong>Booked by:<\/strong> Alex Employee \(staff@example\.invalid\)/)
   assert.ok(message.html.indexOf('Booked by:') < message.html.indexOf('Client:'))
-  for (const value of ['Payment pending', '$650.00', '11:00 PM-1:00 AM (Mon, Sep 28) PT', '2 hours', 'Teleprompter', 'in_fixture', 'Sample internal note']) {
+  for (const value of ['Payment link sent', '$650.00', '11:00 PM-1:00 AM (Mon, Sep 28) PT', '2 hours', 'Teleprompter', 'in_fixture', 'Sample internal note']) {
     assert.ok(message.text.includes(value), value)
   }
   assert.equal('cc' in message, false)
   assert.equal('bcc' in message, false)
   assert.equal('replyTo' in message, false)
   record.phase = 'paid'
-  assert.match(employeeBookingNotification(record).text, /Payment: Paid\n/)
-  assert.doesNotMatch(employeeBookingNotification(record).text, /Payment pending/)
+  assert.match(employeeBookingNotification(record).text, /Payment: Paid online\n/)
+  assert.doesNotMatch(employeeBookingNotification(record).text, /Payment link sent|Payment note|Marked paid by/)
 })
 
 test('notifications cannot be sent before verified payment or after cancellation', async () => {
@@ -152,4 +154,72 @@ test('SMTP acceptance followed by a failed ledger save never causes a duplicate 
   await assert.rejects(instance.notify(record), /delivery uncertain/)
   assert.equal(instance.messages.length, 1)
   assert.equal((await instance.store.read())?.record.messages.staff.state, 'uncertain')
+})
+
+test('staff email shows the payment label, note, and who marked it paid only when that differs from the creator', () => {
+  const record: EmployeeBooking = { ...booking(), payment: 'external', paidMethod: 'cash', paidNote: 'Front desk <b>& "cash"</b>', paidBy: 'Other Staff (other@example.invalid)', paidAt: 1 }
+  const message = employeeBookingNotification(record)
+  assert.match(message.text, /Payment: Paid in cash\nPayment note: Front desk <b>& "cash"<\/b>\nMarked paid by: Other Staff \(other@example\.invalid\)\nTotal:/)
+  assert.match(message.html, /<strong>Payment note:<\/strong> Front desk &lt;b&gt;&amp; &quot;cash&quot;&lt;\/b&gt;/)
+  assert.doesNotMatch(message.html, /<b>/)
+  const own = employeeBookingNotification({ ...record, paidBy: 'Alex Employee (staff@example.invalid)' })
+  assert.doesNotMatch(own.text, /Marked paid by/)
+  assert.match(employeeBookingNotification({ ...booking(), payment: 'none', paidMethod: 'none', paidBy: 'Alex Employee (staff@example.invalid)', invoiceId: undefined }).text, /Payment: No charge\n/)
+  assert.match(employeeBookingNotification({ ...booking(), payment: 'prepaid', paidMethod: 'zelle' }).text, /Payment: Paid by Zelle\n/)
+  assert.equal(message.to, 'founder@vibeshackstudios.com')
+  assert.equal('cc' in message, false)
+})
+
+test('unpaid reminder goes to staff only, copies an active creator, and links to the Bookings page', () => {
+  const record: EmployeeBooking = { ...booking(), phase: 'ready', payment: 'external', invoiceId: undefined }
+  const message = employeeUnpaidReminder(record, 'staff@example.invalid')
+  assert.equal(message.to, 'founder@vibeshackstudios.com')
+  assert.equal(message.cc, 'staff@example.invalid')
+  assert.equal(message.subject, 'Unpaid booking: Test Client - The Executive - September 27, 2026')
+  for (const value of ['This session starts within 48 hours and is still unpaid.', 'Booked by: Alex Employee (staff@example.invalid)', 'Payment: Awaiting payment', 'Client: Test Client', 'https://www.vibeshackstudios.com/employee/bookings/', 'Mark it paid or cancel it', 'Nothing has been cancelled or released.']) {
+    assert.ok(message.text.includes(value), value)
+  }
+  assert.match(message.html, /<a href="https:\/\/www\.vibeshackstudios\.com\/employee\/bookings\/">/)
+  for (const part of [message.subject, message.text, message.html]) assert.doesNotMatch(part, /\u2014|\u2013/)
+  // The creator saved in Calendar is never copied on its own.
+  assert.equal('cc' in employeeUnpaidReminder(record), false)
+  assert.equal('cc' in employeeUnpaidReminder(record, null), false)
+  assert.equal('cc' in employeeUnpaidReminder(record, 'Founder@VibeShackStudios.com'), false)
+  assert.equal('cc' in employeeUnpaidReminder(record, 'staff@example.invalid\r\nBcc: wrong@example.invalid'), false)
+  assert.match(employeeUnpaidReminder({ ...record, payment: undefined, invoiceId: 'in_fixture' }).text, /Payment: Payment link sent\n/)
+})
+
+test('unpaid reminder copies the creator only while their team account is active', async () => {
+  const record = { ...booking(), phase: 'ready' as const }
+  const lookups: string[] = []
+  // A disabled or unknown account resolves to null. A failed lookup also sends to staff only.
+  for (const [active, cc] of [['staff@example.invalid', 'staff@example.invalid'], [null, undefined], [new Error('Synthetic registry outage'), undefined]] as const) {
+    const instance = fixture()
+    const remind = createEmployeeUnpaidReminder({ ...instance.dependencies, async activeCreator(value) { lookups.push(value.ref); if (active instanceof Error) throw active; return active } })
+    await remind(record)
+    assert.equal(instance.messages.length, 1)
+    assert.equal(instance.messages[0].to, 'founder@vibeshackstudios.com')
+    assert.equal(instance.messages[0].cc, cc)
+    assert.ok(instance.messages[0].text.includes('Booked by: Alex Employee (staff@example.invalid)'))
+  }
+  assert.deepEqual(lookups, [record.ref, record.ref, record.ref])
+})
+
+test('unpaid reminder waits for an unpaid booking and uses its own durable ledger entry', async () => {
+  const instance = fixture()
+  for (const phase of ['new', 'reserved', 'paid', 'cancelled'] as const) {
+    await assert.rejects(instance.remind({ ...booking(), phase }), /awaiting payment/)
+  }
+  assert.equal(instance.messages.length, 0)
+  const record = { ...booking(), phase: 'ready' as const }
+  await Promise.allSettled([instance.remind(record), instance.remind(record)])
+  await instance.remind(record)
+  assert.equal(instance.messages.length, 1)
+  const identity = createHash('sha256').update(`employee:${record.ref}`).digest('hex').slice(0, 40)
+  assert.equal(instance.messages[0].messageId, `<${identity}.unpaid-reminder@vibeshackstudios.com>`)
+  await instance.notify({ ...record, phase: 'paid' })
+  assert.equal(instance.messages.length, 2)
+  assert.equal(instance.messages[1].messageId, `<${identity}.staff@vibeshackstudios.com>`)
+  const ledger = (await instance.store.read())?.record.messages
+  assert.deepEqual(Object.keys(ledger || {}).sort(), ['staff', 'unpaid-reminder'])
 })
