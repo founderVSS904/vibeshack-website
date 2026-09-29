@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       key: 'cancel-checkout-session',
       max: CANCEL_RATE_LIMIT_MAX,
       windowMs: CANCEL_RATE_LIMIT_WINDOW_MS,
+      fallback: 'local',
     })
     if (limited) return limited
 

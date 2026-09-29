@@ -11,6 +11,7 @@ import { reserveTour, type TourReservationDependencies } from '../lib/booking/to
 import { addMinutes, bookingDateInPacific, isValidBookingDate } from '../lib/booking/time'
 import { isEmail, stripControlChars } from '../lib/server/sanitize'
 import { jsonBodyErrorResponse, readJsonBody, readTextBody } from '../lib/server/request-guards'
+import { GET as healthCheck } from '../app/api/health/route'
 
 function isolatedFunctions(file: string, names: string[], bindings: Record<string, unknown> = {}) {
   const ast = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.ES2022, true)
@@ -43,7 +44,10 @@ for (const route of ['create-checkout-session', 'cancel-checkout-session', 'cont
         CHECKOUT_RATE_LIMIT_MAX: 12, CHECKOUT_RATE_LIMIT_WINDOW_MS: 600_000,
         CANCEL_RATE_LIMIT_MAX: 20, CANCEL_RATE_LIMIT_WINDOW_MS: 600_000,
         RATE_LIMIT_MAX: 6, RATE_LIMIT_WINDOW_MS: 600_000,
-        distributedRateLimit: async () => { await Promise.resolve(); claims++; return NextResponse.json({ error: 'Unavailable' }, { status }) },
+        distributedRateLimit: async (_req: unknown, options: { fallback?: string }) => {
+          assert.equal(options.fallback, 'local')
+          await Promise.resolve(); claims++; return NextResponse.json({ error: 'Unavailable' }, { status })
+        },
       })
       // Provider bindings intentionally do not exist in this context.
       const result = await context[method](new NextRequest(`https://example.invalid/api/${route}`, { method }))
@@ -52,6 +56,24 @@ for (const route of ['create-checkout-session', 'cancel-checkout-session', 'cont
     })
   }
 }
+
+test('health adds only the short release commit to its public fields', async () => {
+  const previous = process.env.VERCEL_GIT_COMMIT_SHA
+  const check = async (sha?: string) => {
+    if (sha === undefined) delete process.env.VERCEL_GIT_COMMIT_SHA
+    else process.env.VERCEL_GIT_COMMIT_SHA = sha
+    return (await healthCheck(new NextRequest('https://example.invalid/api/health'))).json()
+  }
+  try {
+    const body = await check('0123ABCdef456789abcdef0123456789abcdef01')
+    assert.deepEqual(Object.keys(body).sort(), ['commit', 'envConfigured', 'service', 'status', 'timestamp'])
+    assert.equal(body.commit, '0123abc')
+    for (const sha of [undefined, '', 'release-main', 'abc12']) assert.equal((await check(sha)).commit, null)
+  } finally {
+    if (previous === undefined) delete process.env.VERCEL_GIT_COMMIT_SHA
+    else process.env.VERCEL_GIT_COMMIT_SHA = previous
+  }
+})
 
 function tourCalendarFixture() {
   let reads = 0
@@ -136,7 +158,8 @@ test('tour route rejects bad request authority and recipient throttling before r
   const ids: string[] = []
   const context = isolatedFunctions('app/api/book-tour/route.ts', ['POST'], {
     RATE_LIMIT_MAX: 6, RATE_LIMIT_WINDOW_MS: 600_000, MAX_BODY_BYTES: 10_240, MIN_FORM_AGE_MS: 1500,
-    distributedRateLimit: async (_req: unknown, options: { subject?: string; max: number; windowMs: number }) => {
+    distributedRateLimit: async (_req: unknown, options: { subject?: string; max: number; windowMs: number; fallback?: string }) => {
+      assert.equal(options.fallback, 'local')
       if (options.subject) {
         assert.equal(options.subject, fixtureTour.email)
         assert.equal(options.max, 3)

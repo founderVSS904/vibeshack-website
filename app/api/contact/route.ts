@@ -10,7 +10,7 @@ const MAX_BODY_BYTES = 12 * 1024
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = await distributedRateLimit(req, { key: 'contact', max: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS })
+    const limited = await distributedRateLimit(req, { key: 'contact', max: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, fallback: 'local' })
     if (limited) return limited
 
     const body = await readJsonBody(req, MAX_BODY_BYTES)

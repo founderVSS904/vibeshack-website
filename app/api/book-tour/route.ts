@@ -83,7 +83,7 @@ async function sendTourEmails(tour: {
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = await distributedRateLimit(req, { key: 'tour-booking', max: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS })
+    const limited = await distributedRateLimit(req, { key: 'tour-booking', max: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, fallback: 'local' })
     if (limited) return limited
 
     const body = await readJsonBody(req, MAX_BODY_BYTES)
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
     const tour = { name, email, phone, date, slot, studioId: studio?.id, studioName, notes, requestId: requestId.toLowerCase() }
 
     const reservation = await reserveTourBooking(tour, async () => {
-      const limited = await distributedRateLimit(req, { key: 'tour-booking-recipient', max: 3, windowMs: 60 * 60_000, subject: email })
+      const limited = await distributedRateLimit(req, { key: 'tour-booking-recipient', max: 3, windowMs: 60 * 60_000, subject: email, fallback: 'local' })
       if (!limited) return null
       const body = await limited.json()
       return { ok: false, status: limited.status, error: body.error as string, headers: {

@@ -7,7 +7,7 @@ if (!configured.length) {
     console.error('Production requires the private account and request-limit database configuration.')
     process.exitCode = 1
   } else {
-    console.log('Private account and request-limit integration is not configured in this environment. Provider-backed requests remain closed.')
+    console.log('Private account and request-limit integration is not configured in this environment. Employee access stays closed. Public booking and contact routes use per-instance request limits only.')
   }
 } else {
   try {
