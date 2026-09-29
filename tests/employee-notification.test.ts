@@ -56,7 +56,7 @@ function fixture(outcome: 'accepted' | 'rejected' | 'uncertain' = 'accepted') {
   const notify = createEmployeeBookingNotifier(dependencies)
   const remind = createEmployeeUnpaidReminder(dependencies)
   return {
-    notify, remind, messages, identities, store,
+    notify, remind, messages, identities, store, dependencies,
     accept: () => { outcome = 'accepted' },
     failSentSave: () => { failSentSave = true },
     advance: () => { now = new Date(now.getTime() + DELIVERY_LEASE_MS + 1) },
@@ -170,9 +170,9 @@ test('staff email shows the payment label, note, and who marked it paid only whe
   assert.equal('cc' in message, false)
 })
 
-test('unpaid reminder goes to staff only, copies the creator, and links to the Bookings page', () => {
+test('unpaid reminder goes to staff only, copies an active creator, and links to the Bookings page', () => {
   const record: EmployeeBooking = { ...booking(), phase: 'ready', payment: 'external', invoiceId: undefined }
-  const message = employeeUnpaidReminder(record)
+  const message = employeeUnpaidReminder(record, 'staff@example.invalid')
   assert.equal(message.to, 'founder@vibeshackstudios.com')
   assert.equal(message.cc, 'staff@example.invalid')
   assert.equal(message.subject, 'Unpaid booking: Test Client - The Executive - September 27, 2026')
@@ -181,9 +181,28 @@ test('unpaid reminder goes to staff only, copies the creator, and links to the B
   }
   assert.match(message.html, /<a href="https:\/\/www\.vibeshackstudios\.com\/employee\/bookings\/">/)
   for (const part of [message.subject, message.text, message.html]) assert.doesNotMatch(part, /\u2014|\u2013/)
-  assert.equal('cc' in employeeUnpaidReminder({ ...record, employee: 'Founder@VibeShackStudios.com' }), false)
-  assert.equal('cc' in employeeUnpaidReminder({ ...record, employee: 'staff@example.invalid\r\nBcc: wrong@example.invalid' }), false)
+  // The creator saved in Calendar is never copied on its own.
+  assert.equal('cc' in employeeUnpaidReminder(record), false)
+  assert.equal('cc' in employeeUnpaidReminder(record, null), false)
+  assert.equal('cc' in employeeUnpaidReminder(record, 'Founder@VibeShackStudios.com'), false)
+  assert.equal('cc' in employeeUnpaidReminder(record, 'staff@example.invalid\r\nBcc: wrong@example.invalid'), false)
   assert.match(employeeUnpaidReminder({ ...record, payment: undefined, invoiceId: 'in_fixture' }).text, /Payment: Payment link sent\n/)
+})
+
+test('unpaid reminder copies the creator only while their team account is active', async () => {
+  const record = { ...booking(), phase: 'ready' as const }
+  const lookups: string[] = []
+  // A disabled or unknown account resolves to null. A failed lookup also sends to staff only.
+  for (const [active, cc] of [['staff@example.invalid', 'staff@example.invalid'], [null, undefined], [new Error('Synthetic registry outage'), undefined]] as const) {
+    const instance = fixture()
+    const remind = createEmployeeUnpaidReminder({ ...instance.dependencies, async activeCreator(value) { lookups.push(value.ref); if (active instanceof Error) throw active; return active } })
+    await remind(record)
+    assert.equal(instance.messages.length, 1)
+    assert.equal(instance.messages[0].to, 'founder@vibeshackstudios.com')
+    assert.equal(instance.messages[0].cc, cc)
+    assert.ok(instance.messages[0].text.includes('Booked by: Alex Employee (staff@example.invalid)'))
+  }
+  assert.deepEqual(lookups, [record.ref, record.ref, record.ref])
 })
 
 test('unpaid reminder waits for an unpaid booking and uses its own durable ledger entry', async () => {

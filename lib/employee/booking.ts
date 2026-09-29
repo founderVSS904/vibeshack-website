@@ -182,8 +182,9 @@ export async function createEmployeeBooking(input: EmployeeBooking, services: Em
       if (!record.customerId) { record.customerId = await services.customer(record); await save(record) }
       if (!record.invoiceId) { record.invoiceId = await services.invoice(record); await save(record) }
       if (!record.paymentUrl) { record.paymentUrl = await services.finalize(record); await save(record) }
-      await services.calendar({ ...record, phase: 'ready' })
       if (!record.emailedAt) { await services.send(record); record.emailedAt = Date.now(); await save(record) }
+      // Calendar says Payment link sent only once the email has gone out.
+      await services.calendar({ ...record, phase: 'ready' })
       record.phase = 'ready'; await save(record)
       return record
     }
@@ -233,7 +234,8 @@ export async function markEmployeeBookingPaid(ref: string, raw: unknown, service
   if (!employeeCanManageBooking(snapshot.record, actor)) throw new EmployeeBookingError('You can only update bookings you created.', 403)
   return withEmployeeBooking(store, async (record, save) => {
     if (!employeeCanManageBooking(record, actor)) throw new EmployeeBookingError('You can only update bookings you created.', 403)
-    if (record.phase === 'paid') return { record, outcome: 'already-paid' as const }
+    // A retry also repairs a Calendar entry that an interrupted update left behind.
+    if (record.phase === 'paid') { await services.calendar(record); return { record, outcome: 'already-paid' as const } }
     if (record.phase === 'cancelled') throw new EmployeeBookingError('This booking was cancelled, so it cannot be marked as paid.', 409)
     if (!markableUnpaid(record)) throw new EmployeeBookingError('This booking is still being set up. Finish it before marking it as paid.', 409)
     // Closing the Stripe invoice first means the client cannot also pay it online.
@@ -241,8 +243,10 @@ export async function markEmployeeBookingPaid(ref: string, raw: unknown, service
     const paid: EmployeeBooking = online
       ? { ...record, phase: 'paid', paidMethod: 'stripe', paidAt: Date.now() }
       : { ...record, phase: 'paid', paidMethod: payment.method, ...(payment.note ? { paidNote: payment.note } : {}), paidAt: Date.now(), paidBy: employeeCreatorLabel({ employee: actor.email.toLowerCase(), employeeName: actor.name }) }
-    await services.calendar(paid)
+    // Save as soon as the invoice is closed, so the invoice.paid webhook finds the
+    // staff payment instead of recording its own. Calendar follows.
     await save(paid)
+    await services.calendar(paid)
     await notifyStaff(paid, save, services)
     return { record: paid, outcome: online ? 'paid-online' as const : 'marked' as const }
   })

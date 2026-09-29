@@ -28,9 +28,13 @@ function text(node: React.ReactNode): string {
 
 // Runs the real Bookings component with isolated hook state and a fake fetch.
 // Its rendered handlers are called directly; no browser, Calendar or Stripe is used.
+// Like a commit, each render gives refs fake nodes that record real focus, then runs the
+// effects whose inputs changed. Mount effects never run, so nothing loads on its own.
 function bookingsFixture(props: Props, responses: Array<{ status: number; body: object }> = []) {
   const states: unknown[] = []
   const calls: Call[] = []
+  const focused: string[] = []
+  const effects: Array<() => void> = []
   let cursor = 0
   const hooks = {
     ...React,
@@ -44,7 +48,11 @@ function bookingsFixture(props: Props, responses: Array<{ status: number; body: 
       if (!(index in states)) states[index] = { current }
       return states[index]
     },
-    useEffect: () => {},
+    useEffect: (effect: () => void, inputs: unknown[]) => {
+      const index = cursor++
+      if (index in states && inputs.some((value, position) => !Object.is(value, (states[index] as unknown[])[position]))) effects.push(effect)
+      states[index] = inputs
+    },
   }
   const componentModule = { exports: {} as { default: (props: Props) => React.ReactNode } }
   const source = readFileSync(new URL('../app/employee/bookings/BookingsPage.tsx', import.meta.url), 'utf8')
@@ -68,7 +76,17 @@ function bookingsFixture(props: Props, responses: Array<{ status: number; body: 
     },
   })
   vm.runInContext(compiled, context)
-  const render = () => { cursor = 0; return componentModule.exports.default(props) }
+  const render = () => {
+    cursor = 0
+    const tree = componentModule.exports.default(props)
+    for (const element of children(tree)) {
+      const ref = (element as { ref?: { current: unknown } | null }).ref
+      const focusable = element.type === 'button' || element.props.tabIndex !== undefined
+      if (ref) ref.current = { focus: () => { if (focusable) focused.push(text(element)) } }
+    }
+    effects.splice(0).forEach((effect) => effect())
+    return tree
+  }
   const all = () => children(render())
   const row = (client: string) => {
     const item = all().find((element) => element.type === 'li' && text(element).includes(client))
@@ -82,7 +100,7 @@ function bookingsFixture(props: Props, responses: Array<{ status: number; body: 
   }
   const flush = () => new Promise((resolve) => setImmediate(resolve))
   return {
-    calls, row, button, flush,
+    calls, focused, row, button, flush,
     page: () => text(render()),
     status: (client: string) => text(row(client).find((element) => element.props.className === 'status')!),
     click: async (client: string, label: string) => { (button(row(client), label).props.onClick as () => void)(); await flush() },
@@ -173,6 +191,47 @@ describe('employee bookings list', () => {
     await fixture.click('Morgan Blake', 'Keep unpaid')
     assert.equal(fixture.status('Morgan Blake'), 'Awaiting payment')
     assert.doesNotMatch(text(fixture.row('Morgan Blake')), /Confirm payment/)
+  })
+
+  test('a second press on an open row button closes its panel without posting anything', async () => {
+    const fixture = bookingsFixture({ email: 'Local preview', role: 'superadmin', enabled: true, preview: true, initial: previewBookingHistory() })
+    const expanded = (label: string) => fixture.button(fixture.row('Morgan Blake'), label).props['aria-expanded']
+    await fixture.click('Morgan Blake', 'Mark as paid')
+    fixture.choose('Morgan Blake', 'zelle')
+    fixture.note('Morgan Blake', 'Ref 55')
+    assert.equal(expanded('Mark as paid'), true)
+    await fixture.click('Morgan Blake', 'Mark as paid')
+    assert.equal(expanded('Mark as paid'), false)
+    assert.equal(fixture.row('Morgan Blake').some((element) => element.type === 'form'), false)
+    await fixture.click('Morgan Blake', 'Cancel reservation')
+    assert.deepEqual([expanded('Mark as paid'), expanded('Cancel reservation')], [false, true])
+    await fixture.click('Morgan Blake', 'Cancel reservation')
+    assert.equal(expanded('Cancel reservation'), false)
+    assert.doesNotMatch(text(fixture.row('Morgan Blake')), /Confirm payment|Confirm cancellation/)
+    assert.equal(fixture.status('Morgan Blake'), 'Awaiting payment')
+    assert.equal(fixture.calls.length, 0)
+    // Opening it again starts a fresh panel.
+    await fixture.click('Morgan Blake', 'Mark as paid')
+    assert.equal(fixture.row('Morgan Blake').find((element) => element.type === 'select')!.props.value, '')
+  })
+
+  test('closing a panel returns focus to its button, and a finished change focuses the result', async () => {
+    const fixture = bookingsFixture({ email: 'Local preview', role: 'superadmin', enabled: true, preview: true, initial: previewBookingHistory() })
+    await fixture.click('Morgan Blake', 'Mark as paid')
+    await fixture.click('Morgan Blake', 'Keep unpaid')
+    await fixture.click('Morgan Blake', 'Cancel reservation')
+    await fixture.click('Morgan Blake', 'Keep reservation')
+    assert.deepEqual(fixture.focused, ['Mark as paid', 'Cancel reservation'])
+    await fixture.click('Avery Morgan', 'Mark as paid')
+    fixture.choose('Avery Morgan', 'zelle')
+    await fixture.submit('Avery Morgan')
+    // The panel and the Mark as paid button are gone, so focus moves to the status message.
+    assert.doesNotMatch(text(fixture.row('Avery Morgan')), /Mark as paid|Confirm payment/)
+    assert.equal(fixture.focused.at(-1), 'Preview booking now shows Paid by Zelle. No real booking was changed.')
+    await fixture.click('Riley Park', 'Cancel reservation')
+    await fixture.click('Riley Park', 'Confirm cancellation')
+    fixture.page()
+    assert.deepEqual(fixture.focused.slice(2), ['Preview booking now shows Paid by Zelle. No real booking was changed.', 'Preview reservation cancelled. No real booking was changed.'])
   })
 
   test('preview cancel shows the refund note for money taken outside the website', async () => {

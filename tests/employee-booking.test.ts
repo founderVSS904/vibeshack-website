@@ -70,7 +70,7 @@ test('creation reserves the room before preparing or sending a payment request, 
   const result = await createEmployeeBooking(record, fixture.services)
   assert.equal(result.phase, 'ready')
   assert.ok(result.emailedAt)
-  assert.deepEqual(fixture.calls, ['available', 'hold', 'available', 'calendar', 'customer', 'invoice', 'finalize', 'calendar', 'send'])
+  assert.deepEqual(fixture.calls, ['available', 'hold', 'available', 'calendar', 'customer', 'invoice', 'finalize', 'send', 'calendar'])
   const before = fixture.calls.length
   assert.equal((await createEmployeeBooking(record, fixture.services)).invoiceId, result.invoiceId)
   assert.equal(fixture.calls.length, before)

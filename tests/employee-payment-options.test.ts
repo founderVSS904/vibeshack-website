@@ -90,7 +90,7 @@ test('only a superadmin can create a no-charge booking', () => {
 
 test('each payment mode reserves the room the same way and only Stripe mode calls Stripe', async () => {
   const cases = [
-    { payment: undefined, actor: creator, phase: 'ready', label: 'Payment link sent', expected: ['available', 'hold', 'available', 'calendar', 'customer', 'invoice', 'finalize', 'calendar', 'send'] },
+    { payment: undefined, actor: creator, phase: 'ready', label: 'Payment link sent', expected: ['available', 'hold', 'available', 'calendar', 'customer', 'invoice', 'finalize', 'send', 'calendar'] },
     { payment: { mode: 'external' }, actor: creator, phase: 'ready', label: 'Awaiting payment', expected: ['available', 'hold', 'available', 'calendar', 'calendar'] },
     { payment: { mode: 'prepaid', method: 'zelle', note: 'Paid at booking' }, actor: creator, phase: 'paid', label: 'Paid by Zelle', expected: ['available', 'hold', 'available', 'calendar', 'calendar', 'notifyPaid'] },
     { payment: { mode: 'none' }, actor: superadmin, phase: 'paid', label: 'No charge', expected: ['available', 'hold', 'available', 'calendar', 'calendar', 'notifyPaid'] },
@@ -116,6 +116,31 @@ test('each payment mode reserves the room the same way and only Stripe mode call
     assert.equal(fixture.calls.length, before)
     assert.equal((await fixture.store.read())?.record.lease, undefined)
   }
+})
+
+test('Calendar says a payment link was sent only after the invoice email goes out', async () => {
+  const fixture = memory()
+  fixture.failures.add('send')
+  const input = employeeBookingInput(raw(), creator)
+  await assert.rejects(createEmployeeBooking(input, fixture.services), /Fixture provider failed/)
+  assert.equal((await fixture.current()).phase, 'reserved')
+  assert.deepEqual(fixture.calendars.map(employeePaymentLabel), ['In progress'])
+  fixture.failures.clear()
+  const result = await createEmployeeBooking(input, fixture.services)
+  assert.equal(result.phase, 'ready')
+  assert.equal(employeePaymentLabel(fixture.calendars.at(-1)!), 'Payment link sent')
+  assert.deepEqual(fixture.calls.slice(-2), ['send', 'calendar'])
+  // A Calendar failure after the email is repaired by a retry without a second email.
+  const later = memory()
+  const second = employeeBookingInput(raw(), creator)
+  let calendarWrites = 0
+  const calendar = later.services.calendar
+  later.services.calendar = async (value) => { if (++calendarWrites === 2) throw new Error('Synthetic Calendar outage'); await calendar(value) }
+  await assert.rejects(createEmployeeBooking(second, later.services), /Calendar outage/)
+  assert.equal((await later.current()).phase, 'reserved')
+  assert.equal((await createEmployeeBooking(second, later.services)).phase, 'ready')
+  assert.equal(later.calls.filter((call) => call === 'send').length, 1)
+  assert.equal(employeePaymentLabel(later.calendars.at(-1)!), 'Payment link sent')
 })
 
 test('a failed staff email never fails a paid booking and is left for the follow-up job', async () => {
@@ -168,11 +193,12 @@ test('mark as paid records an outside payment for staff-billed bookings without 
   assert.equal(saved.paidBy, 'Fixture Employee (first@example.invalid)')
   assert.ok(saved.paidAt && saved.internalNotifiedAt)
   assert.equal(employeePaymentLabel(fixture.calendars[0]), 'Paid in cash')
-  // A repeat is idempotent and returns the recorded payment unchanged.
+  // A repeat returns the recorded payment unchanged and only rewrites Calendar.
   const repeat = await markEmployeeBookingPaid(ref, { ref, method: 'zelle' }, fixture.services, creator)
   assert.equal(repeat.outcome, 'already-paid')
   assert.equal(repeat.record.paidMethod, 'cash')
-  assert.deepEqual(fixture.calls, ['calendar', 'notifyPaid'])
+  assert.deepEqual(fixture.calls, ['calendar', 'notifyPaid', 'calendar'])
+  assert.equal(employeePaymentLabel(fixture.calendars.at(-1)!), 'Paid in cash')
 })
 
 test('a superadmin may mark another employee booking paid and is recorded as the marker', async () => {
@@ -322,6 +348,29 @@ test('reconciliation accepts out-of-band payment without replacing the recorded 
   assert.equal((await outside.current()).paidMethod, 'other')
   const cancelled = memory({ ...waiting, phase: 'cancelled' })
   await assert.rejects(reconcileEmployeeInvoice('in_fixture', cancelled.services, { invoices: { async retrieve() { return invoiceFixture(waiting, { status: 'paid', amount_paid: 0, paid_out_of_band: true }) } } } as unknown as Stripe), /manual review/)
+})
+
+test('a Calendar outage after the invoice closes keeps the staff payment through the webhook and a retry', async () => {
+  const fixture = memory(stored({ customerId: 'cus_fixture', invoiceId: 'in_fixture', paymentUrl: 'https://invoice.example.invalid/fixture' }))
+  const record = await fixture.current()
+  const stripe = { invoices: { async retrieve() { return invoiceFixture(record, { status: 'paid', amount_paid: 0 }) } } } as unknown as Stripe
+  const staff = { method: 'cash', note: 'Front desk', by: 'Fixture Employee (first@example.invalid)' }
+  const payment = async () => { const saved = await fixture.current(); return { method: saved.paidMethod, note: saved.paidNote, by: saved.paidBy, phase: saved.phase, lease: saved.lease } }
+  fixture.failures.add('calendar')
+  await assert.rejects(markEmployeeBookingPaid(record.ref, { method: 'cash', note: 'Front desk' }, fixture.services, creator), /Fixture provider failed/)
+  assert.deepEqual(fixture.calls, ['markInvoicePaid', 'calendar'])
+  assert.deepEqual(await payment(), { ...staff, phase: 'paid', lease: undefined })
+  // The invoice.paid webhook from the out-of-band payment never replaces it, in or after the outage.
+  await assert.rejects(reconcileEmployeeInvoice('in_fixture', fixture.services, stripe), /Fixture provider failed/)
+  assert.deepEqual(await payment(), { ...staff, phase: 'paid', lease: undefined })
+  fixture.failures.clear()
+  const retry = await markEmployeeBookingPaid(record.ref, { method: 'zelle' }, fixture.services, creator)
+  assert.equal(retry.outcome, 'already-paid')
+  assert.equal(employeePaymentLabel(fixture.calendars.at(-1)!), 'Paid in cash')
+  assert.equal(await reconcileEmployeeInvoice('in_fixture', fixture.services, stripe), true)
+  assert.deepEqual(await payment(), { ...staff, phase: 'paid', lease: undefined })
+  assert.equal(fixture.calls.filter((call) => call === 'markInvoicePaid').length, 1)
+  assert.equal(fixture.calls.filter((call) => call === 'notifyPaid').length, 1)
 })
 
 test('cancellation follows the payment mode and the list uses the same rule', async () => {

@@ -51,6 +51,8 @@ export default function BookingsPage({ email, role, enabled, preview = false, in
   const [method, setMethod] = useState<EmployeeRecordedMethod | ''>('')
   const [note, setNote] = useState('')
   const mounted = useRef(true)
+  const trigger = useRef<HTMLButtonElement>(null)
+  const status = useRef<HTMLParagraphElement>(null)
 
   async function load(cursor?: string, signal?: AbortSignal) {
     setLoading(true); setError('')
@@ -74,10 +76,16 @@ export default function BookingsPage({ email, role, enabled, preview = false, in
     if (!preview) void load(undefined, controller.signal)
     return () => { mounted.current = false; controller.abort() }
   }, [preview])
+  // A finished change removes the panel and often its button, so focus moves to the result.
+  useEffect(() => { if (message) status.current?.focus() }, [message])
 
-  function openConfirm(ref: string, action: 'cancel' | 'paid') {
+  const expanded = (ref: string, action: 'cancel' | 'paid') => confirm?.ref === ref && confirm.action === action
+  // The row buttons are disclosures, so a second press closes the open panel.
+  function toggleConfirm(ref: string, action: 'cancel' | 'paid') {
+    if (expanded(ref, action)) return setConfirm(null)
     setConfirm({ ref, action }); setMethod(''); setNote(''); setMessage(''); setError('')
   }
+  function keep() { trigger.current?.focus(); setConfirm(null) }
   function update(ref: string, change: Partial<EmployeeHistoryItem>) {
     setHistory((previous) => previous ? { ...previous, items: previous.items.map((booking) => booking.ref === ref ? { ...booking, ...change } : booking) } : previous)
   }
@@ -128,7 +136,7 @@ export default function BookingsPage({ email, role, enabled, preview = false, in
       {preview && <p className={styles.notice}>Local preview · Fictional clients and reservations. Changes on this page stay in this preview.</p>}
       <div className={styles.toolbar}><p>Calendar booking records updated in the last 90 days. Public website bookings are outside this view.</p>{!preview && <button type="button" disabled={loading || Boolean(working)} onClick={() => { setMessage(''); void load() }}>Refresh</button>}</div>
       {error && <div className={styles.notice} role="alert"><p>{error}</p>{!history && <button type="button" disabled={loading} onClick={() => void load()}>Try again</button>}</div>}
-      {message && <p className={styles.notice} role="status">{message}</p>}
+      {message && <p className={styles.notice} role="status" ref={status} tabIndex={-1}>{message}</p>}
       {!history && loading && <p className={styles.empty} role="status">Loading booking history…</p>}
       {history && history.items.length === 0 && <div className={styles.empty}><h2>{history.nextCursor ? 'No matching bookings on this page' : 'No bookings to show'}</h2><p>{history.nextCursor ? 'More Calendar records are available. Load more to keep looking.' : 'Employee reservations updated in the last 90 days will appear here.'}</p></div>}
       {history && history.items.length > 0 && <ul className={styles.list} aria-label="Employee bookings">
@@ -137,15 +145,15 @@ export default function BookingsPage({ email, role, enabled, preview = false, in
           <div className={styles.session}><strong>{item.studioName}</strong><p>{date(item.start)}</p><p>{time(item.start)} – {time(item.end)}{date(item.start) !== date(item.end) ? ` · ends ${date(item.end)}` : ''}</p></div>
           <div className={styles.creator}><span>Booked by</span><p>{item.bookedBy}</p><span>{money(item.total)}</span></div>
           <div className={styles.actions}>{enabled && (item.canMarkPaid || item.canCancel) ? <>
-            {item.canMarkPaid && <button type="button" disabled={Boolean(working)} aria-expanded={confirm?.ref === item.ref && confirm.action === 'paid'} onClick={() => openConfirm(item.ref, 'paid')}>Mark as paid</button>}
-            {item.canCancel && <button type="button" disabled={Boolean(working)} aria-expanded={confirm?.ref === item.ref && confirm.action === 'cancel'} onClick={() => openConfirm(item.ref, 'cancel')}>Cancel reservation</button>}
+            {item.canMarkPaid && <button type="button" ref={expanded(item.ref, 'paid') ? trigger : undefined} disabled={Boolean(working)} aria-expanded={expanded(item.ref, 'paid')} onClick={() => toggleConfirm(item.ref, 'paid')}>Mark as paid</button>}
+            {item.canCancel && <button type="button" ref={expanded(item.ref, 'cancel') ? trigger : undefined} disabled={Boolean(working)} aria-expanded={expanded(item.ref, 'cancel')} onClick={() => toggleConfirm(item.ref, 'cancel')}>Cancel reservation</button>}
           </> : <span>{bookingActionNote(item, role, enabled)}</span>}</div>
-          {confirm?.ref === item.ref && confirm.action === 'paid' && <form className={`${styles.confirm} ${styles.paid}`} aria-label={`Mark the booking for ${item.clientName} as paid`} onSubmit={(event) => { event.preventDefault(); void markPaid(item) }}>
+          {expanded(item.ref, 'paid') && <form className={`${styles.confirm} ${styles.paid}`} aria-label={`Mark the booking for ${item.clientName} as paid`} onSubmit={(event) => { event.preventDefault(); void markPaid(item) }}>
             <div><strong>Mark this booking as paid?</strong><p>The team gets the booking email. If a website invoice was sent, it will show as paid so the client can’t pay twice.</p>
               <div className={styles.fields}><label>How they paid<EmployeeSelect aria-label="How they paid" required value={method} disabled={Boolean(working)} onChange={(event) => setMethod(event.target.value as EmployeeRecordedMethod)}><option value="" disabled>Choose a method</option>{EMPLOYEE_RECORDED_METHODS.map((value) => <option key={value} value={value}>{EMPLOYEE_METHOD_NAMES[value]}</option>)}</EmployeeSelect></label><label>Payment note <span className="employee-optional">Optional</span><input value={note} disabled={Boolean(working)} onChange={(event) => setNote(event.target.value)} placeholder="Zelle confirmation 1234" maxLength={200} /></label></div></div>
-            <div><button type="button" disabled={Boolean(working)} onClick={() => setConfirm(null)}>Keep unpaid</button><button type="submit" disabled={Boolean(working) || !method}>{working === item.ref ? 'Recording…' : 'Confirm payment'}</button></div>
+            <div><button type="button" disabled={Boolean(working)} onClick={keep}>Keep unpaid</button><button type="submit" disabled={Boolean(working) || !method}>{working === item.ref ? 'Recording…' : 'Confirm payment'}</button></div>
           </form>}
-          {confirm?.ref === item.ref && confirm.action === 'cancel' && <div className={styles.confirm} role="group" aria-label={`Confirm cancellation for ${item.clientName}`}><div><strong>Cancel this reservation?</strong><p>{bookingCancelCopy(item)}</p></div><div><button type="button" disabled={Boolean(working)} onClick={() => setConfirm(null)}>Keep reservation</button><button type="button" disabled={Boolean(working)} onClick={() => void cancel(item)}>{working === item.ref ? 'Cancelling…' : 'Confirm cancellation'}</button></div></div>}
+          {expanded(item.ref, 'cancel') && <div className={styles.confirm} role="group" aria-label={`Confirm cancellation for ${item.clientName}`}><div><strong>Cancel this reservation?</strong><p>{bookingCancelCopy(item)}</p></div><div><button type="button" disabled={Boolean(working)} onClick={keep}>Keep reservation</button><button type="button" disabled={Boolean(working)} onClick={() => void cancel(item)}>{working === item.ref ? 'Cancelling…' : 'Confirm cancellation'}</button></div></div>}
         </li>)}
       </ul>}
       {history && <div className={styles.pagination}><p>{history.items.length} {history.items.length === 1 ? 'reservation' : 'reservations'} loaded.{history.nextCursor ? ' More Calendar records are available.' : ' End of this 90-day history window.'}</p>{history.nextCursor && <button type="button" disabled={loading || Boolean(working)} onClick={() => void load(history.nextCursor || undefined)}>{loading ? 'Loading…' : 'Load more'}</button>}</div>}

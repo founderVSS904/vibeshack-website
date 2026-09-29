@@ -1,5 +1,6 @@
 import 'server-only'
-import { employeeDisplayName } from './identity'
+import { isEmail } from '../server/sanitize'
+import { employeeDisplayName, employeeUserId, type EmployeeIdentity } from './identity'
 import { employeeAdmin, employeeSupabase, employeeSupabaseConfigured } from './supabase'
 
 export type CurrentEmployee = {
@@ -21,6 +22,20 @@ export async function currentEmployee(): Promise<CurrentEmployee | null> {
     if (member.role === 'superadmin' && member.email !== 'founder@vibeshackstudios.com') return null
     const mfaVerified = verified.claims.aal === 'aal2'
     return { id: identity.user.id, email: member.email, name: employeeDisplayName(member.name) || employeeDisplayName(identity.user.user_metadata?.full_name || identity.user.user_metadata?.name), role: member.role, status: 'active', mfaVerified }
+  } catch { return null }
+}
+
+// Background jobs have no session. A booking keeps its creator from booking time,
+// so staff mail may copy that address only while the account is still active.
+// Records with an account ID match by ID; older records match by email.
+export async function activeEmployeeEmail(creator: EmployeeIdentity) {
+  if (!employeeSupabaseConfigured()) return null
+  const id = employeeUserId(creator.id)
+  if (creator.id !== undefined && !id) return null
+  try {
+    const query = employeeAdmin().from('employee_members').select('email,status')
+    const { data: member, error } = await (id ? query.eq('user_id', id) : query.eq('email', creator.email.toLowerCase())).maybeSingle()
+    return !error && member?.status === 'active' && isEmail(member.email) ? member.email as string : null
   } catch { return null }
 }
 

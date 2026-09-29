@@ -14,6 +14,8 @@ type Notification = { to: string; cc?: string; subject: string; html: string; te
 type NotificationDependencies = {
   store(identity: string): Promise<DeliveryStore>
   send(message: Notification & { messageId: string }): Promise<{ accepted?: unknown[]; rejected?: unknown[] }>
+  // The creator's current address while their team account is active, otherwise null.
+  activeCreator?(record: EmployeeBooking): Promise<string | null>
   now?: () => Date
 }
 
@@ -56,13 +58,13 @@ export function employeeBookingNotification(record: EmployeeBooking): Notificati
   }
 }
 
-// Staff only. The creator is copied so the person who booked it can follow up.
-export function employeeUnpaidReminder(record: EmployeeBooking): Notification {
+// Staff only. An active creator is copied so the person who booked it can follow up.
+export function employeeUnpaidReminder(record: EmployeeBooking, activeCreator?: string | null): Notification {
   const rows = bookingRows(record)
   const link = `${siteUrl}/employee/bookings/`
   const intro = 'This session starts within 48 hours and is still unpaid.'
   const action = 'Mark it paid or cancel it on the Bookings page. Nothing has been cancelled or released.'
-  const creator = stripControlChars(record.employee, 254).toLowerCase()
+  const creator = stripControlChars(activeCreator, 254).toLowerCase()
   return {
     to: internalAddress, ...(isEmail(creator) && creator !== internalAddress ? { cc: creator } : {}),
     subject: `Unpaid booking: ${subjectDetails(record)}`,
@@ -94,10 +96,11 @@ export function createEmployeeBookingNotifier(dependencies: NotificationDependen
   }
 }
 export function createEmployeeUnpaidReminder(dependencies: NotificationDependencies) {
-  const deliver = ledgerDelivery(dependencies, 'unpaid-reminder', employeeUnpaidReminder)
   return async (record: EmployeeBooking) => {
     if (record.phase !== 'ready') throw new Error('Unpaid reminders are only for bookings awaiting payment')
-    await deliver(record)
+    // Never trust the creator saved in Calendar. Any doubt sends to the fixed staff address only.
+    const creator = await dependencies.activeCreator?.(record).catch(() => null)
+    await ledgerDelivery(dependencies, 'unpaid-reminder', (current) => employeeUnpaidReminder(current, creator))(record)
   }
 }
 
@@ -113,6 +116,10 @@ const mail: NotificationDependencies = {
       connectionTimeout: 20_000, greetingTimeout: 20_000, socketTimeout: 30_000,
     })
     return transporter.sendMail({ ...message, from: `"VibeShack Booking" <${user}>` })
+  },
+  async activeCreator(record) {
+    const { activeEmployeeEmail } = await import('./access')
+    return activeEmployeeEmail({ id: record.employeeId, email: record.employee })
   },
 }
 const notify = createEmployeeBookingNotifier(mail)
