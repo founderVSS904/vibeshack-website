@@ -4,6 +4,8 @@ interface RateLimitOptions {
   key: string
   max: number
   windowMs: number
+  // Replaces the client IP, for callers that already derived a bucket id.
+  identity?: string
 }
 
 const buckets = new Map<string, { count: number; resetAt: number }>()
@@ -27,9 +29,9 @@ export function getClientIp(req: NextRequest) {
     .trim()
 }
 
-export function rateLimit(req: NextRequest, { key, max, windowMs }: RateLimitOptions) {
+export function rateLimit(req: NextRequest, { key, max, windowMs, identity }: RateLimitOptions) {
   const now = Date.now()
-  const bucketKey = `${key}:${getClientIp(req)}`
+  const bucketKey = `${key}:${identity ?? getClientIp(req)}`
   const current = buckets.get(bucketKey)
 
   if (!current || current.resetAt <= now) {

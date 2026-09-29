@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
-import { createHmac } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { createHash, createHmac } from 'node:crypto'
+import { readFileSync, readdirSync } from 'node:fs'
 import vm from 'node:vm'
 import { after, before, test } from 'node:test'
 import { PGlite } from '@electric-sql/pglite'
@@ -8,29 +8,42 @@ import { NextRequest, NextResponse } from 'next/server'
 import ts from 'typescript'
 import { getClientIp, rateLimit } from '../lib/server/request-guards'
 
-function limiterFixture({ error = false, allowed = true, malformed = false, secret = 'synthetic-server-secret', throws = false, localFilter = false } = {}) {
+type LimitOptions = { key: string; max: number; windowMs: number; subject?: string; fallback?: 'local' }
+
+function limiterFixture({ error = false, allowed = true, malformed = false, secret = 'synthetic-server-secret', throws = false, hang = false, localFilter = false, url = 'https://fixture.supabase.invalid', now = () => Date.now() } = {}) {
   const calls: Array<{ name: string; args: Record<string, unknown> }> = []
+  const timeouts: number[] = []
+  const warnings: unknown[][] = []
+  const state = { error, allowed, malformed, throws, hang }
   const source = readFileSync('lib/server/distributed-rate-limit.ts', 'utf8')
   const ast = ts.createSourceFile('fixture.ts', source, ts.ScriptTarget.ES2022, true)
-  const functions = ast.statements.filter(ts.isFunctionDeclaration).map((node) => node.getText(ast).replace(/^export\s+/, '')).join('\n')
+  // Functions plus module state, so each fixture has its own store retry window.
+  const functions = ast.statements.filter((node) => ts.isFunctionDeclaration(node) || ts.isVariableStatement(node)).map((node) => node.getText(ast).replace(/^export\s+/, '')).join('\n')
   const context = vm.createContext({
-    createHmac, URL, Number, NextResponse, getClientIp, AbortSignal,
+    createHash, createHmac, URL, Number, NextResponse, getClientIp, Date: { now },
+    AbortSignal: { timeout: (ms: number) => { timeouts.push(ms); return AbortSignal.timeout(1) } },
+    console: { warn: (...args: unknown[]) => { warnings.push(args) } },
     rateLimit: localFilter ? rateLimit : () => null,
-    process: { env: { SUPABASE_URL: 'https://fixture.supabase.invalid', SUPABASE_SECRET_KEY: secret, NODE_ENV: 'production' } },
-    fetch: () => { throw new Error('Network forbidden') },
-    createClient: (url: string, key: string, options: { auth: Record<string, boolean> }) => {
+    process: { env: { SUPABASE_URL: url, SUPABASE_SECRET_KEY: secret, NODE_ENV: 'production' } },
+    // Never reaches the network: it answers at once or waits for its timeout.
+    fetch: (_input: string, init: { signal: AbortSignal }) => state.hang ? new Promise((_resolve, reject) => {
+      if (init.signal.aborted) reject(init.signal.reason)
+      init.signal.addEventListener('abort', () => reject(init.signal.reason))
+    }) : Promise.resolve(new Response('{}')),
+    createClient: (url: string, key: string, options: { auth: Record<string, boolean>; global: { fetch: (input: string, init: RequestInit) => Promise<Response> } }) => {
       assert.equal(url, 'https://fixture.supabase.invalid/'); assert.equal(key, secret)
       assert.equal(options.auth.persistSession, false); assert.equal(options.auth.autoRefreshToken, false)
       return { rpc: async (name: string, args: Record<string, unknown>) => {
         calls.push({ name, args })
-        if (throws) throw new Error('Synthetic private provider exception')
-        return { data: malformed ? {} : { allowed, retry_after_seconds: allowed ? 0 : 42 }, error: error ? { message: 'Synthetic private provider error' } : null }
+        await options.global.fetch('https://fixture.supabase.invalid/rest/v1/rpc/request_rate_limit_claim', {})
+        if (state.throws) throw new Error('Synthetic private provider exception')
+        return { data: state.malformed ? {} : { allowed: state.allowed, retry_after_seconds: state.allowed ? 0 : 42 }, error: state.error ? { message: 'Synthetic private provider error' } : null }
       } }
     },
   })
   vm.runInContext(ts.transpileModule(functions, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText, context)
   const request = (ip = '192.0.2.55') => new NextRequest('https://example.invalid/api/fixture', { headers: { 'x-vercel-forwarded-for': ip } })
-  return { calls, run: (options: { key: string; max: number; windowMs: number; subject?: string }, ip?: string) => context.distributedRateLimit(request(ip), options) as Promise<NextResponse | null>, hash: (key: string, subject: string) => context.rateLimitSubjectHash(key, subject) as string }
+  return { calls, timeouts, warnings, state, run: (options: LimitOptions, ip?: string) => context.distributedRateLimit(request(ip), options) as Promise<NextResponse | null>, hash: (key: string, subject: string) => context.rateLimitSubjectHash(key, subject) as string }
 }
 
 test('distributed limits send only stable HMAC identifiers to the private atomic store', async () => {
@@ -81,6 +94,89 @@ test('the bounded local prefilter stops repeated bursts without replacing the du
   const denied = limiterFixture({ localFilter: true, allowed: false })
   assert.equal((await denied.run({ ...options, key: 'durable-denial-fixture' }))?.status, 429)
   assert.equal(denied.calls.length, 1)
+})
+
+test('only fallback callers keep serving when the store errors, times out, replies badly or is not configured', async () => {
+  const options = { key: 'fallback-fixture', max: 2, windowMs: 60_000 }
+  for (const settings of [{ error: true }, { malformed: true }, { throws: true }, { hang: true }, { secret: '' }, { url: '' }, { url: 'http://fixture.supabase.invalid' }]) {
+    const failClosed = limiterFixture(settings)
+    assert.equal((await failClosed.run(options))?.status, 503)
+    assert.ok(failClosed.timeouts.every((ms) => ms === 5_000))
+    assert.equal(failClosed.warnings.length, 0)
+    const fixture = limiterFixture(settings)
+    assert.equal(await fixture.run({ ...options, fallback: 'local' }), null)
+    assert.ok(fixture.timeouts.every((ms) => ms === 2_000))
+    assert.equal(fixture.calls.length, 'secret' in settings || 'url' in settings ? 0 : 1)
+    if ('hang' in settings) assert.deepEqual([failClosed.timeouts, fixture.timeouts], [[5_000], [2_000]])
+    assert.deepEqual(fixture.warnings, [['Shared rate limit store unavailable; using local limits for fallback-fixture']])
+  }
+})
+
+test('during a store outage fallback callers stay capped by the local bucket', async () => {
+  for (const [label, settings] of [['keyed', { error: true }], ['unkeyed', { secret: '' }]] as const) {
+    const fixture = limiterFixture({ ...settings, localFilter: true })
+    const options = { key: `outage-${label}`, max: 2, windowMs: 60_000, fallback: 'local' as const }
+    assert.equal(await fixture.run(options), null)
+    assert.equal(await fixture.run(options), null)
+    const limited = await fixture.run(options)
+    assert.equal(limited?.status, 429); assert.ok(Number(limited?.headers.get('Retry-After')) >= 1)
+    assert.equal(await fixture.run(options, '192.0.2.77'), null)
+    // A recipient cap follows the recipient across addresses.
+    const recipient = { ...options, key: `outage-${label}-recipient`, subject: 'guest@example.invalid' }
+    assert.equal(await fixture.run(recipient, '192.0.2.1'), null)
+    assert.equal(await fixture.run(recipient, '192.0.2.2'), null)
+    assert.equal((await fixture.run(recipient, '192.0.2.3'))?.status, 429)
+    assert.equal(fixture.calls.length, label === 'keyed' ? 1 : 0)
+    assert.equal(fixture.warnings.length, 1)
+  }
+})
+
+test('a store that answers with a denial still wins for fallback callers', async () => {
+  const fixture = limiterFixture({ allowed: false, localFilter: true })
+  const denied = await fixture.run({ key: 'fallback-denial-fixture', max: 5, windowMs: 60_000, fallback: 'local' })
+  assert.equal(denied?.status, 429); assert.equal(denied?.headers.get('Retry-After'), '42')
+  assert.equal(fixture.calls.length, 1); assert.equal(fixture.warnings.length, 0)
+})
+
+test('after a store failure fallback callers skip the store for thirty seconds, then try again', async () => {
+  let clock = 1_000_000
+  const fixture = limiterFixture({ hang: true, now: () => clock })
+  const options = { key: 'breaker-fixture', max: 100, windowMs: 60_000, fallback: 'local' as const }
+  // Requests already waiting on the store share one warning.
+  assert.deepEqual(await Promise.all([fixture.run(options), fixture.run(options)]), [null, null])
+  assert.equal(fixture.calls.length, 2); assert.equal(fixture.warnings.length, 1)
+  clock += 29_999
+  assert.equal(await fixture.run(options), null); assert.equal(fixture.calls.length, 2)
+  // Fail-closed callers never skip the store.
+  assert.equal((await fixture.run({ ...options, fallback: undefined }))?.status, 503); assert.equal(fixture.calls.length, 3)
+  clock += 1
+  assert.equal(await fixture.run(options), null); assert.equal(fixture.calls.length, 4); assert.equal(fixture.warnings.length, 2)
+  fixture.state.hang = false; fixture.state.allowed = false
+  clock += 30_000
+  assert.equal((await fixture.run(options))?.status, 429); assert.equal(fixture.calls.length, 5)
+  fixture.state.allowed = true
+  assert.equal(await fixture.run(options), null); assert.equal(fixture.calls.length, 6); assert.equal(fixture.warnings.length, 2)
+})
+
+test('public booking and lead routes opt into the local fallback while employee auth stays fail closed', () => {
+  const publicRoutes = ['add-on-availability', 'availability', 'book-tour', 'booking-confirmation', 'cancel-checkout-session', 'contact', 'create-checkout-session', 'tour-availability']
+  const limits = new Map<string, string[]>()
+  for (const file of readdirSync('app/api', { recursive: true }).map(String).filter((file) => file.endsWith('route.ts'))) {
+    const route = file.replace(/\/route\.ts$/, '')
+    const ast = ts.createSourceFile(file, readFileSync(`app/api/${file}`, 'utf8'), ts.ScriptTarget.ES2022, true)
+    const visit = (node: ts.Node) => {
+      if (ts.isCallExpression(node) && node.expression.getText(ast) === 'distributedRateLimit' && ts.isObjectLiteralExpression(node.arguments[1])) {
+        const fallback = node.arguments[1].properties.find((property) => property.name?.getText(ast) === 'fallback')
+        limits.set(route, [...(limits.get(route) || []), fallback && ts.isPropertyAssignment(fallback) ? fallback.initializer.getText(ast) : 'none'])
+      }
+      ts.forEachChild(node, visit)
+    }
+    visit(ast)
+  }
+  assert.deepEqual([...limits.keys()].filter((route) => !route.startsWith('employee/auth/')).sort(), publicRoutes)
+  assert.equal(limits.get('book-tour')?.length, 2)
+  for (const [route, fallbacks] of limits) assert.ok(fallbacks.every((value) => value === (route.startsWith('employee/auth/') ? 'none' : "'local'")), route)
+  assert.ok(['confirm', 'email', 'password', 'password/reset'].every((route) => limits.has(`employee/auth/${route}`)))
 })
 
 // Actual PostgreSQL functions and grants, with no Supabase project or network.

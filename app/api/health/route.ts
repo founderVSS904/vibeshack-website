@@ -24,6 +24,13 @@ function missingEnvVars() {
   return missing
 }
 
+// The repository is public, so the short commit only says which release is
+// serving. Anything other than a git SHA is left out.
+function releaseCommit() {
+  const sha = process.env.VERCEL_GIT_COMMIT_SHA || ''
+  return /^[0-9a-f]{7,40}$/i.test(sha) ? sha.slice(0, 7).toLowerCase() : null
+}
+
 export async function GET(req: NextRequest) {
   const missing = missingEnvVars()
   // Variable names are only listed for callers holding the cron secret, so the
@@ -35,6 +42,7 @@ export async function GET(req: NextRequest) {
     status: 'ok',
     service: 'vibeshack-website',
     timestamp: new Date().toISOString(),
+    commit: releaseCommit(),
     envConfigured: missing.length === 0,
     ...(authorized ? { missingEnv: missing } : {}),
   }, {
