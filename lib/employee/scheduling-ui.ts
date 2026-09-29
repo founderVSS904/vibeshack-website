@@ -1,4 +1,5 @@
 import { BOOKING_TIME_ZONE, bookingDateInPacific, formatTimeForDisplay, getBookingWindowForDay, getTimeSlotsForDay, isValidBookingDate, nextDateString } from '../booking/time'
+import type { EmployeePaymentMode } from './payment'
 
 export type EmployeeSlot = { time: string; label: string; available: boolean }
 export type TimePeriod = 'morning' | 'afternoon' | 'evening' | 'overnight'
@@ -69,11 +70,23 @@ export async function findNextEmployeeSession(
   return null
 }
 
-export function employeeResultStatus(phase: string, emailed: boolean, preview: boolean) {
-  if (phase === 'cancelled') return { reservation: 'Cancelled', payment: 'Not payable', delivery: preview ? 'Nothing sent' : 'Payment link disabled' }
+// Only the website invoice emails the client. Every other choice sends nothing.
+export function employeeResultStatus(phase: string, emailed: boolean, preview: boolean, payment: EmployeePaymentMode = 'stripe', label = phase === 'paid' ? 'Paid' : 'Payment pending') {
+  const invoice = payment === 'stripe'
+  if (phase === 'cancelled') return { reservation: 'Cancelled', payment: 'Not payable', delivery: preview || !invoice ? 'Nothing sent' : 'Payment link disabled' }
   return {
     reservation: preview ? 'Reserved in preview' : 'Studio reserved',
-    payment: phase === 'paid' ? 'Paid' : preview ? 'Payment pending (sample)' : 'Payment pending',
-    delivery: preview ? 'Nothing sent' : emailed ? 'Email request accepted' : 'Email not sent',
+    payment: preview && invoice && phase !== 'paid' ? 'Payment pending (sample)' : label,
+    delivery: preview || !invoice ? 'Nothing sent' : emailed ? 'Email request accepted' : 'Email not sent',
   }
+}
+
+export function employeeResultMessage(phase: string, emailed: boolean, preview: boolean, payment: EmployeePaymentMode = 'stripe', clientEmail = '') {
+  const invoice = payment === 'stripe'
+  if (phase === 'cancelled') return { title: 'Reservation cancelled.', detail: invoice ? 'The room and selected equipment are available again. The payment link is no longer payable.' : 'The room and selected equipment are available again.' }
+  if (preview) return { title: 'Preview booking created.', detail: 'Nothing was sent or charged. This room is now reserved in this preview only.' }
+  if (payment === 'external') return { title: 'Reserved. Nothing was sent to the client.', detail: 'Mark it paid on the Bookings page when the money arrives.' }
+  if (payment === 'prepaid') return { title: 'Reserved and marked paid.', detail: 'Nothing was sent to the client. The team gets the booking email.' }
+  if (payment === 'none') return { title: 'Reserved at no charge.', detail: 'Nothing was sent to the client. The team gets the booking email.' }
+  return { title: 'Studio reserved.', detail: emailed ? `Stripe accepted the email request for ${clientEmail}. Delivery to their inbox is not confirmed here.` : 'The studio is reserved, but the payment email has not been sent.' }
 }

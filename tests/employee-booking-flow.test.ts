@@ -50,11 +50,11 @@ describe('employee booking steps', () => {
   test('page enforces final-step submission and keeps draft fields outside mounted step panels', () => {
     const source = readFileSync(new URL('../app/employee/EmployeeBookingPage.tsx', import.meta.url), 'utf8')
     assert.match(source, /if \(step !== 3 \|\| submitLock\.current/)
-    for (const field of ['name', 'clientEmail', 'phone', 'notes', 'setupId', 'addOnIds', 'platform', 'studioId', 'date', 'start', 'count']) {
+    for (const field of ['name', 'clientEmail', 'phone', 'notes', 'payment', 'setupId', 'addOnIds', 'platform', 'studioId', 'date', 'start', 'count']) {
       assert.ok(source.indexOf(`const [${field},`) < source.indexOf('return <>'), field)
     }
     const navigation = source.slice(source.indexOf('function visitStep'), source.indexOf('function focusSection'))
-    assert.doesNotMatch(navigation, /setName\(|setClientEmail\(|setPhone\(|setNotes\(|setSetupId\(|setAddOnIds\(|setPlatform\(|setStart\(/)
+    assert.doesNotMatch(navigation, /setName\(|setClientEmail\(|setPhone\(|setNotes\(|setPayment\(|setSetupId\(|setAddOnIds\(|setPlatform\(|setStart\(/)
     assert.match(navigation, /setReachedStep/)
     assert.match(source, /setStep\(1\); setReachedStep\(1\)/)
     assert.equal((source.match(/<EmployeeBookingSubmit /g) || []).length, 1)

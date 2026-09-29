@@ -18,18 +18,24 @@
 .creator > span { color: #a1a1aa; font-size: 12px; }
 .creator p { color: #d4d4d8; margin: 4px 0 8px; }
 .status { display: inline-flex; margin-top: 12px; padding: 3px 9px; border: 1px solid #ffffff26; border-radius: 30px; color: #d4d4d8; font-size: 12px; }
+.status[data-phase=ready] { color: #dccfae; border-color: #c9bb9433; }
 .status[data-phase=paid] { color: #c2decd; border-color: #c2decd40; }
+.status[data-phase=paid][data-payment=none] { color: #e4e4e7; border-color: #ffffff33; }
 .status[data-phase=cancelled] { color: #71717a; border-color: #ffffff14; }
-.actions { align-self: center; text-align: right; }
+.actions { align-self: center; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; }
 .actions > span { font-size: 12px; color: #71717a; }
+.actions > button { min-width: 152px; }
 .notice { padding: 16px 18px; border: 1px solid #ffffff26; border-radius: 12px; font-size: 14px; line-height: 1.6; color: #d4d4d8; margin: 18px 0; }
 .notice p { margin: 0 0 10px; }
 .empty { padding: 60px 24px; text-align: center; border: 1px solid #ffffff1a; border-radius: 16px; color: #a1a1aa; font-size: 14px; }
 .empty h2 { font-size: 18px; color: #e4e4e7; margin-bottom: 10px; }
 .confirm { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px; border: 1px solid #ffffff26; border-radius: 12px; background: #0b0b0b; }
 .confirm strong { font-weight: 500; }
+.confirm > div:first-child { flex: 1; min-width: 0; }
 .confirm > div:last-child { display: flex; gap: 8px; flex-shrink: 0; }
+.confirm.paid { align-items: flex-end; }
+.fields { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 16px; margin-top: 16px; }
 .confirm button:last-child { color: #fff; border-color: #ffffff59; }
 .pagination { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 0; font-size: 13px; color: #a1a1aa; }
-@media (max-width: 1050px) { .booking { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .actions { text-align: left; } .confirm { align-items: flex-start; flex-direction: column; } }
-@media (max-width: 600px) { .main { padding: 28px 20px 48px; } .heading { align-items: flex-start; flex-direction: column; gap: 20px; } .page .heading h1 { font-size: 28px; } .toolbar { align-items: flex-start; gap: 12px; } .booking { grid-template-columns: minmax(0, 1fr); gap: 16px; } .client, .creator { min-width: 0; } .actions { grid-column: 1 / -1; } .confirm > div:last-child { flex-direction: column; width: 100%; } .pagination { align-items: flex-start; gap: 12px; } }
+@media (max-width: 1050px) { .booking { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .actions { flex-direction: row; flex-wrap: wrap; align-items: center; text-align: left; } .confirm, .confirm.paid { align-items: stretch; flex-direction: column; } .confirm > div:last-child { justify-content: flex-start; } }
+@media (max-width: 600px) { .main { padding: 28px 20px 48px; } .heading { align-items: flex-start; flex-direction: column; gap: 20px; } .page .heading h1 { font-size: 28px; } .toolbar { align-items: flex-start; gap: 12px; } .booking { grid-template-columns: minmax(0, 1fr); gap: 16px; } .client, .creator { min-width: 0; } .actions { grid-column: 1 / -1; } .confirm > div:last-child { flex-direction: column; width: 100%; } .fields { grid-template-columns: minmax(0, 1fr); } .pagination { align-items: flex-start; gap: 12px; } }

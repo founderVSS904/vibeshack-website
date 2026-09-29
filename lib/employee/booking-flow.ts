@@ -3,7 +3,7 @@ export type EmployeeBookingStep = 1 | 2 | 3
 export const EMPLOYEE_BOOKING_STEPS = [
   { number: 1, label: 'Session', title: 'Choose the session.', description: 'Pick a studio, date, and time. All times Pacific.' },
   { number: 2, label: 'Setup & extras', title: 'Set up the session.', description: 'Choose the arrangement and any extras for your client.' },
-  { number: 3, label: 'Client & review', title: 'Client details & review.', description: 'Check the details, reserve the studio, and request payment.' },
+  { number: 3, label: 'Client & review', title: 'Client details & review.', description: 'Add the client, choose how they pay, and reserve the studio.' },
 ] as const
 
 export function canContinueEmployeeStep(step: EmployeeBookingStep, sessionReady: boolean, extrasReady: boolean, locked: boolean) {

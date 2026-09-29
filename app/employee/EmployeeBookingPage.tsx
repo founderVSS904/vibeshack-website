@@ -6,13 +6,14 @@ import { getStudioSetup, getStudioSetups } from '@/lib/booking/studio-setups'
 import { BOOKING_ADD_ONS, bookingAddOnRateLabel, bookingAddOnTotalCents, priceBookingAddOns, type BookingAddOnId } from '@/lib/booking/add-ons'
 import { addMinutes, bookingDateRange, formatBookingDuration, formatDateForDisplay, formatTimeForDisplay, formatTimeRelativeToDate, getBookingWindowForDay } from '@/lib/booking/time'
 import { previewSlots, previewTeleprompterAvailable, type PreviewReservation } from '@/lib/employee/preview'
-import { EMPLOYEE_TIME_PERIODS, employeeResultStatus, employeeStartSlots, findNextEmployeeSession, sessionFits, timePeriod, type TimePeriod } from '@/lib/employee/scheduling-ui'
+import { EMPLOYEE_PAYMENT_DRAFT, employeePaymentChoice, employeePaymentLabel, employeePaymentReady, employeePaymentRequest, type EmployeePaymentDraft, type EmployeePaymentMode } from '@/lib/employee/payment'
+import { EMPLOYEE_TIME_PERIODS, employeeResultMessage, employeeResultStatus, employeeStartSlots, findNextEmployeeSession, sessionFits, timePeriod, type TimePeriod } from '@/lib/employee/scheduling-ui'
 import { canContinueEmployeeStep, canVisitEmployeeStep, EMPLOYEE_BOOKING_STEPS, type EmployeeBookingStep } from '@/lib/employee/booking-flow'
-import { EmployeeBookingIcon, EmployeeBookingProgress, EmployeeBookingSubmit, EmployeeSelect, EmployeeSessionDetails, EmployeeSessionRecap, EmployeeSetupPicker, EmployeeStepPanel } from './EmployeeBookingUI'
+import { EmployeeBookingIcon, EmployeeBookingProgress, EmployeeBookingSubmit, EmployeePaymentPicker, EmployeeSelect, EmployeeSessionDetails, EmployeeSessionRecap, EmployeeSetupPicker, EmployeeStepPanel } from './EmployeeBookingUI'
 import EmployeeHeader from './EmployeeHeader'
 
 type Slot = { time: string; label: string; available: boolean }
-type Result = { ref: string; phase: string; paymentUrl?: string; emailed: boolean; total: number }
+type Result = { ref: string; phase: string; paymentUrl?: string; emailed: boolean; total: number; payment?: EmployeePaymentMode; paymentLabel?: string }
 const money = (cents: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: cents % 100 ? 2 : 0 }).format(cents / 100)
 function moveMonth(month: string, amount: number) {
   const [year, number] = month.split('-').map(Number)
@@ -48,6 +49,7 @@ export default function EmployeeBookingPage({ email, preview = false, enabled, r
   const [clientEmail, setClientEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [notes, setNotes] = useState('')
+  const [payment, setPayment] = useState<EmployeePaymentDraft>(EMPLOYEE_PAYMENT_DRAFT)
   const [refresh, setRefresh] = useState(0)
   const [reservations, setReservations] = useState<PreviewReservation[]>([])
   const [availability, setAvailability] = useState<{ key: string; slots: Slot[]; error?: string }>({ key: '', slots: [] })
@@ -80,14 +82,18 @@ export default function EmployeeBookingPage({ email, preview = false, enabled, r
   const teleprompterReady = inventory.key === inventoryKey && inventory.available
   const locked = busy || attempted || Boolean(result)
   const extrasReady = (!setups.length || Boolean(setup)) && (!addOnIds.includes('teleprompter') || teleprompterReady)
-  const ready = sessionReady && !searching && (!addOnIds.includes('teleprompter') || teleprompterReady) && name.trim() && clientEmail.trim() && enabled
+  const ready = sessionReady && !searching && (!addOnIds.includes('teleprompter') || teleprompterReady) && name.trim() && clientEmail.trim() && employeePaymentReady(payment) && enabled
   const dateLabel = new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })
   const timeLabel = start && end ? `${formatTimeForDisplay(new Date(start))} – ${formatTimeRelativeToDate(end, date)}` : 'Choose a start time'
   const startSlots = useMemo(() => employeeStartSlots(date, daySlots), [date, daySlots])
   const periodSlots = startSlots.filter((slot) => timePeriod(slot.start) === period)
   const visibleSlots = periodSlots.filter((slot) => showUnavailable || canFit(slot.index))
-  const nextAction = !enabled ? 'Employee booking is not activated yet.' : searching ? 'Finding your next opening…' : !currentAvailability ? 'Checking studio availability…' : availability.error ? availability.error : !start ? 'Choose a start time to continue.' : !canFit(startIndex) ? 'This time is no longer available. Choose another start time.' : !sessionReady ? 'Choose a studio setup to continue.' : addOnIds.includes('teleprompter') && !teleprompterReady ? 'The teleprompter is unavailable or still being checked. Choose another time or remove it.' : !name.trim() || !clientEmail.trim() ? 'Add the client’s name and email to continue.' : preview ? 'Preview only. No reservation, email, or payment will be created outside this page.' : 'No payment is collected now.'
-  const status = result ? employeeResultStatus(result.phase, result.emailed, preview) : null
+  const nextAction = !enabled ? 'Employee booking is not activated yet.' : searching ? 'Finding your next opening…' : !currentAvailability ? 'Checking studio availability…' : availability.error ? availability.error : !start ? 'Choose a start time to continue.' : !canFit(startIndex) ? 'This time is no longer available. Choose another start time.' : !sessionReady ? 'Choose a studio setup to continue.' : addOnIds.includes('teleprompter') && !teleprompterReady ? 'The teleprompter is unavailable or still being checked. Choose another time or remove it.' : !name.trim() || !clientEmail.trim() ? 'Add the client’s name and email to continue.' : !employeePaymentReady(payment) ? 'Choose how the client already paid to continue.' : preview ? 'Preview only. No reservation, email, or payment will be created outside this page.' : employeePaymentChoice(payment.mode).help
+  const status = result ? employeeResultStatus(result.phase, result.emailed, preview, result.payment, result.paymentLabel) : null
+  const resultMessage = result ? employeeResultMessage(result.phase, result.emailed, preview, result.payment, clientEmail) : null
+  // The submitted choice once a result exists. Only the website invoice has a payment link.
+  const paymentMode = result?.payment ?? payment.mode
+  const invoice = paymentMode === 'stripe'
   const stepCopy = EMPLOYEE_BOOKING_STEPS[step - 1]
   const sessionHelp = searching ? 'Finding your next opening…' : !currentAvailability ? 'Checking availability…' : availability.error || (!start ? 'Choose a start time to continue.' : !canFit(startIndex) ? 'This time is no longer available. Choose another start time.' : 'Your selections carry through to the next step.')
   const extrasHelp = !slotReady ? 'Your session needs an available time. Return to Session to check it.' : setups.length && !setup ? 'Choose a studio setup to continue.' : !extrasReady ? 'The teleprompter is unavailable or still being checked. Remove it or choose another time.' : 'Extras are optional. Nothing is reserved until the final step.'
@@ -184,10 +190,11 @@ export default function EmployeeBookingPage({ email, preview = false, enabled, r
     try {
       if (preview) {
         const ref = `preview-${requestId.current}`
+        const phase = payment.mode === 'prepaid' || payment.mode === 'none' ? 'paid' : 'ready'
         setReservations((items) => [...items, { ref, studioId, start, end: end!.toISOString(), teleprompter: addOnIds.includes('teleprompter') }])
-        setResult({ ref, phase: 'ready', total, emailed: false })
+        setResult({ ref, phase, total, emailed: false, payment: payment.mode, paymentLabel: employeePaymentLabel({ phase, payment: payment.mode, paidMethod: payment.mode === 'none' ? 'none' : payment.method || undefined }) })
       } else {
-        const response = await fetch('/api/employee/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestId: requestId.current, session: { studioId, date, slots: selectedSlots, setupId: setupId || undefined, addOnIds, remotePodcastPlatform: platform }, customer: { name, email: clientEmail, phone }, notes }) })
+        const response = await fetch('/api/employee/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestId: requestId.current, session: { studioId, date, slots: selectedSlots, setupId: setupId || undefined, addOnIds, remotePodcastPlatform: platform }, customer: { name, email: clientEmail, phone }, notes, payment: employeePaymentRequest(payment) }) })
         const data = await response.json()
         if (!response.ok) { if (response.status === 400) { setAttempted(false); requestId.current = '' }; throw new Error(data.error || 'Booking could not finish. Retry the same request.') }
         setResult(data)
@@ -199,7 +206,7 @@ export default function EmployeeBookingPage({ email, preview = false, enabled, r
     if (!result || submitLock.current) return
     submitLock.current = true; setBusy(true); setError('')
     try {
-      if (preview) { setReservations((items) => items.filter((item) => item.ref !== result.ref)); setResult({ ...result, phase: 'cancelled' }) }
+      if (preview) { setReservations((items) => items.filter((item) => item.ref !== result.ref)); setResult({ ...result, phase: 'cancelled', paymentLabel: 'Cancelled' }) }
       else {
         const response = await fetch('/api/employee/bookings/cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: result.ref }) })
         const data = await response.json()
@@ -212,7 +219,7 @@ export default function EmployeeBookingPage({ email, preview = false, enabled, r
   }
   function newBooking() {
     stopSearch()
-    setResult(null); setAttempted(false); setStart(''); setName(''); setClientEmail(''); setPhone(''); setNotes(''); setAddOnIds([]); setPlatform(''); setError(''); setCopied(false); setCancelPrompt(false); requestId.current = ''; setRefresh((value) => value + 1)
+    setResult(null); setAttempted(false); setStart(''); setName(''); setClientEmail(''); setPhone(''); setNotes(''); setAddOnIds([]); setPlatform(''); setPayment(EMPLOYEE_PAYMENT_DRAFT); setError(''); setCopied(false); setCancelPrompt(false); requestId.current = ''; setRefresh((value) => value + 1)
     setStep(1); setReachedStep(1)
   }
   return <>
@@ -276,8 +283,9 @@ export default function EmployeeBookingPage({ email, preview = false, enabled, r
           <EmployeeStepPanel step={3} active={step}>
           <section className="employee-card employee-details" ref={clientRef} tabIndex={-1} aria-label="Client details"><div className="employee-section-heading"><h2>Client details</h2><span>Who’s coming in?</span></div>
             <div className="employee-client-grid"><label>Full name<input required autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Client’s full name" maxLength={120} /></label><label>Email address<input required type="email" autoComplete="email" value={clientEmail} onChange={(event) => setClientEmail(event.target.value)} placeholder="client@example.com" maxLength={254} /></label><label>Phone number <span className="employee-optional">Optional</span><input type="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="(415) 555-0123" maxLength={40} /></label><label>Internal note <span className="employee-optional">Optional</span><input value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Anything the team should know" maxLength={1000} /></label></div>
-            <div className="employee-payment-note"><span aria-hidden="true">↗</span><div><strong>{preview ? 'Try the booking flow' : 'Payment link sent automatically'}</strong><p>{preview ? 'Use sample client details. This preview does not send invoices or create real bookings.' : 'The client receives a secure Stripe invoice. No card or upfront payment needed here.'}</p></div></div>
+            {preview && <div className="employee-payment-note"><span aria-hidden="true">↗</span><div><strong>Try the booking flow</strong><p>Use sample client details. This preview does not send invoices or create real bookings.</p></div></div>}
           </section>
+          <EmployeePaymentPicker draft={payment} superadmin={role === 'superadmin'} onChange={setPayment} />
           <button type="button" className="employee-text-button employee-back-button" disabled={locked} onClick={() => visitStep(2)}>← Back to setup & extras</button>
           </EmployeeStepPanel>
         </fieldset>
@@ -298,19 +306,20 @@ export default function EmployeeBookingPage({ email, preview = false, enabled, r
             <dl className="employee-price-breakdown"><div><dt>Studio · {formatBookingDuration(count)}</dt><dd>{money(Math.round(studio.price * count / 2 * 100))}</dd></div>{addOns.map((addon) => <div key={addon.id}><dt>{addon.name}</dt><dd>{addon.amountCents ? money(addon.amountCents) : 'No charge'}</dd></div>)}</dl>
             {!result && <div className="employee-summary-edit" aria-label="Edit booking details"><button type="button" disabled={locked} onClick={() => visitStep(1)}>Edit session</button><button type="button" disabled={locked} onClick={() => visitStep(2)}>Edit setup & extras</button></div>}
             <div className="employee-total"><span>Session total</span><strong>{money(result?.total ?? total)}</strong></div>
-            {!result && <EmployeeBookingSubmit preview={preview} busy={busy} attempted={attempted} disabled={busy || (!ready && !attempted)} help={nextAction} />}
+            {paymentMode === 'none' && <p className="employee-total-note">No charge. The total is shown for reference only.</p>}
+            {!result && <EmployeeBookingSubmit preview={preview} busy={busy} attempted={attempted} disabled={busy || (!ready && !attempted)} help={nextAction} mode={payment.mode} />}
             {error && <p className="employee-notice" role="alert">{error}</p>}
-            {result && status && <div className="employee-result" ref={resultRef} tabIndex={-1} role="status"><span className="employee-result-check" aria-hidden="true">✓</span><h3>{result.phase === 'cancelled' ? 'Reservation cancelled.' : preview ? 'Preview booking created.' : 'Studio reserved.'}</h3>
-              <dl className="employee-result-status"><div><dt>Reservation</dt><dd>{status.reservation}</dd></div><div><dt>Payment</dt><dd>{status.payment}</dd></div><div><dt>Payment request</dt><dd>{status.delivery}</dd></div></dl>
-              <p>{result.phase === 'cancelled' ? 'The room and selected equipment are available again. The payment link is no longer payable.' : preview ? 'Nothing was sent or charged. This room is now reserved in this preview only.' : result.emailed ? `Stripe accepted the email request for ${clientEmail}. Delivery to their inbox is not confirmed here.` : 'The studio is reserved, but the payment email has not been sent.'}</p>
+            {result && status && resultMessage && <div className="employee-result" ref={resultRef} tabIndex={-1} role="status"><span className="employee-result-check" aria-hidden="true">✓</span><h3>{resultMessage.title}</h3>
+              <dl className="employee-result-status"><div><dt>Reservation</dt><dd>{status.reservation}</dd></div><div><dt>Payment</dt><dd>{status.payment}</dd></div><div><dt>{invoice ? 'Payment request' : 'Client email'}</dt><dd>{status.delivery}</dd></div></dl>
+              <p>{resultMessage.detail}</p>
               <p className="employee-result-client">{name}<br />{clientEmail}</p>
-              {result.paymentUrl && result.phase !== 'cancelled' && <button type="button" className="employee-secondary" onClick={async () => { try { await navigator.clipboard.writeText(result.paymentUrl!); setCopied(true) } catch { setError('Could not copy the link. Please use the invoice in Stripe.') } }}>{copied ? 'Payment link copied ✓' : 'Copy payment link'}</button>}
+              {invoice && result.paymentUrl && result.phase !== 'cancelled' && <button type="button" className="employee-secondary" onClick={async () => { try { await navigator.clipboard.writeText(result.paymentUrl!); setCopied(true) } catch { setError('Could not copy the link. Please use the invoice in Stripe.') } }}>{copied ? 'Payment link copied ✓' : 'Copy payment link'}</button>}
               <button type="button" className="employee-primary" onClick={newBooking} disabled={busy}>Create another booking →</button>
               {result.phase !== 'cancelled' && result.phase !== 'paid' && <button type="button" className="employee-text-button" disabled={busy} aria-expanded={cancelPrompt} onClick={() => setCancelPrompt(!cancelPrompt)}>Cancel unpaid reservation</button>}
-              {cancelPrompt && <div className="employee-notice"><p>{preview ? 'Release this sample studio and equipment reservation?' : 'Release this studio and disable the payment link?'}</p><button type="button" className="employee-secondary" onClick={cancel} disabled={busy}>{busy ? 'Cancelling…' : 'Yes, cancel reservation'}</button><button type="button" className="employee-text-button" onClick={() => setCancelPrompt(false)} disabled={busy}>Keep reservation</button></div>}
+              {cancelPrompt && <div className="employee-notice"><p>{preview ? 'Release this sample studio and equipment reservation?' : invoice ? 'Release this studio and disable the payment link?' : 'Release this studio? Nothing is sent to the client.'}</p><button type="button" className="employee-secondary" onClick={cancel} disabled={busy}>{busy ? 'Cancelling…' : 'Yes, cancel reservation'}</button><button type="button" className="employee-text-button" onClick={() => setCancelPrompt(false)} disabled={busy}>Keep reservation</button></div>}
             </div>}
           </section>
-          {result?.phase !== 'cancelled' && result?.phase !== 'paid' && <div className="employee-reservation-note"><span aria-hidden="true">◇</span><p><strong>Reserve now. Payment later.</strong> {preview ? 'Preview reservations reset when you reload.' : 'Unpaid reservations stay reserved until a team member cancels.'} {end && <>Turnaround ends at {formatTimeRelativeToDate(addMinutes(end, 30), date)}.</>}</p></div>}
+          {result?.phase !== 'cancelled' && result?.phase !== 'paid' && (invoice || paymentMode === 'external') && <div className="employee-reservation-note"><span aria-hidden="true">◇</span><p><strong>Reserve now. Payment later.</strong> {preview ? 'Preview reservations reset when you reload.' : 'Unpaid reservations stay reserved until a team member cancels.'} {end && <>Turnaround ends at {formatTimeRelativeToDate(addMinutes(end, 30), date)}.</>}</p></div>}
         </aside>
         </EmployeeStepPanel>
       </form>

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import React, { type ReactNode, type SelectHTMLAttributes } from 'react'
 import type { StudioSetup } from '@/lib/booking/studio-setups'
 import { EMPLOYEE_BOOKING_STEPS, type EmployeeBookingStep } from '@/lib/employee/booking-flow'
+import { EMPLOYEE_METHOD_NAMES, EMPLOYEE_RECORDED_METHODS, employeePaymentChoice, employeePaymentChoices, type EmployeePaymentDraft, type EmployeePaymentMode, type EmployeeRecordedMethod } from '@/lib/employee/payment'
 
 type IconName = 'calendar' | 'clock' | 'duration' | 'setup' | 'rate' | 'plus' | 'chevron'
 
@@ -77,6 +78,20 @@ export function EmployeeSessionRecap({ studio, date, time, duration, onEdit, loc
   return <section className="employee-session-recap" aria-label="Selected session"><div><strong>{studio}</strong><p>{date} · {time} <span>· {duration}</span></p></div><button type="button" onClick={onEdit} disabled={locked}>Change session</button></section>
 }
 
-export function EmployeeBookingSubmit({ preview, busy, attempted, disabled, help }: { preview: boolean; busy: boolean; attempted: boolean; disabled: boolean; help: string }) {
-  return <><button className="employee-primary" type="submit" disabled={disabled} aria-describedby="employee-next-action">{busy ? 'Creating reservation…' : attempted ? 'Retry this booking' : preview ? 'Create preview booking' : 'Reserve & send payment link'}<span aria-hidden="true">→</span></button><p className="employee-summary-help" id="employee-next-action" role="status">{help}</p></>
+// Native radios keep arrow-key selection. No charge is offered to superadmins only.
+export function EmployeePaymentPicker({ draft, superadmin, onChange }: { draft: EmployeePaymentDraft; superadmin: boolean; onChange: (draft: EmployeePaymentDraft) => void }) {
+  return <section className="employee-card employee-details employee-payment" aria-labelledby="employee-payment-heading"><div className="employee-section-heading"><h2 id="employee-payment-heading">Payment</h2><span>How will this session be paid?</span></div>
+    <div className="employee-payment-options" role="radiogroup" aria-labelledby="employee-payment-heading">{employeePaymentChoices(superadmin).map((choice) => <label key={choice.mode} className={`employee-payment-option${draft.mode === choice.mode ? ' is-selected' : ''}`}>
+      <input type="radio" name="payment-mode" value={choice.mode} checked={draft.mode === choice.mode} onChange={() => onChange({ ...draft, mode: choice.mode })} />
+      <span><strong>{choice.title}</strong><small>{choice.description}</small></span>
+    </label>)}</div>
+    {draft.mode === 'prepaid' && <div className="employee-payment-record">
+      <label>How they paid<EmployeeSelect aria-label="How they paid" required value={draft.method} onChange={(event) => onChange({ ...draft, method: event.target.value as EmployeeRecordedMethod })}><option value="" disabled>Choose a method</option>{EMPLOYEE_RECORDED_METHODS.map((method) => <option key={method} value={method}>{EMPLOYEE_METHOD_NAMES[method]}</option>)}</EmployeeSelect></label>
+      <label>Payment note <span className="employee-optional">Optional</span><input value={draft.note} onChange={(event) => onChange({ ...draft, note: event.target.value })} placeholder="Zelle confirmation 1234" maxLength={200} /></label>
+    </div>}
+  </section>
+}
+
+export function EmployeeBookingSubmit({ preview, busy, attempted, disabled, help, mode = 'stripe' }: { preview: boolean; busy: boolean; attempted: boolean; disabled: boolean; help: string; mode?: EmployeePaymentMode }) {
+  return <><button className="employee-primary" type="submit" disabled={disabled} aria-describedby="employee-next-action">{busy ? 'Creating reservation…' : attempted ? 'Retry this booking' : preview ? 'Create preview booking' : employeePaymentChoice(mode).action}<span aria-hidden="true">→</span></button><p className="employee-summary-help" id="employee-next-action" role="status">{help}</p></>
 }
