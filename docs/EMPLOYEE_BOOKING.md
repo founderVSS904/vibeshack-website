@@ -228,7 +228,8 @@ Auth provider settings. It requires email authentication, checks Google when
 the Google flag is enabled, and checks that mail transport variables exist.
 The script prints no keys, tokens, employee rows or email contents, and creates
 no records or messages. Partial or rejected configuration fails the build.
-With no Supabase configuration it reports closed employee access.
+With no Supabase configuration it reports closed employee access and
+per-instance request limits for the public booking and contact routes.
 
 The booking check is skipped unless `EMPLOYEE_BOOKING_ENABLED=1`. When enabled,
 it requires the Stripe secret, webhook signing secret and Gmail transport

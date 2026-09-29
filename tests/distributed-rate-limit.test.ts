@@ -150,12 +150,17 @@ test('after a store failure fallback callers skip the store for thirty seconds, 
   // Fail-closed callers never skip the store.
   assert.equal((await fixture.run({ ...options, fallback: undefined }))?.status, 503); assert.equal(fixture.calls.length, 3)
   clock += 1
-  assert.equal(await fixture.run(options), null); assert.equal(fixture.calls.length, 4); assert.equal(fixture.warnings.length, 2)
+  // Once the window ends one request probes the hanging store; the rest stay local.
+  assert.deepEqual(await Promise.all([fixture.run(options), fixture.run(options), fixture.run(options)]), [null, null, null])
+  assert.equal(fixture.calls.length, 4); assert.equal(fixture.warnings.length, 2)
+  assert.equal(await fixture.run(options), null); assert.equal(fixture.calls.length, 4)
   fixture.state.hang = false; fixture.state.allowed = false
   clock += 30_000
-  assert.equal((await fixture.run(options))?.status, 429); assert.equal(fixture.calls.length, 5)
+  const [probe, waiting] = await Promise.all([fixture.run(options), fixture.run(options)])
+  assert.equal(probe?.status, 429); assert.equal(waiting, null); assert.equal(fixture.calls.length, 5)
+  // A store that answers the probe closes the breaker for concurrent callers too.
   fixture.state.allowed = true
-  assert.equal(await fixture.run(options), null); assert.equal(fixture.calls.length, 6); assert.equal(fixture.warnings.length, 2)
+  assert.deepEqual(await Promise.all([fixture.run(options), fixture.run(options)]), [null, null]); assert.equal(fixture.calls.length, 7); assert.equal(fixture.warnings.length, 2)
 })
 
 test('public booking and lead routes opt into the local fallback while employee auth stays fail closed', () => {

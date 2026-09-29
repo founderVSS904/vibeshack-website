@@ -15,10 +15,12 @@ type DistributedRateLimitOptions = {
   fallback?: 'local'
 }
 
-// After a store failure, fallback callers skip the store until this moment so
-// a dead store does not add its timeout to every public request.
+// After a store failure, fallback callers skip the store until this moment,
+// then one request at a time probes it while the rest stay local, so a dead
+// store does not add its timeout to every public request.
 const STORE_RETRY_MS = 30_000
 let storeRetryAt = 0
+let storeProbing = false
 
 export function rateLimitSubjectHash(key: string, subject: string) {
   const secret = process.env.SUPABASE_SECRET_KEY
@@ -76,10 +78,15 @@ export async function distributedRateLimit(req: NextRequest, options: Distribute
     const local = rateLimit(req, { key: 'durable', identity: bucket, max, windowMs })
     if (local) return local
     if (!fallback) return await claimSharedLimit(bucket, max, windowMs, 5_000)
-    if (Date.now() < storeRetryAt) return null
+    if (storeProbing || Date.now() < storeRetryAt) return null
+    const probing = storeRetryAt > 0
+    if (probing) storeProbing = true
     try {
       if (!keyed) throw new Error('Rate limiting is unavailable')
-      return await claimSharedLimit(bucket, max, windowMs, 2_000)
+      const claimed = await claimSharedLimit(bucket, max, windowMs, 2_000)
+      // An answer from the store ends the outage for every caller.
+      if (probing) storeRetryAt = 0
+      return claimed
     } catch {
       // One warning per retry window, with no address, subject or provider detail.
       if (Date.now() >= storeRetryAt) {
@@ -87,6 +94,8 @@ export async function distributedRateLimit(req: NextRequest, options: Distribute
         console.warn(`Shared rate limit store unavailable; using local limits for ${key}`)
       }
       return null
+    } finally {
+      if (probing) storeProbing = false
     }
   } catch {
     return NextResponse.json({ error: 'This request is temporarily unavailable. Please try again shortly.' }, {
