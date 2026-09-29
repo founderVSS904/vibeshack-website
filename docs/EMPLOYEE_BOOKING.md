@@ -118,8 +118,10 @@ of band in Stripe, so the client can no longer pay it online. If the client
 already paid online, the booking shows Paid online and the chosen method is
 not recorded. A repeat request reports that the booking was already paid. An
 invoice that does not match needs administrator review in Stripe. A later
-`invoice.paid` webhook never replaces a payment staff recorded; an invoice
-marked paid directly in Stripe shows Paid (other).
+`invoice.paid` webhook never replaces a payment staff recorded. An invoice
+marked paid directly in Stripe shows Paid (other) only if Stripe reports
+`amount_paid` as 0; if it reports the full amount, it shows Paid online.
+Which one Stripe reports is unverified (see the status at the end).
 
 **Cancellation.** Cancelling releases the studio and equipment holds and
 removes the room event.
@@ -280,9 +282,9 @@ and recovery-token expiry and a suitable session lifetime. Keep the provider's
 AAL1 session-duration limit off so a first-factor session does not expire
 waiting for an authenticator challenge. The earlier mandatory Superadmin
 authenticator step was removed in PR #34 (`/employee/security/` now redirects
-to sign-in), and the founder MFA-factor removal belonged to that migration. If
-a factor ever needs removal again, a trusted Supabase administrator does it;
-login code never removes factors. Google authentication may create an Auth
+to sign-in). The September 26 handoff records that the founder Auth account
+had no MFA factors then, so none were removed. If a factor ever needs removal,
+a trusted Supabase administrator does it; login code never removes factors. Google authentication may create an Auth
 identity, but it grants no portal access without founder identity verification
 or an invited membership.
 Disable unused public authentication methods; never enable anonymous users
@@ -496,6 +498,7 @@ validation does not create real reservations, invoices, charges or client
 emails. These remain unverified live: invitation and reset email delivery, a
 paid employee booking end to end, the internal New Booking email, and how
 Stripe reports `amount_paid` for an invoice paid out of band on API version
-`2026-02-25.clover` (the code accepts either 0 or the full amount; confirm in
+`2026-02-25.clover` (the code accepts either 0 or the full amount, but only 0
+labels a payment marked in the Stripe dashboard as Paid (other); confirm in
 Stripe test mode). Any such operational test must stay within the exact
 external actions authorized by Tay.
