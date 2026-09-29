@@ -7,7 +7,7 @@ import { distributedRateLimit } from '@/lib/server/distributed-rate-limit'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const limited = await distributedRateLimit(req, { key: 'booking-confirmation', max: 40, windowMs: 60_000 })
+  const limited = await distributedRateLimit(req, { key: 'booking-confirmation', max: 40, windowMs: 60_000, fallback: 'local' })
   if (limited) {
     limited.headers.set('Cache-Control', 'no-store, max-age=0')
     return limited

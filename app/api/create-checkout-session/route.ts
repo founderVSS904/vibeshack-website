@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
       key: 'checkout-session',
       max: CHECKOUT_RATE_LIMIT_MAX,
       windowMs: CHECKOUT_RATE_LIMIT_WINDOW_MS,
+      fallback: 'local',
     })
     if (limited) return limited
 

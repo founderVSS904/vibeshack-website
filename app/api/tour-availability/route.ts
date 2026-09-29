@@ -6,7 +6,7 @@ import { distributedRateLimit } from '@/lib/server/distributed-rate-limit'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const limited = await distributedRateLimit(req, { key: 'tour-availability', max: 120, windowMs: 60 * 1000 })
+  const limited = await distributedRateLimit(req, { key: 'tour-availability', max: 120, windowMs: 60 * 1000, fallback: 'local' })
   if (limited) return limited
 
   const { searchParams } = new URL(req.url)
