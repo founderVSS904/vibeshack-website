@@ -1,6 +1,9 @@
 # Employee booking
 
-Implementation updated September 26, 2026. The previous sign-in copy release is live. The password and Google sign-in update described here is authorized but still requires provider migration, verification and deployment.
+Implementation updated September 28, 2026, checked against production commit
+`f67aaaf`. Email/password sign-in and Continue with Google are live, with no
+mandatory authenticator step. Payment choices, Mark as paid and the hourly
+staff follow-ups shipped in that commit.
 
 ## Routes and behavior
 
@@ -10,7 +13,8 @@ Implementation updated September 26, 2026. The previous sign-in copy release is 
 - `/employee/password/`: request a link to set a first password or reset an
   existing one. The response does not reveal whether an email has team access.
 - `/employee/book/`: authenticated three-step booking flow: Session, Setup &
-  extras, and Client & review. No payment fields for staff.
+  extras, and Client & review. Staff never enter card details; step three
+  asks how the booking will be paid (see Payment choices).
 - `/employee/preview/`: development-only browser-memory preview. Requires
   `EMPLOYEE_LOCAL_PREVIEW=1`, `NODE_ENV=development`, and no `VERCEL` environment.
   It never authenticates API calls or creates provider records. Production
@@ -86,10 +90,68 @@ offer unpaid cancellation. Booking history and real account activation are
 handled by the account and history routes described
 below. In-place rescheduling remains outside this release.
 
-Pending-payment policy currently defaults to keeping the reservation until
-staff cancels it. Tay was asked to confirm this policy; no answer was received
-during implementation. Invoices request payment before the booked start time,
-but overdue invoices do not automatically release the room.
+Unpaid bookings are never cancelled or released automatically. This is the
+decided policy. Invoices request payment before the booked start time, but an
+overdue invoice keeps the room. Staff get one reminder instead when an unpaid
+booking starts within 48 hours.
+
+## Payment choices
+
+Step three (Client & review) has a Payment section. The server checks every
+choice again.
+
+| Choice | What happens | Shows as |
+| --- | --- | --- |
+| Send payment link (default) | The Stripe flow below: the client is emailed a hosted Stripe invoice. | Payment link sent |
+| We'll bill them | No Stripe call and nothing sent to the client. | Awaiting payment |
+| Already paid | Staff pick cash, Zelle, Venmo, card, bank transfer, check or other, plus an optional note of up to 200 characters. No Stripe call and nothing sent to the client. | Paid immediately, for example Paid in cash |
+| No charge | Superadmin only; the server returns 403 for anyone else. No Stripe call and nothing sent to the client. The normal total is still recorded. | No charge |
+
+The same payment label appears in the Calendar event title, the internal email
+and the Bookings list.
+
+**Mark as paid.** `POST /api/employee/bookings/paid`, offered on
+`/employee/bookings/`, records a method and optional note for an unpaid Send
+payment link or We'll bill them booking. Only the creator or the Superadmin
+can use it. For a Stripe booking the server first marks the invoice paid out
+of band in Stripe, so the client can no longer pay it online. If the client
+already paid online, the booking shows Paid online and the chosen method is
+not recorded. A repeat request reports that the booking was already paid. An
+invoice that does not match needs administrator review in Stripe. A later
+`invoice.paid` webhook never replaces a payment staff recorded. An invoice
+marked paid directly in Stripe shows Paid (other) only if Stripe reports
+`amount_paid` as 0; if it reports the full amount, it shows Paid online.
+Which one Stripe reports is unverified (see the status at the end).
+
+**Cancellation.** Cancelling releases the studio and equipment holds and
+removes the room event.
+
+- Send payment link: creator or Superadmin while unpaid; the invoice is
+  voided first. Once paid, online or marked paid, review it in Stripe instead.
+- We'll bill them: creator or Superadmin before payment, without Stripe. Once
+  marked paid, Superadmin only.
+- Already paid: Superadmin only. Any refund happens outside the website.
+- No charge: creator or Superadmin.
+
+**Internal email.** The New Booking email to `founder@vibeshackstudios.com`
+goes when a booking becomes paid by any route: at creation for Already paid and
+No charge, on Mark as paid, or when the Stripe webhook confirms payment. It
+includes Booked by, the payment label, any payment note and, when someone other
+than the creator recorded it, Marked paid by. Client emails are unchanged.
+
+**Hourly follow-ups.** The hourly `/api/cron/booking-reminders/` job runs staff
+follow-ups after the public reminders, only when `EMPLOYEE_BOOKING_ENABLED=1`:
+
+- One reminder to the same internal address when an unpaid booking (Payment
+  link sent or Awaiting payment) starts within 48 hours. It copies the creator
+  while their team account is still active.
+- A retry for paid bookings whose internal email did not go out, for up to
+  seven days after payment.
+
+Each run skips records changed in the last 10 minutes or held by a lease, and
+sends at most 20 messages. The delivery ledger prevents repeats. A follow-up
+failure never changes the public reminder response. Nothing is cancelled,
+released or sent to a client by these follow-ups.
 
 ## Employee creator attribution
 
@@ -102,27 +164,32 @@ the account's display name changes later. Older sessions or profiles without a
 name remain attributable by email; the system does not invent a name.
 
 The private studio Calendar event shows `Booked by: Name (email)` from creation
-onward, with no guest attendees or Calendar update emails. New named bookings
-also store `bookedByName` and `bookedByEmail` as internal Stripe invoice metadata.
-These fields are excluded from invoice descriptions, line items, booking API
-results and all client/guest email templates. Legacy records retain their
-original invoice-creation parameters for safe idempotent retries.
+onward, with no guest attendees or Calendar update emails. New named Send
+payment link bookings also store `bookedByName` and `bookedByEmail` as internal
+Stripe invoice metadata. These fields are excluded from invoice descriptions,
+line items, booking API results and all client/guest email templates. Legacy
+records retain their original invoice-creation parameters for safe idempotent
+retries.
 
-Tay confirmed the internal notification should go out **after the client pays**.
-After a signature-verified invoice webhook retrieves and validates the invoice,
-the booking is marked paid and Calendar is updated. A dedicated New Booking
-email then goes only to the existing internal address,
-`founder@vibeshackstudios.com`, including the Booked by line. No internal email
-is sent merely for an unpaid reservation or cancellation. Client invoice emails
-and the public checkout's confirmation, prep and invited-guest emails stay
-unchanged. The preview never sends mail or invents a signed-in employee.
+As Tay confirmed, the internal notification waits for payment. A dedicated New
+Booking email goes only to the existing internal address,
+`founder@vibeshackstudios.com`, once the booking is paid by any route (see
+Payment choices), including the Booked by line. For a Stripe payment, a
+signature-verified invoice webhook first retrieves and validates the invoice,
+then the booking is marked paid and Calendar is updated. Apart from the 48-hour
+unpaid reminder, no internal email is sent for an unpaid reservation or a
+cancellation. Client invoice emails and the public checkout's confirmation,
+prep and invited-guest emails stay unchanged. The preview never sends mail or
+invents a signed-in employee.
 
 The internal email uses the existing Gmail transport and durable message
 delivery ledger. Verified rejections can retry; accepted messages are not
 repeated. Ambiguous SMTP outcomes require inspection instead of blind resend.
-A notification failure returns a retryable webhook error while retaining the
-paid reservation. Repeated webhooks resume notification delivery without
-recreating the reservation/invoice or resending the client's invoice email.
+On the webhook path, a notification failure returns a retryable webhook error
+while retaining the paid reservation. Repeated webhooks resume notification
+delivery without recreating the reservation/invoice or resending the client's
+invoice email. When staff record the payment, a failed send is left for the
+hourly follow-up instead.
 
 ## Accounts, roles and production activation
 
@@ -181,12 +248,13 @@ service credentials access those records. The production environment needs:
 | `SUPABASE_PUBLISHABLE_KEY` | Project publishable or legacy anon key |
 | `SUPABASE_SECRET_KEY` | Project secret or legacy service-role key, server-only |
 | `EMPLOYEE_BASE_URL` | `https://www.vibeshackstudios.com` |
-| `EMPLOYEE_GOOGLE_ENABLED` | `1` only after the Supabase Google provider and its OAuth configuration are verified; leave unset while Google is unavailable |
+| `EMPLOYEE_GOOGLE_ENABLED` | `1` shows Continue with Google, as production does now; the prebuild check fails if it is set while the Supabase Google provider is unavailable |
 | `EMPLOYEE_BOOKING_ENABLED` | `1` only after authentication and booking integrations are verified |
 | `GMAIL_USER`, `GMAIL_APP_PASSWORD` | Existing website mail transport |
 | `STRIPE_SECRET_KEY` | Existing server-side Stripe account used for employee customers, invoices and payment reconciliation |
 | `STRIPE_WEBHOOK_SECRET` | Signing secret for the existing `/api/webhook/` endpoint |
 | `GCAL_TOKEN_JSON` or `GCAL_TOKEN_B64` | Existing server-side Calendar credentials; configure one production credential source |
+| `CRON_SECRET` | Existing secret that authorizes the hourly `/api/cron/booking-reminders/` job, which also runs the staff follow-ups |
 
 For OAuth Calendar credentials, `GCAL_CLIENT_ID` and `GCAL_CLIENT_SECRET` are
 needed only when those values are not contained in the credential JSON;
@@ -210,26 +278,30 @@ Supabase's redirect allowlist, permit only the canonical website callback
 required development/test origins. Do not use wildcard production redirects.
 Use identity/email/profile scopes only, never Calendar scopes for staff login.
 The existing Calendar credentials remain separate. Configure short invitation
-and recovery-token expiry and a suitable session lifetime. The provider's AAL1
-session-duration limit must be off so a first-factor session does not expire
-because an authenticator challenge was never completed. During migration, a
-trusted Supabase administrator must remove any existing founder MFA factors
-from the exact founder Auth account; never remove factors automatically at
-login. Google authentication may create an Auth identity, but it grants no
-portal access without founder identity verification or an invited membership.
+and recovery-token expiry and a suitable session lifetime. Keep the provider's
+AAL1 session-duration limit off so a first-factor session does not expire
+waiting for an authenticator challenge. The earlier mandatory Superadmin
+authenticator step was removed in PR #34 (`/employee/security/` now redirects
+to sign-in). The September 26 handoff records that the founder Auth account
+had no MFA factors then, so none were removed. If a factor ever needs removal,
+a trusted Supabase administrator does it; login code never removes factors. Google authentication may create an Auth
+identity, but it grants no portal access without founder identity verification
+or an invited membership.
 Disable unused public authentication methods; never enable anonymous users
 for the employee portal.
 
 Production `npm run build` runs `scripts/verify-employee-config.mjs` first,
 followed by `scripts/verify-employee-booking.ts`.
 When Supabase variables are present, this performs read-only checks of the
-service account's membership-table access, denied anonymous table access and
-Auth provider settings. It requires email authentication, checks Google when
-the Google flag is enabled, and checks that mail transport variables exist.
-The script prints no keys, tokens, employee rows or email contents, and creates
-no records or messages. Partial or rejected configuration fails the build.
-With no Supabase configuration it reports closed employee access and
-per-instance request limits for the public booking and contact routes.
+service account's membership-table access, the shared request-limit store,
+denied anonymous table access and Auth provider settings. It requires email
+authentication, checks Google when the Google flag is enabled, and checks that
+mail transport variables exist. The script prints no keys, tokens, employee
+rows or email contents, and creates no records or messages. Partial or rejected
+configuration fails the build, and so does a production build with no Supabase
+configuration. Elsewhere, no Supabase configuration reports closed employee
+access and per-instance request limits for the public booking and contact
+routes.
 
 The booking check is skipped unless `EMPLOYEE_BOOKING_ENABLED=1`. When enabled,
 it requires the Stripe secret, webhook signing secret and Gmail transport
@@ -244,21 +316,17 @@ build without exposing credentials, provider objects or record identifiers.
 
 These read-only checks do not create reservations, test invoice delivery,
 confirm the webhook signing secret matches the endpoint, verify the provider's
-AAL1 duration setting or existing MFA factors, prove password setup/sign-in,
-or prove a paid booking end to end. Keep the existing verified
+AAL1 duration setting, prove password setup/sign-in, or prove a paid booking
+end to end. Keep the existing verified
 webhook signing secret when updating its event subscriptions.
 `EMPLOYEE_BOOKING_ENABLED=1` requires working employee access and the booking
 provider checks; Supabase setup alone does not activate those providers. Keep
 `EMPLOYEE_LOCAL_PREVIEW` out of the production configuration.
 
-Before releasing this password update, verify the dedicated Supabase migration,
-exact Auth callback allowlist, email authentication and production variables;
-turn off the AAL1 duration limit and finish the trusted-administrator founder
-MFA-factor migration described above. Run the production prebuild checks, then
-verify password setup, password sign-in and reset behavior on the deployed
-routes. Keep the Google flag unset until the dedicated provider and exact
-founder identity are verified. The previous sign-in copy deployment does not
-establish that this new authentication flow or provider migration is live.
+The password and Google release is live: the production sign-in page shows
+email/password fields and Continue with Google, and Tay confirmed the founder
+portal password is set. No live end-to-end test of invitation or reset email
+delivery has been run; each needs Tay's approval for that exact action.
 
 The Team screen supports pending invitation resend/revocation and active account
 disable/restore. Restoring an unaccepted invitation returns it to Invited;
@@ -274,7 +342,22 @@ Bookings retain creator name/email and stable ID snapshots across profile
 changes and deactivation. New bookings use stable ID ownership; historical
 records without it fall back to the verified original email. Cancellation
 checks ownership before provider writes and again inside the record lease.
-Paid invoices still require a separate Stripe refund/cancellation process.
+Paid Stripe invoices still require a separate Stripe refund/cancellation
+process. Payment choices lists who may cancel each kind of booking.
+
+### Request limits
+
+Request limits use the shared Supabase store
+(`supabase/migrations/202609270002_request_rate_limits.sql`). Public
+availability, add-on availability, tour availability, booking confirmation,
+checkout create and cancel, contact and book-tour (IP and recipient caps)
+opt into a local fallback. If the store is missing, errors, answers badly or
+takes more than 2 seconds, those routes keep serving on this server instance's
+own limit, skip the store for 30 seconds, then let one request probe it. A 429
+from a working store is still final. During an outage each instance counts on
+its own, so the overall cap is looser. Employee password sign-in, reset,
+email-link and confirmation routes stay fail-closed: they return 503 when the
+store cannot answer.
 
 ### Owner recovery
 
@@ -285,10 +368,9 @@ inbox; configured Google sign-in must use the exact founder Google identity.
 If account or inbox recovery requires administration, use trusted Supabase and
 email-provider administrative access, preserve the existing stable Auth user
 ID and Superadmin membership, and revoke sessions when compromise is suspected.
-Any existing founder MFA factors must be removed through that trusted Supabase
-administrative path during this migration, never through automatic login code.
-Never recover by accepting a client-supplied role, sharing an employee session,
-or creating a public bypass.
+Any MFA factor cleanup also uses that trusted administrative path, never login
+code. Never recover by accepting a client-supplied role, sharing an employee
+session, or creating a public bypass.
 
 ### Booking provider readiness
 
@@ -307,6 +389,11 @@ References: [Supabase server authentication](https://supabase.com/docs/guides/au
 
 ## Reservation and payment lifecycle
 
+Steps 4 to 6 apply only to Send payment link. The other payment choices never
+call Stripe or email the client: after step 3 the booking is saved as Awaiting
+payment, or as paid for Already paid and No charge, which sends the internal
+email.
+
 1. Authenticate the employee and validate the canonical session/client input.
 2. Create a private transparent state event in the existing hold calendar. A
    deterministic reference and ETag lease serialize retries across instances.
@@ -319,16 +406,20 @@ References: [Supabase server authentication](https://supabase.com/docs/guides/au
    advancement, and send the hosted Stripe invoice email.
 6. Show success only after the send request succeeds. Keep the reservation if
    invoice creation or email fails; retry the same request to resume safely.
-7. A verified payment webhook marks the calendar Paid. No duplicate public
-   booking event or customer checkout fulfillment is created.
-8. Staff cancellation voids the unpaid invoice first, then removes the room
-   event and releases room/equipment ledgers. Paid invoices cannot be cancelled
-   by this endpoint. Voiding the invoice in Stripe also reconciles via webhook.
+7. A verified payment webhook marks a Stripe booking Paid in Calendar; Mark as
+   paid does the same for Send payment link and We'll bill them. No duplicate
+   public booking event or customer checkout fulfillment is created.
+8. Staff cancellation of a Stripe booking voids the unpaid invoice first, then
+   removes the room event and releases room/equipment ledgers. Paid invoices
+   cannot be cancelled by this endpoint. Voiding the invoice in Stripe also
+   reconciles via webhook.
 
-The employee page supports cancelling the reservation just created. History is available at `/employee/bookings/`;
-in-place rescheduling remains outside this release. Existing reservations can
-also be managed through Calendar and Stripe; void the invoice in Stripe to release through the webhook. Do not
-delete only the calendar event, because the resource ledger also needs release.
+The employee page supports cancelling the unpaid reservation just created.
+History is available at `/employee/bookings/`, with Mark as paid and Cancel
+where the rules allow; in-place rescheduling remains outside this release.
+Existing reservations can also be managed through Calendar and Stripe; void
+the invoice in Stripe to release through the webhook. Do not delete only the
+calendar event, because the resource ledger also needs release.
 
 ## Interrupted bookings and recovery
 
@@ -389,21 +480,25 @@ expired or invalid setup links display a friendly request-new-link notice.
 Development preview sign-in and reset interactions make no authentication or
 email requests and say that nothing was sent. `/employee/preview/team/` and
 `/employee/preview/bookings/` allow safe review of invitations and history with
-fictional data and the same production guards. No preview route is available
-in a production build.
+fictional data and the same production guards, including one row per payment
+state with local Mark as paid and Cancel. No preview route is available in a
+production build.
 
 Automated tests exercise canonical prices, strict authentication, origin
 protection, concurrent and repeated submissions, invoice/email failures,
 late-retry protection, cancellation ordering, Stripe invoice parameters,
 webhook reconciliation, room-only occupancy, turnaround, global teleprompter
-inventory and preservation of public checkout rules. Provider tests use
-in-memory fakes, not live services.
+inventory, payment choices, Mark as paid, cancellation per payment choice, the
+hourly follow-ups, the public rate-limit fallback and preservation of public
+checkout rules. Provider tests use in-memory fakes, not live services.
 
-The password and Google sign-in update is authorized and pending; provider
-migration, production prebuild verification and post-deployment sign-in checks
-still need to finish at this checkpoint. This does not change the status of the
-previous copy release, which is already live. Google sign-in remains unavailable
-until its provider setup is completed and the application flag is enabled.
-Automated validation does not create real reservations, invoices, charges or
-client emails, and does not claim an end-to-end paid booking test. Any such
-operational test must stay within the exact external actions authorized by Tay.
+Status on September 28, 2026: email/password sign-in and Continue with Google
+are live in production, with no mandatory authenticator step. Automated
+validation does not create real reservations, invoices, charges or client
+emails. These remain unverified live: invitation and reset email delivery, a
+paid employee booking end to end, the internal New Booking email, and how
+Stripe reports `amount_paid` for an invoice paid out of band on API version
+`2026-02-25.clover` (the code accepts either 0 or the full amount, but only 0
+labels a payment marked in the Stripe dashboard as Paid (other); confirm in
+Stripe test mode). Any such operational test must stay within the exact
+external actions authorized by Tay.
